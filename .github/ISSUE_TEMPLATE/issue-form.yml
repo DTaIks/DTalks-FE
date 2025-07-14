@@ -23,6 +23,7 @@ body:
         - hotfix
         - refactor
         - test
+        - add
     validations:
       required: true
 
