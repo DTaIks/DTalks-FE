@@ -12,7 +12,6 @@ body:
         예시:
         feat/DTalks-101-login-page  
         fix/DTalks-202-api-error-fix  
-        ```
 
   - type: dropdown
     id: branchType
