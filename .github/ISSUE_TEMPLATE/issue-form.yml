@@ -1,12 +1,9 @@
 name: "이슈 생성"
 description: |
   GitHub에서 이슈를 생성하면, 해당 이슈를 기반으로 브랜치를 생성하여 작업을 시작할 수 있습니다.
-
   ✅ 브랜치 이름은 아래 형식을 따라 주세요:
-  → 예시: `feat/DTalks-101-login-page`, `refactor/DTalks-205-cleanup-code`
-
+ex) feat/DTalks-101-login-page, refactor/DTalks-205-cleanup-code
 title: "이슈 이름을 작성해주세요"
-
 body:
   - type: dropdown
     id: branchType
@@ -21,4 +18,23 @@ body:
         - test
         - add
     validations:
-      required:
+      required: true
+
+  - type: input
+    id: description
+    attributes:
+      label: "📝 상세 내용(Description)"
+      description: "이슈에 대해서 간략히 설명해 주세요"
+    validations:
+      required: true
+
+  - type: textarea
+    id: tasks
+    attributes:
+      label: "✅ 체크리스트(Tasks)"
+      description: "이 작업에서 수행해야 할 내용을 작성해 주세요"
+      value: |
+        - [ ] 작업 항목 1
+        - [ ] 작업 항목 2
+    validations:
+      required: true
