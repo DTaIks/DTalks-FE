@@ -3,15 +3,6 @@ description: "GitHub에서 이슈를 생성하면, 해당 이슈를 기반으로
 labels: [feat]
 title: "이슈 이름을 작성해주세요"
 body:
-  - type: input
-    id: parentKey
-    attributes:
-      label: "🎟️ 상위 이슈 키"
-      description: "연결할 상위 이슈의 Ticket Number를 입력해 주세요 (예: DTalks-27)"
-      placeholder: "DTalks-00"
-    validations:
-      required: true
-
   - type: dropdown
     id: branchType
     attributes:
