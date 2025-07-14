@@ -1,12 +1,62 @@
-# React + Vite
+# FE
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+DTalks 프론트엔드 레포지토리
 
-Currently, two official plugins are available:
+## 🧷 Git 작업 컨벤션 (Branch / Commit / PR)
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+### 📂 브랜치 네이밍 규칙
 
-## Expanding the ESLint configuration
+예시:
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+- `feat/DTalks-31-login-api`
+- `fix/DTalks-27-comment-delete-bug`
+- `test/DTalks-40-user-service-test`
+
+**타입 목록:**
+
+| 타입       | 설명                                |
+| ---------- | ----------------------------------- |
+| `feat`     | 새로운 기능 추가                    |
+| `fix`      | 버그 수정                           |
+| `refactor` | 리팩토링 (기능 변경 없이 코드 개선) |
+| `test`     | 테스트 코드 관련                    |
+| `hotfix`   | 긴급 수정                           |
+
+---
+
+### 💬 커밋 메시지 컨벤션.
+
+예시:
+
+```
+feat: 로그인 성공 시 홈 리디렉션 구현
+
+- 로그인 성공 시 api/home 으로 이동
+
+resolves: #12
+```
+
+> 🔹 `resolves: #12` → PR 머지 시 GitHub 이슈 자동 닫힘
+
+**타입 목록:**
+
+| 타입              | 설명                                                                                    |
+| ----------------- | --------------------------------------------------------------------------------------- |
+| `feat`            | 새로운 기능 추가                                                                        |
+| `fix`             | 버그 수정                                                                               |
+| `refactor`        | 리팩토링 (기능 변경 없이 코드 개선)                                                     |
+| `test`            | 테스트 코드 관련                                                                        |
+| `style`           | 코드 포맷팅, 세미콜론 누락, 코드 변경이 없는 경우                                       |
+| `chore`           | 빌드 설정 등 코드가 아닌 유지 보수 관련된 작업                                          |
+| `docs`            | 문서 수정                                                                               |
+| `BREAKING CHANGE` | 기존 기능을 크게 변경했을 때 </br> 다른 부분에 영향을 미치는 중요한 변경 사항이 있을 때 |
+
+---
+
+### 🔁 작업 프로세스 요약
+
+1. GitHub 이슈 생성 시 → 브랜치 자동 생성
+2. 브랜치로 이동해 작업 수행
+3. 커밋 시 `resolves` 포함
+4. PR 작성 → 템플릿에 맞춰 작성
+5. PR 머지 시 → GitHub 이슈 자동 닫힘
