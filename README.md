@@ -1,69 +1,63 @@
-# React + TypeScript + Vite
+# FE
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+DTalks 프론트엔드 레포지토리
 
-Currently, two official plugins are available:
+## 🧷 Git 작업 컨벤션 (Branch / Commit / PR)
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+### 📂 브랜치 네이밍 규칙
 
-## Expanding the ESLint configuration
+예시:
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+- `feat/#31-login-api`
+- `fix/#27-comment-delete-bug`
+- `test/#40-user-service-test`
 
-```js
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+**타입 목록:**
 
-      // Remove tseslint.configs.recommended and replace with this
-      ...tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      ...tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      ...tseslint.configs.stylisticTypeChecked,
+| 타입       | 설명                                |
+| ---------- | ----------------------------------- |
+| `feat`     | 새로운 기능 추가                    |
+| `fix`      | 버그 수정                           |
+| `refactor` | 리팩토링 (기능 변경 없이 코드 개선) |
+| `test`     | 테스트 코드 관련                    |
+| `hotfix`   | 긴급 수정                           |
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+---
+
+### 💬 커밋 메시지 컨벤션.
+
+예시:
+
+```
+feat: 로그인 성공 시 홈 리디렉션 구현
+
+- 로그인 성공 시 api/home 으로 이동
+
+resolves: #12
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+> 🔹 `resolves: #12` → PR 머지 시 GitHub 이슈 자동 닫힘
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+**타입 목록:**
 
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+| 타입              | 설명                                                                                    |
+| ----------------- | --------------------------------------------------------------------------------------- |
+| `feat`            | 새로운 기능 추가                                                                        |
+| `fix`             | 버그 수정                                                                               |
+| `refactor`        | 리팩토링 (기능 변경 없이 코드 개선)                                                     |
+| `test`            | 테스트 코드 관련                                                                        |
+| `style`           | 코드 포맷팅, 세미콜론 누락, 코드 변경이 없는 경우                                       |
+| `chore`           | 빌드 설정 등 코드가 아닌 유지 보수 관련된 작업                                          |
+| `docs`            | 문서 수정                                                                               |
+| `BREAKING CHANGE` | 기존 기능을 크게 변경했을 때 </br> 다른 부분에 영향을 미치는 중요한 변경 사항이 있을 때 |
+| `mod`             | 코드 및 내부 파일 수정                                                                  |
+
+---
+
+### 🔁 작업 프로세스 요약
+
+1. GitHub 이슈 생성 시 → 브랜치 자동 생성
+2. 브랜치로 이동해 작업 수행
+3. 커밋 시 `resolves` 포함
+4. PR 작성 → 템플릿에 맞춰 작성
+5. PR 머지 시 → GitHub 이슈 자동 닫힘
