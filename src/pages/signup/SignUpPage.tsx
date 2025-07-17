@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
 
 import InputField from '../../components/common/InputField';
-import ActionButton from '../../components/signup/ActionButton';
+import Button from '../../components/common/Button';
 import Logo from '../../assets/common/Logo.png';
 
 // 추후에 백엔드 측에서 설정한 시간으로 변경
@@ -380,10 +380,10 @@ export default function SignUpPage(): JSX.Element {
             infoTextColor={getMessageColor('passwordCheck')}
           />
 
-          <ActionButton
+          <Button
+            text="회원가입"
             type="submit"
             variant="submit"
-            text="회원가입"
             disabled={!isSubmitEnabled()}
             fontSize="16px"
             style={{ marginTop: '60px' }}

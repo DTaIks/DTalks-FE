@@ -22,7 +22,8 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
       <BrowserRouter>
         <App />
       </BrowserRouter>
-      <ReactQueryDevtools initialIsOpen={false} />
+      {/* React Query DevTools - 개발 중 쿼리 상태, 캐시, 네트워크 요청을 실시간으로 모니터링하는 도구 */}
+      {/* <ReactQueryDevtools initialIsOpen={false} /> */}
     </QueryClientProvider>
   </React.StrictMode>
 );

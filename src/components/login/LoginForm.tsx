@@ -2,6 +2,7 @@ import React from 'react';
 import styled from "styled-components";
 import InputField from "../common/InputField";
 import EmailInputField from "./EmailInputField";
+import Button from "../common/Button";
 
 interface LoginFormProps {
   className?: string;
@@ -59,59 +60,6 @@ const WelcomeTitle = styled.h1`
   @media screen and (max-width: 450px) {
     font-size: var(--font-size-19);
     line-height: 17px;
-  }
-`;
-
-const LoginButtonText = styled.div`
-  position: relative;
-  font-size: var(--font-size-22);
-  line-height: 24px;
-  font-weight: 600;
-  font-family: var(--font-pretendard);
-  color: var(--color-white);
-  text-align: left;
-  @media screen and (max-width: 450px) {
-    font-size: var(--font-size-18);
-    line-height: 19px;
-  }
-`;
-
-const LoginButtonInner = styled.div`
-  flex: 1;
-  border-radius: var(--br-8);
-  background-color: var(--color-mediumpurple-300);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: var(--padding-12);
-  box-sizing: border-box;
-  max-width: 100%;
-  transition: all 0.2s ease;
-`;
-
-const LoginButton = styled.button<{ disabled?: boolean }>`
-  cursor: ${props => props.disabled ? 'not-allowed' : 'pointer'};
-  border: none;
-  padding: 0.5px 0px 0px;
-  background-color: transparent;
-  flex: 1;
-  overflow: hidden;
-  display: flex;
-  flex-direction: row;
-  align-items: flex-start;
-  justify-content: flex-start;
-  box-sizing: border-box;
-  max-width: 100%;
-  z-index: 1;
-  transition: transform 0.2s ease;
-
-  &:hover:not(:disabled) {
-    ${LoginButtonInner} {
-      background-color: #7742A7;
-      box-shadow: 0 4px 8px rgba(119, 66, 167, 0.3);
-      transform: scale(1.02);
-    }
   }
 `;
 
@@ -182,6 +130,20 @@ const ErrorMessage = styled.div`
   text-align: center;
 `;
 
+const ForgotPasswordLink = styled.a`
+  color: var(--color-mediumpurple-300);
+  font-size: 14px;
+  text-decoration: none;
+  cursor: pointer;
+  margin-bottom: 8px;
+  align-self: flex-end;
+  
+  &:hover {
+    text-decoration: underline;
+    color: #7742A7;
+  }
+`;
+
 const LoginForm: React.FC<LoginFormProps> = ({ 
   className = "",
   email = "",
@@ -222,14 +184,17 @@ const LoginForm: React.FC<LoginFormProps> = ({
           onChange={onPasswordChange}
         />
         {error && <ErrorMessage>{error}</ErrorMessage>}
+        <ForgotPasswordLink href="/forgot-password">
+          비밀번호 찾기
+        </ForgotPasswordLink>
         <LoginButtonWrapper>
-          <LoginButton type="submit" disabled={isLoading}>
-            <LoginButtonInner>
-              <LoginButtonText>
-                {isLoading ? '로그인 중...' : '로그인'}
-              </LoginButtonText>
-            </LoginButtonInner>
-          </LoginButton>
+          <Button
+            text="로그인"
+            type="submit"
+            variant="login"
+            disabled={isLoading}
+            isLoading={isLoading}
+          />
         </LoginButtonWrapper>
       </Form>
     </LoginFormContainer>
