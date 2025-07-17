@@ -57,35 +57,6 @@ const SignUpContainer = styled.div`
   width: 520px;
 `;
 
-const DemoAccountsContainer = styled.div`
-  position: absolute;
-  top: 750px;
-  left: calc(50% - 200px);
-  background: rgba(255, 255, 255, 0.9);
-  border-radius: 8px;
-  padding: 16px;
-  font-size: 14px;
-  color: #666;
-  text-align: left;
-  max-width: 400px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-`;
-
-const DemoAccount = styled.div`
-  margin-bottom: 8px;
-  
-  &:last-child {
-    margin-bottom: 0;
-  }
-`;
-
-const DemoTitle = styled.div`
-  font-weight: 600;
-  color: #333;
-  margin-bottom: 8px;
-  text-align: center;
-`;
-
 const LoginPageContainer = styled.div`
   width: 100%;
   position: relative;
@@ -159,19 +130,6 @@ export default function LoginPage(): JSX.Element {
         isLoading={loginMutation.isPending}
         error={error || errors.email?.message || errors.password?.message}
       />
-      <DemoAccountsContainer>
-        <DemoTitle>🧪 데모 계정</DemoTitle>
-        <DemoAccount>
-          <strong>테스트 사용자:</strong> test@example.com / 123456
-        </DemoAccount>
-        <DemoAccount>
-          <strong>관리자:</strong> admin@dtalks.com / admin123
-        </DemoAccount>
-        <DemoAccount>
-          <strong>일반 사용자:</strong> user@dtalks.com / user123
-        </DemoAccount>
-      </DemoAccountsContainer>
-      
       <SignUpContainer>
         <SignUpText>{`처음이신가요? `}</SignUpText>
         <SignUpText>

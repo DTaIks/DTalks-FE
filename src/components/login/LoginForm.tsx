@@ -1,7 +1,6 @@
 import React from 'react';
 import styled from "styled-components";
 import InputField from "../common/InputField";
-import EmailInputField from "./EmailInputField";
 import Button from "../common/Button";
 
 interface LoginFormProps {
@@ -125,14 +124,14 @@ const LoginFormContainer = styled.div`
 
 const ErrorMessage = styled.div`
   color: #f44336;
-  font-size: 14px;
+  font-size: 16px;
   margin-top: 8px;
   text-align: center;
 `;
 
 const ForgotPasswordLink = styled.a`
   color: var(--color-mediumpurple-300);
-  font-size: 14px;
+  font-size: 16px;
   text-decoration: none;
   cursor: pointer;
   margin-bottom: 8px;
@@ -168,9 +167,11 @@ const LoginForm: React.FC<LoginFormProps> = ({
         <WelcomeTitle>다시 만나서 반가워요 :)</WelcomeTitle>
       </TitleWrapper>
       <Form onSubmit={handleSubmit}>
-        <EmailInputField 
-          title="아이디" 
+        <InputField
+          variant="login"
+          title="아이디"
           placeholder="이메일을 입력하세요."
+          type="email"
           value={email}
           onChange={onEmailChange}
         />
