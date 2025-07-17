@@ -8,9 +8,9 @@ DTalks 프론트엔드 레포지토리
 
 예시:
 
-- `feat/#31-login-api`
-- `fix/#27-comment-delete-bug`
-- `test/#40-user-service-test`
+- `feat/31-login-api`
+- `fix/27-comment-delete-bug`
+- `test/40-user-service-test`
 
 **타입 목록:**
 
@@ -29,7 +29,7 @@ DTalks 프론트엔드 레포지토리
 예시:
 
 ```
-feat: 로그인 성공 시 홈 리디렉션 구현
+feat #12 : 로그인 성공 시 홈 리디렉션 구현
 
 - 로그인 성공 시 api/home 으로 이동
 
