@@ -39,6 +39,7 @@ body {
   --padding-10: 10px;
   --padding-11: 11px;
   --padding-12: 12px;
+  --padding-17: 17px;
   --padding-20: 20px;
   --padding-32: 32px;
   --padding-60: 60px;
@@ -57,7 +58,9 @@ body {
   --font-size-18: 18px;
   --font-size-19: 19px;
   --font-size-20: 20px;
+  --font-size-24: 24px;
   --font-size-22: 22px;
   --font-size-26: 26px;
   --font-size-32: 32px;
+  --font-size-42: 42px;
 } 
