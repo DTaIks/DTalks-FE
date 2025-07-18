@@ -1,6 +1,6 @@
 import styled from "styled-components";
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import LogoImage from "../assets/common/Small_Logo.png";
 
 export type SidebarProps = {
@@ -168,7 +168,7 @@ const SubMenuItem = styled.div<SubMenuItemProps>`
 `;
 
 const ActiveSubMenuItem = styled(SubMenuItem)`
-  color: var(--color-mediumpurple-100);
+  color: var(--color-dimgray);
 `;
 
 // 메뉴 데이터 정의
@@ -191,7 +191,7 @@ const menuData = [
         text: "사용자 관리",
         isDropdown: true,
         subItems: [
-          { key: MENU_ITEMS.USER_LIST, text: "사용자 목록", isActive: true },
+          { key: MENU_ITEMS.USER_LIST, text: "사용자 목록" },
           { key: MENU_ITEMS.PERMISSION, text: "권한 관리" }
         ]
       }
@@ -243,6 +243,7 @@ const menuData = [
 
 const Sidebar = ({ className = "" }: SidebarProps) => {
   const navigate = useNavigate();
+  const location = useLocation();
   const [openMenus, setOpenMenus] = useState<Record<string, boolean>>({
     [DROPDOWN_MENUS.DOCUMENT]: false,
     [DROPDOWN_MENUS.FAQ]: false,
@@ -297,7 +298,8 @@ const Sidebar = ({ className = "" }: SidebarProps) => {
           </MenuItem>
           <SubMenuContainer isOpen={openMenus[item.key]}>
             {item.subItems.map((subItem: any) => {
-              const SubMenuItemComponent = subItem.isActive ? ActiveSubMenuItem : SubMenuItem;
+              const isCurrentPath = location.pathname === `/admin/${subItem.key.toLowerCase().replace('_', '')}`;
+              const SubMenuItemComponent = isCurrentPath ? ActiveSubMenuItem : SubMenuItem;
               return (
                 <SubMenuItemComponent
                   key={subItem.key}

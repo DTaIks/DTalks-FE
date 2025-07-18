@@ -1,6 +1,7 @@
 import styled from "styled-components";
 import UserTable from "../../components/admin/UserTable";
 import Pagination from "../../components/admin/Pagination";
+import UserTitleContainer from "../../layout/TitleContainer";
 
 const Container = styled.div`
   width: 100%;
@@ -10,6 +11,7 @@ const Container = styled.div`
 const UserListPage = () => {
   return (
     <Container>
+      <UserTitleContainer />
       <UserTable />
       <Pagination />
     </Container>
