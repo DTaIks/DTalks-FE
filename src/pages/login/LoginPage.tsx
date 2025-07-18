@@ -90,10 +90,10 @@ export default function LoginPage(): JSX.Element {
   // React Query mutation
   const loginMutation = useLogin();
 
-  // 이미 로그인된 경우 홈페이지로 리다이렉트
+  // 이미 로그인된 경우 대시보드로 리다이렉트
   useEffect(() => {
     if (isAuthenticated) {
-      navigate('/');
+      navigate('/dashboard');
     }
   }, [isAuthenticated, navigate]);
 

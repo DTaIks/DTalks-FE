@@ -1,5 +1,4 @@
 import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
 
 interface User {
   id: string;
@@ -25,49 +24,40 @@ interface AuthState {
 }
 
 export const useAuthStore = create<AuthState>()(
-  persist(
-    (set) => ({
-      // 초기 상태
-      user: null,
-      isAuthenticated: false,
-      isLoading: false,
-      error: null,
+  (set) => ({
+    // 초기 상태
+    user: null,
+    isAuthenticated: false,
+    isLoading: false,
+    error: null,
 
-      // 순수한 상태 변경 액션들
-      setUser: (user) => {
-        set({ user });
-      },
+    // 순수한 상태 변경 액션들
+    setUser: (user) => {
+      set({ user });
+    },
 
-      setAuthenticated: (isAuthenticated) => {
-        set({ isAuthenticated });
-      },
+    setAuthenticated: (isAuthenticated) => {
+      set({ isAuthenticated });
+    },
 
-      setLoading: (loading) => {
-        set({ isLoading: loading });
-      },
+    setLoading: (loading) => {
+      set({ isLoading: loading });
+    },
 
-      setError: (error) => {
-        set({ error });
-      },
+    setError: (error) => {
+      set({ error });
+    },
 
-      clearError: () => {
-        set({ error: null });
-      },
+    clearError: () => {
+      set({ error: null });
+    },
 
-      logout: () => {
-        set({
-          user: null,
-          isAuthenticated: false,
-          error: null,
-        });
-      },
-    }),
-    {
-      name: 'auth-storage',
-      partialize: (state) => ({
-        user: state.user,
-        isAuthenticated: state.isAuthenticated,
-      }),
-    }
-  )
+    logout: () => {
+      set({
+        user: null,
+        isAuthenticated: false,
+        error: null,
+      });
+    },
+  })
 ); 

@@ -432,7 +432,6 @@ const FormWrapper = styled.div`
   height: 960px;
   flex-shrink: 0;
   border-radius: 25px;
-  box-shadow: 0 4px 16px rgba(0,0,0,0.1);
 `;
 
 const Title = styled.h2`
