@@ -10,11 +10,12 @@ body {
 }
 
 :root {
-  /* Color */
+  /* 색상 변수들 */
   --color-darkslateblue: #764ba2;
   --color-slateblue: #804db3;
   --color-red: #f01a1d;
   --color-darkgray: #a1a1a1;
+  --color-dimgray: #666666;
   --color-mediumpurple-500: rgba(156, 112, 201, 0.09);
   --color-mediumpurple-400: #8061b0;
   --color-mediumpurple-300: #9966cc;
@@ -26,7 +27,7 @@ body {
   --color-white: #fff;
   --color-ghostwhite: #f8f2fb;
 
-  /* Gap */
+  /* 간격 설정 */
   --gap-6: 6px;
   --gap-12: 12px;
   --gap-16: 16px;
@@ -37,7 +38,7 @@ body {
   --gap-40: 40px;
   --gap-48: 48px;
 
-  /* Padding */
+  /* 패딩 값들 */
   --padding-1: 1px;
   --padding-2: 2px;
   --padding-6: 6px;
@@ -50,15 +51,15 @@ body {
   --padding-60: 60px;
   --padding-100: 100px;
 
-  /* BorderRadius */
+  /* 모서리 둥글기 */
   --br-5: 5px;
   --br-6: 6px;
   --br-8: 8px;
 
-  /* Font */
+  /* 폰트 설정 */
   --font-pretendard: Pretendard;
 
-  /* FontSize */
+  /* 글자 크기 */
   --font-size-16: 16px;
   --font-size-18: 18px;
   --font-size-19: 19px;
@@ -68,31 +69,31 @@ body {
   --font-size-26: 26px;
   --font-size-32: 32px;
 
-  /* Page Scale Variables - Default for larger screens */
+  /* 페이지 크기 조절 - 기본값 (큰 화면용) */
   --page-scale-userlist: 1;
 
-  /* Responsive Scale for Different Viewport Sizes */
-  /* 100% viewport (1436x766) - smaller scale needed */
+  /* 화면 크기별 반응형 조절 */
+  /* 작은 화면 (1436x766) - 더 작게 조절 */
   @media screen and (max-width: 1440px) and (max-height: 800px) {
     --page-scale-userlist: 0.75;
   }
 
-  /* 75% viewport (1915x1022) - medium scale */
-  @media screen and (min-width: 1441px) and (max-width: 1920px) and (max-height: 1100px) {
-    --page-scale-userlist: 0.75;
-  }
-
-  /* Large screens - full scale */
-  @media screen and (min-width: 1921px) {
-    --page-scale-userlist: 0.75;
-  }
-
-  /* 90% viewport (1596x851) - adjust scale */
+  /* 중간 크기 화면 (1596x851) - 조절 */
   @media screen and (min-width: 1441px) and (max-width: 1600px) and (max-height: 900px) {
     --page-scale-userlist: 0.75;
   }
 
-  /* Apply scale to UserListPage */
+  /* 중간 화면 (1915x1022) - 적당히 조절 */
+  @media screen and (min-width: 1441px) and (max-width: 1920px) and (max-height: 1100px) {
+    --page-scale-userlist: 0.75;
+  }
+
+  /* 큰 화면 - 원본 크기 */
+  @media screen and (min-width: 1921px) {
+    --page-scale-userlist: 0.75;
+  }
+
+  /* 사용자 목록 페이지에 크기 조절 적용 */
   .user-list-page {
     transform: scale(var(--page-scale-userlist));
     transform-origin: center top;
