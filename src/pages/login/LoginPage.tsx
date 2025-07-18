@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import styled from "styled-components";
 import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
@@ -7,7 +7,6 @@ import * as yup from 'yup';
 import LoginForm from "../../components/login/LoginForm";
 import Logo from "../../assets/common/Logo.png";
 import { useAuthStore } from '../../store/authStore';
-import { useLogin } from '../../hooks/useAuth';
 
 // 유효성 검사 스키마
 const loginSchema = yup.object({
@@ -22,6 +21,31 @@ const loginSchema = yup.object({
 }).required();
 
 type LoginFormData = yup.InferType<typeof loginSchema>;
+
+// 더미 사용자 데이터
+const mockUsers = [
+  {
+    id: '1',
+    email: 'test@example.com',
+    password: '123456',
+    name: '테스트 사용자',
+    employeeNumber: 'EMP001'
+  },
+  {
+    id: '2', 
+    email: 'admin@dtalks.com',
+    password: 'admin123',
+    name: '관리자',
+    employeeNumber: 'EMP002'
+  },
+  {
+    id: '3',
+    email: 'user@dtalks.com', 
+    password: 'user123',
+    name: '일반 사용자',
+    employeeNumber: 'EMP003'
+  }
+];
 
 const LogoImage = styled.img`
   position: absolute;
@@ -71,6 +95,7 @@ const LoginPageContainer = styled.div`
 
 export default function LoginPage(): JSX.Element {
   const navigate = useNavigate();
+  const [isLoading, setIsLoading] = useState(false);
   
   // React Hook Form 설정
   const {
@@ -85,27 +110,47 @@ export default function LoginPage(): JSX.Element {
   });
 
   // Zustand store에서 상태 가져오기
-  const { isAuthenticated, error, clearError } = useAuthStore();
-  
-  // React Query mutation
-  const loginMutation = useLogin();
+  const { isAuthenticated, error, setUser, setAuthenticated, setLoading, setError, clearError } = useAuthStore();
 
-  // 이미 로그인된 경우 대시보드로 리다이렉트
+  // 이미 로그인된 경우 어드민 페이지로 리다이렉트
   useEffect(() => {
     if (isAuthenticated) {
-      navigate('/dashboard');
+      navigate('/admin');
     }
   }, [isAuthenticated, navigate]);
 
-  // 폼 제출 핸들러
-  const onSubmit = async (data: LoginFormData): Promise<void> => {
+  // 로그인 함수
+  const handleLogin = async (data: LoginFormData): Promise<void> => {
     try {
-      await loginMutation.mutateAsync({ 
-        email: data.email, 
-        password: data.password 
+      setIsLoading(true);
+      setError(null);
+      
+      // 1초 지연 시뮬레이션
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      // 더미 데이터에서 사용자 찾기
+      const user = mockUsers.find(u => 
+        u.email === data.email && u.password === data.password
+      );
+      
+      if (!user) {
+        throw new Error('이메일 또는 비밀번호가 올바르지 않습니다.');
+      }
+      
+      // 로그인 성공
+      setUser({
+        id: user.id,
+        email: user.email,
+        name: user.name,
+        employeeNumber: user.employeeNumber
       });
-      // 로그인 성공 시 리다이렉트는 useEffect에서 처리
+      setAuthenticated(true);
+      setLoading(false);
+      setError(null);
+      
     } catch (error) {
+      setLoading(false);
+      setError(error instanceof Error ? error.message : '로그인에 실패했습니다.');
       console.error('로그인 실패:', error);
     }
   };
@@ -126,8 +171,8 @@ export default function LoginPage(): JSX.Element {
         password={password}
         onEmailChange={(e) => setValue('email', e.target.value)}
         onPasswordChange={(e) => setValue('password', e.target.value)}
-        onLogin={handleSubmit(onSubmit)}
-        isLoading={loginMutation.isPending}
+        onLogin={handleSubmit(handleLogin)}
+        isLoading={isLoading}
         error={error || errors.email?.message || errors.password?.message}
       />
       <SignUpContainer>

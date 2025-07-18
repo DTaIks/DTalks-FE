@@ -1,4 +1,3 @@
-import { useEffect } from "react";
 import styled, { keyframes } from "styled-components";
 
 const ActivePageBackground = styled.div`
@@ -30,9 +29,9 @@ const InactivePageBackground = styled.div`
   position: absolute;
   top: 0rem;
   left: 0rem;
-  border-radius: var(--br-5);
-  background-color: var(--color-white);
-  border: 0.5px solid var(--color-lightgray);
+  border-radius: 5px;
+  background: rgba(255, 255, 255, 0.35);
+  border: 0.5px solid #CCC;
   box-sizing: border-box;
   width: 2.375rem;
   height: 2.375rem;
@@ -64,9 +63,9 @@ const NextButtonBackground = styled.div`
   position: absolute;
   top: 0rem;
   left: 0rem;
-  border-radius: var(--br-5);
-  background-color: var(--color-white);
-  border: 0.5px solid var(--color-lightgray);
+  border-radius: 5px;
+  background: rgba(255, 255, 255, 0.35);
+  border: 0.5px solid #CCC;
   box-sizing: border-box;
   width: 3.75rem;
   height: 2.375rem;
@@ -84,9 +83,9 @@ const PrevButtonBackground = styled.div`
   position: absolute;
   top: 0rem;
   left: 0rem;
-  border-radius: var(--br-5);
-  background-color: var(--color-gray-100);
-  border: 0.5px solid var(--color-lightgray);
+  border-radius: 5px;
+  background: rgba(255, 255, 255, 0.35);
+  border: 0.5px solid #CCC;
   box-sizing: border-box;
   width: 3.75rem;
   height: 2.375rem;

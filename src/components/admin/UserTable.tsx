@@ -1,11 +1,28 @@
 import styled from "styled-components";
 
+interface User {
+  id: number;
+  name: string;
+  department: string;
+  role: string;
+  email: string;
+  top: string;
+}
+
+const Wrapper = styled.div`
+  position: absolute;
+  top: 275px;
+  left: 458px;
+  width: 1413px;
+  height: 434px;
+`;
+
 const Container = styled.div`
   position: absolute;
   top: 0px;
   left: 0px;
   box-shadow: 0px 0px 15px 3px rgba(153, 102, 204, 0.05);
-  border-radius: 25px;
+  border-radius: var(--br-8);
   background-color: var(--color-white);
   width: 1413px;
   height: 434px;
@@ -37,21 +54,19 @@ const HeaderCell = styled.div`
   position: absolute;
   top: 152px;
   font-weight: 600;
-  color: var(--color-midnightblue);
+  font-size: var(--font-size-24);
+  color: var(--color-dimgray);
 `;
 
 const NameColumn = styled(HeaderCell)`
   left: 49px;
 `;
-
 const DepartmentColumn = styled(HeaderCell)`
   left: 327px;
 `;
-
 const RoleColumn = styled(HeaderCell)`
   left: 630px;
 `;
-
 const EmailColumn = styled(HeaderCell)`
   left: 1000px;
   display: inline-block;
@@ -61,20 +76,18 @@ const EmailColumn = styled(HeaderCell)`
 const DataCell = styled.div`
   position: absolute;
   font-weight: 500;
+  font-size: var(--font-size-24);
+  color: var(--color-black);
 `;
-
 const NameCell = styled(DataCell)`
   left: 49px;
 `;
-
 const DepartmentCell = styled(DataCell)`
   left: 327px;
 `;
-
 const RoleCell = styled(DataCell)`
   left: 630px;
 `;
-
 const EmailCell = styled(DataCell)`
   left: 1000px;
   display: inline-block;
@@ -85,25 +98,20 @@ const Title = styled.b`
   position: absolute;
   top: 49px;
   left: 48px;
-  font-size: 26px;
+  font-size: var(--font-size-26);
+  color: var(--color-black);
 `;
 
-const SearchBox = styled.div`
-  position: absolute;
-  top: 0px;
-  left: 0px;
+const SearchInput = styled.input`
   border-radius: var(--br-5);
-  border: 1px solid var(--color-lightgray);
-  box-sizing: border-box;
+  border: 1px solid var(--color-darkgray);
   width: 240px;
   height: 45px;
-`;
-
-const SearchText = styled.div`
-  position: absolute;
-  top: 11px;
-  left: 20px;
-  font-weight: 500;
+  padding: 0 var(--padding-20);
+  font-size: var(--font-size-20);
+  color: var(--color-darkgray);
+  box-sizing: border-box;
+  outline: none;
 `;
 
 const SearchContainer = styled.div`
@@ -112,19 +120,9 @@ const SearchContainer = styled.div`
   left: 1125px;
   width: 240px;
   height: 45px;
-  font-size: var(--font-size-20);
-  color: var(--color-lightgray);
 `;
 
-const Wrapper = styled.div`
-  position: absolute;
-  top: 275px;
-  left: 458px;
-  width: 1413px;
-  height: 434px;
-`;
-
-const userData = [
+const userData: User[] = [
   {
     id: 1,
     name: "이주원",
@@ -161,7 +159,6 @@ const UserTable = () => {
       <RoleColumn>역할</RoleColumn>
       <EmailColumn>이메일</EmailColumn>
       <HeaderDivider />
-      
       {userData.map((user) => (
         <div key={user.id}>
           <NameCell style={{ top: user.top }}>{user.name}</NameCell>
@@ -170,11 +167,9 @@ const UserTable = () => {
           <EmailCell style={{ top: user.top }}>{user.email}</EmailCell>
         </div>
       ))}
-      
       <Title>사용자 목록</Title>
       <SearchContainer>
-        <SearchBox />
-        <SearchText>이름으로 검색</SearchText>
+        <SearchInput placeholder="이름으로 검색" />
       </SearchContainer>
     </Wrapper>
   );

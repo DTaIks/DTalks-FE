@@ -70,34 +70,42 @@ body {
   --font-size-32: 32px;
 
   /* 페이지 크기 조절 - 기본값 (큰 화면용) */
-  --page-scale-userlist: 1;
+  --page-scale: 1;
+}
 
-  /* 화면 크기별 반응형 조절 */
-  /* 작은 화면 (1436x766) - 더 작게 조절 */
-  @media screen and (max-width: 1440px) and (max-height: 800px) {
-    --page-scale-userlist: 0.75;
+/* 화면 크기별 반응형 조절 */
+/* 작은 화면 (1436x766) - 더 작게 조절 */
+@media screen and (max-width: 1440px) and (max-height: 800px) {
+  :root {
+    --page-scale: 0.75;
   }
+}
 
-  /* 중간 크기 화면 (1596x851) - 조절 */
-  @media screen and (min-width: 1441px) and (max-width: 1600px) and (max-height: 900px) {
-    --page-scale-userlist: 0.75;
+/* 중간 크기 화면 (1596x851) - 조절 */
+@media screen and (min-width: 1441px) and (max-width: 1600px) and (max-height: 900px) {
+  :root {
+    --page-scale: 0.75;
   }
+}
 
-  /* 중간 화면 (1915x1022) - 적당히 조절 */
-  @media screen and (min-width: 1441px) and (max-width: 1920px) and (max-height: 1100px) {
-    --page-scale-userlist: 0.75;
+/* 중간 화면 (1915x1022) - 적당히 조절 */
+@media screen and (min-width: 1441px) and (max-width: 1920px) and (max-height: 1100px) {
+  :root {
+    --page-scale: 0.75;
   }
+}
 
-  /* 큰 화면 - 원본 크기 */
-  @media screen and (min-width: 1921px) {
-    --page-scale-userlist: 0.75;
+/* 큰 화면 - 원본 크기 */
+@media screen and (min-width: 1921px) {
+  :root {
+    --page-scale: 0.75;
   }
+}
 
-  /* 사용자 목록 페이지에 크기 조절 적용 */
-  .user-list-page {
-    transform: scale(var(--page-scale-userlist));
-    transform-origin: center top;
-    width: calc(100% / var(--page-scale-userlist));
-    margin-left: calc((100% - 100% / var(--page-scale-userlist)) / 2);
-  }
+/* 페이지 크기 조절 적용 */
+.page-scale {
+  transform: scale(var(--page-scale));
+  transform-origin: center top;
+  width: calc(100% / var(--page-scale));
+  margin-left: calc((100% - 100% / var(--page-scale)) / 2);
 }
