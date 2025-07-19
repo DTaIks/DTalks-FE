@@ -2,9 +2,7 @@ import AppRoutes from './routes/Route';
 import './styles/Global.css';
 
 function App() {
-  return (
-    <AppRoutes />
-  )
+  return <AppRoutes />;
 }
 
-export default App
+export default App;
