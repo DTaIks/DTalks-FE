@@ -34,10 +34,8 @@ const ChartPage: React.FC = () => {
 
   return (
     <PageContainer>
-      <Header>
-        <h1>통계</h1>
-        <p>챗봇 성능 사용자 데이터를 분석하세요</p>
-      </Header>
+      <PageTitle>통계</PageTitle>
+      <PageDescription>챗봇 성능과 사용자 데이터를 분석하세요</PageDescription>
 
       <StatsContainer1>
         {statCards.map((card, index) => (
@@ -69,22 +67,18 @@ const PageContainer = styled.div`
   padding: 183px 60px 120px 460px;
 `;
 
-const Header = styled.div`
-  margin-bottom: 30px;
+const PageTitle = styled.h1`
+  color: #323232;
+  font-size: var(--font-size-42);
+  font-weight: 700;
+  margin: 0 0 8px 0;
+`;
 
-  h1 {
-    color: #323232;
-    font-size: var(--font-size-42);
-    font-weight: 700;
-    margin: 0 0 8px 0;
-  }
-
-  p {
-    color: #323232;
-    font-size: var(--font-size-24);
-    font-weight: 400;
-    padding-bottom: 60px;
-  }
+const PageDescription = styled.p`
+  color: #323232;
+  font-size: var(--font-size-24);
+  font-weight: 400;
+  padding-bottom: 60px;
 `;
 
 const StatsContainer1 = styled.div`
