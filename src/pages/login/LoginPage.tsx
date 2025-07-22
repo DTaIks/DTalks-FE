@@ -164,23 +164,25 @@ export default function LoginPage(): JSX.Element {
   const password = watch('password') || '';
 
   return (
-    <LoginPageContainer>
-      <LogoImage alt="로고" src={Logo} onClick={() => navigate('/')} />
-      <LoginForm 
-        email={email}
-        password={password}
-        onEmailChange={(e) => setValue('email', e.target.value)}
-        onPasswordChange={(e) => setValue('password', e.target.value)}
-        onLogin={handleSubmit(handleLogin)}
-        isLoading={isLoading}
-        error={error || errors.email?.message || errors.password?.message}
-      />
-      <SignUpContainer>
-        <SignUpText>{`처음이신가요? `}</SignUpText>
-        <SignUpText>
-          <SignUpLink onClick={handleSignUpClick}>회원가입</SignUpLink> 하러 가기
-        </SignUpText>
-      </SignUpContainer>
-    </LoginPageContainer>
+    <div className="page-scale">
+      <LoginPageContainer>
+        <LogoImage alt="로고" src={Logo} onClick={() => navigate('/')} />
+        <LoginForm 
+          email={email}
+          password={password}
+          onEmailChange={(e) => setValue('email', e.target.value)}
+          onPasswordChange={(e) => setValue('password', e.target.value)}
+          onLogin={handleSubmit(handleLogin)}
+          isLoading={isLoading}
+          error={error || errors.email?.message || errors.password?.message}
+        />
+        <SignUpContainer>
+          <SignUpText>{`처음이신가요? `}</SignUpText>
+          <SignUpText>
+            <SignUpLink onClick={handleSignUpClick}>회원가입</SignUpLink> 하러 가기
+          </SignUpText>
+        </SignUpContainer>
+      </LoginPageContainer>
+    </div>
   );
 } 
