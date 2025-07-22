@@ -175,10 +175,6 @@ const SelectedSubMenuItemBackground = styled.div<{ color?: string }>`
   z-index: 0;
 `;
 
-const ActiveSubMenuItem = styled(SubMenuItem)`
-  color: var(--color-dimgray);
-`;
-
 // 메뉴 데이터 타입 명확화
 interface MenuDataItem {
   key: string;
