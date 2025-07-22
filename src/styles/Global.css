@@ -1,6 +1,8 @@
 body {
   margin: 0; 
   line-height: normal;
+  font-family: var(--font-pretendard);
+  font-style: normal;
 }
 
 :root {
@@ -8,7 +10,11 @@ body {
   --color-darkslateblue: #764ba2;
   --color-slateblue: #804db3;
   --color-red: #f01a1d;
+  --color-darkred: #ef4444;
+  --color-gray: #666;
   --color-darkgray: #a1a1a1;
+  --color-lightgray: #d9d9d9;
+  --color-lightbluegray: #f5f7fa;
   --color-mediumpurple-500: rgba(156, 112, 201, 0.09);
   --color-mediumpurple-400: #8061b0;
   --color-mediumpurple-300: #9966cc;
@@ -22,11 +28,14 @@ body {
 
   /* Gap */
   --gap-6: 6px;
+  --gap-8: 8px;
   --gap-12: 12px;
+  --gap-15: 15px;
   --gap-16: 16px;
   --gap-20: 20px;
   --gap-24: 24px;
   --gap-26: 26px;
+  --gap-27: 27px;
   --gap-32: 32px;
   --gap-40: 40px;
   --gap-48: 48px;
@@ -42,6 +51,8 @@ body {
   --padding-17: 17px;
   --padding-20: 20px;
   --padding-32: 32px;
+  --padding-36: 36px;
+  --padding-40: 40px;
   --padding-60: 60px;
   --padding-100: 100px;
 
@@ -49,6 +60,7 @@ body {
   --br-5: 5px;
   --br-6: 6px;
   --br-8: 8px;
+  --br-25: 25px;
 
   /* Font */
   --font-pretendard: Pretendard;
@@ -61,6 +73,9 @@ body {
   --font-size-24: 24px;
   --font-size-22: 22px;
   --font-size-26: 26px;
+  --font-size-28: 28px;
   --font-size-32: 32px;
+  --font-size-36: 36px;
   --font-size-42: 42px;
+  --font-size-52: 52px;
 } 
