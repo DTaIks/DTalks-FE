@@ -386,7 +386,7 @@ export default function SignUpPage(): JSX.Element {
               type="submit"
               variant="submit"
               disabled={!isSubmitEnabled()}
-              fontSize="16px"
+              fontSize="22px"
               style={{ marginTop: '60px' }}
             />
           </form>
@@ -450,7 +450,7 @@ const Title = styled.h2`
 const BottomText = styled.p`
   color: #000;
   text-align: center;
-  font-size: 18px;
+  font-size: 22px;
   font-weight: 400;
   line-height: 24px;
   margin-top: 27px;
@@ -458,7 +458,7 @@ const BottomText = styled.p`
 
 const BottomLink = styled.a`
   color: #96C;
-  font-size: 18px;
+  font-size: 22px;
   font-weight: 600;
   line-height: 24px;
   cursor: pointer;

@@ -14,6 +14,66 @@ interface LoginFormProps {
   error?: string | null;
 }
 
+const LoginForm: React.FC<LoginFormProps> = ({ 
+  className = "",
+  email = "",
+  password = "",
+  onEmailChange,
+  onPasswordChange,
+  onLogin,
+  isLoading = false,
+  error = null
+}) => {
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>): void => {
+    e.preventDefault();
+    if (onLogin && !isLoading) {
+      onLogin();
+    }
+  };
+
+  return (
+    <LoginFormContainer className={className}>
+      <BackgroundPanel />
+      <TitleWrapper>
+        <WelcomeTitle>다시 만나서 반가워요 :)</WelcomeTitle>
+      </TitleWrapper>
+      <Form onSubmit={handleSubmit}>
+        <InputField
+          variant="login"
+          title="아이디"
+          placeholder="이메일을 입력하세요."
+          type="email"
+          value={email}
+          onChange={onEmailChange}
+        />
+        <InputField
+          inputWidth="510px"
+          inputAlignSelf="unset"
+          title="비밀번호"
+          placeholder="비밀번호를 입력하세요."
+          type="password"
+          value={password}
+          onChange={onPasswordChange}
+        />
+        {error && <ErrorMessage>{error}</ErrorMessage>}
+        <ForgotPasswordLink href="/forgot-password">
+          비밀번호 찾기
+        </ForgotPasswordLink>
+        <LoginButtonWrapper>
+          <Button
+            text="로그인"
+            type="submit"
+            variant="login"
+            disabled={isLoading}
+            isLoading={isLoading}
+          />
+        </LoginButtonWrapper>
+      </Form>
+    </LoginFormContainer>
+  );
+};
+
+// styled-components 정의부 (파일 하단)
 const BackgroundPanel = styled.div`
   width: 780px;
   height: 510px;
@@ -127,11 +187,13 @@ const ErrorMessage = styled.div`
   font-size: 16px;
   margin-top: 8px;
   text-align: center;
+  align-self: flex-start;
+  width: 100%;
 `;
 
 const ForgotPasswordLink = styled.a`
   color: var(--color-mediumpurple-300);
-  font-size: 16px;
+  font-size: 18px;
   text-decoration: none;
   cursor: pointer;
   margin-bottom: 8px;
@@ -142,64 +204,5 @@ const ForgotPasswordLink = styled.a`
     color: #7742A7;
   }
 `;
-
-const LoginForm: React.FC<LoginFormProps> = ({ 
-  className = "",
-  email = "",
-  password = "",
-  onEmailChange,
-  onPasswordChange,
-  onLogin,
-  isLoading = false,
-  error = null
-}) => {
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>): void => {
-    e.preventDefault();
-    if (onLogin && !isLoading) {
-      onLogin();
-    }
-  };
-
-  return (
-    <LoginFormContainer className={className}>
-      <BackgroundPanel />
-      <TitleWrapper>
-        <WelcomeTitle>다시 만나서 반가워요 :)</WelcomeTitle>
-      </TitleWrapper>
-      <Form onSubmit={handleSubmit}>
-        <InputField
-          variant="login"
-          title="아이디"
-          placeholder="이메일을 입력하세요."
-          type="email"
-          value={email}
-          onChange={onEmailChange}
-        />
-        <InputField
-          inputWidth="510px"
-          inputAlignSelf="unset"
-          title="비밀번호"
-          placeholder="비밀번호를 입력하세요."
-          type="password"
-          value={password}
-          onChange={onPasswordChange}
-        />
-        {error && <ErrorMessage>{error}</ErrorMessage>}
-        <ForgotPasswordLink href="/forgot-password">
-          비밀번호 찾기
-        </ForgotPasswordLink>
-        <LoginButtonWrapper>
-          <Button
-            text="로그인"
-            type="submit"
-            variant="login"
-            disabled={isLoading}
-            isLoading={isLoading}
-          />
-        </LoginButtonWrapper>
-      </Form>
-    </LoginFormContainer>
-  );
-};
 
 export default LoginForm;

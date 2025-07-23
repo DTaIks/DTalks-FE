@@ -159,14 +159,17 @@ const UserTable = () => {
       <RoleColumn>역할</RoleColumn>
       <EmailColumn>이메일</EmailColumn>
       <HeaderDivider />
-      {userData.map((user) => (
-        <div key={user.id}>
-          <NameCell style={{ top: user.top }}>{user.name}</NameCell>
-          <DepartmentCell style={{ top: user.top }}>{user.department}</DepartmentCell>
-          <RoleCell style={{ top: user.top }}>{user.role}</RoleCell>
-          <EmailCell style={{ top: user.top }}>{user.email}</EmailCell>
-        </div>
-      ))}
+      {userData.map((user) => {
+        const topValue = parseInt(user.top, 10) + 5;
+        return (
+          <div key={user.id}>
+            <NameCell style={{ top: `${topValue}px` }}>{user.name}</NameCell>
+            <DepartmentCell style={{ top: `${topValue}px` }}>{user.department}</DepartmentCell>
+            <RoleCell style={{ top: `${topValue}px` }}>{user.role}</RoleCell>
+            <EmailCell style={{ top: `${topValue}px` }}>{user.email}</EmailCell>
+          </div>
+        );
+      })}
       <Title>사용자 목록</Title>
       <SearchContainer>
         <SearchInput placeholder="이름으로 검색" />

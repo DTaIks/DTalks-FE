@@ -23,13 +23,18 @@ const Subtitle = styled.div`
   font-size: var(--font-size-24);
 `;
 
-const UserTitleContainer = () => {
+interface TitleContainerProps {
+  title: string;
+  subtitle?: string;
+}
+
+const TitleContainer = ({ title, subtitle }: TitleContainerProps) => {
   return (
     <Container>
-      <Title>사용자 목록</Title>
-      <Subtitle>등록한 사용자들을 관리하세요</Subtitle>
+      <Title>{title}</Title>
+      {subtitle && <Subtitle>{subtitle}</Subtitle>}
     </Container>
   );
 };
 
-export default UserTitleContainer; 
+export default TitleContainer; 
