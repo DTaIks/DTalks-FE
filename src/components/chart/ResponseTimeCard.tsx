@@ -5,8 +5,8 @@ import '../../styles/Global.css';
 
 
 export interface ResponseTime {
-  avg: number;        
-  zones: number[];   
+  avg: number;
+  zones: number[];
 }
 
 interface Zone {
@@ -90,7 +90,7 @@ export const ResponseTimeChart: React.FC<ResponseTimeChartProps> = ({ responseTi
     labels: groupedZones.map((d) => d.range),
     legend: { show: false },
     dataLabels: { enabled: false },
-    
+
     states: {
       hover: {
         filter: {
@@ -98,7 +98,7 @@ export const ResponseTimeChart: React.FC<ResponseTimeChartProps> = ({ responseTi
         }
       }
     },
-    
+
     tooltip: {
       enabled: true,
       y: {
@@ -226,8 +226,9 @@ const LegendItem = styled.div`
   align-items: center;
   gap: var(--gap-16);
   border-bottom: 1px solid #d9d9d9;
-  padding-bottom: 24px;
-  margin-bottom: 12px;
+  height: 56px;
+  padding-bottom: 16px;
+
 `;
 
 const LegendDot = styled.div<{ color: string }>`
@@ -259,7 +260,7 @@ const LegendCount = styled.span`
 `;
 
 const LegendPercentage = styled.span`
-  color: var(--color-gray);
-  font-size: var(--font-size-16);
+  color: var(—color-gray);
+  font-size: var(—font-size-16);
   font-weight: 400;
 `;

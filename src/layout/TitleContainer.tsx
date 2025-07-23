@@ -23,6 +23,7 @@ const Container = styled.div`
   width: 1409px;
   height: 87px;
   font-size: 42px;
+  margin-left: 60px;
   color: var(--color-darkslategray);
 `;
 

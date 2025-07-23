@@ -146,4 +146,5 @@ const PaginationContainer = styled.div`
   width: 17.125rem;
   height: 2.375rem;
   font-size: var(--font-size-18);
+  margin-left: 60px;
 `; 

@@ -32,5 +32,7 @@ const Main = styled.div`
 const Content = styled.div`
   flex: 1;
   padding: 32px;
+  margin-left: 76px;
+  margin-top: 292px;
   background: var(--color-lightgray-100);
 `; 

@@ -71,7 +71,7 @@ const Container = styled.div`
 
 const Title = styled.h3`
   color: var(--color-black);
-  font-size: var(--font-size-28);
+  font-size: var(--font-size-24);
   font-weight: 600;
   position: absolute;
   top: 24px;

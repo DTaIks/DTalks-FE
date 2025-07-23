@@ -101,11 +101,11 @@ const PermissionTable = () => {
 
 export default PermissionTable;
 
-// styled-components 정의부 (파일 하단)
 const Wrapper = styled.div`
   position: absolute;
   top: 275px;
-  left: 456px;
+  left: 458px;
+  margin-left: 60px;
   width: 1413px;
   height: 434px;
 `;
@@ -114,7 +114,7 @@ const Container = styled.div`
   top: 0px;
   left: 0px;
   box-shadow: 0px 0px 15px 3px rgba(153, 102, 204, 0.05);
-  border-radius: var(--br-8);
+  border-radius: var(--br-25);
   background-color: var(--color-white);
   width: 1413px;
   height: 590px;

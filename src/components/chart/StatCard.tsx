@@ -19,7 +19,7 @@ function getChange(increase: number, compareWith: string = '이전 대비') {
   const prefix = isPositive ? '+' : '';
   const text = `${prefix}${increase}% ${compareWith}`;
   const color = isPositive ? '#22C55D' : '#EF4444';
-      
+
   return { text, color };
 }
 
@@ -29,10 +29,10 @@ function formatStatValue(value: number, unit: string = ''): string {
 
 const StatCard: React.FC<StatCardProps> = ({ data }) => {
   const { title, value, increase, unit = '', compareWith = '이전 대비' } = data;
-      
+
   const formatValue = formatStatValue(value, unit);
   const change = getChange(increase, compareWith);
- 
+
   return (
     <Card>
       <Content>
@@ -66,13 +66,14 @@ const Content = styled.div`
   padding: 0 48px;
   box-sizing: border-box;
   text-align: left;
+  padding-bottom: 36px;
 `;
 
 const Title = styled.p`
   color: var(--color-black);
   font-size: var(--font-size-26);
   font-weight: 500;
-  margin-bottom: 17px;
+  margin-bottom: 18px;
 `;
 
 const Value = styled.div`
@@ -84,7 +85,7 @@ const Value = styled.div`
 
 const ChangeIndicator = styled.div<{ color: string }>`
   color: ${props => props.color};
-  font-size: var(--font-size-26);
+  font-size: var(—font-size-26);
   font-weight: 500;
   margin-top: 12px;
 `;
