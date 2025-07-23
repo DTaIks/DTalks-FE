@@ -1,7 +1,7 @@
 import React from 'react';
-import styled from "styled-components";
 import InputField from "../common/InputField";
 import Button from "../common/Button";
+import styled from "styled-components";
 
 interface LoginFormProps {
   className?: string;
@@ -73,7 +73,8 @@ const LoginForm: React.FC<LoginFormProps> = ({
   );
 };
 
-// styled-components 정의부 (파일 하단)
+export default LoginForm;
+
 const BackgroundPanel = styled.div`
   width: 780px;
   height: 510px;
@@ -204,5 +205,3 @@ const ForgotPasswordLink = styled.a`
     color: #7742A7;
   }
 `;
-
-export default LoginForm;

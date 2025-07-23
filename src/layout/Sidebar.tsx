@@ -42,139 +42,6 @@ const DROPDOWN_MENUS = {
   FAQ: "faq"
 } as const;
 
-// 스타일 컴포넌트
-const SidebarRoot = styled.div`
-  width: 400px;
-  min-height: 3067px;
-  height: 100vh;
-  background-color: var(--color-white);
-  font-size: var(--font-size-22);
-  color: var(--color-dimgray);
-  font-family: var(--font-pretendard);
-  box-shadow: 0px 1px 15px rgba(153, 102, 204, 0.1);
-  display: flex;
-  flex-direction: column;
-`;
-
-const LogoRow = styled.div`
-  display: flex;
-  align-items: center;
-  padding: 24px 32px 0 24px;
-`;
-
-const Logo = styled.img`
-  width: 55.6px;
-  height: 55px;
-  object-fit: cover;
-  cursor: pointer;
-  transition: opacity 0.2s ease;
-  &:hover { opacity: 0.8; }
-`;
-
-const AdminPageTitle = styled.div`
-  margin-left: 24px;
-  font-weight: 600;
-  font-size: var(--font-size-22);
-  color: var(--color-dimgray);
-`;
-
-const DividerLine = styled.div`
-  border-top: 0.5px solid var(--color-darkgray-200);
-  margin: 32px 0 0 0;
-`;
-
-const MenuSection = styled.div<{ isSecond?: boolean }>`
-  margin-top: ${({ isSecond }) => (isSecond ? '40px' : '24px')};
-`;
-
-const MenuTitle = styled.div`
-  font-size: var(--font-size-22);
-  font-weight: 600;
-  color: var(--color-dimgray);
-  padding: 0 32px 12px 32px;
-  margin-top: 0px;
-`;
-
-const MenuItem = styled.div<MenuItemProps>`
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 12px 32px 12px 60px;
-  cursor: pointer;
-  transition: background-color 0.2s ease;
-  border-radius: 8px;
-  position: relative;
-  overflow: hidden;
-`;
-
-const SelectedMenuItemBackground = styled.div<{ color?: string }>`
-  background: ${({ color }) => color || 'rgba(153, 102, 204, 0.15)'};
-  margin: 0 20px;
-  border-radius: 8px;
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  z-index: 0;
-`;
-
-const MenuItemText = styled.div`
-  font-size: var(--font-size-20);
-  font-weight: 500;
-  color: var(--color-dimgray);
-  margin-top: 0px;
-  position: relative;
-  z-index: 1;
-`;
-
-const DropdownIcon = styled.span<DropdownIconProps>`
-  cursor: pointer;
-  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  transform: ${({ isOpen }) => isOpen ? 'rotate(180deg)' : 'rotate(0deg)'};
-  font-size: var(--font-size-16);
-  color: #666666;
-  margin-top: 0px;
-  position: relative;
-  z-index: 1;
-`;
-
-const SubMenuContainer = styled.div<{ isOpen: boolean }>`
-  max-height: ${({ isOpen }) => isOpen ? '500px' : '0'};
-  overflow: hidden;
-  transition: max-height 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  background: none;
-`;
-
-const DropdownMenuWrapper = styled.div`
-  & + & { margin-top: 0px; }
-`;
-
-const SubMenuItem = styled.div<SubMenuItemProps>`
-  padding: 12px 32px 12px 92px;
-  font-size: var(--font-size-20);
-  font-weight: 500;
-  color: var(--color-dimgray);
-  cursor: pointer;
-  border-radius: 8px;
-  transition: background-color 0.2s ease;
-  position: relative;
-  overflow: hidden;
-  & + & { margin-top: 0px; }
-`;
-
-const SelectedSubMenuItemBackground = styled.div<{ color?: string }>`
-  background: ${({ color }) => color || 'rgba(153, 102, 204, 0.15)'};
-  margin: 0 20px;
-  border-radius: 8px;
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  z-index: 0;
-`;
-
 // 메뉴 데이터 타입 명확화
 interface MenuDataItem {
   key: string;
@@ -394,3 +261,135 @@ const Sidebar: React.FC<SidebarProps> = ({ className = "" }) => {
 };
 
 export default Sidebar;
+
+const SidebarRoot = styled.div`
+  width: 400px;
+  min-height: 3067px;
+  height: 100vh;
+  background-color: var(--color-white);
+  font-size: var(--font-size-22);
+  color: var(--color-dimgray);
+  font-family: var(--font-pretendard);
+  box-shadow: 0px 1px 15px rgba(153, 102, 204, 0.1);
+  display: flex;
+  flex-direction: column;
+`;
+
+const LogoRow = styled.div`
+  display: flex;
+  align-items: center;
+  padding: 24px 32px 0 24px;
+`;
+
+const Logo = styled.img`
+  width: 55.6px;
+  height: 55px;
+  object-fit: cover;
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+  &:hover { opacity: 0.8; }
+`;
+
+const AdminPageTitle = styled.div`
+  margin-left: 24px;
+  font-weight: 600;
+  font-size: var(--font-size-22);
+  color: var(--color-dimgray);
+`;
+
+const DividerLine = styled.div`
+  border-top: 0.5px solid var(--color-darkgray-200);
+  margin: 32px 0 0 0;
+`;
+
+const MenuSection = styled.div<{ isSecond?: boolean }>`
+  margin-top: ${({ isSecond }) => (isSecond ? '40px' : '24px')};
+`;
+
+const MenuTitle = styled.div`
+  font-size: var(--font-size-22);
+  font-weight: 600;
+  color: var(--color-dimgray);
+  padding: 0 32px 12px 32px;
+  margin-top: 0px;
+`;
+
+const MenuItem = styled.div<MenuItemProps>`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 32px 12px 60px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  border-radius: 8px;
+  position: relative;
+  overflow: hidden;
+`;
+
+const SelectedMenuItemBackground = styled.div<{ color?: string }>`
+  background: ${({ color }) => color || 'rgba(153, 102, 204, 0.15)'};
+  margin: 0 20px;
+  border-radius: 8px;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 0;
+`;
+
+const MenuItemText = styled.div`
+  font-size: var(--font-size-20);
+  font-weight: 500;
+  color: var(--color-dimgray);
+  margin-top: 0px;
+  position: relative;
+  z-index: 1;
+`;
+
+const DropdownIcon = styled.span<DropdownIconProps>`
+  cursor: pointer;
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transform: ${({ isOpen }) => isOpen ? 'rotate(180deg)' : 'rotate(0deg)'};
+  font-size: var(--font-size-16);
+  color: #666666;
+  margin-top: 0px;
+  position: relative;
+  z-index: 1;
+`;
+
+const SubMenuContainer = styled.div<{ isOpen: boolean }>`
+  max-height: ${({ isOpen }) => isOpen ? '500px' : '0'};
+  overflow: hidden;
+  transition: max-height 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  background: none;
+`;
+
+const DropdownMenuWrapper = styled.div`
+  & + & { margin-top: 0px; }
+`;
+
+const SubMenuItem = styled.div<SubMenuItemProps>`
+  padding: 12px 32px 12px 92px;
+  font-size: var(--font-size-20);
+  font-weight: 500;
+  color: var(--color-dimgray);
+  cursor: pointer;
+  border-radius: 8px;
+  transition: background-color 0.2s ease;
+  position: relative;
+  overflow: hidden;
+  & + & { margin-top: 0px; }
+`;
+
+const SelectedSubMenuItemBackground = styled.div<{ color?: string }>`
+  background: ${({ color }) => color || 'rgba(153, 102, 204, 0.15)'};
+  margin: 0 20px;
+  border-radius: 8px;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 0;
+`;

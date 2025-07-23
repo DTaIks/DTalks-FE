@@ -1,5 +1,21 @@
 import styled from "styled-components";
 
+interface TitleContainerProps {
+  title: string;
+  subtitle?: string;
+}
+
+const TitleContainer = ({ title, subtitle }: TitleContainerProps) => {
+  return (
+    <Container>
+      <Title>{title}</Title>
+      {subtitle && <Subtitle>{subtitle}</Subtitle>}
+    </Container>
+  );
+};
+
+export default TitleContainer;
+
 const Container = styled.div`
   position: absolute;
   top: 156px;
@@ -21,20 +37,4 @@ const Subtitle = styled.div`
   top: 58px;
   left: 0px;
   font-size: var(--font-size-24);
-`;
-
-interface TitleContainerProps {
-  title: string;
-  subtitle?: string;
-}
-
-const TitleContainer = ({ title, subtitle }: TitleContainerProps) => {
-  return (
-    <Container>
-      <Title>{title}</Title>
-      {subtitle && <Subtitle>{subtitle}</Subtitle>}
-    </Container>
-  );
-};
-
-export default TitleContainer; 
+`; 

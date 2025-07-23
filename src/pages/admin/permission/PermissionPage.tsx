@@ -3,11 +3,6 @@ import TitleContainer from "../../../layout/TitleContainer";
 import PermissionTable from "../../../components/admin/permission/PermissionTable";
 // 필요시 Pagination 등 import
 
-const Container = styled.div`
-  width: 100%;
-  height: 100%;
-`;
-
 const PermissionPage = () => {
   return (
     <Container>
@@ -18,4 +13,9 @@ const PermissionPage = () => {
   );
 };
 
-export default PermissionPage; 
+export default PermissionPage;
+
+const Container = styled.div`
+  width: 100%;
+  height: 100%;
+`; 

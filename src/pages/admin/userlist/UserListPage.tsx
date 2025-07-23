@@ -3,11 +3,6 @@ import TitleContainer from "../../../layout/TitleContainer";
 import UserTable from "../../../components/admin/userlist/UserListTable";
 import Pagination from "../../../components/admin/Pagination";
 
-const Container = styled.div`
-  width: 100%;
-  height: 100%;
-`;
-
 const UserListPage = () => {
   return (
     <Container>
@@ -19,3 +14,8 @@ const UserListPage = () => {
 };
 
 export default UserListPage;
+
+const Container = styled.div`
+  width: 100%;
+  height: 100%;
+`;

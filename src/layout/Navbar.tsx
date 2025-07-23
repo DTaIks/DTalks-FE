@@ -6,6 +6,39 @@ export type NavbarProps = {
   className?: string;
 };
 
+const Navbar = ({ className = "" }: NavbarProps) => {
+  const location = useLocation();
+  
+  const getBreadcrumbText = () => {
+    const path = location.pathname;
+    
+    if (path === "/admin") {
+      return "홈  >  통계";
+    } else if (path === "/admin/users") {
+      return "홈  >  사용자 관리  >  사용자 목록";
+    } else if (path === "/admin/permission") {
+      return "홈  >  사용자 관리  >  권한 관리";
+    } else if (path === "/admin/settings") {
+      return "홈  >  시스템  >  설정";
+    } else {
+      return "홈";
+    }
+  };
+
+  return (
+    <>
+      <Container className={className}>
+        <Background />
+        <BreadcrumbText>{getBreadcrumbText()}</BreadcrumbText>
+      </Container>
+      <AdminText>admin</AdminText>
+      <Profile alt="" src={ProfileImageSrc} />
+    </>
+  );
+};
+
+export default Navbar;
+
 const Background = styled.div`
   position: absolute;
   top: 0px;
@@ -53,37 +86,4 @@ const Container = styled.div`
   height: 100px;
   background-color: transparent;
   z-index: 999;
-`;
-
-const Navbar = ({ className = "" }: NavbarProps) => {
-  const location = useLocation();
-  
-  const getBreadcrumbText = () => {
-    const path = location.pathname;
-    
-    if (path === "/admin") {
-      return "홈  >  통계";
-    } else if (path === "/admin/users") {
-      return "홈  >  사용자 관리  >  사용자 목록";
-    } else if (path === "/admin/permission") {
-      return "홈  >  사용자 관리  >  권한 관리";
-    } else if (path === "/admin/settings") {
-      return "홈  >  시스템  >  설정";
-    } else {
-      return "홈";
-    }
-  };
-
-  return (
-    <>
-      <Container className={className}>
-        <Background />
-        <BreadcrumbText>{getBreadcrumbText()}</BreadcrumbText>
-      </Container>
-      <AdminText>admin</AdminText>
-      <Profile alt="" src={ProfileImageSrc} />
-    </>
-  );
-};
-
-export default Navbar; 
+`; 

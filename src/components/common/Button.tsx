@@ -1,34 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
 
-const LoginButtonText = styled.div`
-  position: relative;
-  font-size: var(--font-size-22);
-  line-height: 24px;
-  font-weight: 600;
-  font-family: var(--font-pretendard);
-  color: var(--color-white);
-  text-align: left;
-  @media screen and (max-width: 450px) {
-    font-size: var(--font-size-18);
-    line-height: 19px;
-  }
-`;
-
-const LoginButtonInner = styled.div`
-  flex: 1;
-  border-radius: var(--br-8);
-  background-color: var(--color-mediumpurple-300);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: var(--padding-12);
-  box-sizing: border-box;
-  max-width: 100%;
-  transition: all 0.2s ease;
-`;
-
 interface ButtonProps {
   text: string;
   onClick?: () => void;
@@ -100,6 +72,36 @@ const Button: React.FC<ButtonProps> = ({
     </StyledButton>
   );
 };
+
+export default Button;
+
+const LoginButtonText = styled.div`
+  position: relative;
+  font-size: var(--font-size-22);
+  line-height: 24px;
+  font-weight: 600;
+  font-family: var(--font-pretendard);
+  color: var(--color-white);
+  text-align: left;
+  @media screen and (max-width: 450px) {
+    font-size: var(--font-size-18);
+    line-height: 19px;
+  }
+`;
+
+const LoginButtonInner = styled.div`
+  flex: 1;
+  border-radius: var(--br-8);
+  background-color: var(--color-mediumpurple-300);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--padding-12);
+  box-sizing: border-box;
+  max-width: 100%;
+  transition: all 0.2s ease;
+`;
 
 const StyledButton = styled.button<{
   variant?: 'primary' | 'secondary' | 'submit' | 'login';
@@ -178,6 +180,4 @@ const StyledButton = styled.button<{
   &:active:not(:disabled) {
     transform: ${props => props.variant === 'login' ? 'scale(0.98)' : 'translateY(1px)'};
   }
-`;
-
-export default Button; 
+`; 
