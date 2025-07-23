@@ -49,9 +49,9 @@ export default function SignUpPage(): JSX.Element {
   const navigate = useNavigate();
 
   useEffect(() => {
-    let interval: NodeJS.Timeout | null = null;
+    let interval: ReturnType<typeof setInterval> | null = null;
     if (formState.authTimer > 0) {
-      interval = setInterval(() => {
+      interval = window.setInterval(() => {
         setFormState(prev => {
           const newTimer = prev.authTimer - 1;
           if (newTimer === 0) {
@@ -62,7 +62,7 @@ export default function SignUpPage(): JSX.Element {
       }, 1000);
     }
     return () => {
-      if (interval) clearInterval(interval);
+      if (interval) window.clearInterval(interval);
     };
   }, [formState.authTimer]);
 
@@ -285,117 +285,119 @@ export default function SignUpPage(): JSX.Element {
   };
 
   return (
-    <PageWrapper>
-      <LogoImage src={Logo} alt="Logo" onClick={() => navigate('/')} />
-      <FormWrapper>
-        <Title>지금 함께 시작해볼까요?</Title>
-        <form onSubmit={handleSubmit} noValidate>
-          <InputField
-            variant="signup"
-            label="이메일"
-            placeholder="이메일을 입력해 주세요."
-            inputProps={{
-              type: 'email',
-              value: formData.email,
-              onChange: handleInputChange('email'),
-              onBlur: handleInputBlur('email'),
-              required: true
-            }}
-            infoText={getMessage('email')}
-            infoTextColor={getMessageColor('email')}
-            buttonText="중복 확인"
-            onButtonClick={handleEmailCheck}
-            buttonDisabled={!formData.email || formState.isEmailVerified}
-          />
-
-          <AuthCodeFieldWrapper>
+    <div className="page-scale">
+      <PageWrapper>
+        <LogoImage src={Logo} alt="Logo" onClick={() => navigate('/')} />
+        <FormWrapper>
+          <Title>지금 함께 시작해볼까요?</Title>
+          <form onSubmit={handleSubmit} noValidate>
             <InputField
               variant="signup"
-              label="인증번호 입력"
-              placeholder="인증번호를 입력해 주세요."
+              label="이메일"
+              placeholder="이메일을 입력해 주세요."
               inputProps={{
-                value: formData.authCode,
-                onChange: handleInputChange('authCode'),
-                onBlur: handleInputBlur('authCode'),
-                required: true,
-                disabled: !formState.isEmailVerified || formState.isAuthCodeVerified
+                type: 'email',
+                value: formData.email,
+                onChange: handleInputChange('email'),
+                onBlur: handleInputBlur('email'),
+                required: true
               }}
-              infoText={getMessage('authCode')}
-              infoTextColor={getMessageColor('authCode')}
-              buttonText={getAuthButtonText()}
-              onButtonClick={getAuthButtonClick()}
-              buttonDisabled={isAuthButtonDisabled()}
+              infoText={getMessage('email')}
+              infoTextColor={getMessageColor('email')}
+              buttonText="중복 확인"
+              onButtonClick={handleEmailCheck}
+              buttonDisabled={!formData.email || formState.isEmailVerified}
             />
 
-            {formState.authTimer > 0 && !formState.isAuthCodeVerified && (
-              <TimerText>남은 시간: {formatTimer(formState.authTimer)}</TimerText>
-            )}
+            <AuthCodeFieldWrapper>
+              <InputField
+                variant="signup"
+                label="인증번호 입력"
+                placeholder="인증번호를 입력해 주세요."
+                inputProps={{
+                  value: formData.authCode,
+                  onChange: handleInputChange('authCode'),
+                  onBlur: handleInputBlur('authCode'),
+                  required: true,
+                  disabled: !formState.isEmailVerified || formState.isAuthCodeVerified
+                }}
+                infoText={getMessage('authCode')}
+                infoTextColor={getMessageColor('authCode')}
+                buttonText={getAuthButtonText()}
+                onButtonClick={getAuthButtonClick()}
+                buttonDisabled={isAuthButtonDisabled()}
+              />
 
-            {formState.isAuthCodeSent && formState.authTimer === 0 && !formState.isAuthCodeVerified && (
-              <TimerText>인증시간이 만료되었습니다. 재전송 버튼을 눌러주세요.</TimerText>
-            )}
-          </AuthCodeFieldWrapper>
+              {formState.authTimer > 0 && !formState.isAuthCodeVerified && (
+                <TimerText>남은 시간: {formatTimer(formState.authTimer)}</TimerText>
+              )}
 
-          <InputField
-            variant="signup"
-            label="사원번호"
-            placeholder="사원번호를 입력해 주세요."
-            inputProps={{
-              value: formData.employeeNumber,
-              onChange: handleInputChange('employeeNumber'),
-              onBlur: handleInputBlur('employeeNumber'),
-              required: true
-            }}
-            infoText={getMessage('employeeNumber')}
-            infoTextColor={getMessageColor('employeeNumber')}
-          />
+              {formState.isAuthCodeSent && formState.authTimer === 0 && !formState.isAuthCodeVerified && (
+                <TimerText>인증시간이 만료되었습니다. 재전송 버튼을 눌러주세요.</TimerText>
+              )}
+            </AuthCodeFieldWrapper>
 
-          <InputField
-            variant="signup"
-            label="비밀번호"
-            placeholder="문자, 숫자, 특수문자 포함 8자~20자"
-            inputProps={{
-              type: 'password',
-              value: formData.password,
-              onChange: handleInputChange('password'),
-              onBlur: handleInputBlur('password'),
-              required: true
-            }}
-            infoText={getMessage('password')}
-            infoTextColor={getMessageColor('password')}
-          />
+            <InputField
+              variant="signup"
+              label="사원번호"
+              placeholder="사원번호를 입력해 주세요."
+              inputProps={{
+                value: formData.employeeNumber,
+                onChange: handleInputChange('employeeNumber'),
+                onBlur: handleInputBlur('employeeNumber'),
+                required: true
+              }}
+              infoText={getMessage('employeeNumber')}
+              infoTextColor={getMessageColor('employeeNumber')}
+            />
 
-          <InputField
-            variant="signup"
-            label="비밀번호 확인"
-            placeholder="비밀번호를 다시 입력해 주세요."
-            inputProps={{
-              type: 'password',
-              value: formData.passwordCheck,
-              onChange: handleInputChange('passwordCheck'),
-              onBlur: handleInputBlur('passwordCheck'),
-              required: true
-            }}
-            infoText={getMessage('passwordCheck')}
-            infoTextColor={getMessageColor('passwordCheck')}
-          />
+            <InputField
+              variant="signup"
+              label="비밀번호"
+              placeholder="문자, 숫자, 특수문자 포함 8자~20자"
+              inputProps={{
+                type: 'password',
+                value: formData.password,
+                onChange: handleInputChange('password'),
+                onBlur: handleInputBlur('password'),
+                required: true
+              }}
+              infoText={getMessage('password')}
+              infoTextColor={getMessageColor('password')}
+            />
 
-          <Button
-            text="회원가입"
-            type="submit"
-            variant="submit"
-            disabled={!isSubmitEnabled()}
-            fontSize="16px"
-            style={{ marginTop: '60px' }}
-          />
-        </form>
-      </FormWrapper>
+            <InputField
+              variant="signup"
+              label="비밀번호 확인"
+              placeholder="비밀번호를 다시 입력해 주세요."
+              inputProps={{
+                type: 'password',
+                value: formData.passwordCheck,
+                onChange: handleInputChange('passwordCheck'),
+                onBlur: handleInputBlur('passwordCheck'),
+                required: true
+              }}
+              infoText={getMessage('passwordCheck')}
+              infoTextColor={getMessageColor('passwordCheck')}
+            />
 
-      <BottomText>
-        이미 계정이 있으신가요?{' '}
-        <BottomLink href="/login">로그인하기</BottomLink>
-      </BottomText>
-    </PageWrapper>
+            <Button
+              text="회원가입"
+              type="submit"
+              variant="submit"
+              disabled={!isSubmitEnabled()}
+              fontSize="22px"
+              style={{ marginTop: '60px' }}
+            />
+          </form>
+        </FormWrapper>
+
+        <BottomText>
+          이미 계정이 있으신가요?{' '}
+          <BottomLink href="/login">로그인하기</BottomLink>
+        </BottomText>
+      </PageWrapper>
+    </div>
   );
 }
 
@@ -448,7 +450,7 @@ const Title = styled.h2`
 const BottomText = styled.p`
   color: #000;
   text-align: center;
-  font-size: 18px;
+  font-size: 22px;
   font-weight: 400;
   line-height: 24px;
   margin-top: 27px;
@@ -456,7 +458,7 @@ const BottomText = styled.p`
 
 const BottomLink = styled.a`
   color: #96C;
-  font-size: 18px;
+  font-size: 22px;
   font-weight: 600;
   line-height: 24px;
   cursor: pointer;

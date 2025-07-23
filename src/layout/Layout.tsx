@@ -3,22 +3,6 @@ import { useAuthStore } from "../store/authStore";
 import Sidebar from "./Sidebar";
 import Navbar from "./Navbar";
 
-const LayoutContainer = styled.div`
-  display: flex;
-  min-height: 100vh;
-`;
-
-const MainContent = styled.div`
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-`;
-
-const ContentArea = styled.div`
-  flex: 1;
-  background-color: var(--color-lightgray-100);
-`;
-
 interface LayoutProps {
   children: React.ReactNode;
 }
@@ -43,4 +27,20 @@ const Layout = ({ children }: LayoutProps) => {
   );
 };
 
-export default Layout; 
+export default Layout;
+
+const LayoutContainer = styled.div`
+  display: flex;
+  min-height: 100vh;
+`;
+
+const MainContent = styled.div`
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+`;
+
+const ContentArea = styled.div`
+  flex: 1;
+  background-color: var(--color-lightgray-100);
+`; 

@@ -4,8 +4,9 @@ import { Routes, Route, Navigate, Outlet } from 'react-router-dom';
 import { useAuthStore } from '../store/authStore';
 import LoginPage from '../pages/login/LoginPage';
 import SignUpPage from '../pages/signup/SignUpPage';
-import UserListPage from '../pages/admin/UserListPage';
+import UserListPage from '../pages/admin/userlist/UserListPage';
 import StatsPage from '../pages/admin/StatsPage';
+import PermissionPage from '../pages/admin/permission/PermissionPage';
 import AdminPage from '../pages/admin/AdminPage';
 
 // 인증이 필요한 라우트
@@ -53,7 +54,7 @@ export default function AppRoutes() {
         <Route path="/admin" element={<AdminPage />}>
           <Route index element={<StatsPage />} />
           <Route path="users" element={<UserListPage />} />
-          <Route path="permission" element={<StatsPage />} />
+          <Route path="permission" element={<PermissionPage />} />
           <Route path="settings" element={<StatsPage />} />
         </Route>
       </Route>

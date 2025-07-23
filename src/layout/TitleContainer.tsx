@@ -1,5 +1,21 @@
 import styled from "styled-components";
 
+interface TitleContainerProps {
+  title: string;
+  subtitle?: string;
+}
+
+const TitleContainer = ({ title, subtitle }: TitleContainerProps) => {
+  return (
+    <Container>
+      <Title>{title}</Title>
+      {subtitle && <Subtitle>{subtitle}</Subtitle>}
+    </Container>
+  );
+};
+
+export default TitleContainer;
+
 const Container = styled.div`
   position: absolute;
   top: 156px;
@@ -21,15 +37,4 @@ const Subtitle = styled.div`
   top: 58px;
   left: 0px;
   font-size: var(--font-size-24);
-`;
-
-const UserTitleContainer = () => {
-  return (
-    <Container>
-      <Title>사용자 목록</Title>
-      <Subtitle>등록한 사용자들을 관리하세요</Subtitle>
-    </Container>
-  );
-};
-
-export default UserTitleContainer; 
+`; 

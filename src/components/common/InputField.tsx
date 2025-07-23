@@ -183,7 +183,7 @@ const SignupInput = styled.input<{ hasButton: boolean }>`
   border-radius: 6px;
   border: 1px solid rgba(0, 0, 0, 0.10);
   background: #FFF;
-  font-size: 14px;
+  font-size: 20px;
   outline: none;
   box-sizing: border-box;
   
@@ -196,7 +196,7 @@ const SignupInput = styled.input<{ hasButton: boolean }>`
 const SignupButton = styled.button`
   width: 166px;
   height: 46px;
-  font-size: 14px;
+  font-size: 18px;
   border-radius: 6px;
   background: #8061B0;
   color: #fff;
@@ -214,7 +214,7 @@ const SignupButton = styled.button`
 `;
 
 const SignupInfoText = styled.div<{ color?: string }>`
-  font-size: 11px;
+  font-size: 16px;
   color: ${props => props.color || '#8c8c8c'};
   margin-top: 4px;
   line-height: 1.2;
@@ -222,6 +222,7 @@ const SignupInfoText = styled.div<{ color?: string }>`
   width: 100%;
   max-width: 720px;
   margin-left: auto;
+  margin-top: 5px;
   margin-right: auto;
   padding-left: calc((100% - 508px) / 2 + 12px);
 `;

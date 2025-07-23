@@ -3,6 +3,20 @@ import Sidebar from '../../layout/Sidebar';
 import Navbar from '../../layout/Navbar';
 import styled from 'styled-components';
 
+export default function AdminPage() {
+  return (
+    <Wrapper className="page-scale">
+      <Sidebar />
+      <Main>
+        <Navbar />
+        <Content>
+          <Outlet />
+        </Content>
+      </Main>
+    </Wrapper>
+  );
+}
+
 const Wrapper = styled.div`
   display: flex;
   min-height: 100vh;
@@ -19,18 +33,4 @@ const Content = styled.div`
   flex: 1;
   padding: 32px;
   background: var(--color-lightgray-100);
-`;
-
-export default function AdminPage() {
-  return (
-    <Wrapper className="page-scale">
-      <Sidebar />
-      <Main>
-        <Navbar />
-        <Content>
-          <Outlet />
-        </Content>
-      </Main>
-    </Wrapper>
-  );
-} 
+`; 

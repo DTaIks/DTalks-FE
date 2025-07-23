@@ -1,5 +1,44 @@
 import styled from "styled-components";
 
+const Pagination = () => {
+  return (
+    <PaginationContainer>
+      <ActivePageContainer>
+        <ActivePageBackground />
+        <ActivePageNumber>
+          1
+        </ActivePageNumber>
+      </ActivePageContainer>
+      <PageContainer2>
+        <InactivePageBackground />
+        <InactivePageNumber>
+          2
+        </InactivePageNumber>
+      </PageContainer2>
+      <PageContainer3>
+        <InactivePageBackground />
+        <InactivePageNumber>
+          3
+        </InactivePageNumber>
+      </PageContainer3>
+      <NextButtonContainer>
+        <NextButtonBackground />
+        <InactivePageNumber>
+          다음
+        </InactivePageNumber>
+      </NextButtonContainer>
+      <PrevButtonContainer>
+        <InactivePageNumber>
+          이전
+        </InactivePageNumber>
+        <PrevButtonBackground />
+      </PrevButtonContainer>
+    </PaginationContainer>
+  );
+};
+
+export default Pagination;
+
 const ActivePageBackground = styled.div`
   position: absolute;
   top: 0rem;
@@ -107,43 +146,4 @@ const PaginationContainer = styled.div`
   width: 17.125rem;
   height: 2.375rem;
   font-size: var(--font-size-18);
-`;
-
-const Pagination = () => {
-  return (
-    <PaginationContainer>
-      <ActivePageContainer>
-        <ActivePageBackground />
-        <ActivePageNumber>
-          1
-        </ActivePageNumber>
-      </ActivePageContainer>
-      <PageContainer2>
-        <InactivePageBackground />
-        <InactivePageNumber>
-          2
-        </InactivePageNumber>
-      </PageContainer2>
-      <PageContainer3>
-        <InactivePageBackground />
-        <InactivePageNumber>
-          3
-        </InactivePageNumber>
-      </PageContainer3>
-      <NextButtonContainer>
-        <NextButtonBackground />
-        <InactivePageNumber>
-          다음
-        </InactivePageNumber>
-      </NextButtonContainer>
-      <PrevButtonContainer>
-        <InactivePageNumber>
-          이전
-        </InactivePageNumber>
-        <PrevButtonBackground />
-      </PrevButtonContainer>
-    </PaginationContainer>
-  );
-};
-
-export default Pagination; 
+`; 
