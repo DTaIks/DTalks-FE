@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
@@ -63,7 +63,7 @@ export default function LoginPage(): JSX.Element {
   });
 
   // Zustand store에서 상태 가져오기
-  const { isAuthenticated, error, setUser, setAuthenticated, setLoading, setError, clearError } = useAuthStore();
+  const { isAuthenticated, error, setUser, setAuthenticated, setLoading, setError } = useAuthStore();
 
   // 이미 로그인된 경우 어드민 페이지로 리다이렉트
   useEffect(() => {
