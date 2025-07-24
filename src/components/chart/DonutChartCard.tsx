@@ -77,7 +77,6 @@ const Title = styled.h3`
   top: 18px;
   left: 33px;
   margin: 0;
-  white-space: nowrap;
 `;
 
 const Wrapper = styled.div<{ $size: string }>`

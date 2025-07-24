@@ -37,6 +37,6 @@ const MainContent = styled.div`
 const ContentArea = styled.div`
   padding: 32px;
   margin-left: 255px;
-  margin-top: 210px;
+  margin-top: 190px;
   background: var(--color-lightgray-100);
 `; 

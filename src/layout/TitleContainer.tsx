@@ -31,12 +31,12 @@ const Title = styled.b`
   position: absolute;
   top: 0px;
   left: 0px;
-  font-size: var(--font-size-24);
+  font-size: var(--font-size-30);
 `;
 
 const Subtitle = styled.div`
   position: absolute;
   top: 43.5px;
   left: 0px;
-  font-size: var(--font-size-14);
+  font-size: var(--font-size-18);
 `; 

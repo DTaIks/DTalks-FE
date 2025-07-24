@@ -46,7 +46,7 @@ export const PromptTemplateCard: React.FC<PromptTemplateCardProps> = ({ data }) 
               value={chartData.value}
               count={chartData.count}
               pathColor={pathColor}
-              size="140px"
+              size="120px"
             />
           );
         })}
@@ -77,6 +77,7 @@ const CardTitle = styled.h1`
   font-size: var(--font-size-20);
   font-weight: 600;
   color: var(--color-black);
+  white-space: nowrap;
 `;
 
 const DonutGrid = styled.div`
@@ -86,4 +87,5 @@ const DonutGrid = styled.div`
   padding: var(--padding-27);
   justify-items: center;
   align-items: center;
+  padding-bottom: 64px
 `;

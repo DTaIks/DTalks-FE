@@ -32,6 +32,7 @@ body {
   --color-black: #000;
   --color-white: #fff;
   --color-ghostwhite: #f8f2fb;
+  --color-divider: #E5E5E5;
 
   /* 간격 설정 */
   --gap-6: 6px;
@@ -68,6 +69,7 @@ body {
   --br-5: 5px;
   --br-6: 6px;
   --br-8: 8px;
+  --br-12: 12px;
   --br-18: 18px;
   --br-25: 25px;
 
@@ -89,6 +91,7 @@ body {
   --font-size-28: 28px;
   --font-size-32: 32px;
   --font-size-36: 36px;
+  --font-size-39: 39px;
   --font-size-42: 42px;
   --font-size-52: 52px;
   /* 페이지 크기 조절 - 기본값 (큰 화면용) */

@@ -6,7 +6,6 @@ interface User {
   department: string;
   role: string;
   email: string;
-  top: string;
 }
 
 const userData: User[] = [
@@ -15,159 +14,107 @@ const userData: User[] = [
     name: "이주원",
     department: "마케팅팀",
     role: "관리자",
-    email: "lee@gachon.ac.kr",
-    top: "224px"
+    email: "lee@gachon.ac.kr"
   },
   {
     id: 2,
     name: "정지민",
     department: "개발팀",
     role: "편집자",
-    email: "jmjung@gachon.ac.kr",
-    top: "296px"
+    email: "jmjung@gachon.ac.kr"
   },
   {
     id: 3,
     name: "김동섭",
     department: "디자인팀",
     role: "사용자",
-    email: "dongsub@gachon.ac.kr",
-    top: "368px"
+    email: "dongsub@gachon.ac.kr"
   }
 ];
 
 const UserTable = () => {
   return (
-    <Wrapper>
-      <Container />
-      <Divider />
-      <NameColumn>이름</NameColumn>
-      <DepartmentColumn>부서</DepartmentColumn>
-      <RoleColumn>역할</RoleColumn>
-      <EmailColumn>이메일</EmailColumn>
-      <HeaderDivider />
-      {userData.map((user) => {
-        const topValue = parseInt(user.top, 10) + 10;
-        return (
-          <div key={user.id}>
-            <NameCell style={{ top: `${topValue}px` }}>{user.name}</NameCell>
-            <DepartmentCell style={{ top: `${topValue}px` }}>{user.department}</DepartmentCell>
-            <RoleCell style={{ top: `${topValue}px` }}>{user.role}</RoleCell>
-            <EmailCell style={{ top: `${topValue}px` }}>{user.email}</EmailCell>
-          </div>
-        );
-      })}
-      <Title>사용자 목록</Title>
-      <SearchContainer>
+    <>
+      <SearchContainerOutside>
         <SearchInput placeholder="이름으로 검색" />
-      </SearchContainer>
-    </Wrapper>
+      </SearchContainerOutside>
+      <Wrapper>
+        <TableHeader>
+          <div>이름</div>
+          <div>부서</div>
+          <div>역할</div>
+          <div>이메일</div>
+        </TableHeader>
+        <Divider />
+        {userData.map((user) => (
+          <TableRow key={user.id}>
+            <div>{user.name}</div>
+            <div>{user.department}</div>
+            <div>{user.role}</div>
+            <div>{user.email}</div>
+          </TableRow>
+        ))}
+      </Wrapper>
+    </>
   );
 };
 
 export default UserTable;
 
 const Wrapper = styled.div`
-  position: absolute;
-  top: 275px;
-  left: 458px;
-  margin-left: 60px;
-  width: 1413px;
-  height: 434px;
+  width: 989.33px;
+  margin: 0 auto 12px auto;
+  background: var(--color-white);
+  border-radius: var(--br-18);
+  box-shadow: 0px 0px 11.25px 2.25px rgba(153, 102, 204, 0.05);
+  padding: 20px 36px 24px 36px;
+  overflow-x: hidden;
+  position: relative;
 `;
-const Container = styled.div`
-  position: absolute;
-  top: 0px;
-  left: 0px;
-  box-shadow: 0px 0px 15px 3px rgba(153, 102, 204, 0.05);
-  border-radius: var(--br-25);
-  background-color: var(--color-white);
-  width: 1413px;
-  height: 434px;
-  max-width: 100%;
-  overflow-x: auto;
-`;
+const TableGrid = `display: grid; grid-template-columns: 1.5fr 1.5fr 1fr 2.2fr; align-items: center; row-gap: 0;`;
 const Divider = styled.div`
-  position: absolute;
-  top: 117px;
-  left: -0.2px;
-  border-top: 0.5px solid var(--color-darkgray);
-  box-sizing: border-box;
-  width: 1413.5px;
-  height: 0.5px;
+  position: relative;
+  left: -36px;
+  width: calc(100% + 72px);
+  height: 1px;
+  background: var(--color-divider);
+  margin: 0;
 `;
-const HeaderDivider = styled.div`
-  position: absolute;
-  top: 205px;
-  left: -0.2px;
-  border-top: 0.5px solid var(--color-darkgray);
-  box-sizing: border-box;
-  width: 1413.5px;
-  height: 0.5px;
-`;
-const HeaderCell = styled.div`
-  position: absolute;
-  top: 152px;
+const TableHeader = styled.div`
+  ${TableGrid}
   font-weight: 600;
-  font-size: var(--font-size-24);
+  font-size: 18px;
   color: var(--color-dimgray);
+  margin-bottom: 0;
+  margin-top: 0px;
+  background: transparent;
+  min-height: 48px;
+  padding: 0 0 16px 0;
 `;
-const NameColumn = styled(HeaderCell)`
-  left: 49px;
-`;
-const DepartmentColumn = styled(HeaderCell)`
-  left: 327px;
-`;
-const RoleColumn = styled(HeaderCell)`
-  left: 630px;
-`;
-const EmailColumn = styled(HeaderCell)`
-  left: 1000px;
-  display: inline-block;
-  width: 300px;
-`;
-const DataCell = styled.div`
-  position: absolute;
+const TableRow = styled.div`  ${TableGrid}
+  margin-top: 12px;
   font-weight: 500;
-  font-size: var(--font-size-24);
+  font-size: 18px;
   color: var(--color-black);
-`;
-const NameCell = styled(DataCell)`
-  left: 49px;
-`;
-const DepartmentCell = styled(DataCell)`
-  left: 327px;
-`;
-const RoleCell = styled(DataCell)`
-  left: 630px;
-`;
-const EmailCell = styled(DataCell)`
-  left: 1000px;
-  display: inline-block;
-  width: 300px;
-`;
-const Title = styled.b`
-  position: absolute;
-  top: 49px;
-  left: 48px;
-  font-size: var(--font-size-26);
-  color: var(--color-black);
+  background: transparent;
+  min-height: 48px;
 `;
 const SearchInput = styled.input`
-  border-radius: var(--br-5);
-  border: 1px solid var(--color-darkgray);
-  width: 240px;
-  height: 45px;
-  padding: 0 var(--padding-20);
-  font-size: var(--font-size-20);
+  border-radius: var(--br-8);
+  border: 0.75px solid var(--color-darkgray);
+  width: 180px;
+  height: 33.75px;
+  padding: 0 15px;
+  font-size: 15px;
   color: var(--color-darkgray);
   box-sizing: border-box;
   outline: none;
+  margin-left: 10px;
 `;
-const SearchContainer = styled.div`
-  position: absolute;
-  top: 41px;
-  left: 1125px;
-  width: 240px;
-  height: 45px;
+const SearchContainerOutside = styled.div`
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  width: 989.33px;
+  margin: 0 auto 16px auto;
 `; 
