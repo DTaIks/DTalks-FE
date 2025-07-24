@@ -5,7 +5,7 @@ import LoginPage from '../pages/login/LoginPage';
 import SignUpPage from '../pages/signup/SignUpPage';
 import UserListPage from '../pages/admin/userlist/UserListPage';
 import PermissionPage from '../pages/admin/permission/PermissionPage';
-import AdminPage from '../pages/admin/AdminPage';
+import Layout from '../layout/Layout';
 
 // 인증이 필요한 라우트
 function ProtectedLayout() {
@@ -49,7 +49,7 @@ export default function AppRoutes() {
 
       {/* 인증 필요, admin 중첩 라우트 */}
       <Route element={<ProtectedLayout />}>
-        <Route path="/admin" element={<AdminPage />}>
+        <Route path="/admin" element={<Layout />}>
           <Route index element={<ChartPage />} />
           <Route path="users" element={<UserListPage />} />
           <Route path="permission" element={<PermissionPage />} />

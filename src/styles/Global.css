@@ -44,6 +44,7 @@ body {
   --gap-26: 26px;
   --gap-27: 27px;
   --gap-32: 32px;
+  --gap-36: 36px;
   --gap-40: 40px;
   --gap-48: 48px;
 
@@ -67,12 +68,16 @@ body {
   --br-5: 5px;
   --br-6: 6px;
   --br-8: 8px;
+  --br-18: 18px;
   --br-25: 25px;
 
   /* 폰트 설정 */
   --font-pretendard: Pretendard;
 
   /* 글자 크기 */
+  --font-size-13: 13px;
+  --font-size-14: 14px;
+  --font-size-15: 15px;
   --font-size-16: 16px;
   --font-size-18: 18px;
   --font-size-19: 19px;
@@ -88,19 +93,6 @@ body {
   --font-size-52: 52px;
   /* 페이지 크기 조절 - 기본값 (큰 화면용) */
   --page-scale: 0.7;
-
-  /* 모달 관련 변수들 */
-  --modal-scale: 1.43;
-  --modal-z-index: 9999;
-  --modal-background: rgba(0, 0, 0, 0.45);
-  --modal-container-bg: #fff;
-  --modal-border-radius: 18px;
-  --modal-box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
-  --modal-padding: 40px 48px;
-  --modal-max-width: 90vw;
-  --modal-max-height: 90vh;
-  --modal-close-button-color: #888;
-  --modal-close-button-size: 2rem;
 }
 
 /* 화면 크기별 반응형 조절 */

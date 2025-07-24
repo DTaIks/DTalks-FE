@@ -49,12 +49,12 @@ const StatCard: React.FC<StatCardProps> = ({ data }) => {
 export default StatCard;
 
 const Card = styled.div`
-  width: 440px;
-  height: 300px;
+  width: 330px;
+  height: 210px;
   flex-shrink: 0;
   border-radius: var(--br-25);
   background: var(--color-white);
-  box-shadow: 0px 0px 15px 3px rgba(153, 102, 204, 0.05);
+  box-shadow: 0px 0px 11.25px 2.25px rgba(153, 102, 204, 0.05);
 `;
 
 const Content = styled.div`
@@ -63,29 +63,29 @@ const Content = styled.div`
   align-items: flex-start;
   justify-content: center;
   height: 100%;
-  padding: 0 48px;
+  padding: 0 36px;
   box-sizing: border-box;
   text-align: left;
-  padding-bottom: 36px;
+  padding-bottom: 27px;
 `;
 
 const Title = styled.p`
   color: var(--color-black);
-  font-size: var(--font-size-26);
+  font-size: var(--font-size-20);
   font-weight: 500;
-  margin-bottom: 18px;
+  margin-bottom: 13.5px;
 `;
 
 const Value = styled.div`
   color: var(--color-black);
-  font-size: var(--font-size-42);
+  font-size: var(--font-size-32);
   font-weight: 700;
   margin: 0;
 `;
 
 const ChangeIndicator = styled.div<{ color: string }>`
   color: ${props => props.color};
-  font-size: var(—font-size-26);
+  font-size: var(--font-size-20);
   font-weight: 500;
-  margin-top: 12px;
+  margin-top: 9px;
 `;

@@ -87,16 +87,13 @@ const BackgroundPanel = styled.div`
 `;
 
 const TitleWrapper = styled.div`
-  position: absolute;
-  top: 45px;
-  left: 50%;
-  transform: translateX(-50%);
   width: 100%;
   display: flex;
   flex-direction: row;
   align-items: center;
   justify-content: center;
   box-sizing: border-box;
+  margin-bottom: 0px;
 `;
 
 const WelcomeTitle = styled.h1`
@@ -122,20 +119,17 @@ const LoginButtonWrapper = styled.div`
 
 const Form = styled.form`
   margin: 0;
-  margin-top: 105px;
+  margin-top: 0;
   align-self: stretch;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: flex-start;
-  gap: 13.875px; /* 18.5 * 0.75 */
+  gap: 12px;
   max-width: 100%;
 `;
 
 const LoginFormContainer = styled.div`
-  position: absolute;
-  top: 263.25px;
-  left: 431.25px;
   width: 585px;
   height: 382.5px;
   flex-shrink: 0;
@@ -143,9 +137,9 @@ const LoginFormContainer = styled.div`
   background: #FFF;
   display: flex;
   flex-direction: column;
-  align-items: flex-end;
-  justify-content: flex-start;
-  padding: var(--padding-45) 105px 38.625px 88.5px;
+  align-items: center;
+  justify-content: center;
+  padding: 45px 40px;
   box-sizing: border-box;
   gap: 38.625px;
   max-width: 100%;

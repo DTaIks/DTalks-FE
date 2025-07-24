@@ -56,12 +56,12 @@ export const DonutChart = ({
 };
 
 const Container = styled.div`
-  width: 300px;
-  height: 250px;
+  width: 225px;
+  height: 187.5px;
   flex-shrink: 0;
-  border-radius: var(--br-25);
+  border-radius: 18.75px;
   background: var(--color-white);
-  box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.05);
+  box-shadow: 0px 0px 7.5px 0px rgba(0, 0, 0, 0.05);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -71,24 +71,25 @@ const Container = styled.div`
 
 const Title = styled.h3`
   color: var(--color-black);
-  font-size: var(--font-size-24);
+  font-size: var(--font-size-18);
   font-weight: 600;
   position: absolute;
-  top: 24px;
-  left: 44px;
+  top: 18px;
+  left: 33px;
   margin: 0;
+  white-space: nowrap;
 `;
 
 const Wrapper = styled.div<{ $size: string }>`
   position: relative;
   width: ${({ $size }) => $size};
   height: ${({ $size }) => $size};
-  padding: 69px 0 31px 0;
+  padding: 51.75px 0 23.25px 0;
 `;
 
 const Content = styled.div`
   position: absolute;
-  top: calc(50% + 19px);
+  top: calc(50% + 14.25px);
   left: 50%;
   transform: translate(-50%, -50%);
   color: var(--color-black);
@@ -96,12 +97,12 @@ const Content = styled.div`
 `;
 
 const Percentage = styled.div`
-  font-size: var(--font-size-28);
+  font-size: var(--font-size-21);
   font-weight: 700;
 `;
 
 const Count = styled.div`
-  font-size: var(--font-size-20);
+  font-size: var(--font-size-15);
   font-weight: 500;
-  margin-top: 6px;
+  margin-top: 4.5px;
 `;

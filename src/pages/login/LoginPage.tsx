@@ -100,9 +100,10 @@ export default function LoginPage(): JSX.Element {
       setAuthenticated(true);
       setLoading(false);
       setError(null);
-      
+      setIsLoading(false); // 성공 시에도 false로
     } catch (error) {
       setLoading(false);
+      setIsLoading(false); // 실패 시에도 false로
       setError(error instanceof Error ? error.message : '로그인에 실패했습니다.');
       console.error('로그인 실패:', error);
     }
@@ -148,18 +149,12 @@ export default function LoginPage(): JSX.Element {
 
 // styled-components 정의부 (파일 하단)
 const LogoImage = styled.img`
-  position: absolute;
-  top: 114px; /* 152 * 0.75 */
-  left: calc(50% - 50.625px); /* 101.25 / 2: 화면 정중앙 */
-  width: 101.25px; /* 135 * 0.75 */
-  height: 100.5px; /* 134 * 0.75 */
+  width: 101.25px;
+  height: 100.5px;
   object-fit: cover;
   cursor: pointer;
   transition: transform 0.2s ease;
-  
-  &:hover {
-    transform: scale(1.05);
-  }
+  margin-bottom: 32px;
 `;
 
 const SignUpText = styled.span`
@@ -176,9 +171,7 @@ const SignUpLink = styled.span`
 `;
 
 const SignUpContainer = styled.div`
-  position: absolute;
-  top: 666px; /* 888 * 0.75 */
-  left: calc(50% - 195px); /* 260 * 0.75 */
+  margin-top: 32px;
   line-height: 24px;
   display: inline-block;
   width: 390px;
@@ -186,11 +179,14 @@ const SignUpContainer = styled.div`
 `;
 
 const LoginPageContainer = styled.div`
-  width: 100%;
-  position: relative;
+  width: 100vw;
+  height: 100vh;
   background-color: var(--color-ghostwhite);
-  height: 810px;
-  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: relative;
   text-align: center;
   font-size: var(--font-size-16);
   color: var(--color-black);

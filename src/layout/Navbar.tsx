@@ -26,14 +26,14 @@ const Navbar = ({ className = "" }: NavbarProps) => {
   };
 
   return (
-    <>
-      <Container className={className}>
-        <Background />
-        <BreadcrumbText>{getBreadcrumbText()}</BreadcrumbText>
-      </Container>
-      <AdminText>admin</AdminText>
-      <Profile alt="" src={ProfileImageSrc} />
-    </>
+    <Container className={className}>
+      <Background />
+      <BreadcrumbText>{getBreadcrumbText()}</BreadcrumbText>
+      <RightGroup>
+        <Profile alt="" src={ProfileImageSrc} />
+        <AdminText>admin</AdminText>
+      </RightGroup>
+    </Container>
   );
 };
 
@@ -42,48 +42,55 @@ export default Navbar;
 const Background = styled.div`
   position: absolute;
   top: 0px;
-  background-color: var(--color-white);
+  background: rgba(255, 255, 255, 0.95);
+  box-shadow: 0 0.75px 11.25px 0 rgba(153, 102, 204, 0.10);
   width: 100%;
   height: 75px;
+  z-index: 1;
 `;
 
 const AdminText = styled.div`
-  position: absolute;
-  top: 36px;
-  right: 64px;
-  font-size: var(--font-size-24);
+  font-size: var(--font-size-18);
   font-weight: 500;
   color: var(--color-black);
   font-family: var(--font-pretendard);
   z-index: 1000;
+  margin-right: 48px;
 `;
 
 const Profile = styled.img`
-  position: absolute;
-  top: 20px;
-  right: 159px;
-  width: 60px;
-  height: 60px;
+  width: 45px;
+  height: 45px;
   object-fit: cover;
+  margin-right: 12px;
   z-index: 1000;
 `;
 
 const BreadcrumbText = styled.div`
-  position: absolute;
-  top: 39px;
-  left: 58px;
-  font-size: var(--font-size-20);
+  margin-left: 93px;
+  font-size: var(--font-size-15);
   font-weight: 300;
   color: var(--color-dimgray);
   white-space: pre-wrap;
+  flex-grow: 1;
+  z-index: 1100;
 `;
 
 const Container = styled.div`
-  position: absolute;
+  position: fixed;
   top: 0px;
-  left: 400px;
+  left: 210px;
   right: 0px;
-  height: 100px;
+  height: 75px;
   background-color: transparent;
   z-index: 999;
+  display: flex;
+  align-items: center;
+  width: calc(100% - 210px);
+`; 
+
+const RightGroup = styled.div`
+  display: flex;
+  align-items: center;
+  margin-right: 0;
 `; 
