@@ -117,14 +117,20 @@ export default function LoginPage(): JSX.Element {
   const password = watch('password') || '';
 
   return (
-    <div className="page-scale">
+    <div>
       <LoginPageContainer>
         <LogoImage alt="로고" src={Logo} onClick={() => navigate('/')} />
         <LoginForm 
           email={email}
           password={password}
-          onEmailChange={(e) => setValue('email', e.target.value)}
-          onPasswordChange={(e) => setValue('password', e.target.value)}
+          onEmailChange={(e) => {
+            setValue('email', e.target.value);
+            setError(null);
+          }}
+          onPasswordChange={(e) => {
+            setValue('password', e.target.value);
+            setError(null);
+          }}
           onLogin={handleSubmit(handleLogin)}
           isLoading={isLoading}
           error={error || errors.email?.message || errors.password?.message}
@@ -143,10 +149,10 @@ export default function LoginPage(): JSX.Element {
 // styled-components 정의부 (파일 하단)
 const LogoImage = styled.img`
   position: absolute;
-  top: 152px;
-  left: calc(50% - 67px);
-  width: 135px;
-  height: 134px;
+  top: 114px; /* 152 * 0.75 */
+  left: calc(50% - 50.625px); /* 101.25 / 2: 화면 정중앙 */
+  width: 101.25px; /* 135 * 0.75 */
+  height: 100.5px; /* 134 * 0.75 */
   object-fit: cover;
   cursor: pointer;
   transition: transform 0.2s ease;
@@ -156,11 +162,14 @@ const LogoImage = styled.img`
   }
 `;
 
-const SignUpText = styled.span``;
+const SignUpText = styled.span`
+  font-size: var(--font-size-16);
+`;
 
 const SignUpLink = styled.span`
   text-decoration: underline;
   cursor: pointer;
+  font-size: var(--font-size-16);
   &:hover {
     color: var(--color-mediumpurple-300);
   }
@@ -168,21 +177,22 @@ const SignUpLink = styled.span`
 
 const SignUpContainer = styled.div`
   position: absolute;
-  top: 888px;
-  left: calc(50% - 260px);
+  top: 666px; /* 888 * 0.75 */
+  left: calc(50% - 195px); /* 260 * 0.75 */
   line-height: 24px;
   display: inline-block;
-  width: 520px;
+  width: 390px;
+  font-size: var(--font-size-16);
 `;
 
 const LoginPageContainer = styled.div`
   width: 100%;
   position: relative;
   background-color: var(--color-ghostwhite);
-  height: 1080px;
+  height: 810px;
   overflow: hidden;
   text-align: center;
-  font-size: var(--font-size-22);
+  font-size: var(--font-size-16);
   color: var(--color-black);
   font-family: var(--font-pretendard);
 `; 

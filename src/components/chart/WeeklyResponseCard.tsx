@@ -89,11 +89,10 @@ export default WeeklyResponseCard;
 
 const Container = styled.div`
   width: 1417px;
-  height: 580px;
   border-radius: var(--br-25);
   background: var(--color-white);
   box-shadow: 0px 8px 24px 0px rgba(125, 93, 246, 0.1);
-  margin: 60px 0 117px;
+  margin: 60px 0 0px;
   display: flex;
   flex-direction: column;
 `;
@@ -120,7 +119,7 @@ const CardTitle = styled.h2`
 `;
 
 const BarChartWrapper = styled.div`
-  flex: 1;
+
   border-radius: var(--br-25);
   background: #f9f5ff;
   margin: 60px;

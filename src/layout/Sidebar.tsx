@@ -263,27 +263,32 @@ const Sidebar: React.FC<SidebarProps> = ({ className = "" }) => {
 export default Sidebar;
 
 const SidebarRoot = styled.div`
-  width: 400px;
-  min-height: 3067px;
+  width: 210px;
+  position: fixed;
+  top: 0;
+  left: 0;
   height: 100vh;
   background-color: var(--color-white);
-  font-size: var(--font-size-22);
+  font-size: var(--font-size-14);
   color: var(--color-dimgray);
   font-family: var(--font-pretendard);
-  box-shadow: 0px 1px 15px rgba(153, 102, 204, 0.1);
+  box-shadow: 0px 0.7px 10.5px rgba(153, 102, 204, 0.1);
   display: flex;
   flex-direction: column;
+  padding-bottom: 56px;
+  z-index: 1000;
+  transform-origin: top left;
 `;
 
 const LogoRow = styled.div`
   display: flex;
   align-items: center;
-  padding: 24px 32px 0 24px;
+  padding: 16.8px 22.4px 0 16.8px;
 `;
 
 const Logo = styled.img`
-  width: 55.6px;
-  height: 55px;
+  width: 38.92px;
+  height: 38.5px;
   object-fit: cover;
   cursor: pointer;
   transition: opacity 0.2s ease;
@@ -291,26 +296,26 @@ const Logo = styled.img`
 `;
 
 const AdminPageTitle = styled.div`
-  margin-left: 24px;
+  margin-left: 16.8px;
   font-weight: 600;
-  font-size: var(--font-size-22);
+  font-size: var(--font-size-14);
   color: var(--color-dimgray);
 `;
 
 const DividerLine = styled.div`
-  border-top: 0.5px solid var(--color-darkgray-200);
-  margin: 32px 0 0 0;
+  border-top: 0.35px solid var(--color-darkgray-200);
+  margin: 22.4px 0 0 0;
 `;
 
 const MenuSection = styled.div<{ isSecond?: boolean }>`
-  margin-top: ${({ isSecond }) => (isSecond ? '40px' : '24px')};
+  margin-top: ${({ isSecond }) => (isSecond ? '28px' : '12.6px')};
 `;
 
 const MenuTitle = styled.div`
-  font-size: var(--font-size-22);
+  font-size: var(--font-size-14);
   font-weight: 600;
   color: var(--color-dimgray);
-  padding: 0 32px 12px 32px;
+  padding: 0 22.4px 8.4px 22.4px;
   margin-top: 0px;
 `;
 
@@ -318,18 +323,18 @@ const MenuItem = styled.div<MenuItemProps>`
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 12px 32px 12px 60px;
+  padding: 8.4px 22.4px 8.4px 42px;
   cursor: pointer;
   transition: background-color 0.2s ease;
-  border-radius: 8px;
+  border-radius: 5.6px;
   position: relative;
   overflow: hidden;
 `;
 
 const SelectedMenuItemBackground = styled.div<{ color?: string }>`
   background: ${({ color }) => color || 'rgba(153, 102, 204, 0.15)'};
-  margin: 0 20px;
-  border-radius: 8px;
+  margin: 0 14px;
+  border-radius: 5.6px;
   position: absolute;
   top: 0;
   left: 0;
@@ -339,7 +344,7 @@ const SelectedMenuItemBackground = styled.div<{ color?: string }>`
 `;
 
 const MenuItemText = styled.div`
-  font-size: var(--font-size-20);
+  font-size: var(--font-size-14);
   font-weight: 500;
   color: var(--color-dimgray);
   margin-top: 0px;
@@ -351,7 +356,7 @@ const DropdownIcon = styled.span<DropdownIconProps>`
   cursor: pointer;
   transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   transform: ${({ isOpen }) => isOpen ? 'rotate(180deg)' : 'rotate(0deg)'};
-  font-size: var(--font-size-16);
+  font-size: var(--font-size-14);
   color: #666666;
   margin-top: 0px;
   position: relative;
@@ -359,7 +364,7 @@ const DropdownIcon = styled.span<DropdownIconProps>`
 `;
 
 const SubMenuContainer = styled.div<{ isOpen: boolean }>`
-  max-height: ${({ isOpen }) => isOpen ? '500px' : '0'};
+  max-height: ${({ isOpen }) => isOpen ? '350px' : '0'};
   overflow: hidden;
   transition: max-height 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   background: none;
@@ -370,12 +375,12 @@ const DropdownMenuWrapper = styled.div`
 `;
 
 const SubMenuItem = styled.div<SubMenuItemProps>`
-  padding: 12px 32px 12px 92px;
-  font-size: var(--font-size-20);
+  padding: 8.4px 22.4px 8.4px 64.4px;
+  font-size: var(--font-size-14);
   font-weight: 500;
   color: var(--color-dimgray);
   cursor: pointer;
-  border-radius: 8px;
+  border-radius: 5.6px;
   transition: background-color 0.2s ease;
   position: relative;
   overflow: hidden;
@@ -384,8 +389,8 @@ const SubMenuItem = styled.div<SubMenuItemProps>`
 
 const SelectedSubMenuItemBackground = styled.div<{ color?: string }>`
   background: ${({ color }) => color || 'rgba(153, 102, 204, 0.15)'};
-  margin: 0 20px;
-  border-radius: 8px;
+  margin: 0 14px;
+  border-radius: 5.6px;
   position: absolute;
   top: 0;
   left: 0;

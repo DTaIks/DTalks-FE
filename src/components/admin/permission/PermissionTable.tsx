@@ -1,8 +1,10 @@
+import React, { useState } from "react";
 import styled from "styled-components";
 import Roll1 from '../../../assets/permission/Roll.svg';
 import Roll2 from '../../../assets/permission/Roll2.svg';
 import Roll3 from '../../../assets/permission/Roll3.svg';
 import ActiveIcon from '../../../assets/Permission/Active.svg';
+import PermissionModal from './PermissionModal';
 
 interface PermissionUser {
   id: number;
@@ -60,42 +62,64 @@ function getRowPositions(rowCount: number, cellHeight: number) {
 }
 
 const PermissionTable = () => {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedUser, setSelectedUser] = useState<PermissionUser | null>(null);
+  
   const cellHeight = 48;
   const rowPositions = getRowPositions(permissionData.length, cellHeight);
+
+  const handleEditClick = (user: PermissionUser) => {
+    setSelectedUser(user);
+    setIsModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setSelectedUser(null);
+  };
+
   return (
-    <Wrapper>
-      <Container />
-      <Divider />
-      <NameColumn>역할명</NameColumn>
-      <DescriptionColumn>설명</DescriptionColumn>
-      <UserCountColumn>사용자 수</UserCountColumn>
-      <StatusColumn>상태</StatusColumn>
-      <ActionColumn>작업</ActionColumn>
-      <HeaderDivider />
-      {permissionData.map((user, idx) => {
-        const { baseTop, cellTop } = rowPositions[idx];
-        return (
-          <div key={user.id}>
-            <NameCell style={{ top: `${baseTop}px` }}>
-              <RoleImage src={user.image} alt={user.name} />
-              <NameTextBox>
-                <NameText>{user.name}</NameText>
-                <EngNameText>{user.engName}</EngNameText>
-              </NameTextBox>
-            </NameCell>
-            <DescriptionCell style={{ top: `${cellTop}px` }}>{user.description}</DescriptionCell>
-            <UserCountCell style={{ top: `${cellTop}px` }}>{user.userCount}</UserCountCell>
-            <StatusCell style={{ top: `${cellTop}px` }}>
-              <StatusIcon src={ActiveIcon} alt={user.status} />
-            </StatusCell>
-            <ActionCell style={{ top: `${cellTop}px` }}>
-              <ActionText>수정</ActionText>
-            </ActionCell>
-          </div>
-        );
-      })}
-      <Title>역할 관리</Title>
-    </Wrapper>
+    <>
+      <Wrapper>
+        <Container />
+        <Divider />
+        <NameColumn>역할명</NameColumn>
+        <DescriptionColumn>설명</DescriptionColumn>
+        <UserCountColumn>사용자 수</UserCountColumn>
+        <StatusColumn>상태</StatusColumn>
+        <ActionColumn>작업</ActionColumn>
+        <HeaderDivider />
+        {permissionData.map((user, idx) => {
+          const { baseTop, cellTop } = rowPositions[idx];
+          return (
+            <div key={user.id}>
+              <NameCell style={{ top: `${baseTop}px` }}>
+                <RoleImage src={user.image} alt={user.name} />
+                <NameTextBox>
+                  <NameText>{user.name}</NameText>
+                  <EngNameText>{user.engName}</EngNameText>
+                </NameTextBox>
+              </NameCell>
+              <DescriptionCell style={{ top: `${cellTop}px` }}>{user.description}</DescriptionCell>
+              <UserCountCell style={{ top: `${cellTop}px` }}>{user.userCount}</UserCountCell>
+              <StatusCell style={{ top: `${cellTop}px` }}>
+                <StatusIcon src={ActiveIcon} alt={user.status} />
+              </StatusCell>
+              <ActionCell style={{ top: `${cellTop}px` }}>
+                <ActionText onClick={() => handleEditClick(user)}>수정</ActionText>
+              </ActionCell>
+            </div>
+          );
+        })}
+        <Title>역할 관리</Title>
+      </Wrapper>
+
+      <PermissionModal 
+        open={isModalOpen} 
+        onClose={handleCloseModal} 
+        selectedUser={selectedUser}
+      />
+    </>
   );
 };
 

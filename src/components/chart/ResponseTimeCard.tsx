@@ -189,7 +189,6 @@ const ChartWrapper = styled.div`
   width: 320px;
   height: 320px;
   margin-left: 60px;
-  margin-bottom: 120px;
 `;
 
 const CenterContent = styled.div`
@@ -218,7 +217,6 @@ const LegendContainer = styled.div`
   flex-direction: column;
   gap: var(--gap-24);
   flex: 0.8;
-  margin-bottom: 120px;
 `;
 
 const LegendItem = styled.div`

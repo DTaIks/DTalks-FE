@@ -84,18 +84,18 @@ const InputField: React.FC<InputFieldProps> = ({
 
 // 로그인용 스타일 컴포넌트들
 const LoginInputRoot = styled.div<{ inputWidth?: string; inputAlignSelf?: string }>`
-  width: 510px;
+  width: 382.5px;
   overflow: hidden;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
   justify-content: center;
-  gap: var(--gap-16);
+  gap: var(--gap-12); /* 16 * 0.75 */
   text-align: left;
   font-size: var(--font-size-22);
   color: var(--color-black);
   font-family: var(--font-pretendard);
-  width: ${(p) => p.inputWidth};
+  width: ${(p) => p.inputWidth || '382.5px'};
   align-self: ${(p) => p.inputAlignSelf};
 `;
 
@@ -104,6 +104,7 @@ const LoginTitle = styled.div`
   position: relative;
   line-height: 20px;
   font-weight: 500;
+  font-size: var(--font-size-16);
 `;
 
 const LoginText = styled.input`
@@ -119,7 +120,7 @@ const LoginText = styled.input`
   outline: none;
   background: transparent;
   font-family: var(--font-pretendard);
-  font-size: var(--font-size-20);
+  font-size: 16px;
   color: var(--color-gray-100);
   width: 100%;
   padding: 0;
@@ -127,16 +128,16 @@ const LoginText = styled.input`
 
 const LoginTextfield = styled.div`
   align-self: stretch;
-  border-radius: var(--br-6);
+  border-radius: 4.5px; /* 6 * 0.75 */
   background-color: var(--color-white);
-  border: 1px solid var(--color-gray-200);
+  border: 0.75px solid var(--color-gray-200); /* 1 * 0.75 */
   box-sizing: border-box;
-  height: 46px;
+  height: 34.5px; /* 46 * 0.75 */
   display: flex;
   flex-direction: row;
   align-items: center;
   justify-content: flex-start;
-  padding: var(--padding-8) var(--padding-12);
+  padding: 6px 9px; /* 8, 12 * 0.75 */
   font-size: var(--font-size-20);
   color: var(--color-gray-100);
 `;
