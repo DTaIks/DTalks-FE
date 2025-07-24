@@ -71,7 +71,7 @@ const Wrapper = styled.div`
   overflow-x: hidden;
   position: relative;
 `;
-const TableGrid = `display: grid; grid-template-columns: 1.5fr 1.5fr 1fr 2.2fr; align-items: center; row-gap: 0;`;
+const TableGrid = `display: grid; grid-template-columns: 1.5fr 1.5fr 1.5fr 2.2fr; align-items: center; row-gap: 0;`;
 const Divider = styled.div`
   position: relative;
   left: -36px;
@@ -82,9 +82,12 @@ const Divider = styled.div`
 `;
 const TableHeader = styled.div`
   ${TableGrid}
-  font-weight: 600;
+  color: #2D1457;
+  font-family: Pretendard;
   font-size: 18px;
-  color: var(--color-dimgray);
+  font-style: normal;
+  font-weight: 600;
+  line-height: normal;
   margin-bottom: 0;
   margin-top: 0px;
   background: transparent;
@@ -92,7 +95,7 @@ const TableHeader = styled.div`
   padding: 0 0 16px 0;
 `;
 const TableRow = styled.div`  ${TableGrid}
-  margin-top: 12px;
+  margin-top: 8px;
   font-weight: 500;
   font-size: 18px;
   color: var(--color-black);
@@ -117,4 +120,5 @@ const SearchContainerOutside = styled.div`
   align-items: center;
   width: 989.33px;
   margin: 0 auto 16px auto;
+  margin-left: 72px;
 `; 

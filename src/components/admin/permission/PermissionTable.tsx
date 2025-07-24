@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import styled from "styled-components";
 import Roll1 from '../../../assets/permission/Roll.svg';
 import Roll2 from '../../../assets/permission/Roll2.svg';
@@ -46,27 +46,17 @@ const permissionData: PermissionUser[] = [
   }
 ];
 
-// 행 위치 계산 함수
-function getRowPositions(rowCount: number, cellHeight: number) {
-  const dividerBottom = 205; // 디바이더 선
-  const firstRowTop = dividerBottom + 32; // 첫 행 top
-  const firstRowCenter = firstRowTop + cellHeight / 2;
-  const lastRowCenterMax = 534; // 마지막 행 중앙
-  const rowHeight = (lastRowCenterMax - firstRowCenter) / (rowCount - 1);
-  return Array.from({ length: rowCount }, (_, idx) => {
-    const baseTop = idx === 0 ? firstRowTop : firstRowTop + idx * rowHeight;
-    const imageCenterY = baseTop + 32; // 롤 이미지 중앙
-    const cellTop = imageCenterY - cellHeight / 2;
-    return { baseTop, cellTop };
-  });
-}
+const columns = [
+  { key: 'name', label: '역할명', width: '22%' },
+  { key: 'description', label: '설명', width: '32%' },
+  { key: 'userCount', label: '사용자 수', width: '14%' },
+  { key: 'status', label: '상태', width: '14%' },
+  { key: 'action', label: '작업', width: '14%' },
+];
 
 const PermissionTable = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState<PermissionUser | null>(null);
-  
-  const cellHeight = 48;
-  const rowPositions = getRowPositions(permissionData.length, cellHeight);
 
   const handleEditClick = (user: PermissionUser) => {
     setSelectedUser(user);
@@ -80,40 +70,42 @@ const PermissionTable = () => {
 
   return (
     <>
-      <Wrapper>
-        <Container />
-        <Divider />
-        <NameColumn>역할명</NameColumn>
-        <DescriptionColumn>설명</DescriptionColumn>
-        <UserCountColumn>사용자 수</UserCountColumn>
-        <StatusColumn>상태</StatusColumn>
-        <ActionColumn>작업</ActionColumn>
-        <HeaderDivider />
-        {permissionData.map((user, idx) => {
-          const { baseTop, cellTop } = rowPositions[idx];
-          return (
-            <div key={user.id}>
-              <NameCell style={{ top: `${baseTop}px` }}>
-                <RoleImage src={user.image} alt={user.name} />
-                <NameTextBox>
-                  <NameText>{user.name}</NameText>
-                  <EngNameText>{user.engName}</EngNameText>
-                </NameTextBox>
-              </NameCell>
-              <DescriptionCell style={{ top: `${cellTop}px` }}>{user.description}</DescriptionCell>
-              <UserCountCell style={{ top: `${cellTop}px` }}>{user.userCount}</UserCountCell>
-              <StatusCell style={{ top: `${cellTop}px` }}>
-                <StatusIcon src={ActiveIcon} alt={user.status} />
-              </StatusCell>
-              <ActionCell style={{ top: `${cellTop}px` }}>
-                <ActionText onClick={() => handleEditClick(user)}>수정</ActionText>
-              </ActionCell>
-            </div>
-          );
-        })}
-        <Title>역할 관리</Title>
-      </Wrapper>
-
+      <TableWrapper>
+        <TableBox>
+          <TableHeader>
+            {columns.map((col, idx) => (
+              <HeaderCell
+                key={col.key}
+                style={{ width: col.width, marginRight: idx === 0 ? '48px' : 0 }}
+              >
+                {col.label}
+              </HeaderCell>
+            ))}
+          </TableHeader>
+          <Divider />
+          <TableBody>
+            {permissionData.map((user) => (
+              <TableRow key={user.id}>
+                <BodyCell style={{ width: columns[0].width, justifyContent: 'flex-start', paddingLeft: '48px' }}>
+                  <RoleImage src={user.image} alt={user.name} />
+                  <NameTextBox>
+                    <NameText>{user.name}</NameText>
+                    <EngNameText>{user.engName}</EngNameText>
+                  </NameTextBox>
+                </BodyCell>
+                <BodyCell style={{ width: columns[1].width, border: "none" }}>{user.description}</BodyCell>
+                <BodyCell style={{ width: columns[2].width, border: "none"}}>{user.userCount}</BodyCell>
+                <BodyCell style={{ width: columns[3].width, border: "none" }}>
+                  <StatusIcon src={ActiveIcon} alt={user.status} />
+                </BodyCell>
+                <BodyCell style={{ width: columns[4].width }}>
+                  <ActionText onClick={() => handleEditClick(user)}>수정</ActionText>
+                </BodyCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </TableBox>
+      </TableWrapper>
       <PermissionModal 
         open={isModalOpen} 
         onClose={handleCloseModal} 
@@ -125,128 +117,76 @@ const PermissionTable = () => {
 
 export default PermissionTable;
 
-const Wrapper = styled.div`
-  position: absolute;
-  top: 275px;
-  left: 458px;
-  margin-left: 60px;
-  width: 1413px;
-  height: 434px;
+const TableWrapper = styled.div`
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 32px 0;
 `;
-const Container = styled.div`
-  position: absolute;
-  top: 0px;
-  left: 0px;
-  box-shadow: 0px 0px 15px 3px rgba(153, 102, 204, 0.05);
-  border-radius: var(--br-25);
-  background-color: var(--color-white);
-  width: 1413px;
-  height: 590px;
-  max-width: 100%;
-  overflow-x: auto;
+const TableBox = styled.div`
+  width: 1052.25px;
+  background: var(--color-white);
+  border-radius: 17.5px;
+  box-shadow: 0px 0px 10.5px 2.1px rgba(153, 102, 204, 0.05);
+  overflow: hidden;
 `;
-const Divider = styled.div`
-  position: absolute;
-  top: 117px;
-  left: -0.2px;
-  border-top: 0.5px solid var(--color-darkgray);
-  box-sizing: border-box;
-  width: 1413.5px;
-  height: 0.5px;
-`;
-const HeaderDivider = styled.div`
-  position: absolute;
-  top: 205px;
-  left: -0.2px;
-  border-top: 0.5px solid var(--color-darkgray);
-  box-sizing: border-box;
-  width: 1413.5px;
-  height: 0.5px;
+const TableHeader = styled.div`
+  display: flex;
+  width: 100%;
+  padding: 24px 0 24px 0;
+  background: transparent;
 `;
 const HeaderCell = styled.div`
-  position: absolute;
-  top: 152px;
+  width: 100%;
   font-weight: 600;
-  font-size: var(--font-size-24);
+  font-size: 16.8px;
   color: var(--color-dimgray);
-`;
-const NameColumn = styled(HeaderCell)`
-  left: 49px;
-`;
-const DescriptionColumn = styled(HeaderCell)`
-  left: 327px;
-  width: 450px;
-`;
-const UserCountColumn = styled(HeaderCell)`
-  left: 800px;
-  width: 120px;
-`;
-const StatusColumn = styled(HeaderCell)`
-  left: 1065px;
-  display: inline-block;
-  width: 120px;
-`;
-const ActionColumn = styled(HeaderCell)`
-  left: 1300px;
-  width: 80px;
-`;
-const DataCell = styled.div`
-  position: absolute;
-  font-weight: 500;
-  font-size: var(--font-size-24);
-  color: var(--color-black);
-`;
-const NameCell = styled(DataCell)`
-  left: 49px;
+  text-align: center;
   display: flex;
   align-items: center;
-  gap: 15px;
+  justify-content: center;
 `;
-const DescriptionCell = styled(DataCell)`
-  left: 327px;
-  width: 450px;
+const Divider = styled.div`
+  width: 100%;
+  border-top: 0.35px solid var(--color-darkgray);
+  margin-bottom: 4px;
 `;
-const UserCountCell = styled(DataCell)`
-  left: 800px;
-  width: 120px;
+const TableBody = styled.div`
+  width: 100%;
 `;
-const StatusCell = styled(DataCell)`
-  left: 1050px;
-  display: inline-block;
-  width: 120px;
-  height: 48px;
-  margin-top: -3px;
-`;
-const ActionCell = styled(DataCell)`
-  left: 1300px;
-  width: 80px;
+const TableRow = styled.div`
   display: flex;
-  gap: 8px;
-  align-items: flex-start;
-  justify-content: flex-start;
+  width: 100%;
+  min-height: 72px;
+  align-items: center;
+  margin-bottom: 12px;
+`;
+const BodyCell = styled.div`
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 500;
+  font-size: 16.8px;
+  color: var(--color-black);
+  height: 72px;
+  gap: 10px;
 `;
 const ActionText = styled.span`
   color: var(--color-black);
-  font-size: 24px;
+  font-size: 16.8px;
   cursor: pointer;
-  padding: 0;
-  border-radius: 4px;
+  border-radius: 2.8px;
   transition: color 0.2s;
   &:hover {
     color: var(--color-mediumpurple-300);
   }
 `;
-const Title = styled.b`
-  position: absolute;
-  top: 49px;
-  left: 48px;
-  font-size: var(--font-size-26);
-  color: var(--color-black);
-`;
 const RoleImage = styled.img`
-  width: 48px;
-  height: 48px;
-  border-radius: 12px;
+  width: 33.6px;
+  height: 33.6px;
+  border-radius: 8.4px;
   background: #ffa800;
   object-fit: cover;
 `;
@@ -255,21 +195,20 @@ const NameTextBox = styled.div`
   flex-direction: column;
 `;
 const NameText = styled.span`
-  font-size: 24px;
+  font-size: 16.8px;
   font-weight: 700;
   color: var(--color-black);
   width: 100%;
   text-align: left;
 `;
 const EngNameText = styled.span`
-  font-size: 20px;
+  font-size: 14px;
   color: #888;
-  margin-left: 0;
   width: 100%;
   text-align: left;
 `;
 const StatusIcon = styled.img`
-  width: 75px;
-  height: 42px;
+  width: 52.5px;
+  height: 29.4px;
   object-fit: contain;
 `; 

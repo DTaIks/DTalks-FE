@@ -33,6 +33,12 @@ body {
   --color-white: #fff;
   --color-ghostwhite: #f8f2fb;
   --color-divider: #E5E5E5;
+  --table-header-color: #2D1457;
+  --table-header-font: Pretendard;
+  --table-header-font-size: 18px;
+  --table-header-font-weight: 600;
+  --table-header-line-height: normal;
+  --table-header-font-style: normal;
 
   /* 간격 설정 */
   --gap-6: 6px;

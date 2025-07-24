@@ -42,11 +42,11 @@ export default Navbar;
 const Background = styled.div`
   position: absolute;
   top: 0px;
-  background: rgba(255, 255, 255, 0.95);
+  background: rgba(255, 255, 255, 1);
   box-shadow: 0 0.75px 11.25px 0 rgba(153, 102, 204, 0.10);
   width: 100%;
   height: 75px;
-  z-index: 1;
+  z-index: 100;
 `;
 
 const AdminText = styled.div`
