@@ -4,7 +4,6 @@ import Roll1 from '../../../assets/permission/Roll.svg';
 import Roll2 from '../../../assets/permission/Roll2.svg';
 import Roll3 from '../../../assets/permission/Roll3.svg';
 import ActiveIcon from '../../../assets/Permission/Active.svg';
-import PermissionModal from './PermissionModal';
 
 interface PermissionUser {
   id: number;
@@ -55,17 +54,14 @@ const columns = [
 ];
 
 const PermissionTable = () => {
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedUser, setSelectedUser] = useState<PermissionUser | null>(null);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
-  const handleEditClick = (user: PermissionUser) => {
-    setSelectedUser(user);
-    setIsModalOpen(true);
+  const handleEditClick = () => {
+    setIsEditModalOpen(true);
   };
 
-  const handleCloseModal = () => {
-    setIsModalOpen(false);
-    setSelectedUser(null);
+  const handleEditModalClose = () => {
+    setIsEditModalOpen(false);
   };
 
   return (
@@ -99,23 +95,92 @@ const PermissionTable = () => {
                   <StatusIcon src={ActiveIcon} alt={user.status} />
                 </BodyCell>
                 <BodyCell style={{ width: columns[4].width }}>
-                  <ActionText onClick={() => handleEditClick(user)}>수정</ActionText>
+                  <ActionText onClick={handleEditClick}>수정</ActionText>
                 </BodyCell>
               </TableRow>
             ))}
           </TableBody>
         </TableBox>
       </TableWrapper>
-      <PermissionModal 
-        open={isModalOpen} 
-        onClose={handleCloseModal} 
-        selectedUser={selectedUser}
-      />
+
+      {isEditModalOpen && (
+        <EditModalOverlay>
+          <EditModalContainer>
+            <EditModalCloseButton onClick={handleEditModalClose}>×</EditModalCloseButton>
+            <EditModalContent>
+              <EditModalTitle>역할 수정</EditModalTitle>
+              <EditModalBody>
+                <p>역할 수정 내용이 여기에 들어갑니다.</p>
+              </EditModalBody>
+            </EditModalContent>
+          </EditModalContainer>
+        </EditModalOverlay>
+      )}
     </>
   );
 };
 
 export default PermissionTable;
+
+const EditModalOverlay = styled.div`
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+`;
+
+const EditModalContainer = styled.div`
+  width: 868px;
+  height: 678px;
+  background: #FFF;
+  border-radius: 19.5px;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  padding: 2rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+`;
+
+const EditModalCloseButton = styled.button`
+  position: absolute;
+  top: 24px;
+  right: 32px;
+  background: none;
+  border: none;
+  font-size: 24px;
+  color: #666;
+  cursor: pointer;
+  z-index: 1;
+`;
+
+const EditModalContent = styled.div`
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+`;
+
+const EditModalTitle = styled.h2`
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #222;
+  margin: 0 0 2rem 0;
+`;
+
+const EditModalBody = styled.div`
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+`;
 
 const TableWrapper = styled.div`
   width: 100%;

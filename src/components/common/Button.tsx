@@ -115,28 +115,28 @@ const StyledButton = styled.button<{
 }>`
   display: flex;
   width: ${props => {
-    if (props.variant === 'submit') return '381px'; /* 508 * 0.75 */
-    if (props.variant === 'login') return '382.125px'; /* 509.5 * 0.75 */
-    return props.width || '82.5px'; /* 110 * 0.75 */
+    if (props.variant === 'submit') return '381px';
+    if (props.variant === 'login') return '382.125px';
+    return props.width || '82.5px';
   }};
   height: ${props => {
-    if (props.variant === 'submit') return '34.5px'; /* 46 * 0.75 */
-    if (props.variant === 'login') return '34.5px'; /* 46 * 0.75 */
+    if (props.variant === 'submit') return '34.5px'; 
+    if (props.variant === 'login') return '34.5px';
     return props.height || '34.5px';
   }};
   padding: ${props => {
-    if (props.variant === 'submit') return '9px'; /* 12 * 0.75 */
-    if (props.variant === 'login') return '0.375px 0px 0px'; /* 0.5 * 0.75 */
-    return '6px 12px'; /* 8, 16 * 0.75 */
+    if (props.variant === 'submit') return '9px';
+    if (props.variant === 'login') return '0.375px 0px 0px';
+    return '6px 12px';
   }};
   flex-direction: ${props => props.variant === 'login' ? 'row' : 'column'};
   justify-content: ${props => props.variant === 'login' ? 'flex-start' : 'center'};
   align-items: ${props => props.variant === 'login' ? 'flex-start' : 'center'};
   flex-shrink: 0;
   border-radius: ${props => {
-    if (props.variant === 'submit') return '6px'; /* 8 * 0.75 */
-    if (props.variant === 'login') return '6px'; /* var(--br-8) * 0.75 */
-    return '4.5px'; /* 6 * 0.75 */
+    if (props.variant === 'submit') return '6px';
+    if (props.variant === 'login') return '6px';
+    return '4.5px';
   }};
   background-color: ${props => {
     if (props.variant === 'submit') {
@@ -165,7 +165,7 @@ const StyledButton = styled.button<{
       transform: scale(1.02);
       ${LoginButtonInner} {
         background-color: #7742A7;
-        box-shadow: 0 3px 6px rgba(119, 66, 167, 0.3); /* 4, 8 * 0.75 */
+        box-shadow: 0 3px 6px rgba(119, 66, 167, 0.3);
         transform: scale(1.02);
       }
     ` : `
@@ -177,6 +177,6 @@ const StyledButton = styled.button<{
     cursor: not-allowed;
   }
   &:active:not(:disabled) {
-    transform: ${props => props.variant === 'login' ? 'scale(0.98)' : 'translateY(0.75px)'}; /* 1 * 0.75 */
+    transform: ${props => props.variant === 'login' ? 'scale(0.98)' : 'translateY(0.75px)'};
   }
 `; 

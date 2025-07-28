@@ -18,7 +18,7 @@ export default TitleContainer;
 
 const Container = styled.div`
   position: absolute;
-  top: 117px;
+  top: 40px;
   left: 255px;
   width: 1056.75px;
   height: 65.25px;

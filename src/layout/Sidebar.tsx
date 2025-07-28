@@ -2,6 +2,8 @@ import styled from "styled-components";
 import React, { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import LogoImage from "../assets/common/Small_Logo.png";
+import ProfileImageSrc from "../assets/common/Profile.png";
+import SettingIcon from "../assets/common/setting.svg";
 
 export type SidebarProps = {
   className?: string;
@@ -32,8 +34,7 @@ const MENU_ITEMS = {
   REPORT_FORM: "reportForm",
   MEDIA: "media",
   SCHEDULE_LIST: "scheduleList",
-  SCHEDULE_REGISTER: "scheduleRegister",
-  SETTINGS: "settings"
+  SCHEDULE_REGISTER: "scheduleRegister"
 } as const;
 
 const DROPDOWN_MENUS = {
@@ -117,12 +118,6 @@ const menuData: MenuSectionData[] = [
         ]
       }
     ]
-  },
-  {
-    title: "시스템",
-    items: [
-      { key: MENU_ITEMS.SETTINGS, text: "설정", className: "stats" }
-    ]
   }
 ];
 
@@ -142,7 +137,6 @@ const Sidebar: React.FC<SidebarProps> = ({ className = "" }) => {
     if (location.pathname === "/admin") return MENU_ITEMS.STATS;
     if (location.pathname.startsWith("/admin/users")) return MENU_ITEMS.USER_LIST;
     if (location.pathname.startsWith("/admin/permission")) return MENU_ITEMS.PERMISSION;
-    if (location.pathname.startsWith("/admin/settings")) return MENU_ITEMS.SETTINGS;
     // 필요시 추가
     return "";
   };
@@ -169,9 +163,6 @@ const Sidebar: React.FC<SidebarProps> = ({ className = "" }) => {
         break;
       case MENU_ITEMS.PERMISSION:
         navigate("/admin/permission");
-        break;
-      case MENU_ITEMS.SETTINGS:
-        navigate("/admin/settings");
         break;
       default:
         break;
@@ -242,20 +233,30 @@ const Sidebar: React.FC<SidebarProps> = ({ className = "" }) => {
         <AdminPageTitle>관리자 페이지</AdminPageTitle>
       </LogoRow>
       <DividerLine />
-      {menuData.map((section, index) => (
-        <MenuSection key={index} isSecond={index === 1 || index === 6}>
-          {section.title && <MenuTitle>{section.title}</MenuTitle>}
-          {section.items.map((item) =>
-            item.isDropdown ? (
-              <DropdownMenuWrapper key={item.key}>
-                {renderMenuItem(item)}
-              </DropdownMenuWrapper>
-            ) : (
-              renderMenuItem(item)
-            )
-          )}
-        </MenuSection>
-      ))}
+      <MenuContent>
+        {menuData.map((section, index) => (
+          <MenuSection key={index} isSecond={index === 1}>
+            {section.title && <MenuTitle>{section.title}</MenuTitle>}
+            {section.items.map((item) =>
+              item.isDropdown ? (
+                <DropdownMenuWrapper key={item.key}>
+                  {renderMenuItem(item)}
+                </DropdownMenuWrapper>
+              ) : (
+                renderMenuItem(item)
+              )
+            )}
+          </MenuSection>
+        ))}
+      </MenuContent>
+      <ProfileDivider />
+      <ProfileSection>
+        <Profile alt="" src={ProfileImageSrc} />
+        <AdminText>admin</AdminText>
+        <SettingButton>
+          <SettingImage alt="" src={SettingIcon} />
+        </SettingButton>
+      </ProfileSection>
     </SidebarRoot>
   );
 };
@@ -263,7 +264,7 @@ const Sidebar: React.FC<SidebarProps> = ({ className = "" }) => {
 export default Sidebar;
 
 const SidebarRoot = styled.div`
-  width: 210px;
+  width: 248px;
   position: fixed;
   top: 0;
   left: 0;
@@ -275,7 +276,6 @@ const SidebarRoot = styled.div`
   box-shadow: 0px 0.7px 10.5px rgba(153, 102, 204, 0.1);
   display: flex;
   flex-direction: column;
-  padding-bottom: 56px;
   z-index: 1000;
   transform-origin: top left;
 `;
@@ -298,7 +298,7 @@ const Logo = styled.img`
 const AdminPageTitle = styled.div`
   margin-left: 16.8px;
   font-weight: 600;
-  font-size: var(--font-size-14);
+  font-size: var(--font-size-16);
   color: var(--color-dimgray);
 `;
 
@@ -364,7 +364,7 @@ const DropdownIcon = styled.span<DropdownIconProps>`
 `;
 
 const SubMenuContainer = styled.div<{ isOpen: boolean }>`
-  max-height: ${({ isOpen }) => isOpen ? '350px' : '0'};
+  max-height: ${({ isOpen }) => isOpen ? '100px' : '0'};
   overflow: hidden;
   transition: max-height 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   background: none;
@@ -397,4 +397,61 @@ const SelectedSubMenuItemBackground = styled.div<{ color?: string }>`
   right: 0;
   bottom: 0;
   z-index: 0;
+`;
+
+const MenuContent = styled.div`
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding-bottom: 56px;
+`;
+
+const ProfileDivider = styled.div`
+  height: 0.35px;
+  background-color: #E9E0F0
+  margin: 0;
+`;
+
+const ProfileSection = styled.div`
+  display: flex;
+  align-items: center;
+  padding: 16.8px 22.4px;
+  border-top: 0.35px solid var(--color-darkgray-200);
+  margin-top: auto;
+  position: relative;
+`;
+
+const Profile = styled.img`
+  width: 40px;
+  height: 40px;
+  object-fit: cover;
+  margin-right: 12px;
+`;
+
+const AdminText = styled.div`
+  font-size: var(--font-size-18);
+  font-weight: 500;
+  color: var(--color-dimgray);
+  font-family: var(--font-pretendard);
+  position: absolute;
+  left: 50%;
+  transform: translateX(-70%);
+`;
+
+const SettingButton = styled.div`
+  position: absolute;
+  right: 10px;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  cursor: pointer;
+`;
+
+const SettingImage = styled.img`
+  width: 24px;
+  height: 24px;
+  object-fit: contain;
 `;
