@@ -3,54 +3,54 @@ import Roll1 from '../../../assets/permission/Roll.svg';
 import Roll2 from '../../../assets/permission/Roll2.svg';
 import Roll3 from '../../../assets/permission/Roll3.svg';
 import ActiveIcon from '../../../assets/Permission/Active.svg';
-import PermissionModal from './PermissionModal';
+import RoleManagement from './RoleManagement';
 import { usePermissionStore } from '../../../store/permissionStore';
 
 interface PermissionUser {
-  id: number;
+  roleId: number;
   image: string;
-  name: string;
-  engName: string;
+  roleName: string;
+  roleNameEn: string;
   description: string;
-  userCount: string;
-  status: string;
+  roleUserCount: number;
+  isActive: string;
 }
 
 const permissionData: PermissionUser[] = [
   {
-    id: 1,
+    roleId: 1,
     image: Roll1,
-    name: "관리자",
-    engName: "Administrator",
+    roleName: "관리자",
+    roleNameEn: "Administrator",
     description: "시스템 관리 및 전체 권한 보유",
-    userCount: "1명",
-    status: "active",
+    roleUserCount: 1,
+    isActive: "active",
   },
   {
-    id: 2,
+    roleId: 2,
     image: Roll2,
-    name: "편집자",
-    engName: "Editor",
+    roleName: "편집자",
+    roleNameEn: "Editor",
     description: "콘텐츠 관리, 편집 및 게시 권한",
-    userCount: "5명",
-    status: "active",
+    roleUserCount: 5,
+    isActive: "active",
   },
   {
-    id: 3,
+    roleId: 3,
     image: Roll3,
-    name: "사용자",
-    engName: "User",
+    roleName: "사용자",
+    roleNameEn: "User",
     description: "기본 읽기 및 제한된 쓰기 권한",
-    userCount: "10명",
-    status: "active",
+    roleUserCount: 10,
+    isActive: "active",
   }
 ];
 
 const columns = [
-  { key: 'name', label: '역할명', width: '22%' },
+  { key: 'roleName', label: '역할명', width: '22%' },
   { key: 'description', label: '설명', width: '32%' },
-  { key: 'userCount', label: '사용자 수', width: '14%' },
-  { key: 'status', label: '상태', width: '14%' },
+  { key: 'roleUserCount', label: '사용자 수', width: '14%' },
+  { key: 'isActive', label: '상태', width: '14%' },
   { key: 'action', label: '작업', width: '14%' },
 ];
 
@@ -84,18 +84,18 @@ const PermissionTable = () => {
           <Divider />
           <TableBody>
             {permissionData.map((user) => (
-              <TableRow key={user.id}>
+              <TableRow key={user.roleId}>
                 <BodyCell style={{ width: columns[0].width, justifyContent: 'flex-start', paddingLeft: '48px' }}>
-                  <RoleImage src={user.image} alt={user.name} />
+                  <RoleImage src={user.image} alt={user.roleName} />
                   <NameTextBox>
-                    <NameText>{user.name}</NameText>
-                    <EngNameText>{user.engName}</EngNameText>
+                    <NameText>{user.roleName}</NameText>
+                    <EngNameText>{user.roleNameEn}</EngNameText>
                   </NameTextBox>
                 </BodyCell>
                 <BodyCell style={{ width: columns[1].width, border: "none" }}>{user.description}</BodyCell>
-                <BodyCell style={{ width: columns[2].width, border: "none"}}>{user.userCount}</BodyCell>
+                <BodyCell style={{ width: columns[2].width, border: "none"}}>{user.roleUserCount}명</BodyCell>
                 <BodyCell style={{ width: columns[3].width, border: "none" }}>
-                  <StatusIcon src={ActiveIcon} alt={user.status} />
+                  <StatusIcon src={ActiveIcon} alt={user.isActive} />
                 </BodyCell>
                 <BodyCell style={{ width: columns[4].width }}>
                   <ActionText onClick={() => handleEditClick(user)}>수정</ActionText>
@@ -106,7 +106,7 @@ const PermissionTable = () => {
         </TableBox>
       </TableWrapper>
 
-      <PermissionModal
+      <RoleManagement
         open={isModalOpen}
         onClose={handleEditModalClose}
         selectedUser={selectedUser}

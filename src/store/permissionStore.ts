@@ -1,13 +1,13 @@
 import { create } from 'zustand';
 
 interface PermissionUser {
-  id: number;
+  roleId: number;
   image: string;
-  name: string;
-  engName: string;
+  roleName: string;
+  roleNameEn: string;
   description: string;
-  userCount: string;
-  status: string;
+  roleUserCount: number;
+  isActive: string;
 }
 
 interface PermissionState {

@@ -4,22 +4,22 @@ import Roll1 from '../../../assets/permission/Roll.svg';
 import { usePermissionStore } from '../../../store/permissionStore';
 
 interface PermissionUser {
-  id: number;
+  roleId: number;
   image: string;
-  name: string;
-  engName: string;
+  roleName: string;
+  roleNameEn: string;
   description: string;
-  userCount: string;
-  status: string;
+  roleUserCount: number;
+  isActive: string;
 }
 
-interface PermissionModalProps {
+interface RoleManagementProps {
   open: boolean;
   onClose: () => void;
   selectedUser: PermissionUser | null;
 }
 
-const PermissionModal = ({ open, onClose, selectedUser }: PermissionModalProps) => {
+const RoleManagement = ({ open, onClose, selectedUser }: RoleManagementProps) => {
   const { selectedRows, toggleSelectedRow, clearSelectedRows } = usePermissionStore();
 
   // 모달이 열릴 때 선택 상태 초기화
@@ -44,7 +44,7 @@ const PermissionModal = ({ open, onClose, selectedUser }: PermissionModalProps) 
     <ModalOverlay>
       <ModalContainer>
         <ModalHeader>
-          <ModalTitle>{selectedUser?.name || "관리자"} 관리</ModalTitle>
+          <ModalTitle>{selectedUser?.roleName || "관리자"} 관리</ModalTitle>
           <CloseButton onClick={onClose}>×</CloseButton>
         </ModalHeader>
         
@@ -52,11 +52,11 @@ const PermissionModal = ({ open, onClose, selectedUser }: PermissionModalProps) 
           <ModalContent>
             <RoleIcon src={selectedUser?.image || Roll1} alt="role" />
             <RoleInfo>
-              <RoleName>{selectedUser?.name || "관리자"}</RoleName>
-              <RoleEngName>{selectedUser?.engName || "Administrator"}</RoleEngName>
+              <RoleName>{selectedUser?.roleName || "관리자"}</RoleName>
+              <RoleEngName>{selectedUser?.roleNameEn || "Administrator"}</RoleEngName>
             </RoleInfo>
           </ModalContent>
-          <UserCountText>현재 {selectedUser?.userCount || "1명"}의 사용자가 이 권한을 가지고 있습니다.</UserCountText>
+          <UserCountText>현재 {selectedUser?.roleUserCount || 1}명의 사용자가 이 권한을 가지고 있습니다.</UserCountText>
         </ModalSection>
         
         <ModalSection2>
@@ -94,7 +94,7 @@ const PermissionModal = ({ open, onClose, selectedUser }: PermissionModalProps) 
   );
 };
 
-export default PermissionModal;
+export default RoleManagement;
 
 // 스타일 변수들
 const MODAL_WIDTH = '868px';
@@ -388,4 +388,4 @@ const ActionButton = styled.button`
   &:hover {
     background: #6b4f8f;
   }
-`; 
+`;
