@@ -4,7 +4,9 @@ import { useNavigate, useLocation } from "react-router-dom";
 import LogoImage from "../assets/common/Small_Logo.png";
 import ProfileImageSrc from "../assets/common/Profile.png";
 import SettingIcon from "../assets/common/setting.svg";
+import LogoutModal from "../components/common/LogoutModal";
 
+// 타입 정의
 export type SidebarProps = {
   className?: string;
 };
@@ -22,7 +24,14 @@ interface SubMenuItemProps {
   isSelected?: boolean;
 }
 
-// 메뉴 및 드롭다운 상수
+interface ProfileMenuAction {
+  key: string;
+  label: string;
+  icon: string;
+  hasArrow?: boolean;
+}
+
+// 상수 정의
 const MENU_ITEMS = {
   STATS: "stats",
   USER_LIST: "userList",
@@ -43,7 +52,12 @@ const DROPDOWN_MENUS = {
   FAQ: "faq"
 } as const;
 
-// 메뉴 데이터 타입 명확화
+const PROFILE_MENU_ACTIONS: ProfileMenuAction[] = [
+  { key: 'settings', label: '설정', icon: '' },
+  { key: 'logout', label: '로그아웃', icon: '' }
+];
+
+// 메뉴 데이터 타입
 interface MenuDataItem {
   key: string;
   text: string;
@@ -57,7 +71,7 @@ interface MenuSectionData {
   items: MenuDataItem[];
 }
 
-// 메뉴 데이터 정의
+// 메뉴 데이터
 const menuData: MenuSectionData[] = [
   {
     title: "메인",
@@ -121,32 +135,115 @@ const menuData: MenuSectionData[] = [
   }
 ];
 
+// 프로필 드롭다운 컴포넌트
+const ProfileDropdown: React.FC<{
+  isOpen: boolean;
+  onMenuClick: (action: string) => void;
+}> = ({ isOpen, onMenuClick }) => {
+  if (!isOpen) return null;
+
+  return (
+    <ProfileDropdownContainer>
+      {PROFILE_MENU_ACTIONS.map((action) => (
+        <ProfileDropdownItem key={action.key} onClick={() => onMenuClick(action.key)}>
+          {action.icon && <ProfileDropdownIcon>{action.icon}</ProfileDropdownIcon>}
+          <ProfileDropdownText>{action.label}</ProfileDropdownText>
+          {action.hasArrow && <ProfileDropdownArrow>›</ProfileDropdownArrow>}
+        </ProfileDropdownItem>
+      ))}
+    </ProfileDropdownContainer>
+  );
+};
+
+// 메뉴 아이템 컴포넌트
+const MenuItemComponent: React.FC<{
+  item: MenuDataItem;
+  isSelected: boolean;
+  onMenuClick: (key: string) => void;
+  onToggle: (key: string) => void;
+  isOpen: boolean;
+  hoveredMenu: string;
+  onHover: (key: string) => void;
+  onLeave: () => void;
+}> = ({ item, isSelected, onMenuClick, onToggle, isOpen, hoveredMenu, onHover, onLeave }) => {
+  if (item.isDropdown && item.subItems) {
+    return (
+      <div>
+        <MenuItem
+          isToggle={true}
+          onClick={() => onToggle(item.key)}
+          onMouseEnter={() => onHover(item.key)}
+          onMouseLeave={onLeave}
+        >
+          <MenuItemText>{item.text}</MenuItemText>
+          <DropdownIcon isOpen={isOpen}>▼</DropdownIcon>
+        </MenuItem>
+        <SubMenuContainer isOpen={isOpen}>
+          {item.subItems.map((subItem) => (
+            <SubMenuItem
+              key={subItem.key}
+              isSelected={isSelected}
+              onClick={() => onMenuClick(subItem.key)}
+              onMouseEnter={() => onHover(subItem.key)}
+              onMouseLeave={onLeave}
+            >
+              {isSelected
+                ? <SelectedSubMenuItemBackground color="rgba(153, 102, 204, 0.15)" />
+                : hoveredMenu === subItem.key
+                  ? <SelectedSubMenuItemBackground color="rgba(153, 102, 204, 0.08)" />
+                  : null}
+              {subItem.text}
+            </SubMenuItem>
+          ))}
+        </SubMenuContainer>
+      </div>
+    );
+  }
+
+  return (
+    <MenuItem
+      isSelected={isSelected}
+      onClick={() => onMenuClick(item.key)}
+      onMouseEnter={() => onHover(item.key)}
+      onMouseLeave={onLeave}
+    >
+      {isSelected
+        ? <SelectedMenuItemBackground color="rgba(153, 102, 204, 0.15)" />
+        : hoveredMenu === item.key
+          ? <SelectedMenuItemBackground color="rgba(153, 102, 204, 0.08)" />
+          : null}
+      <MenuItemText className={item.className}>{item.text}</MenuItemText>
+    </MenuItem>
+  );
+};
+
+// 메인 사이드바 컴포넌트
 const Sidebar: React.FC<SidebarProps> = ({ className = "" }) => {
   const navigate = useNavigate();
   const location = useLocation();
+  
+  // 상태 관리
   const [openMenus, setOpenMenus] = useState<Record<string, boolean>>({
     [DROPDOWN_MENUS.DOCUMENT]: false,
     [DROPDOWN_MENUS.FAQ]: false,
     [DROPDOWN_MENUS.USER_MANAGEMENT]: false
   });
   const [hoveredMenu, setHoveredMenu] = useState<string>("");
-  const [hoveredSubMenu, setHoveredSubMenu] = useState<string>("");
+  const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false);
+  const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
 
-  // 현재 경로에 따라 선택된 메뉴 키 반환
-  const getSelectedMenuKey = () => {
+  // 현재 선택된 메뉴 키 반환
+  const getSelectedMenuKey = (): string => {
     if (location.pathname === "/admin") return MENU_ITEMS.STATS;
     if (location.pathname.startsWith("/admin/users")) return MENU_ITEMS.USER_LIST;
     if (location.pathname.startsWith("/admin/permission")) return MENU_ITEMS.PERMISSION;
-    // 필요시 추가
     return "";
   };
-  const selectedMenu = getSelectedMenuKey();
 
-  const handleLogoClick = () => {
-    navigate("/");
-  };
+  // 이벤트 핸들러들
+  const handleLogoClick = () => navigate("/");
 
-  const toggleMenu = (menuKey: string) => {
+  const handleMenuToggle = (menuKey: string) => {
     setOpenMenus(prev => ({
       ...prev,
       [menuKey]: !prev[menuKey]
@@ -154,77 +251,46 @@ const Sidebar: React.FC<SidebarProps> = ({ className = "" }) => {
   };
 
   const handleMenuClick = (menuKey: string) => {
-    switch (menuKey) {
-      case MENU_ITEMS.STATS:
-        navigate("/admin");
-        break;
-      case MENU_ITEMS.USER_LIST:
-        navigate("/admin/users");
-        break;
-      case MENU_ITEMS.PERMISSION:
-        navigate("/admin/permission");
-        break;
-      default:
-        break;
+    const navigationMap: Record<string, string> = {
+      [MENU_ITEMS.STATS]: "/admin",
+      [MENU_ITEMS.USER_LIST]: "/admin/users",
+      [MENU_ITEMS.PERMISSION]: "/admin/permission"
+    };
+
+    const targetPath = navigationMap[menuKey];
+    if (targetPath) {
+      navigate(targetPath);
     }
   };
 
-  // 메뉴 렌더링 함수 (중복 제거)
-  const renderMenuItem = (item: MenuDataItem) => {
-    if (item.isDropdown && item.subItems) {
-      return (
-        <div key={item.key}>
-          <MenuItem
-            isToggle={true}
-            onClick={() => toggleMenu(item.key)}
-            onMouseEnter={() => setHoveredMenu(item.key)}
-            onMouseLeave={() => setHoveredMenu("")}
-          >
-            <MenuItemText>{item.text}</MenuItemText>
-            <DropdownIcon isOpen={openMenus[item.key]}>▼</DropdownIcon>
-          </MenuItem>
-          <SubMenuContainer isOpen={openMenus[item.key]}>
-            {item.subItems.map((subItem) => renderSubMenuItem(subItem))}
-          </SubMenuContainer>
-        </div>
-      );
-    }
-    // 리프 메뉴
-    return (
-      <MenuItem
-        key={item.key}
-        isSelected={selectedMenu === item.key}
-        onClick={() => handleMenuClick(item.key)}
-        onMouseEnter={() => setHoveredMenu(item.key)}
-        onMouseLeave={() => setHoveredMenu("")}
-      >
-        {selectedMenu === item.key
-          ? <SelectedMenuItemBackground color="rgba(153, 102, 204, 0.15)" />
-          : hoveredMenu === item.key
-            ? <SelectedMenuItemBackground color="rgba(153, 102, 204, 0.08)" />
-            : null}
-        <MenuItemText className={item.className}>{item.text}</MenuItemText>
-      </MenuItem>
-    );
+  const handleProfileClick = () => {
+    setIsProfileDropdownOpen(!isProfileDropdownOpen);
   };
 
-  // 서브 메뉴 렌더링 함수
-  const renderSubMenuItem = (subItem: MenuDataItem) => (
-    <SubMenuItem
-      key={subItem.key}
-      isSelected={selectedMenu === subItem.key}
-      onClick={() => handleMenuClick(subItem.key)}
-      onMouseEnter={() => setHoveredSubMenu(subItem.key)}
-      onMouseLeave={() => setHoveredSubMenu("")}
-    >
-      {selectedMenu === subItem.key
-        ? <SelectedSubMenuItemBackground color="rgba(153, 102, 204, 0.15)" />
-        : hoveredSubMenu === subItem.key
-          ? <SelectedSubMenuItemBackground color="rgba(153, 102, 204, 0.08)" />
-          : null}
-      {subItem.text}
-    </SubMenuItem>
-  );
+  const handleProfileMenuClick = (action: string) => {
+    const actionHandlers: Record<string, () => void> = {
+      settings: () => console.log('설정'),
+      logout: () => setIsLogoutModalOpen(true)
+    };
+
+    const handler = actionHandlers[action];
+    if (handler) {
+      handler();
+    }
+    setIsProfileDropdownOpen(false);
+  };
+
+  const handleLogoutConfirm = () => {
+    console.log('로그아웃 확인');
+    setIsLogoutModalOpen(false);
+    // 실제 로그아웃 로직 구현
+  };
+
+  const handleLogoutCancel = () => {
+    setIsLogoutModalOpen(false);
+  };
+
+  const selectedMenu = getSelectedMenuKey();
 
   return (
     <SidebarRoot className={className}>
@@ -237,32 +303,46 @@ const Sidebar: React.FC<SidebarProps> = ({ className = "" }) => {
         {menuData.map((section, index) => (
           <MenuSection key={index} isSecond={index === 1}>
             {section.title && <MenuTitle>{section.title}</MenuTitle>}
-            {section.items.map((item) =>
-              item.isDropdown ? (
-                <DropdownMenuWrapper key={item.key}>
-                  {renderMenuItem(item)}
-                </DropdownMenuWrapper>
-              ) : (
-                renderMenuItem(item)
-              )
-            )}
+            {section.items.map((item) => (
+              <DropdownMenuWrapper key={item.key}>
+                <MenuItemComponent
+                  item={item}
+                  isSelected={selectedMenu === item.key}
+                  onMenuClick={handleMenuClick}
+                  onToggle={handleMenuToggle}
+                  isOpen={openMenus[item.key] || false}
+                  hoveredMenu={hoveredMenu}
+                  onHover={setHoveredMenu}
+                  onLeave={() => setHoveredMenu("")}
+                />
+              </DropdownMenuWrapper>
+            ))}
           </MenuSection>
         ))}
       </MenuContent>
       <ProfileDivider />
-      <ProfileSection>
+      <ProfileSection onClick={handleProfileClick}>
         <Profile alt="" src={ProfileImageSrc} />
         <AdminText>admin</AdminText>
         <SettingButton>
           <SettingImage alt="" src={SettingIcon} />
         </SettingButton>
+        <ProfileDropdown 
+          isOpen={isProfileDropdownOpen} 
+          onMenuClick={handleProfileMenuClick} 
+        />
       </ProfileSection>
+      <LogoutModal
+        isOpen={isLogoutModalOpen}
+        onClose={handleLogoutCancel}
+      />
     </SidebarRoot>
   );
 };
 
 export default Sidebar;
 
+// Styled Components
 const SidebarRoot = styled.div`
   width: 248px;
   position: fixed;
@@ -408,7 +488,7 @@ const MenuContent = styled.div`
 
 const ProfileDivider = styled.div`
   height: 0.35px;
-  background-color: #E9E0F0
+  background-color: #E9E0F0;
   margin: 0;
 `;
 
@@ -419,6 +499,12 @@ const ProfileSection = styled.div`
   border-top: 0.35px solid var(--color-darkgray-200);
   margin-top: auto;
   position: relative;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  
+  &:hover {
+    background-color: rgba(153, 102, 204, 0.05);
+  }
 `;
 
 const Profile = styled.img`
@@ -454,4 +540,51 @@ const SettingImage = styled.img`
   width: 24px;
   height: 24px;
   object-fit: contain;
+`;
+
+const ProfileDropdownContainer = styled.div`
+  position: absolute;
+  bottom: 100%;
+  left: 0;
+  right: 0;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  margin-bottom: 8px;
+  z-index: 1001;
+  overflow: hidden;
+`;
+
+const ProfileDropdownItem = styled.div`
+  display: flex;
+  align-items: center;
+  padding: 12px 16px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  position: relative;
+  
+  &:hover {
+    background-color: rgba(153, 102, 204, 0.08);
+  }
+`;
+
+const ProfileDropdownIcon = styled.span`
+  font-size: 16px;
+  margin-right: 12px;
+  width: 20px;
+  text-align: center;
+`;
+
+const ProfileDropdownText = styled.span`
+  font-size: 14px;
+  color: var(--color-dimgray);
+  font-weight: 500;
+  flex: 1;
+  padding-left: 8px;
+`;
+
+const ProfileDropdownArrow = styled.span`
+  font-size: 14px;
+  color: var(--color-dimgray);
+  margin-left: 8px;
 `;
