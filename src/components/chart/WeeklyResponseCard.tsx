@@ -88,43 +88,41 @@ const WeeklyResponseCard: React.FC<WeeklyResponseStatCardProps> = ({ data }) => 
 export default WeeklyResponseCard;
 
 const Container = styled.div`
-  width: 1417px;
-  height: 580px;
-  border-radius: var(--br-25);
+  width: 1062.75px;
+  border-radius: 18.75px;
   background: var(--color-white);
-  box-shadow: 0px 8px 24px 0px rgba(125, 93, 246, 0.1);
-  margin: 60px 0 117px;
+  box-shadow: 0px 6px 18px 0px rgba(125, 93, 246, 0.1);
+  margin: 45px 0 0px;
   display: flex;
   flex-direction: column;
 `;
 
 const CardHeader = styled.div`
   width: 100%;
-  height: 100px;
-  min-height: 100px;
+  height: 75px;
+  min-height: 75px;
   flex-shrink: 0;
-  border-radius: 25px 25px 0 0;
-  border-bottom: 2px solid #e9e0f0;
+  border-radius: 18.75px 18.75px 0 0;
+  border-bottom: 1.5px solid #e9e0f0;
   background: var(--color-white);
   display: flex;
   align-items: center;
-  padding: 0 48px;
+  padding: 0 36px;
   box-sizing: border-box;
 `;
 
 const CardTitle = styled.h2`
-  font-size: var(--font-size-26);
+  font-size: var(--font-size-20);
   font-weight: 600;
   color: var(--color-black);
   margin: 0;
 `;
 
 const BarChartWrapper = styled.div`
-  flex: 1;
-  border-radius: var(--br-25);
+  border-radius: 18.75px;
   background: #f9f5ff;
-  margin: 60px;
-  padding: var(--padding-40);
+  margin: 45px;
+  padding: 30px;
   position: relative;
   display: flex;
   justify-content: center;
@@ -136,24 +134,24 @@ const BarChartWrapper = styled.div`
 
 const Count = styled.div`
   position: absolute;
-  bottom: 10px;
-  right: 40px;
+  bottom: 7.5px;
+  right: 30px;
   text-align: right;
 `;
 
 const CountInline = styled.div`
   display: flex;
   align-items: baseline;
-  gap: var(--gap-8);
+  gap: 6px;
 `;
 
 const Label = styled.div`
-  font-size: var(--font-size-16);
+  font-size: var(--font-size-12);
   color: var(--color-black);
 `;
 
 const DailyAverage = styled.div`
-  font-size: var(--font-size-36);
+  font-size: var(--font-size-27);
   font-weight: 700;
   color: #9966CC;
 `;

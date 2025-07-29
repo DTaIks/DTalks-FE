@@ -46,7 +46,7 @@ export const PromptTemplateCard: React.FC<PromptTemplateCardProps> = ({ data }) 
               value={chartData.value}
               count={chartData.count}
               pathColor={pathColor}
-              size="140px"
+              size="120px"
             />
           );
         })}
@@ -57,33 +57,35 @@ export const PromptTemplateCard: React.FC<PromptTemplateCardProps> = ({ data }) 
 
 const Container = styled.div`
   flex-shrink: 0;
-  width: 695px;
-  height: 720px;
-  border-radius: var(--br-25);
+  width: 521.25px;
+  height: 540px;
+  border-radius: 18.75px;
   background: var(--color-white);
-  box-shadow: 0 8px 24px rgba(125, 93, 246, 0.1);
+  box-shadow: 0 6px 18px rgba(125, 93, 246, 0.1);
 `;
 
 const CardHeader = styled.div`
   width: 100%;
-  height: 98px;
-  border-radius: 26px 26px 0 0;
-  border-bottom: 2px solid #e9e0f0;
+  height: 73.5px;
+  border-radius: 19.5px 19.5px 0 0;
+  border-bottom: 1.5px solid #e9e0f0;
   background: var(--color-white);
 `;
 
 const CardTitle = styled.h1`
-  padding: 32px 381px 35px 48px;
-  font-size: var(--font-size-26);
+  padding: 24px 285.75px 26.25px 36px;
+  font-size: var(--font-size-20);
   font-weight: 600;
   color: var(--color-black);
+  white-space: nowrap;
 `;
 
 const DonutGrid = styled.div`
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: var(--gap-24);
-  padding: var(--padding-36);
+  gap: var(--gap-18);
+  padding: var(--padding-27);
   justify-items: center;
   align-items: center;
+  padding-bottom: 64px
 `;

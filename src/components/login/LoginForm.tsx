@@ -45,9 +45,10 @@ const LoginForm: React.FC<LoginFormProps> = ({
           type="email"
           value={email}
           onChange={onEmailChange}
+          inputWidth="382.5px"
         />
         <InputField
-          inputWidth="510px"
+          inputWidth="382.5px"
           inputAlignSelf="unset"
           title="비밀번호"
           placeholder="비밀번호를 입력하세요."
@@ -76,117 +77,81 @@ const LoginForm: React.FC<LoginFormProps> = ({
 export default LoginForm;
 
 const BackgroundPanel = styled.div`
-  width: 780px;
-  height: 510px;
+  width: 585px;
+  height: 382.5px;
   position: relative;
-  border-radius: 25px;
+  border-radius: 18.75px;
   background-color: var(--color-white);
   display: none;
   max-width: 100%;
 `;
 
 const TitleWrapper = styled.div`
+  width: 100%;
   display: flex;
   flex-direction: row;
-  align-items: flex-start;
-  justify-content: flex-end;
-  padding: 0px 108px;
+  align-items: center;
+  justify-content: center;
   box-sizing: border-box;
-  max-width: 100%;
-  @media screen and (max-width: 700px) {
-    padding-left: 54px;
-    padding-right: 54px;
-    box-sizing: border-box;
-  }
-  @media screen and (max-width: 450px) {
-    padding-left: var(--padding-20);
-    padding-right: var(--padding-20);
-    box-sizing: border-box;
-  }
+  margin-bottom: 0px;
 `;
 
 const WelcomeTitle = styled.h1`
   margin: 0;
-  position: relative;
-  font-size: inherit;
+  font-size: 24px;
   line-height: 28px;
   font-weight: 700;
   font-family: inherit;
   z-index: 1;
-  @media screen and (max-width: 950px) {
-    font-size: var(--font-size-26);
-    line-height: 22px;
-  }
-  @media screen and (max-width: 450px) {
-    font-size: var(--font-size-19);
-    line-height: 17px;
-  }
+  text-align: center;
 `;
 
 const LoginButtonWrapper = styled.div`
-  width: 509.5px;
+  width: 382.125px;
   display: flex;
   flex-direction: row;
   align-items: flex-start;
   justify-content: flex-end;
-  padding: 0px var(--padding-1);
+  padding: 0px 0.75px;
   box-sizing: border-box;
   max-width: 100%;
 `;
 
 const Form = styled.form`
   margin: 0;
+  margin-top: 0;
   align-self: stretch;
   display: flex;
   flex-direction: column;
-  align-items: flex-end;
+  align-items: center;
   justify-content: flex-start;
-  gap: 18.5px;
+  gap: 12px;
   max-width: 100%;
 `;
 
 const LoginFormContainer = styled.div`
-  position: absolute;
-  top: 351px;
-  left: calc(50% - 385px);
-  border-radius: 25px;
-  background-color: var(--color-white);
+  width: 585px;
+  height: 382.5px;
+  flex-shrink: 0;
+  border-radius: 18.75px;
+  background: #FFF;
   display: flex;
   flex-direction: column;
-  align-items: flex-end;
-  justify-content: flex-start;
-  padding: var(--padding-60) 140px 51.5px 118px;
+  align-items: center;
+  justify-content: center;
+  padding: 45px 40px;
   box-sizing: border-box;
-  gap: 51.5px;
-  width: 780px;
-  height: 510px;
+  gap: 38.625px;
   max-width: 100%;
   text-align: center;
   font-size: var(--font-size-32);
   color: var(--color-black);
   font-family: var(--font-pretendard);
-  @media screen and (max-width: 950px) {
-    padding-left: 59px;
-    padding-right: 70px;
-    box-sizing: border-box;
-  }
-  @media screen and (max-width: 700px) {
-    padding-top: 39px;
-    padding-bottom: 33px;
-    box-sizing: border-box;
-  }
-  @media screen and (max-width: 450px) {
-    gap: var(--gap-26);
-    padding-left: var(--padding-20);
-    padding-right: var(--padding-20);
-    box-sizing: border-box;
-  }
 `;
 
 const ErrorMessage = styled.div`
   color: #f44336;
-  font-size: 16px;
-  margin-top: 8px;
+  font-size: 12px;
   text-align: center;
   align-self: flex-start;
   width: 100%;
@@ -194,12 +159,13 @@ const ErrorMessage = styled.div`
 
 const ForgotPasswordLink = styled.a`
   color: var(--color-mediumpurple-300);
-  font-size: 18px;
+  font-size: 14px;
   text-decoration: none;
   cursor: pointer;
   margin-bottom: 8px;
-  align-self: flex-end;
-  
+  width: 382.5px;
+  display: block;
+  text-align: right;
   &:hover {
     text-decoration: underline;
     color: #7742A7;
