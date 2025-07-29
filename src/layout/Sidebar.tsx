@@ -280,12 +280,6 @@ const Sidebar: React.FC<SidebarProps> = ({ className = "" }) => {
     setIsProfileDropdownOpen(false);
   };
 
-  const handleLogoutConfirm = () => {
-    console.log('로그아웃 확인');
-    setIsLogoutModalOpen(false);
-    // 실제 로그아웃 로직 구현
-  };
-
   const handleLogoutCancel = () => {
     setIsLogoutModalOpen(false);
   };
