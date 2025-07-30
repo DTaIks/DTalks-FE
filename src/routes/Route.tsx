@@ -5,6 +5,8 @@ import LoginPage from '../pages/login/LoginPage';
 import SignUpPage from '../pages/signup/SignUpPage';
 import UserListPage from '../pages/admin/userlist/UserListPage';
 import PermissionPage from '../pages/admin/permission/PermissionPage';
+import FAQPage from '../pages/admin/faq/FAQPage';
+import FAQCategoryPage from '../pages/admin/faq/FAQCategoryPage';
 import Layout from '../layout/Layout';
 
 // 인증이 필요한 라우트
@@ -53,6 +55,8 @@ export default function AppRoutes() {
           <Route index element={<ChartPage />} />
           <Route path="users" element={<UserListPage />} />
           <Route path="permission" element={<PermissionPage />} />
+          <Route path="faq" element={<FAQPage />} />
+          <Route path="faq-category" element={<FAQCategoryPage />} />
           <Route path="settings" element={<ChartPage />} />
         </Route>
       </Route>
