@@ -146,7 +146,7 @@ const NAVIGATION_MAP: Record<string, string> = {
   [MENU_ITEMS.REPORT_FORM]: "/admin/report-form",
   [MENU_ITEMS.MEDIA]: "/admin/media",
   [MENU_ITEMS.SCHEDULE_LIST]: "/admin/faq",
-  [MENU_ITEMS.SCHEDULE_REGISTER]: "/admin/faq-category"
+  [MENU_ITEMS.SCHEDULE_REGISTER]: "/admin/faqcategory"
 };
 
 // 프로필 드롭다운 컴포넌트

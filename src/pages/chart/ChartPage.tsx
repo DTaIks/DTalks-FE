@@ -1,5 +1,4 @@
 import React from 'react';
-import TitleContainer from '../../layout/TitleContainer';
 import StatCard from '../../components/chart/StatCard';
 import { ResponseTimeChart } from '../../components/chart/ResponseTimeCard';
 import { KeywordAnalysisCard } from '../../components/chart/KeywordAnalysisCard';
@@ -15,6 +14,8 @@ import {
   useKeyword,
   useWeeklyResponse,
 } from '../../hooks/useChart';
+
+import styled from 'styled-components';
 
 const ChartPage: React.FC = () => {
   const dailyChat = useDailyChat();
@@ -32,8 +33,7 @@ const ChartPage: React.FC = () => {
   ];
 
   return (
-    <>
-      <TitleContainer title="통계" subtitle="챗봇 성능과 사용자 데이터를 분석하세요" />
+    <Container>
       <div>
         <div style={{ display: "flex", flexWrap: "wrap", gap: "var(--gap-36)", paddingBottom: 60 }}>
           {statCards.map((card, index) => (
@@ -53,8 +53,13 @@ const ChartPage: React.FC = () => {
 
         <WeeklyResponseCard data={weeklyResponse} />
       </div>
-    </>
+    </Container>
   );
 };
 
 export default ChartPage;
+
+const Container = styled.div`
+  width: 100%;
+  height: 100%;
+`;

@@ -56,7 +56,7 @@ export default function AppRoutes() {
           <Route path="users" element={<UserListPage />} />
           <Route path="permission" element={<PermissionPage />} />
           <Route path="faq" element={<FAQPage />} />
-          <Route path="faq-category" element={<FAQCategoryPage />} />
+          <Route path="faqcategory" element={<FAQCategoryPage />} />
           <Route path="settings" element={<ChartPage />} />
         </Route>
       </Route>
