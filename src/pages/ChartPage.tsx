@@ -1,6 +1,5 @@
 import React from 'react';
 import styled from 'styled-components';
-
 import StatCard from '../components/chart/StatCard';
 import { ResponseTimeChart } from '../components/chart/ResponseTimeCard';
 import { KeywordAnalysisCard } from '../components/chart/KeywordAnalysisCard';
