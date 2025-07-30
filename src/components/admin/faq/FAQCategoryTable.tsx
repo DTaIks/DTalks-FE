@@ -133,10 +133,9 @@ const FAQCategoryTable: React.FC = () => {
 
 export default FAQCategoryTable;
 
-// Styled Components
 const TableContainer = styled.div`
-  width: 1062.75px;
-  height: 586.5px;
+  width: 1062px;
+  height: 586px;
   border-radius: var(--br-18);
   background: var(--color-white);
   box-shadow: 0 6px 18px 0 rgba(125, 93, 246, 0.10);
