@@ -1,5 +1,3 @@
-import { Routes, Route } from 'react-router-dom';
-import ChartPage from '../pages/ChartPage';
 import { Routes, Route, Navigate, Outlet } from 'react-router-dom';
 import { useAuthStore } from '../store/authStore';
 import LoginPage from '../pages/login/LoginPage';
@@ -8,6 +6,9 @@ import UserListPage from '../pages/admin/userlist/UserListPage';
 import StatsPage from '../pages/admin/StatsPage';
 import PermissionPage from '../pages/admin/permission/PermissionPage';
 import AdminPage from '../pages/admin/AdminPage';
+import ChartPage from '../pages/ChartPage';
+import MediaPage from '../pages/admin/MediaPage';
+
 
 // 인증이 필요한 라우트
 function ProtectedLayout() {
@@ -30,6 +31,7 @@ export default function AppRoutes() {
     <Routes>
       <Route path ="/" element={<div></div>} />
       <Route path="/chart" element={<ChartPage />} />
+      <Route path="/media" element={<MediaPage />} />
       {/* 루트 경로: 로그인 상태에 따라 리다이렉트 */}
       <Route path="/" element={
         isAuthenticated
