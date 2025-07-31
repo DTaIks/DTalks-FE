@@ -73,9 +73,21 @@ const TABLE_COLUMNS = [
 // Component
 const FAQCategoryTable: React.FC = () => {
   const [selectedCategory, setSelectedCategory] = useState<FAQCategory | null>(null);
+  const [categoryData, setCategoryData] = useState<FAQCategory[]>(CATEGORY_DATA);
 
   const handleRowClick = (category: FAQCategory) => {
     setSelectedCategory(category);
+  };
+
+  const handleArchive = (categoryId: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    setCategoryData(prevData => 
+      prevData.map(category => 
+        category.categoryId === categoryId 
+          ? { ...category, isActive: !category.isActive }
+          : category
+      )
+    );
   };
 
   const renderTableRow = (category: FAQCategory) => (
@@ -102,7 +114,9 @@ const FAQCategoryTable: React.FC = () => {
         <FAQCountText>{category.faqCount}개</FAQCountText>
       </TableCell>
       <TableCell>
-        <ActionText>보관</ActionText>
+        <ActionText onClick={(e) => handleArchive(category.categoryId, e)}>
+          {category.isActive ? "보관" : "복원"}
+        </ActionText>
       </TableCell>
     </TableRow>
   );
@@ -125,7 +139,7 @@ const FAQCategoryTable: React.FC = () => {
         </TableHeaderRow>
       </HeaderBox>
       <TableBody>
-        {CATEGORY_DATA.map(renderTableRow)}
+        {categoryData.map(renderTableRow)}
       </TableBody>
     </TableContainer>
   );
@@ -251,4 +265,10 @@ const ActionText = styled.span`
   font-family: Pretendard;
   font-size: 16px;
   font-weight: 500;
+  cursor: pointer;
+  transition: color 0.2s;
+  
+  &:hover {
+    color: var(--color-mediumpurple-300);
+  }
 `;
