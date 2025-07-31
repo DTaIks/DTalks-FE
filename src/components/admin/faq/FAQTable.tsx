@@ -108,29 +108,29 @@ const FAQTable = () => {
 
   return (
     <TableContainer>
-      <TableHeader>
-        <TableTitle>FAQ 목록</TableTitle>
-      </TableHeader>
-      <HeaderBox>
-        <TableHeaderRow>
-          {TABLE_COLUMNS.map((column) => (
-            <TableHeaderCell 
-              key={column.key} 
-              isQuestion={column.key === "question"}
-              isCategory={column.key === "answer"}
-              isStatus={column.key === "category"}
-              isDate={column.key === "isActive"}
-              isAction={column.key === "action"}
-            >
-              {column.label}
-            </TableHeaderCell>
-          ))}
-        </TableHeaderRow>
-      </HeaderBox>
-      <TableBody>
-        {faqData.map(renderTableRow)}
-      </TableBody>
-    </TableContainer>
+        <TableHeader>
+          <TableTitle>FAQ 목록</TableTitle>
+        </TableHeader>
+        <HeaderBox>
+          <TableHeaderRow>
+            {TABLE_COLUMNS.map((column) => (
+              <TableHeaderCell 
+                key={column.key} 
+                isQuestion={column.key === "question"}
+                isCategory={column.key === "answer"}
+                isStatus={column.key === "category"}
+                isDate={column.key === "isActive"}
+                isAction={column.key === "action"}
+              >
+                {column.label}
+              </TableHeaderCell>
+            ))}
+          </TableHeaderRow>
+        </HeaderBox>
+        <TableBody>
+          {faqData.map(renderTableRow)}
+        </TableBody>
+      </TableContainer>
   );
 };
 
@@ -266,8 +266,8 @@ const CategoryImage = styled.img<{ alt?: string }>`
   object-fit: contain;
 `;
 
-const StatusIcon = styled.img<{ src: string }>`
-  width: ${({ src }) => src.includes('InActive') ? '60px' : '56px'};
+const StatusIcon = styled.img<{ src: string; alt?: string }>`
+  width: ${({ alt }) => alt === "비활성" ? '69px' : '56px'};
   height: 32px;
   object-fit: contain;
 `;

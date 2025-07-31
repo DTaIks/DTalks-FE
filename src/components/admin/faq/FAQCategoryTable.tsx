@@ -227,8 +227,8 @@ const CategoryImage = styled.img<{ alt?: string }>`
 `;
 
 const StatusIcon = styled.img<{ src: string }>`
-  width: ${({ src }) => src.includes('InActive') ? '60px' : '56px'};
-  height: 28px;
+  width: ${({ src }) => src.includes('InActive') ? '68px' : '58px'};
+  height: 32px;
   object-fit: contain;
 `;
 

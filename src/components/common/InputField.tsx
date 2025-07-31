@@ -90,7 +90,7 @@ const LoginInputRoot = styled.div<{ inputWidth?: string; inputAlignSelf?: string
   flex-direction: column;
   align-items: flex-start;
   justify-content: center;
-  gap: var(--gap-12); /* 16 * 0.75 */
+  gap: var(--gap-12);
   text-align: left;
   font-size: var(--font-size-22);
   color: var(--color-black);
@@ -144,61 +144,61 @@ const LoginTextfield = styled.div`
 
 // 회원가입용 스타일 컴포넌트들
 const SignupInputRow = styled.div`
-  margin-bottom: 20px;
+  margin-bottom: 15px;
   position: relative;
 `;
 
 const SignupInputWrapper = styled.div<{ hasButton: boolean }>`
   display: ${props => props.hasButton ? 'flex' : 'flex'};
-  padding: ${props => props.hasButton ? '0' : '8px 12px'};
+  padding: ${props => props.hasButton ? '0' : '6px 9px'};
   align-items: center;
   justify-content: center;
-  gap: ${props => props.hasButton ? '8px' : '0'};
+  gap: ${props => props.hasButton ? '6px' : '0'};
   width: 100%;
   box-sizing: border-box;
 `;
 
 const SignupLabel = styled.label`
   color: #000;
-  font-size: 22px;
+  font-size: 16.5px;
   font-style: normal;
   font-weight: 500;
-  line-height: 20px;
+  line-height: 15px;
   display: block;
-  margin-bottom: 16px;
+  margin-bottom: 12px;
   text-align: left;
   width: 100%;
-  max-width: 720px;
+  max-width: 540px;
   margin-left: auto;
   margin-right: auto;
-  padding-left: calc((100% - 508px) / 2);
+  padding-left: calc((100% - 381px) / 2);
 `;
 
 const SignupInput = styled.input<{ hasButton: boolean }>`
   display: flex;
-  width: ${props => props.hasButton ? '334px' : '508px'};
-  height: 46px;
-  padding: 8px 12px;
+  width: ${props => props.hasButton ? '250.5px' : '381px'};
+  height: 34.5px;
+  padding: 6px 9px;
   align-items: center;
-  gap: 4px;
-  border-radius: 6px;
+  gap: 3px;
+  border-radius: 4.5px;
   border: 1px solid rgba(0, 0, 0, 0.10);
   background: #FFF;
-  font-size: 20px;
+  font-size: 15px;
   outline: none;
   box-sizing: border-box;
   
   &:focus {
     border-color: #8061B0;
-    box-shadow: 0 0 8px #a899f8;
+    box-shadow: 0 0 6px #a899f8;
   }
 `;
 
 const SignupButton = styled.button`
-  width: 166px;
-  height: 46px;
-  font-size: 18px;
-  border-radius: 6px;
+  width: 124.5px;
+  height: 34.5px;
+  font-size: 13.5px;
+  border-radius: 4.5px;
   background: #8061B0;
   color: #fff;
   font-weight: 600;
@@ -215,17 +215,17 @@ const SignupButton = styled.button`
 `;
 
 const SignupInfoText = styled.div<{ color?: string }>`
-  font-size: 16px;
+  font-size: 12px;
   color: ${props => props.color || '#8c8c8c'};
-  margin-top: 4px;
+  margin-top: 3px;
   line-height: 1.2;
   text-align: left;
   width: 100%;
-  max-width: 720px;
+  max-width: 540px;
   margin-left: auto;
-  margin-top: 5px;
+  margin-top: 3.75px;
   margin-right: auto;
-  padding-left: calc((100% - 508px) / 2 + 12px);
+  padding-left: calc((100% - 381px) / 2 + 9px);
 `;
 
 export default InputField; 
