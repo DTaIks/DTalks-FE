@@ -1,3 +1,4 @@
+import React, { useState } from "react";
 import styled from "styled-components";
 import CategoryName1 from "../../../assets/faq/CategoryName1.svg";
 import CategoryName2 from "../../../assets/faq/CategoryName2.svg";
@@ -46,7 +47,7 @@ const faqData: FAQItem[] = [
     createdAt: "2024-01-16 14:30",
   },
   {
-    id: 3,
+    id: 4,
     question: "계정 비밀번호를 변경하는 방법은?",
     answer: "계정 설정에서 비밀번호 변경에 대한 안내입니다.",
     category: "급여 / 복리후생",
@@ -55,7 +56,7 @@ const faqData: FAQItem[] = [
     createdAt: "2024-01-16 14:30",
   },
   {
-    id: 3,
+    id: 5,
     question: "계정 비밀번호를 변경하는 방법은?",
     answer: "계정 설정에서 비밀번호 변경에 대한 안내입니다.",
     category: "복지 / 휴가",
@@ -74,37 +75,63 @@ const TABLE_COLUMNS = [
 ];
 
 const FAQTable = () => {
-  const renderTableRow = (faq: FAQItem) => (
-    <TableRow key={faq.id}>
-      <TableCell isQuestion>
-        <QuestionContainer>
-          <QuestionText>{faq.question}</QuestionText>
-          <AnswerText>{faq.answer}</AnswerText>
-        </QuestionContainer>
-      </TableCell>
-      <TableCell isCategory>
-        <CategoryImageContainer>
-          <CategoryImage src={faq.categoryImage} alt={faq.category} />
-        </CategoryImageContainer>
-      </TableCell>
-      <TableCell isStatus>
-        <StatusIcon 
-          src={faq.isActive ? ActiveIcon : InactiveIcon} 
-          alt={faq.isActive ? "활성" : "비활성"} 
-        />
-      </TableCell>
-      <TableCell isDate>
-        <DateText>{faq.createdAt}</DateText>
-      </TableCell>
-      <TableCell isAction>
-        <ActionContainer>
-          <ActionText>수정</ActionText>
-          <ActionDivider />
-          <ActionText>보관</ActionText>
-        </ActionContainer>
-      </TableCell>
-    </TableRow>
-  );
+  const [expandedRows, setExpandedRows] = useState<Set<number>>(new Set());
+
+  const toggleRow = (id: number) => {
+    const newExpandedRows = new Set(expandedRows);
+    if (newExpandedRows.has(id)) {
+      newExpandedRows.delete(id);
+    } else {
+      newExpandedRows.add(id);
+    }
+    setExpandedRows(newExpandedRows);
+  };
+
+  const renderTableRow = (faq: FAQItem) => {
+    const isExpanded = expandedRows.has(faq.id);
+    
+    return (
+      <React.Fragment key={faq.id}>
+        <TableRow onClick={() => toggleRow(faq.id)} isExpanded={isExpanded}>
+          <TableCell isQuestion>
+            <QuestionContainer>
+              <QuestionText>{faq.question}</QuestionText>
+              <AnswerText>{faq.answer}</AnswerText>
+            </QuestionContainer>
+          </TableCell>
+          <TableCell isCategory>
+            <CategoryImageContainer>
+              <CategoryImage src={faq.categoryImage} alt={faq.category} />
+            </CategoryImageContainer>
+          </TableCell>
+          <TableCell isStatus>
+            <StatusIcon 
+              src={faq.isActive ? ActiveIcon : InactiveIcon} 
+              alt={faq.isActive ? "활성" : "비활성"} 
+            />
+          </TableCell>
+          <TableCell isDate>
+            <DateText>{faq.createdAt}</DateText>
+          </TableCell>
+          <TableCell isAction>
+            <ActionContainer>
+              <ActionText>수정</ActionText>
+              <ActionDivider />
+              <ActionText>보관</ActionText>
+            </ActionContainer>
+          </TableCell>
+        </TableRow>
+        {isExpanded && (
+          <ExpandedRow>
+            <ExpandedContent>
+              <ExpandedTitle>답변</ExpandedTitle>
+              <ExpandedAnswer>{faq.answer}</ExpandedAnswer>
+            </ExpandedContent>
+          </ExpandedRow>
+        )}
+      </React.Fragment>
+    );
+  };
 
   return (
     <TableContainer>
@@ -184,10 +211,64 @@ const TableBody = styled.div`
   padding-top: 28px;
 `;
 
-const TableRow = styled.div`
+const TableRow = styled.div<{ isExpanded?: boolean }>`
   display: flex;
   align-items: center;
   transition: background-color 0.2s ease;
+  cursor: pointer;
+  border-bottom: 1px solid #F5F5F5;
+  
+  &:hover {
+    background-color: #F8F2FB;
+  }
+  
+  ${props => props.isExpanded && `
+    background-color: #F8F2FB;
+    border-bottom: none;
+  `}
+`;
+
+const ExpandedRow = styled.div`
+  background-color: #F8F2FB;
+  border-bottom: 1px solid #E9E0F0;
+  padding: 20px 44px;
+  animation: slideDown 0.3s ease-out;
+  
+  @keyframes slideDown {
+    from {
+      opacity: 0;
+      transform: translateY(-10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+`;
+
+const ExpandedContent = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-width: 800px;
+`;
+
+const ExpandedTitle = styled.h3`
+  color: #000;
+  font-family: Pretendard;
+  font-size: 16px;
+  font-weight: 600;
+  margin: 0;
+`;
+
+const ExpandedAnswer = styled.p`
+  color: #333;
+  font-family: Pretendard;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.6;
+  margin: 0;
+  white-space: pre-wrap;
 `;
 
 const BaseCell = styled.div<{ 
@@ -252,6 +333,11 @@ const AnswerText = styled.span`
   font-size: 14px;
   font-weight: 400;
   line-height: 1.4;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
 `;
 
 const CategoryImageContainer = styled.div`

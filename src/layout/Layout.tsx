@@ -18,6 +18,7 @@ export default function Layout() {
 const LayoutContainer = styled.div`
   display: flex;
   min-height: 100vh;
+  overflow-y: overlay;
 `;
 
 const MainContent = styled.div`
@@ -26,7 +27,6 @@ const MainContent = styled.div`
 `;
 
 const ContentArea = styled.div`
-
   margin-left: 316px;
   margin-top: 140px;
   background: var(--color-lightgray-100);
