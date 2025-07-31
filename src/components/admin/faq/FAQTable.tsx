@@ -7,7 +7,9 @@ import CategoryName4 from "../../../assets/faq/CategoryName4.svg";
 import CategoryName5 from "../../../assets/faq/CategoryName5.svg";
 import ActiveIcon from "../../../assets/common/Active.svg";
 import InactiveIcon from "../../../assets/common/InActive.svg";
+import CustomDropdown from "../../common/CustomDropdown";
 
+// 타입 정의
 interface FAQItem {
   id: number;
   question: string;
@@ -18,11 +20,23 @@ interface FAQItem {
   createdAt: string;
 }
 
-const faqData: FAQItem[] = [
+interface TableColumn {
+  key: string;
+  label: string;
+  width: string;
+}
+
+interface CategoryOption {
+  value: string;
+  label: string;
+}
+
+// 상수 데이터
+const FAQ_DATA: FAQItem[] = [
   {
     id: 1,
-    question: "계정 비밀번호를 변경하는 방법은?",
-    answer: "계정 설정에서 비밀번호 변경에 대한 안내입니다.",
+    question: "계정 비밀번호를 변경하는 방법은? 계정 비밀번호를 변경하는 방법은?",
+    answer: "회사 메일 포털 → [설정] → [비밀번호 변경] 메뉴에서 직접 변경 가능합니다. 보안을 위해 3개월마다 비밀번호 변경을 권장합니다.",
     category: "IT/시스템",
     categoryImage: CategoryName1,
     isActive: true,
@@ -31,7 +45,7 @@ const faqData: FAQItem[] = [
   {
     id: 2,
     question: "계정 비밀번호를 변경하는 방법은?",
-    answer: "계정 설정에서 비밀번호 변경에 대한 안내입니다.",
+    answer: "회사 메일 포털 → [설정] → [비밀번호 변경] 메뉴에서 직접 변경 가능합니다. 보안을 위해 3개월마다 비밀번호 변경을 권장합니다.",
     category: "사내 규정",
     categoryImage: CategoryName2,
     isActive: true,
@@ -40,7 +54,7 @@ const faqData: FAQItem[] = [
   {
     id: 3,
     question: "계정 비밀번호를 변경하는 방법은?",
-    answer: "계정 설정에서 비밀번호 변경에 대한 안내입니다.",
+    answer: "회사 메일 포털 → [설정] → [비밀번호 변경] 메뉴에서 직접 변경 가능합니다. 보안을 위해 3개월마다 비밀번호 변경을 권장합니다.",
     category: "근무 / 근태",
     categoryImage: CategoryName3,
     isActive: true,
@@ -49,7 +63,7 @@ const faqData: FAQItem[] = [
   {
     id: 4,
     question: "계정 비밀번호를 변경하는 방법은?",
-    answer: "계정 설정에서 비밀번호 변경에 대한 안내입니다.",
+    answer: "회사 메일 포털 → [설정] → [비밀번호 변경] 메뉴에서 직접 변경 가능합니다. 보안을 위해 3개월마다 비밀번호 변경을 권장합니다.",
     category: "급여 / 복리후생",
     categoryImage: CategoryName4,
     isActive: true,
@@ -58,7 +72,7 @@ const faqData: FAQItem[] = [
   {
     id: 5,
     question: "계정 비밀번호를 변경하는 방법은?",
-    answer: "계정 설정에서 비밀번호 변경에 대한 안내입니다.",
+    answer: "회사 메일 포털 → [설정] → [비밀번호 변경] 메뉴에서 직접 변경 가능합니다. 보안을 위해 3개월마다 비밀번호 변경을 권장합니다.",
     category: "복지 / 휴가",
     categoryImage: CategoryName5,
     isActive: false,
@@ -66,110 +80,189 @@ const faqData: FAQItem[] = [
   }
 ];
 
-const TABLE_COLUMNS = [
-  { key: "question", label: "질문" },
-  { key: "answer", label: "카테고리" },
-  { key: "category", label: "상태" },
-  { key: "isActive", label: "최종 수정일" },
-  { key: "action", label: "작업" }
+const TABLE_COLUMNS: TableColumn[] = [
+  { key: "question", label: "질문", width: "340px" },
+  { key: "answer", label: "카테고리", width: "120px" },
+  { key: "category", label: "상태", width: "120px" },
+  { key: "isActive", label: "최종 수정일", width: "200px" },
+  { key: "action", label: "작업", width: "150px" }
 ];
 
-const FAQTable = () => {
-  const [expandedRows, setExpandedRows] = useState<Set<number>>(new Set());
+const CATEGORY_OPTIONS: CategoryOption[] = [
+  { value: "", label: "전체 카테고리" },
+  { value: "it", label: "IT/시스템" },
+  { value: "policy", label: "사내 규정" },
+  { value: "work", label: "근무 / 근태" },
+  { value: "salary", label: "급여 / 복리후생" },
+  { value: "welfare", label: "복지 / 휴가" }
+];
 
-  const toggleRow = (id: number) => {
-    const newExpandedRows = new Set(expandedRows);
-    if (newExpandedRows.has(id)) {
-      newExpandedRows.delete(id);
-    } else {
-      newExpandedRows.add(id);
-    }
-    setExpandedRows(newExpandedRows);
+// 메인 컴포넌트
+const FAQTable: React.FC = () => {
+  // 상태 관리
+  const [expandedRows, setExpandedRows] = useState<Set<number>>(new Set());
+  const [faqItems, setFaqItems] = useState<FAQItem[]>(FAQ_DATA);
+  const [selectedCategory, setSelectedCategory] = useState<string>("");
+
+  // 이벤트 핸들러
+  const handleRowToggle = (id: number): void => {
+    setExpandedRows(prev => {
+      const newExpandedRows = new Set(prev);
+      if (newExpandedRows.has(id)) {
+        newExpandedRows.delete(id);
+      } else {
+        newExpandedRows.add(id);
+      }
+      return newExpandedRows;
+    });
   };
 
-  const renderTableRow = (faq: FAQItem) => {
+  const handleArchive = (id: number): void => {
+    setFaqItems(prevItems => 
+      prevItems.map(item => 
+        item.id === id ? { ...item, isActive: false } : item
+      )
+    );
+  };
+
+  const handleEdit = (id: number): void => {
+    console.log('Edit FAQ:', id);
+  };
+
+  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>): void => {
+    console.log('Search:', e.target.value);
+  };
+
+  const handleCategoryChange = (value: string): void => {
+    setSelectedCategory(value);
+    console.log('Category:', value);
+  };
+
+  // 렌더링 함수들
+  const renderActionButtons = (faq: FAQItem): JSX.Element => (
+    <ActionContainer>
+      <ActionText 
+        onClick={(e) => {
+          e.stopPropagation();
+          handleEdit(faq.id);
+        }}
+      >
+        수정
+      </ActionText>
+      <ActionDivider />
+      <ActionText 
+        onClick={(e) => {
+          e.stopPropagation();
+          handleArchive(faq.id);
+        }}
+      >
+        보관
+      </ActionText>
+    </ActionContainer>
+  );
+
+  const renderExpandedContent = (faq: FAQItem): JSX.Element => (
+    <ExpandedRow>
+      <ExpandedBox>
+        <ExpandedHeader>
+          <ExpandedTitle>답변 내용</ExpandedTitle>
+        </ExpandedHeader>
+        <ExpandedContent>
+          <ExpandedAnswer>{faq.answer}</ExpandedAnswer>
+        </ExpandedContent>
+      </ExpandedBox>
+    </ExpandedRow>
+  );
+
+  const renderTableRow = (faq: FAQItem): JSX.Element => {
     const isExpanded = expandedRows.has(faq.id);
     
     return (
       <React.Fragment key={faq.id}>
-        <TableRow onClick={() => toggleRow(faq.id)} isExpanded={isExpanded}>
-          <TableCell isQuestion>
-            <QuestionContainer>
-              <QuestionText>{faq.question}</QuestionText>
-              <AnswerText>{faq.answer}</AnswerText>
-            </QuestionContainer>
-          </TableCell>
-          <TableCell isCategory>
-            <CategoryImageContainer>
-              <CategoryImage src={faq.categoryImage} alt={faq.category} />
-            </CategoryImageContainer>
-          </TableCell>
-          <TableCell isStatus>
+        <TableRow 
+          onClick={() => handleRowToggle(faq.id)} 
+          isExpanded={isExpanded}
+        >
+          <QuestionCell>
+            <QuestionText>{faq.question}</QuestionText>
+          </QuestionCell>
+          <CategoryCell>
+            <CategoryImage src={faq.categoryImage} alt={faq.category} />
+          </CategoryCell>
+          <StatusCell>
             <StatusIcon 
               src={faq.isActive ? ActiveIcon : InactiveIcon} 
               alt={faq.isActive ? "활성" : "비활성"} 
             />
-          </TableCell>
-          <TableCell isDate>
+          </StatusCell>
+          <DateCell>
             <DateText>{faq.createdAt}</DateText>
-          </TableCell>
-          <TableCell isAction>
-            <ActionContainer>
-              <ActionText>수정</ActionText>
-              <ActionDivider />
-              <ActionText>보관</ActionText>
-            </ActionContainer>
-          </TableCell>
+          </DateCell>
+          <ActionCell>
+            {renderActionButtons(faq)}
+          </ActionCell>
         </TableRow>
-        {isExpanded && (
-          <ExpandedRow>
-            <ExpandedContent>
-              <ExpandedTitle>답변</ExpandedTitle>
-              <ExpandedAnswer>{faq.answer}</ExpandedAnswer>
-            </ExpandedContent>
-          </ExpandedRow>
-        )}
+        {isExpanded && renderExpandedContent(faq)}
       </React.Fragment>
     );
   };
 
+  const renderTableHeader = (): JSX.Element => (
+    <TableHeader>
+      <TableTitle>FAQ 목록</TableTitle>
+      <SearchContainer>
+        <SearchInput 
+          type="text" 
+          placeholder="질문으로 검색"
+          onChange={handleSearch}
+        />
+        <DropdownContainer>
+          <CustomDropdown
+            options={CATEGORY_OPTIONS}
+            value={selectedCategory}
+            onChange={handleCategoryChange}
+          />
+        </DropdownContainer>
+      </SearchContainer>
+    </TableHeader>
+  );
+
+  const renderColumnHeaders = (): JSX.Element => (
+    <HeaderBox>
+      <TableHeaderRow>
+        {TABLE_COLUMNS.map((column) => (
+          <TableHeaderCell 
+            key={column.key} 
+            width={column.width}
+          >
+            {column.label}
+          </TableHeaderCell>
+        ))}
+      </TableHeaderRow>
+    </HeaderBox>
+  );
+
   return (
     <TableContainer>
-        <TableHeader>
-          <TableTitle>FAQ 목록</TableTitle>
-        </TableHeader>
-        <HeaderBox>
-          <TableHeaderRow>
-            {TABLE_COLUMNS.map((column) => (
-              <TableHeaderCell 
-                key={column.key} 
-                isQuestion={column.key === "question"}
-                isCategory={column.key === "answer"}
-                isStatus={column.key === "category"}
-                isDate={column.key === "isActive"}
-                isAction={column.key === "action"}
-              >
-                {column.label}
-              </TableHeaderCell>
-            ))}
-          </TableHeaderRow>
-        </HeaderBox>
-        <TableBody>
-          {faqData.map(renderTableRow)}
-        </TableBody>
-      </TableContainer>
+      {renderTableHeader()}
+      {renderColumnHeaders()}
+      <TableBody>
+        {faqItems.map(renderTableRow)}
+      </TableBody>
+    </TableContainer>
   );
 };
 
 export default FAQTable;
 
-// Styled Components
+// 스타일 컴포넌트들
 const TableContainer = styled.div`
   width: 1062px;
-  height: 586px;
+  min-height: 586px;
   border-radius: var(--br-18);
   background: var(--color-white);
   box-shadow: 0 6px 18px 0 rgba(125, 93, 246, 0.10);
+  transition: height 0.3s ease;
 `;
 
 const TableHeader = styled.div`
@@ -181,6 +274,9 @@ const TableHeader = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
+  padding: 0 44px;
+  box-sizing: border-box;
+  position: relative;
 `;
 
 const HeaderBox = styled.div`
@@ -196,19 +292,59 @@ const TableHeaderRow = styled.div`
   height: 100%;
 `;
 
+const TableBody = styled.div`
+  display: flex;
+  flex-direction: column;
+  padding-bottom: 13px;
+`;
+
 const TableTitle = styled.h2`
   color: #000;
   font-family: Pretendard;
   font-size: 20px;
   font-weight: 600;
-  margin-left: 44px;
+  flex-shrink: 0;
 `;
 
-const TableBody = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 32px;
-  padding-top: 28px;
+const QuestionText = styled.span`
+  color: #000;
+  font-family: Pretendard;
+  font-size: 18px;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: block;
+  width: 100%;
+  line-height: 1;
+  vertical-align: middle;
+`;
+
+const DateText = styled.span`
+  color: #000;
+  font-family: Pretendard;
+  font-size: 16px;
+  font-weight: 500;
+`;
+
+const ExpandedTitle = styled.h3`
+  color: #000;
+  font-family: Pretendard;
+  font-size: var(--font-size-20);
+  font-weight: 600;
+  margin-left: 36px;
+`;
+
+const ExpandedAnswer = styled.p`
+  color: #333;
+  font-family: Pretendard;
+  font-size: var(--font-size-15);
+  font-weight: 400;
+  line-height: 1.6;
+  margin: 0;
+  white-space: pre-wrap;
+  margin-left: 36px;
+  margin-top: 24px;
 `;
 
 const TableRow = styled.div<{ isExpanded?: boolean }>`
@@ -216,22 +352,23 @@ const TableRow = styled.div<{ isExpanded?: boolean }>`
   align-items: center;
   transition: background-color 0.2s ease;
   cursor: pointer;
-  border-bottom: 1px solid #F5F5F5;
+  padding: 30px 0;
   
   &:hover {
-    background-color: #F8F2FB;
+    background-color: rgba(153, 102, 204, 0.05);
   }
   
   ${props => props.isExpanded && `
-    background-color: #F8F2FB;
+    background-color: rgba(153, 102, 204, 0.05);
     border-bottom: none;
   `}
 `;
 
 const ExpandedRow = styled.div`
-  background-color: #F8F2FB;
-  border-bottom: 1px solid #E9E0F0;
-  padding: 20px 44px;
+  width: 1062px;
+  height: 200px;
+  flex-shrink: 0;
+  background: rgba(153, 102, 204, 0.05);
   animation: slideDown 0.3s ease-out;
   
   @keyframes slideDown {
@@ -246,104 +383,85 @@ const ExpandedRow = styled.div`
   }
 `;
 
-const ExpandedContent = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  max-width: 800px;
+const ExpandedBox = styled.div`
+  width: 974px;
+  height: 142px;
+  flex-shrink: 0;
+  border-radius: 18.75px;
+  background: #FFF;
+  margin-top: 28px;
+  margin-left: 44px;
 `;
 
-const ExpandedTitle = styled.h3`
-  color: #000;
-  font-family: Pretendard;
-  font-size: 16px;
-  font-weight: 600;
-  margin: 0;
-`;
-
-const ExpandedAnswer = styled.p`
-  color: #333;
-  font-family: Pretendard;
-  font-size: 14px;
-  font-weight: 400;
-  line-height: 1.6;
-  margin: 0;
-  white-space: pre-wrap;
-`;
-
-const BaseCell = styled.div<{ 
-  isQuestion?: boolean; 
-  isCategory?: boolean; 
-  isStatus?: boolean; 
-  isDate?: boolean; 
-  isAction?: boolean; 
-}>`
-  flex: ${({ isQuestion, isCategory, isStatus, isDate, isAction }) => {
-    if (isQuestion) return 1.5;
-    if (isCategory) return 0.5;
-    if (isStatus) return 0.8;
-    if (isDate) return 0.8;
-    if (isAction) return 0.8;
-    return 1;
-  }};
+const ExpandedHeader = styled.div`
+  width: 974px;
+  height: 70px;
+  border-radius: 18.2px 18.2px 0 0;
+  border-bottom: 1.4px solid #E9E0F0;
+  background: #FFF;
   display: flex;
   align-items: center;
-  justify-content: ${({ isCategory, isStatus }) => isCategory || isStatus ? 'center' : 'flex-start'};
-  text-align: ${({ isCategory, isStatus }) => isCategory || isStatus ? 'center' : 'left'};
 `;
 
-const TableHeaderCell = styled(BaseCell)`
+const ExpandedContent = styled.div``;
+
+const TableHeaderCell = styled.div<{ width: string }>`
+  width: ${props => props.width};
   color: #000;
   font-family: Pretendard;
   font-size: var(--font-size-16);
   font-weight: 500;
-  padding-left: ${({ isQuestion }) => isQuestion ? '44px' : '0'};
-  padding-right: ${({ isCategory }) => isCategory ? '24px' : '0'};
-`;
-
-const TableCell = styled(BaseCell)`
-  padding: var(--padding-16) var(--padding-24);
-  font-size: var(--font-size-14);
-  color: var(--color-dimgray);
-  white-space: nowrap;
-  text-overflow: ellipsis;
-  padding-left: ${({ isQuestion }) => isQuestion ? '44px' : 'var(--padding-24)'};
-  padding-right: ${({ isCategory }) => isCategory ? '24px' : 'var(--padding-24)'};
-`;
-
-const QuestionContainer = styled.div`
+  padding-left: ${({ width }) => {
+    if (width === "340px") return '44px';
+    if (width === "120px") return '24px';
+    if (width === "200px") return '36px';
+    return '0';
+  }};
   display: flex;
-  flex-direction: column;
-  gap: 8px;
-  width: 100%;
-  text-align: left;
+  align-items: center;
+  justify-content: ${({ width }) => {
+    if (width === "120px") return 'center';
+    if (width === "150px") return 'flex-start';
+    return 'flex-start';
+  }};
 `;
 
-const QuestionText = styled.span`
-  color: #000;
-  font-family: Pretendard;
-  font-size: 18px;
-  font-weight: 600;
-  line-height: 1.4;
-`;
-
-const AnswerText = styled.span`
-  color: #000;
-  font-family: Pretendard;
-  font-size: 14px;
-  font-weight: 400;
-  line-height: 1.4;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
+const QuestionCell = styled.div`
+  width: 340px;
+  padding-left: 44px;
+  display: flex;
+  align-items: center;
   overflow: hidden;
-  text-overflow: ellipsis;
 `;
 
-const CategoryImageContainer = styled.div`
+const CategoryCell = styled.div`
+  width: 120px;
   display: flex;
+  padding-left: 24px;
+  align-items: center;
   justify-content: center;
-  width: 100%;
+`;
+
+const StatusCell = styled.div`
+  width: 120px;
+  display: flex;
+  align-items: center;
+  padding-left: 24px;
+  justify-content: center;
+`;
+
+const DateCell = styled.div`
+  width: 200px;
+  display: flex;
+  padding-left: 36px;
+  align-items: center;
+`;
+
+const ActionCell = styled.div`
+  width: 150px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
 `;
 
 const CategoryImage = styled.img<{ alt?: string }>`
@@ -356,13 +474,6 @@ const StatusIcon = styled.img<{ src: string; alt?: string }>`
   width: ${({ alt }) => alt === "비활성" ? '69px' : '56px'};
   height: 32px;
   object-fit: contain;
-`;
-
-const DateText = styled.span`
-  color: #000;
-  font-family: Pretendard;
-  font-size: 16px;
-  font-weight: 500;
 `;
 
 const ActionContainer = styled.div`
@@ -384,7 +495,40 @@ const ActionText = styled.span`
   font-weight: 500;
   cursor: pointer;
   transition: color 0.2s;
+  
   &:hover {
     color: var(--color-mediumpurple-300);
+  }
+`;
+
+const SearchContainer = styled.div`
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  position: absolute;
+  right: 48px;
+`;
+
+const DropdownContainer = styled.div`
+  margin-left: 12px;
+  flex-shrink: 0;
+`;
+
+const SearchInput = styled.input`
+  width: 160px;
+  height: 33.75px;
+  flex-shrink: 0;
+  border-radius: 3.75px;
+  border: 0.75px solid #CCC;
+  padding: 0 12px;
+  font-family: Pretendard;
+  font-size: 14px;
+  color: #000;
+  background: #FFF;
+  outline: none;
+  box-sizing: border-box;
+  
+  &::placeholder {
+    color: #999;
   }
 `;

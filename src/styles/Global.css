@@ -177,4 +177,19 @@ body {
 }
 */
 
+/* 드롭다운 옵션 호버 스타일 강제 적용 */
+select option:hover,
+select option:focus,
+select option:active,
+select option:checked {
+  background-color: #F8F2FB !important;
+  color: #000 !important;
+}
+
+/* 웹킷 브라우저용 드롭다운 스타일 */
+select option::-webkit-select-placeholder {
+  background-color: #F8F2FB !important;
+  color: #000 !important;
+}
+
 

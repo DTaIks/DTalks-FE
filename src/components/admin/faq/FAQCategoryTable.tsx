@@ -226,8 +226,8 @@ const CategoryImage = styled.img<{ alt?: string }>`
   object-fit: contain;
 `;
 
-const StatusIcon = styled.img<{ src: string }>`
-  width: ${({ src }) => src.includes('InActive') ? '68px' : '58px'};
+const StatusIcon = styled.img<{ src: string; alt?: string }>`
+  width: ${({ alt }) => alt === "비활성" ? '69px' : '56px'};
   height: 32px;
   object-fit: contain;
 `;

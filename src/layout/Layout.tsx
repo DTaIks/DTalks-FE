@@ -18,7 +18,7 @@ export default function Layout() {
 const LayoutContainer = styled.div`
   display: flex;
   min-height: 100vh;
-  overflow-y: overlay;
+  overflow-y: auto;
 `;
 
 const MainContent = styled.div`
