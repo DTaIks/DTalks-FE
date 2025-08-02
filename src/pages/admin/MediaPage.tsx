@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useCallback } from 'react';
+import React from 'react';
 import Sidebar from '../../layout/Sidebar';
 import styled from 'styled-components';
 
@@ -10,160 +10,38 @@ import Button from '../../components/common/Button';
 
 import MediaFileUploadModal, { type MediaUploadData } from '../../components/admin/mediaModal/MediaFileUploadModal';
 import ConfirmModal from '../../components/common/ConfirmModal';
-import { 
-  useDepartmentStats, 
-  useFiles,
-  type MediaFile
-} from '../../hooks/useMediaFile';
 
-import { useArchivedFilesStore } from '../../store/archivedFileStore';
+import { useDepartmentStats } from '../../hooks/media/useMediaFile';
+import { useMediaPageState } from '../../hooks/media/useMediaPageState';
+import { useMediaActions } from '../../hooks/media/useMediaActions';
 
 const MediaPage: React.FC = () => {
-  const [selectedDepartment, setSelectedDepartment] = useState<string>('전체 파일');
-  const [selectedFileName, setSelectedFileName] = useState<string>('');
-  const [selectedFileType, setSelectedFileType] = useState<'document' | 'image' | 'audio' | 'all'>('all');
-  const [isArchiveMode, setIsArchiveMode] = useState<boolean>(false);
-  const [isArchiveClose, setIsArchiveClose] = useState<boolean>(false);
-  const [isMediaUploadModalOpen, setIsMediaUploadModalOpen] = useState<boolean>(false);
-  const [isConfirmModalOpen, setIsConfirmModalOpen] = useState<boolean>(false);
-  const [modalType, setModalType] = useState<'archive' | 'download'>('download');
-
+  // 데이터 및 상태 관리
   const departments = useDepartmentStats();
-  const files = useFiles();
-  
-  const { 
-    archivedFiles, 
-    archiveFile,
-  } = useArchivedFilesStore();
-  
-  const getFilteredFiles = useMemo((): MediaFile[] => {
-    let filteredFiles = files;
-    
-    // 보관 모드에 따라 필터링
-    if (isArchiveMode) {
-      filteredFiles = filteredFiles.filter(file => archivedFiles.includes(file.fileId));
-    } else {
-      filteredFiles = filteredFiles.filter(file => !archivedFiles.includes(file.fileId));
-    }
-    
-    // 부서별 필터링
-    if (selectedDepartment !== '전체 파일') {
-      filteredFiles = filteredFiles.filter(file => file.departmentName === selectedDepartment);
-    }
-    
-    // 파일 타입별 필터링
-    if (selectedFileType !== 'all') {
-      filteredFiles = filteredFiles.filter(file => file.fileType === selectedFileType);
-    }
-    
-    return filteredFiles;
-  }, [files, archivedFiles, isArchiveMode, selectedDepartment, selectedFileType]);
+  const { filters, archive, modals, actions } = useMediaPageState();
+  const mediaActions = useMediaActions();
 
-  const filesData = getFilteredFiles;
+  // 다운로드 버튼 클릭 핸들러
+  const handleDownloadClick = (fileName: string) => {
+    modals.confirmModal.open('download', fileName);
+  };
 
-  // 부서 선택 핸들러
-  const handleDepartmentSelect = useCallback((departmentName: string): void => {
-    setSelectedDepartment(departmentName);
-    setSelectedFileType('all');
-    if (!isArchiveMode) {
-      setIsArchiveMode(false);
-    }
-  }, [isArchiveMode]);
+  // 보관 버튼 클릭 핸들러
+  const handleArchiveClick = (fileName: string) => {
+    modals.confirmModal.open('archive', fileName);
+  };
 
-  // 보관함에서 부서 선택 핸들러
-  const handleArchiveDepartmentSelect = useCallback((departmentName: string): void => {
-    setSelectedDepartment(departmentName);
-    setSelectedFileType('all');
-  }, []);
+  // 확인 모달 액션 핸들러
+  const handleConfirmAction = () => {
+    mediaActions.handleConfirmAction(modals.confirmModal.type, modals.confirmModal.fileName);
+    modals.confirmModal.close();
+  };
 
-  // 파일 타입 선택 핸들러
-  const handleFileTypeSelect = useCallback((fileType: '전체' | '문서' | '이미지' | '음성'): void => {
-    const fileTypeMap: Record<string, 'document' | 'image' | 'audio' | 'all'> = {
-      '전체': 'all',
-      '문서': 'document', 
-      '이미지': 'image',
-      '음성': 'audio'
-    };
-    setSelectedFileType(fileTypeMap[fileType]);
-  }, []);
-
-  // 전체 선택 핸들러
-  const handleAllSelect = useCallback((): void => {
-    setSelectedDepartment('전체 파일');
-    setSelectedFileType('all');
-    setIsArchiveMode(false);
-  }, []);
-
-  // 보관함 선택 핸들러
-  const handleArchiveSelect = useCallback((): void => {
-    setIsArchiveMode(true);
-    setSelectedDepartment('전체 파일');
-    setSelectedFileType('all');
-  }, []);
-
-  // 보관함 닫기 핸들러
-  const handleArchiveClose = useCallback((): void => {
-    setIsArchiveClose(true);
-    setTimeout(() => {
-      setIsArchiveMode(false);
-      setIsArchiveClose(false);
-    }, 400);
-  }, []);
-
-  // 업로드 클릭 핸들러
-  const handleUploadClick = useCallback((): void => {
-    setIsMediaUploadModalOpen(true);
-  }, []);
-
-  // 모달 닫기 핸들러
-  const handleCloseModal = useCallback((): void => {
-    setIsMediaUploadModalOpen(false);
-  }, []);
-
-  // 파일 업로드 핸들러들
-  const handleMediaUploadSubmit = useCallback((data: MediaUploadData): void => {
-    console.log('미디어 파일 업로드 데이터:', data);
-    alert(`미디어 파일 "${data.fileName}"이 업로드되었습니다!`);
-    setIsMediaUploadModalOpen(false);
-  }, []);
-
-  // 다운로드 핸들러
-  const handleDownload = useCallback((fileName: string): void => {
-    setSelectedFileName(fileName);
-    setModalType('download');
-    setIsConfirmModalOpen(true);
-  }, []);
-
-  // 보관 핸들러
-  const handleArchive = useCallback((fileName: string): void => {
-    setSelectedFileName(fileName);
-    setModalType('archive');
-    setIsConfirmModalOpen(true);
-  }, []);
-
-  // 확인 모달 닫기 핸들러
-  const handleConfirmModalClose = useCallback((): void => {
-    setIsConfirmModalOpen(false);
-    setSelectedFileName('');
-  }, []);
-
-  // 확인 액션 핸들러
-  const handleConfirmAction = useCallback((): void => {
-    const selectedFile = files.find(file => file.fileName === selectedFileName);
-    
-    if (!selectedFile) return;
-
-    if (modalType === 'download') {
-      alert(`${selectedFileName} 다운로드를 시작합니다.`);
-    } 
-    else if (modalType === 'archive') {
-      archiveFile(selectedFile.fileId);
-      alert(`${selectedFileName}을 보관합니다.`);
-    }
-    
-    setIsConfirmModalOpen(false);
-    setSelectedFileName('');
-  }, [files, selectedFileName, modalType, archiveFile]);
+  // 업로드 모달 핸들러
+  const handleUploadSubmit = (data: MediaUploadData) => {
+    mediaActions.handleUpload(data);
+    modals.uploadModal.close();
+  };
 
   return (
     <PageContainer>
@@ -175,10 +53,10 @@ const MediaPage: React.FC = () => {
             <PageDescription>파일을 체계적으로 관리하고 버전을 추적하세요</PageDescription>
           </PageTitleContainer>
           
-          {!isArchiveMode && (
+          {!archive.isMode && (
             <Button
               text="파일 업로드"
-              onClick={handleUploadClick}
+              onClick={modals.uploadModal.open}
               variant="primary"
               width="172px"
               height="44px"
@@ -196,19 +74,19 @@ const MediaPage: React.FC = () => {
                   key={dept.id}
                   title={dept.name}
                   icon={<FolderIcon>📁</FolderIcon>}
-                  isSelected={selectedDepartment === dept.name && !isArchiveMode}
-                  onClick={() => dept.name === '전체 파일' ? handleAllSelect() : handleDepartmentSelect(dept.name)}
+                  isSelected={filters.selectedDepartment === dept.name && !archive.isMode}
+                  onClick={() => dept.name === '전체 파일' ? actions.handleAllSelect() : actions.handleDepartmentSelect(dept.name)}
                 />
               ))}
             </DepartmentListContainer>
-            <Footer onClick={handleArchiveSelect} isSelected={isArchiveMode}>
+            <Footer onClick={archive.select} isSelected={archive.isMode}>
               <ArchiveText>보관함</ArchiveText>
             </Footer>
             
-            <ArchiveModal className={isArchiveMode ? (isArchiveClose ? 'close' : 'show') : ''}>
+            <ArchiveModal className={archive.isMode ? (archive.isClosing ? 'close' : 'show') : ''}>
               <ArchiveHeader>
                 <ArchiveTitle>보관함</ArchiveTitle>
-                <CloseButton onClick={handleArchiveClose}>
+                <CloseButton onClick={archive.close}>
                   ✕
                 </CloseButton>
               </ArchiveHeader>
@@ -221,8 +99,8 @@ const MediaPage: React.FC = () => {
                       key={`archive-${dept.id}`}
                       title={dept.name}
                       icon={<FolderIcon>📁</FolderIcon>}
-                      isSelected={selectedDepartment === dept.name && isArchiveMode}
-                      onClick={() => handleArchiveDepartmentSelect(dept.name)}
+                      isSelected={filters.selectedDepartment === dept.name && archive.isMode}
+                      onClick={() => archive.selectDepartment(dept.name)}
                     />
                   ))}
                 </DepartmentListContainer>
@@ -233,13 +111,12 @@ const MediaPage: React.FC = () => {
           <RightContainer>
             <HeaderContainer>
               <Header 
-                selectedTeam={selectedDepartment} 
-                selectedFileType={selectedFileType}
+                selectedTeam={filters.selectedDepartment} 
               />
               <DropdownWrapper>
                 <DropdownFilter 
                   options={['전체', '문서', '이미지', '음성'] as const}
-                  onSelect={handleFileTypeSelect}
+                  onSelect={actions.handleFileTypeSelect}
                   placeholder="파일 유형"
                 />
               </DropdownWrapper>
@@ -248,13 +125,13 @@ const MediaPage: React.FC = () => {
 
             <FileContainer>
               <FileContentWrapper>
-                {filesData.map(file => (
+                {filters.filteredFiles.map(file => (
                   <MediaFileContent 
                     key={file.fileId} 
                     file={file}
-                    onDownloadClick={() => handleDownload(file.fileName)}
-                    onArchiveClick={() => handleArchive(file.fileName)}
-                    isArchiveMode={isArchiveMode}
+                    onDownloadClick={() => handleDownloadClick(file.fileName)}
+                    onArchiveClick={() => handleArchiveClick(file.fileName)}
+                    isArchiveMode={archive.isMode}
                   />
                 ))}
               </FileContentWrapper>
@@ -264,17 +141,17 @@ const MediaPage: React.FC = () => {
       </Main>
 
       <MediaFileUploadModal
-        isOpen={isMediaUploadModalOpen}
-        onClose={handleCloseModal}
-        onSubmit={handleMediaUploadSubmit}
+        isOpen={modals.uploadModal.isOpen}
+        onClose={modals.uploadModal.close}
+        onSubmit={handleUploadSubmit}
       />
 
       <ConfirmModal
-        isOpen={isConfirmModalOpen}
-        onClose={handleConfirmModalClose}
+        isOpen={modals.confirmModal.isOpen}
+        onClose={modals.confirmModal.close}
         onConfirm={handleConfirmAction}
-        fileName={selectedFileName}
-        type={modalType}
+        fileName={modals.confirmModal.fileName}
+        type={modals.confirmModal.type}
       />
     </PageContainer>
   );
@@ -284,17 +161,19 @@ export default MediaPage;
 
 const PageContainer = styled.div`
   width: 100vw;
+  min-width: 1200px; 
   min-height: 100vh;
   background: var(--color-ghostwhite);
   display: flex;
-  overflow-x: hidden;
+  overflow-x: hidden; 
 `;
 
 const Main = styled.div`
   width: calc(100vw - 320px);
+  min-width: 880px; 
   display: flex;
   flex-direction: column;
-  overflow-x: hidden;
+  overflow-x: hidden; 
 `;
 
 const PageHeaderContainer = styled.div`
@@ -302,6 +181,7 @@ const PageHeaderContainer = styled.div`
   justify-content: space-between;
   align-items: flex-end;
   width: 100%;
+  min-width: 880px; 
   padding: 0 40px;
   margin-top: 160px;
   box-sizing: border-box;
@@ -315,15 +195,17 @@ const PageTitleContainer = styled.div`
 const ContentContainer = styled.div`
   display: flex;
   width: 100%;
+  min-width: 880px; 
   height: calc(100vh - 280px);
   padding: 20px 40px;
   position: relative;
-  overflow: hidden;
+  overflow: visible;
   box-sizing: border-box;
 `;
 
 const LeftContainer = styled.div`
   width: 240px;
+  min-width: 240px; 
   height: calc(100% - 32px);
   border-radius: 25px 0 0 25px;
   background: #F8F9FA;
@@ -350,7 +232,7 @@ const Footer = styled.div<{ isSelected: boolean }>`
   cursor: pointer;
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: var(--gap-8);
   transition: all 0.1s ease;
   flex-shrink: 0;
   
@@ -395,22 +277,22 @@ const ArchiveHeader = styled.div`
 `;
 
 const ArchiveTitle = styled.h2`
-  color: #222;
+  color: var(--color-lightblack);
   font-size: var(--font-size-18);
   padding-top: 4px;
   padding-left: 12px;
-  font-weight: 600;
+  font-weight: var(--font-weight-600);
   margin: 0;
 `;
 
 const CloseButton = styled.button`
   background: none;
   border: none;
-  font-size: 16px;
+  font-size: var(--font-size-16);
   cursor: pointer;
   color: #6b7280;
   margin-top: 14px;
-  padding: 12px;
+  padding: var(--padding-12);
   border-radius: 4px;
   transition: color 0.2s ease;
   margin-bottom: 12px;
@@ -429,18 +311,19 @@ const ArchiveContent = styled.div`
 const ArchiveSubtitle = styled.h3`
   color: #A1A1A1;
   font-size: var(--font-size-14);
-  font-weight: 500;
+  font-weight: var(--font-weight-500);
   margin: 0;
   padding: 16px 24px 12px;
 `;
 
 const ArchiveText = styled.span`
   font-size: var(--font-size-14);
-  font-weight: 500;
+  font-weight: var(--font-weight-500);
 `;
 
 const RightContainer = styled.div`
   flex: 1;
+  min-width: 600px;
   height: calc(100% - 32px);
   border-radius: 0 25px 25px 0;
   background: var(--color-white);
@@ -501,25 +384,25 @@ const FolderIcon = styled.span`
   font-size: var(--font-size-16);
 `;
 
+const Title = styled.h2`
+  color: var(--color-lightblack);
+  font-size: var(--font-size-16);
+  font-weight: var(--font-weight-600);
+  line-height: normal;
+  padding: 16px 120px 12px 32px;
+`;
+
 const PageTitle = styled.h1`
   color: #323232;
   font-size: var(--font-size-32);
-  font-weight: 700;
+  font-weight: var(--font-weight-700);
   margin: 0;
-`;
-
-const Title = styled.h2`
-  color: #222;
-  font-size: var(--font-size-16);
-  font-weight: 600;
-  line-height: normal;
-  padding: 16px 120px 12px 32px;
 `;
 
 const PageDescription = styled.p`
   color: #323232;
   font-size: var(--font-size-18);
-  font-weight: 400;
+  font-weight: var(--font-weight-400);
   margin: 0;
   margin-top: 8px;
 `;
