@@ -20,6 +20,20 @@ export interface FAQUploadData {
   category: string;
 }
 
+const CATEGORY = [
+  '사내 규정',
+  'IT/시스템',
+  '근무/근태',
+  '급여/복리후생',
+  '복지/휴가',
+];
+
+const FAQ_UPLOAD_INFO = [
+  "질문은 사용자 관점에서 명확하게 작성하세요",
+  "답변은 단계별로 구체적으로 설명하세요",
+  "답변 관련 링크를 포함하면 더욱 도움이 됩니다"
+];
+
 const FAQUploadModal: React.FC<FAQUploadModalProps> = ({
   isOpen,
   onClose,
@@ -28,30 +42,24 @@ const FAQUploadModal: React.FC<FAQUploadModalProps> = ({
   const [formData, setFormData] = useState<FAQUploadData>({
     question: '',
     answer: '',
-    category: '',
+    category: '', 
   });
 
-  const [showValidationErrors, setShowValidationErrors] = useState<boolean>(false);
-
-  // 카테고리 종류
-  const categories = [
-    '사내 규정',
-    'IT/시스템',
-    '근무/근태',
-    '급여/복리후생',
-    '복지/휴가',
-  ];
+  const [touched, setTouched] = useState({
+    question: false,
+    answer: false
+  });
 
   useEffect(() => {
     if (!isOpen) {
-      handleReset();
+      setTouched({
+        question: false,
+        answer: false
+      });
     }
   }, [isOpen]);
 
   const handleSubmit = () => {
-    // 저장 버튼을 눌렀을 때 유효성 검사 에러 표시 활성화
-    setShowValidationErrors(true);
-    
     if (isFormValid()) {
       onSubmit(formData);
       handleReset();
@@ -60,15 +68,25 @@ const FAQUploadModal: React.FC<FAQUploadModalProps> = ({
 
   const handleInputChange = (field: keyof FAQUploadData, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
+    
+    if (field !== 'category') {
+      setTouched(prev => ({ ...prev, [field]: true }));
+    }
   };
 
-  const isFormValid = () => {
-    return (
-      formData.question.trim() !== '' &&
-      formData.answer.trim() !== '' &&
-      formData.category.trim() !== ''
-    );
+  const handleBlur = (field: keyof typeof touched) => {
+    setTouched(prev => ({ ...prev, [field]: true }));
   };
+
+  const hasValidQuestion = () => formData.question.trim() !== '';
+  const hasValidAnswer = () => formData.answer.trim() !== '';
+  const hasValidCategory = () => formData.category.trim() !== '';
+
+  const isFormValid = () => (
+    hasValidQuestion() &&
+    hasValidAnswer() &&
+    hasValidCategory()
+  );
 
   const handleReset = () => {
     setFormData({
@@ -76,7 +94,10 @@ const FAQUploadModal: React.FC<FAQUploadModalProps> = ({
       answer: '',
       category: '',
     });
-    setShowValidationErrors(false); 
+    setTouched({
+      question: false,
+      answer: false
+    });
   };
 
   const handleClose = () => {
@@ -89,37 +110,38 @@ const FAQUploadModal: React.FC<FAQUploadModalProps> = ({
       onClose={handleClose}
       title="FAQ 추가"
       onSubmit={handleSubmit}
-      submitDisabled={false} 
+      submitDisabled={!isFormValid()}
     >
       <FileNameInput
         value={formData.question}
         onChange={(value) => handleInputChange('question', value)}
+        onBlur={() => handleBlur('question')}
         label="질문"
         placeholder="자주 묻는 질문을 입력하세요"
+        showError={touched.question && !hasValidQuestion()}
       />
 
       <FileDescriptionInput
         value={formData.answer}
         onChange={(value) => handleInputChange('answer', value)}
+        onBlur={() => handleBlur('answer')}
         label="답변"
         placeholder="질문에 대한 답변을 입력하세요"
-        showError={showValidationErrors}
+        showError={touched.answer && !hasValidAnswer()}
       />
 
       <InputRow>
         <FileCategory
           value={formData.category}
           onChange={(value) => handleInputChange('category', value)}
-          options={categories}
+          options={CATEGORY}
           label="카테고리"
         />
       </InputRow>
 
       <UploadInfoCard
         title="FAQ 추가"
-        text1="질문은 사용자 관점에서 명확하게 작성하세요"
-        text2="답변은 단계별로 구체적으로 설명하세요"
-        text3="답변 관련 링크를 포함하면 더욱 도움이 됩니다"
+        texts={FAQ_UPLOAD_INFO}
       />
     </UploadBaseModal>
   );
@@ -129,6 +151,6 @@ export default FAQUploadModal;
 
 const InputRow = styled.div`
   display: flex;
-  gap: 12px;
+  gap: var(--gap-12);
   margin-bottom: 40px;
 `;

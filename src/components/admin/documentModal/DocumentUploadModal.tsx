@@ -24,6 +24,20 @@ export interface DocumentUploadData {
   category: string; 
 }
 
+const CATEGORY = [
+  '사내 규정',
+  'IT/시스템',
+  '근무/근태',
+  '급여/복리후생',
+  '복지/휴가',
+];
+
+const DOCUMENT_UPLOAD_INFO = [
+  "지원 형식: 문서(pdf, docx, xlsx)",
+  "중복 파일 업로드 시 자동으로 버전 관리됩니다",
+  "파일 변경 사항이 자동으로 추적됩니다"
+];
+
 const DocumentUploadModal: React.FC<DocumentUploadModalProps> = ({
   isOpen,
   onClose,
@@ -38,34 +52,43 @@ const DocumentUploadModal: React.FC<DocumentUploadModalProps> = ({
   });
 
   const [fileDisplayName, setFileDisplayName] = useState<string>('');
-  const [showValidationErrors, setShowValidationErrors] = useState<boolean>(false);
 
-  // 카테고리 종류
-  const category = [
-    '사내 규정',
-    'IT/시스템',
-    '근무/근태',
-    '급여/복리후생',
-    '복지/휴가',
-  ];
+  const [touched, setTouched] = useState({
+    fileName: false,
+    description: false,
+    fileVersion: false
+  });
 
   useEffect(() => {
     if (!isOpen) {
-      handleReset();
+      setTouched({
+        fileName: false,
+        description: false,
+        fileVersion: false
+      });
     }
   }, [isOpen]);
 
   const handleSubmit = () => {
-    setShowValidationErrors(true);
-    
     if (isFormValid()) {
       onSubmit(formData);
       handleReset();
     }
   };
 
-  const handleInputChange = (field: keyof DocumentUploadData, value: string | boolean | File | undefined) => {
+  const handleInputChange = (
+    field: keyof DocumentUploadData,
+    value: string | boolean | File | undefined
+  ) => {
     setFormData(prev => ({ ...prev, [field]: value }));
+    
+    if (field !== 'uploadFile' && field !== 'category') {
+      setTouched(prev => ({ ...prev, [field]: true }));
+    }
+  };
+
+  const handleBlur = (field: keyof typeof touched) => {
+    setTouched(prev => ({ ...prev, [field]: true }));
   };
 
   const handleFileChange = (file: File | null) => {
@@ -79,19 +102,21 @@ const DocumentUploadModal: React.FC<DocumentUploadModalProps> = ({
     setFileDisplayName(fileName);
   };
 
-  const isFormValid = () => {
-    const isValidSemver = (version: string): boolean => {
-      return /^\d+\.\d+\.\d+$/.test(version);
-    };
+  const isValidSemver = (version: string): boolean => /^\d+\.\d+\.\d+$/.test(version);
+  
+  const hasValidFile = () => formData.uploadFile !== undefined;
+  const hasValidFileName = () => formData.fileName.trim() !== '';
+  const hasValidDescription = () => formData.description.trim() !== '';
+  const hasValidVersion = () => isValidSemver(formData.fileVersion);
+  const hasValidCategory = () => formData.category.trim() !== '';
 
-    return (
-      formData.uploadFile !== undefined &&
-      formData.fileName.trim() !== '' &&
-      formData.description.trim() !== '' &&
-      isValidSemver(formData.fileVersion) &&
-      formData.category.trim() !== ''
-    );
-  };
+  const isFormValid = () => (
+    hasValidFile() &&
+    hasValidFileName() &&
+    hasValidDescription() &&
+    hasValidVersion() &&
+    hasValidCategory()
+  );
 
   const handleReset = () => {
     setFormData({
@@ -102,7 +127,11 @@ const DocumentUploadModal: React.FC<DocumentUploadModalProps> = ({
       category: '',
     });
     setFileDisplayName('');
-    setShowValidationErrors(false); 
+    setTouched({
+      fileName: false,
+      description: false,
+      fileVersion: false
+    });
   };
 
   const handleClose = () => {
@@ -115,7 +144,7 @@ const DocumentUploadModal: React.FC<DocumentUploadModalProps> = ({
       onClose={handleClose}
       title="문서 업로드"
       onSubmit={handleSubmit}
-      submitDisabled={false} 
+      submitDisabled={!isFormValid()} 
     >
       <FileSelectInput
         fileDisplayName={fileDisplayName}
@@ -127,34 +156,36 @@ const DocumentUploadModal: React.FC<DocumentUploadModalProps> = ({
       <FileNameInput
         value={formData.fileName}
         onChange={(value) => handleInputChange('fileName', value)}
+        onBlur={() => handleBlur('fileName')}
         placeholder="파일명을 입력하세요"
+        showError={touched.fileName && !hasValidFileName()}
       />
 
       <FileDescriptionInput
         value={formData.description}
         onChange={(value) => handleInputChange('description', value)}
-        showError={showValidationErrors}
+        onBlur={() => handleBlur('description')}
+        showError={touched.description && !hasValidDescription()}
       />
 
       <InputRow>
         <VersionInput
           version={formData.fileVersion}
           onVersionChange={(value) => handleInputChange('fileVersion', value)}
-          showError={showValidationErrors}
+          onBlur={() => handleBlur('fileVersion')}
+          showError={touched.fileVersion && !hasValidVersion()}
         />
         <FileCategory
           value={formData.category}
           onChange={(value) => handleInputChange('category', value)}
-          options={category}
+          options={CATEGORY}
           label="카테고리"
         />
       </InputRow>
 
       <UploadInfoCard
         title="업로드 정보"
-        text1={`지원 형식: 문서(pdf, docx, xlsx)`}
-        text2="중복 파일 업로드 시 자동으로 버전 관리됩니다"
-        text3="파일 변경 사항이 자동으로 추적됩니다"
+        texts={DOCUMENT_UPLOAD_INFO}
       />
     </UploadBaseModal>
   );
@@ -164,6 +195,6 @@ export default DocumentUploadModal;
 
 const InputRow = styled.div`
   display: flex;
-  gap: 12px;
+  gap: var(--gap-12);
   margin-bottom: 32px;
 `;

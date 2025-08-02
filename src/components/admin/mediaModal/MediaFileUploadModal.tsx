@@ -24,6 +24,12 @@ export interface MediaUploadData {
   isPublic: boolean;
 }
 
+const MEDIA_UPLOAD_INFO = [
+  "지원 형식: 이미지(JPG, PNG), 음성(MP3), \n문서(pdf, docx, xlsx)",
+  "중복 파일 업로드 시 자동으로 버전 관리됩니다",
+  "파일 변경 사항이 자동으로 추적됩니다"
+];
+
 const MediaFileUploadModal: React.FC<MediaUploadModalProps> = ({
   isOpen,
   onClose,
@@ -38,26 +44,43 @@ const MediaFileUploadModal: React.FC<MediaUploadModalProps> = ({
   });
 
   const [fileDisplayName, setFileDisplayName] = useState<string>('');
-  const [showValidationErrors, setShowValidationErrors] = useState<boolean>(false);
+
+  const [touched, setTouched] = useState({
+    fileName: false,
+    description: false,
+    fileVersion: false
+  });
 
   useEffect(() => {
     if (!isOpen) {
-      handleReset();
+      setTouched({
+        fileName: false,
+        description: false,
+        fileVersion: false
+      });
     }
   }, [isOpen]);
 
   const handleSubmit = () => {
-    // 저장 버튼을 눌렀을 때 유효성 검사 에러 표시 활성화
-    setShowValidationErrors(true);
-    
     if (isFormValid()) {
       onSubmit(formData);
-      handleReset();
+      handleReset(); 
     }
   };
 
-  const handleInputChange = (field: keyof MediaUploadData, value: string | boolean | File | undefined) => {
+  const handleInputChange = (
+    field: keyof MediaUploadData,
+    value: string | boolean | File | undefined
+  ) => {
     setFormData(prev => ({ ...prev, [field]: value }));
+    
+    if (field !== 'isPublic') {
+      setTouched(prev => ({ ...prev, [field]: true }));
+    }
+  };
+
+  const handleBlur = (field: keyof typeof touched) => {
+    setTouched(prev => ({ ...prev, [field]: true }));
   };
 
   const handleFileChange = (file: File | null) => {
@@ -65,24 +88,26 @@ const MediaFileUploadModal: React.FC<MediaUploadModalProps> = ({
       ...prev,
       uploadFile: file || undefined
     }));
+    setTouched(prev => ({ ...prev, uploadFile: true }));
   };
 
   const handleFileDisplayNameChange = (fileName: string) => {
     setFileDisplayName(fileName);
   };
 
-  const isFormValid = () => {
-    const isValidSemver = (version: string): boolean => {
-      return /^\d+\.\d+\.\d+$/.test(version);
-    };
+  const isValidSemver = (version: string): boolean => /^\d+\.\d+\.\d+$/.test(version);
+  
+  const hasValidFile = () => formData.uploadFile !== undefined;
+  const hasValidFileName = () => formData.fileName.trim() !== '';
+  const hasValidDescription = () => formData.description.trim() !== '';
+  const hasValidVersion = () => isValidSemver(formData.fileVersion);
 
-    return (
-      formData.uploadFile !== undefined &&
-      formData.fileName.trim() !== '' &&
-      formData.description.trim() !== '' &&
-      isValidSemver(formData.fileVersion)
-    );
-  };
+  const isFormValid = () => (
+    hasValidFile() &&
+    hasValidFileName() &&
+    hasValidDescription() &&
+    hasValidVersion()
+  );
 
   const handleReset = () => {
     setFormData({
@@ -93,7 +118,11 @@ const MediaFileUploadModal: React.FC<MediaUploadModalProps> = ({
       isPublic: false
     });
     setFileDisplayName('');
-    setShowValidationErrors(false);
+    setTouched({
+      fileName: false,
+      description: false,
+      fileVersion: false
+    });
   };
 
   const handleClose = () => {
@@ -106,7 +135,7 @@ const MediaFileUploadModal: React.FC<MediaUploadModalProps> = ({
       onClose={handleClose}
       title="파일 업로드"
       onSubmit={handleSubmit}
-      submitDisabled={false} 
+      submitDisabled={!isFormValid()}
     >
       <FileSelectInput
         fileDisplayName={fileDisplayName}
@@ -118,19 +147,23 @@ const MediaFileUploadModal: React.FC<MediaUploadModalProps> = ({
       <FileNameInput
         value={formData.fileName}
         onChange={(value) => handleInputChange('fileName', value)}
+        onBlur={() => handleBlur('fileName')}
+        showError={touched.fileName && !hasValidFileName()}
       />
 
       <FileDescriptionInput
         value={formData.description}
         onChange={(value) => handleInputChange('description', value)}
-        showError={showValidationErrors}
+        onBlur={() => handleBlur('description')}
+        showError={touched.description && !hasValidDescription()}
       />
 
       <InputRow>
         <VersionInput
           version={formData.fileVersion}
           onVersionChange={(value) => handleInputChange('fileVersion', value)}
-          showError={showValidationErrors} 
+          onBlur={() => handleBlur('fileVersion')}
+          showError={touched.fileVersion && !hasValidVersion()}
         />
         <PublicSetting
           isPublic={formData.isPublic}
@@ -140,9 +173,7 @@ const MediaFileUploadModal: React.FC<MediaUploadModalProps> = ({
 
       <UploadInfoCard
         title="업로드 정보"
-        text1={`지원 형식: 이미지(JPG, PNG), 음성(MP3), \n문서(pdf, docx, xlsx)`}
-        text2="중복 파일 업로드 시 자동으로 버전 관리됩니다"
-        text3="파일 변경 사항이 자동으로 추적됩니다"
+        texts={MEDIA_UPLOAD_INFO}
       />
     </UploadBaseModal>
   );
@@ -152,12 +183,11 @@ export default MediaFileUploadModal;
 
 const InputRow = styled.div`
   display: flex;
-  gap: 12px;
+  gap: var(--gap-12);
   margin-bottom: 20px;
   > *:first-child {
     flex: 4.5;
   }
-  
   > *:last-child {
     flex: 1.5;
   }
