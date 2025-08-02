@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import styled from "styled-components";
 import TitleContainer from "../../../layout/TitleContainer";
 import FAQTable from "../../../components/admin/faq/FAQTable";
@@ -7,7 +7,7 @@ import Pagination from "../../../components/common/Pagination";
 
 const FAQPage = () => {
   const [currentPage, setCurrentPage] = useState<number>(1);
-  const [totalPages, setTotalPages] = useState<number>(3); // 예시로 3페이지 설정
+  const totalPages = 3; // 예시로 3페이지 설정
 
   const handlePageChange = (page: number): void => {
     setCurrentPage(page);
