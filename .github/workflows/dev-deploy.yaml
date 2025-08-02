@@ -67,11 +67,10 @@ jobs:
         run: npm ci
 
       - name: Build app
-        run: npm run build
+        run: vite build --mode development
         env:
           DISABLE_ESLINT_PLUGIN: true
           GENERATE_SOURCEMAP: false
-          TSC_COMPILE_ON_ERROR: true
 
       - name: Create version file
         run: |
