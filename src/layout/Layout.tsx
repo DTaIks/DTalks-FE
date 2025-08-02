@@ -1,19 +1,12 @@
 import Sidebar from './Sidebar';
 import styled from 'styled-components';
-import TitleContainer from './TitleContainer';
 import { Outlet } from 'react-router-dom';
 
-interface LayoutProps {
-  title: string;
-  subtitle?: string;
-}
-
-export default function Layout({ title, subtitle }: LayoutProps) {
+export default function Layout() {
   return (
     <LayoutContainer>
       <Sidebar />
       <MainContent>
-        <TitleContainer title={title} subtitle={subtitle} />
         <ContentArea>
           <Outlet />
         </ContentArea>
@@ -25,6 +18,7 @@ export default function Layout({ title, subtitle }: LayoutProps) {
 const LayoutContainer = styled.div`
   display: flex;
   min-height: 100vh;
+  overflow-y: auto;
 `;
 
 const MainContent = styled.div`
@@ -33,8 +27,7 @@ const MainContent = styled.div`
 `;
 
 const ContentArea = styled.div`
-  padding: 32px;
-  margin-left: 276px;
-  margin-top: 100px;
+  margin-left: 316px;
+  margin-top: 140px;
   background: var(--color-lightgray-100);
 `; 

@@ -1,10 +1,11 @@
 import { Routes, Route, Navigate, Outlet } from 'react-router-dom';
-import ChartPage from '../pages/chart/ChartPage';
 import { useAuthStore } from '../store/authStore';
 import LoginPage from '../pages/login/LoginPage';
 import SignUpPage from '../pages/signup/SignUpPage';
 import UserListPage from '../pages/admin/userlist/UserListPage';
 import PermissionPage from '../pages/admin/permission/PermissionPage';
+import ChartPage from '../pages/chart/ChartPage';
+import MediaPage from '../pages/admin/MediaPage';
 import Layout from '../layout/Layout';
 
 // 인증이 필요한 라우트
@@ -28,6 +29,7 @@ export default function AppRoutes() {
     <Routes>
       {/* <Route path ="/" element={<div></div>} /> <-- 삭제 */}
       <Route path="/chart" element={<ChartPage />} />
+      <Route path="/media" element={<MediaPage />} />
       {/* 루트 경로: 로그인 상태에 따라 리다이렉트 */}
       <Route path="/" element={
         isAuthenticated
