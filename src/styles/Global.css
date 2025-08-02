@@ -4,7 +4,6 @@ body {
   font-family: var(--font-pretendard);
   font-style: normal;
   background-color: var(--color-ghostwhite);
-  font-family: var(--font-pretendard);
 }
 
 * {
@@ -17,10 +16,13 @@ body {
   --color-slateblue: #804db3;
   --color-red: #f01a1d;
   --color-darkred: #ef4444;
+  --color-error: #F0191D;
+  --color-lightblack: #222;
   --color-gray: #666;
   --color-darkgray: #a1a1a1;
   --color-lightgray: #d9d9d9;
   --color-lightbluegray: #f5f7fa;
+  --color-lightpurple: #f5f0fa;
   --color-dimgray: #666666;
   --color-mediumpurple-500: rgba(156, 112, 201, 0.09);
   --color-mediumpurple-400: #8061b0;
@@ -41,6 +43,7 @@ body {
   --table-header-font-style: normal;
 
   /* 간격 설정 */
+  --gap-4: 4px;
   --gap-6: 6px;
   --gap-8: 8px;
   --gap-12: 12px;
@@ -75,13 +78,16 @@ body {
   /* 패딩 값들 */
   --padding-1: 1px;
   --padding-2: 2px;
+  --padding-4: 4px;
   --padding-6: 6px;
   --padding-8: 8px;
   --padding-10: 10px;
   --padding-11: 11px;
   --padding-12: 12px;
   --padding-17: 17px;
+  --padding-18: 18px;
   --padding-20: 20px;
+  --padding-24: 24px;
   --padding-32: 32px;
   --padding-36: 36px;
   --padding-40: 40px;
@@ -91,25 +97,25 @@ body {
   --padding-login: 0.375px 0px 0px;
 
   /* 모서리 둥글기 */
+  --br-4: 4px;
   --br-5: 5px;
   --br-6: 6px;
   --br-8: 8px;
-  --br-12: 12px;
-  --br-18: 18px;
+  --br-10: 10px;
+  --br-15: 15px;
   --br-25: 25px;
 
   /* 폰트 설정 */
   --font-pretendard: Pretendard;
 
   /* 글자 크기 */
-  --font-size-13: 13px;
+  --font-size-10: 10px;
   --font-size-14: 14px;
   --font-size-15: 15px;
   --font-size-16: 16px;
   --font-size-18: 18px;
   --font-size-19: 19px;
   --font-size-20: 20px;
-  --font-size-24: 24px;
   --font-size-22: 22px;
   --font-size-24: 24px;
   --font-size-26: 26px;
@@ -119,6 +125,14 @@ body {
   --font-size-39: 39px;
   --font-size-42: 42px;
   --font-size-52: 52px;
+
+  /* 글자 굵기 */
+  --font-weight-400: 400;
+  --font-weight-500: 500;
+  --font-weight-600: 600;
+  --font-weight-700: 700;
+
+
   /* 페이지 크기 조절 - 기본값 (큰 화면용) */
   --page-scale: 0.7;
 }
