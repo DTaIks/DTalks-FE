@@ -1,12 +1,11 @@
 import React from 'react';
 import styled from 'styled-components';
 
-interface HeaderProps {
+interface MediaFileContentHeaderProps {
   selectedTeam: string;
-  selectedFileType: 'document' | 'image' | 'audio' | 'all';
 }
 
-const Header: React.FC<HeaderProps> = ({ selectedTeam }) => {
+const Header: React.FC<MediaFileContentHeaderProps> = ({ selectedTeam }) => {
   return (
     <Container>
       <HeaderContent>
@@ -36,8 +35,8 @@ const HeaderContent = styled.div`
 `;
 
 const TeamName = styled.h2`
-  color: #555;
+  color: var(--color-gray);
   font-size: var(--font-size-16);
-  font-weight: 500;
+  font-weight: var(--font-weight-500);
   line-height: normal;
 `;

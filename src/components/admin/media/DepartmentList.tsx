@@ -15,33 +15,17 @@ const DepartmentBox: React.FC<DepartmentBoxProps> = ({
    onClick
 }) => {
     return (
-        <Box isSelected={isSelected} onClick={onClick}>
+        <Box 
+            className={isSelected ? 'selected' : ''} 
+            onClick={onClick}
+        >
             {icon && <IconWrapper>{icon}</IconWrapper>}
-            <Title isSelected={isSelected}>{title}</Title>
+            <Title>{title}</Title>
         </Box>
     );
 };
 
 export default DepartmentBox;
-
-const Box = styled.div<{ isSelected: boolean }>`
-    width: 204px;
-    height: 40px;
-    flex-shrink: 0;
-    display: flex;
-    align-items: center;
-    cursor: pointer;
-    position: relative;
-    background: ${props => props.isSelected ? 'linear-gradient(to right, #8061B01A 100%)' : '#F8F9FA'};
-    padding: 4px 0 4px 32px;
-    border-right: ${props => props.isSelected ? '4px solid #9966CC' : '4px solid transparent'};
-    
-    &:hover {
-        background: linear-gradient(to left, #8061B01A 100%);
-    }
-     
-    transition: all 0.2s ease;
-`;
 
 const IconWrapper = styled.div`
     display: flex;
@@ -49,10 +33,38 @@ const IconWrapper = styled.div`
     margin-right: 16px;
 `;
 
-const Title = styled.span<{ isSelected: boolean }>`
-    color: ${props => props.isSelected ? '#8061B0' : '#222'};
+const Title = styled.span`
+    color: #222;
     font-size: var(--font-size-16);
-    font-weight: ${props => props.isSelected ? '600' : '500'};
+    font-weight: var(--font-weight-500);
     line-height: normal;
     transition: all 0.2s ease;
+`;
+
+const Box = styled.div`
+    width: 208px;
+    height: 40px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    position: relative;
+    background: #F8F9FA;
+    padding: 4px 0 4px 32px;
+    border-right: 4px solid transparent;
+    transition: all 0.2s ease;
+    
+    &.selected {
+        background: linear-gradient(to right, #8061B01A 100%);
+        border-right: 4px solid var(--color-medium-purple-300);
+        
+        ${Title} {
+            color: var(--color-mediumpurple-400);
+            font-weight: var(--font-weight-600);
+        }
+    }
+         
+    &:hover {
+        background: linear-gradient(to left, #8061B01A 100%);
+    }
 `;

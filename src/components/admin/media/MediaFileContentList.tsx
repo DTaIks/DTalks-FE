@@ -1,20 +1,24 @@
 import React from "react";
 import styled from 'styled-components';
 import DropDownButton from "../../common/DropDownButton";
-import type { MediaFile } from "../../../hooks/useMediaFile";
+import type { MediaFile } from "../../../hooks/media/useMediaFile";
 
 interface MediaFileContentProps {
   file: MediaFile;
+  isArchiveMode?: boolean;
   onDownloadClick?: () => void;
   onArchiveClick?: () => void;
-  isArchiveMode?: boolean;
+  onEditClick?: () => void;
+  onVersionManagementClick?: () => void;
 }
 
 const MediaFileContent: React.FC<MediaFileContentProps> = ({ 
-  file,
+  file, 
+  isArchiveMode = false,
   onDownloadClick,
   onArchiveClick,
-  isArchiveMode = false
+  onEditClick,
+  onVersionManagementClick
 }) => {
   const formatDate = (updatedAt: string) => {
     return updatedAt;
@@ -22,16 +26,20 @@ const MediaFileContent: React.FC<MediaFileContentProps> = ({
 
   const dropdownItems = [
     {
-      label: '다운로드',
-      onClick: onDownloadClick || (() => {}),
+      label: "다운로드",
+      onClick: onDownloadClick || (() => console.log("다운로드 클릭"))
     },
     {
-      label: '버전 관리',
-      onClick: () => console.log('버전 관리 클릭:', file.fileName),
+      label: "수정",
+      onClick: onEditClick || (() => console.log("수정 클릭"))
     },
     {
-      label: '보관',
-      onClick: onArchiveClick || (() => {}),
+      label: "보관하기",
+      onClick: onArchiveClick || (() => console.log("보관하기 클릭"))
+    },
+    {
+      label: "버전 관리",
+      onClick: onVersionManagementClick || (() => console.log("버전관리 클릭"))
     }
   ];
 
@@ -60,7 +68,7 @@ const MediaFileContent: React.FC<MediaFileContentProps> = ({
 export default MediaFileContent;
 
 const Container = styled.div`
-  width: 800px;
+  width: 700px;
   height: 88px;
   flex-shrink: 0;
   background: var(--color-white);
@@ -70,7 +78,7 @@ const Container = styled.div`
   justify-content: space-between;
   margin: 0 20px;
   margin-bottom: 1px;
-       
+
   &:hover {
     background: rgba(153, 102, 204, 0.05);
   }
@@ -91,21 +99,21 @@ const FileDetails = styled.div`
 
 const FileName = styled.h3`
   font-size: var(--font-size-16);
-  font-weight: 600;
+  font-weight: var(--font-weight-600);
   color: #222;
   margin: 0;
   padding-bottom: 5px;
 `;
 
 const FileMetadata = styled.p`
-  font-size: 12px;
-  color: #666;
+  font-size: var(--font-size-12);
+  color: var(--color-gray);
   margin: 0;
 `;
 
 const Department = styled.span`
-  color: #666;
-  font-weight: 500;
+  color: var(--color-gray);
+  font-weight: var(--font-weight-500);
 `;
 
 const MenuButton = styled.div`
