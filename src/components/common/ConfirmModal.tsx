@@ -1,5 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
+import Button from './Button';
 
 interface ConfirmModalProps {
   isOpen: boolean;
@@ -45,12 +46,33 @@ const ConfirmModal: React.FC<ConfirmModalProps> = ({
         </ModalContent>
         
         <ButtonContainer>
-          <CancelButton onClick={onClose}>
-            취소
-          </CancelButton>
-          <ConfirmButton onClick={handleConfirm}>
-            확인
-          </ConfirmButton>
+          <Button
+            text="취소"
+            onClick={onClose}
+            variant="secondary"
+            width="76px"
+            height="32px"
+            fontSize="16px"
+            style={{
+              borderRadius: '3.75px',
+              border: '0.75px solid #8061B0',
+              color: '#8061B0',
+              backgroundColor: 'white'
+            }}
+          />
+          <Button
+            text="확인"
+            onClick={handleConfirm}
+            variant="primary"
+            width="76px"
+            height="32px"
+            fontSize="16px"
+            style={{
+              borderRadius: '3.75px',
+              backgroundColor: '#8061B0',
+              border: '0.75px solid #8061B0'
+            }}
+          />
         </ButtonContainer>
       </ModalContainer>
     </ModalOverlay>
@@ -93,49 +115,22 @@ const CloseButton = styled.button`
   padding: var(--padding-4);
   font-size: var(--font-size-32);
   color: #6b7280;
-  border-radius: 4px;
+  border-radius: var(--br-4);
 `;
 
 const ModalContent = styled.div``;
 
 const MessageText = styled.p`
-  font-size: 20px;
+  font-size: var(--font-size-20);
   color: #222;
-  font-weight: 500;
+  font-weight: var(--font-weight-500);
   margin-top: 52px;
   margin-left: 4px;
 `;
 
 const ButtonContainer = styled.div`
   display: flex;
-  gap: 12px;
+  gap: var(--gap-12);
   justify-content: flex-end;
   margin-top: 72px;
-`;
-
-const BaseButton = styled.button`
-  width: 76px;
-  height: 32px;
-  border-radius: 3.75px;
-  font-size: 16px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s ease;
-`;
-
-const CancelButton = styled(BaseButton)`
-  background: white;
-  border: 0.75px solid #8061B0;
-  color: #8061B0;
-`;
-
-const ConfirmButton = styled(BaseButton)`
-  background: #8061B0;
-  border: 0.75px solid #8061B0;
-  color: white;
-  
-  &:hover {
-    background-color: #553c9a;
-    border-color: #553c9a;
-  }
 `;
