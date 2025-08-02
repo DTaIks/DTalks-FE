@@ -63,11 +63,11 @@ const CATEGORY_DATA: FAQCategory[] = [
 ];
 
 const TABLE_COLUMNS = [
-  { key: "categoryName", label: "카테고리명" },
-  { key: "description", label: "설명" },
-  { key: "isActive", label: "상태" },
-  { key: "faqCount", label: "FAQ 수" },
-  { key: "action", label: "작업" }
+  { key: "categoryName", label: "카테고리명", width: "200px" },
+  { key: "description", label: "설명", width: "400px" },
+  { key: "isActive", label: "상태", width: "150px" },
+  { key: "faqCount", label: "FAQ 수", width: "150px" },
+  { key: "action", label: "작업", width: "150px" }
 ];
 
 // Component
@@ -96,28 +96,26 @@ const FAQCategoryTable: React.FC = () => {
       onClick={() => handleRowClick(category)}
       selected={selectedCategory?.categoryId === category.categoryId}
     >
-      <TableCell>
-        <CategoryImageContainer>
-          <CategoryImage src={category.categoryNameImage} alt={category.categoryName} />
-        </CategoryImageContainer>
-      </TableCell>
-      <TableCell isDescription={true}>
+      <CategoryNameCell>
+        <CategoryImage src={category.categoryNameImage} alt={category.categoryName} />
+      </CategoryNameCell>
+      <DescriptionCell>
         <DescriptionText>{category.description}</DescriptionText>
-      </TableCell>
-      <TableCell>
+      </DescriptionCell>
+      <StatusCell>
         <StatusIcon 
           src={category.isActive ? ActiveIcon : InactiveIcon} 
           alt={category.isActive ? "활성" : "비활성"} 
         />
-      </TableCell>
-      <TableCell>
+      </StatusCell>
+      <FAQCountCell>
         <FAQCountText>{category.faqCount}개</FAQCountText>
-      </TableCell>
-      <TableCell>
+      </FAQCountCell>
+      <ActionCell>
         <ActionText onClick={(e) => handleArchive(category.categoryId, e)}>
           {category.isActive ? "보관" : "복원"}
         </ActionText>
-      </TableCell>
+      </ActionCell>
     </TableRow>
   );
 
@@ -131,7 +129,7 @@ const FAQCategoryTable: React.FC = () => {
           {TABLE_COLUMNS.map((column) => (
             <TableHeaderCell 
               key={column.key} 
-              isDescription={column.key === "description"}
+              width={column.width}
             >
               {column.label}
             </TableHeaderCell>
@@ -147,6 +145,7 @@ const FAQCategoryTable: React.FC = () => {
 
 export default FAQCategoryTable;
 
+// Styled Components
 const TableContainer = styled.div`
   width: 1062px;
   height: 586px;
@@ -181,8 +180,8 @@ const TableHeaderRow = styled.div`
   height: 100%;
 `;
 
-const TableHeaderCell = styled.div<{ isDescription?: boolean }>`
-  flex: ${({ isDescription }) => isDescription ? 2 : 1};
+const TableHeaderCell = styled.div<{ width: string }>`
+  width: ${props => props.width};
   color: #000;
   font-family: Pretendard;
   font-size: var(--font-size-16);
@@ -191,6 +190,7 @@ const TableHeaderCell = styled.div<{ isDescription?: boolean }>`
   display: flex;
   align-items: center;
   justify-content: center;
+  padding: var(--padding-16) var(--padding-24);
 `;
 
 const TableTitle = styled.h2`
@@ -204,34 +204,55 @@ const TableTitle = styled.h2`
 const TableBody = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 60px;
+  gap: 56px;
   padding-top: 28px;
 `;
 
 const TableRow = styled.div<{ selected?: boolean }>`
+  width: 1062px;
   display: flex;
   align-items: center;
   transition: background-color 0.2s ease;
 `;
 
-const TableCell = styled.div<{ isDescription?: boolean }>`
-  flex: ${({ isDescription }) => isDescription ? 2 : 1};
+const CategoryNameCell = styled.div`
+  width: 200px;
   padding: var(--padding-16) var(--padding-24);
-  font-size: var(--font-size-14);
-  color: var(--color-dimgray);
   display: flex;
   align-items: center;
   justify-content: center;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-  text-align: center;
 `;
 
-const CategoryImageContainer = styled.div`
+const DescriptionCell = styled.div`
+  width: 400px;
+  padding: var(--padding-16) var(--padding-24);
   display: flex;
-  justify-content: flex-start;
-  width: 100%;
-  padding-left: 40px;
+  align-items: center;
+  justify-content: center;
+`;
+
+const StatusCell = styled.div`
+  width: 150px;
+  padding: var(--padding-16) var(--padding-24);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+`;
+
+const FAQCountCell = styled.div`
+  width: 150px;
+  padding: var(--padding-16) var(--padding-24);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+`;
+
+const ActionCell = styled.div`
+  width: 150px;
+  padding: var(--padding-16) var(--padding-24);
+  display: flex;
+  align-items: center;
+  justify-content: center;
 `;
 
 const CategoryImage = styled.img<{ alt?: string }>`
