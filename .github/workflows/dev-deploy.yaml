@@ -71,6 +71,7 @@ jobs:
         env:
           DISABLE_ESLINT_PLUGIN: true
           GENERATE_SOURCEMAP: false
+          TSC_COMPILE_ON_ERROR: true
 
       - name: Create version file
         run: |
