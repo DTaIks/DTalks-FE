@@ -254,7 +254,7 @@ const ActionCell = styled.div`
 
 const CategoryImage = styled.img<{ alt?: string }>`
   width: ${({ alt }) => alt?.includes('급여') ? '116.917px' : '97.5px'};
-  height: 31.5px;
+  height: 32px;
   object-fit: contain;
 `;
 

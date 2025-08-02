@@ -82,6 +82,7 @@ export const UploadBaseModal: React.FC<BaseModalProps> = ({
                 text={`${submitText}`}
                 onClick={handleSubmit}
                 disabled={submitDisabled}
+                width="132px"
                 height="44px"
                 fontSize="16px"
               />
