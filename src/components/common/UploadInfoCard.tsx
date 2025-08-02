@@ -1,27 +1,22 @@
-// UploadInfoCard.tsx
 import React from 'react';
 import styled from 'styled-components';
 
 interface UploadInfoCardProps {
   title: string;
-  text1: string;
-  text2: string;
-  text3: string;
+  texts: string[];
 }
 
 export const UploadInfoCard: React.FC<UploadInfoCardProps> = ({
   title,
-  text1,
-  text2,
-  text3
+  texts
 }) => {
   return (
     <InfoCard>
       <InfoTitle>{title}</InfoTitle>
       <InfoList>
-        <InfoText>{text1}</InfoText>
-        <InfoText>{text2}</InfoText>
-        <InfoText>{text3}</InfoText>
+        {texts.map((text, index) => (
+          <InfoText key={index}>{text}</InfoText>
+        ))}
       </InfoList>
     </InfoCard>
   );
@@ -29,19 +24,19 @@ export const UploadInfoCard: React.FC<UploadInfoCardProps> = ({
 
 const InfoCard = styled.div`
   width: 400px;
-  max-width: 100%; 
-  box-sizing: border-box; 
+  max-width: 100%;
+  box-sizing: border-box;
   height: 150px;
   border-radius: 7.5px;
   background: rgba(102, 126, 234, 0.10);
   border: none;
-  padding: 18px;
+  padding: var(--padding-18);
   margin: 0 auto;
 `;
 
 const InfoTitle = styled.h4`
   font-size: var(--font-size-16);
-  font-weight: 600;
+  font-weight: var(--font-weight-600);
   color: #667EEA;
   margin-bottom: 12px;
   margin-top: 0px;
@@ -54,15 +49,15 @@ const InfoList = styled.ul`
   margin: 0;
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: var(--gap-4);
 `;
 
 const InfoText = styled.li`
-  font-size: 15px;
+  font-size: var(--font-size-15);
   color: var(--color-black);
   position: relative;
   padding-left: 12px;
-  font-weight: 400;
+  font-weight: var(--font-weight-400);
   white-space: pre-line;
 
   &::before {

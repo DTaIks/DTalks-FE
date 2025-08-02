@@ -60,14 +60,14 @@ export const FileSelectInput: React.FC<FileSelectInputProps> = ({
 const Container = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: var(--gap-8);
   margin-bottom: 20px;
 `;
 
 const Label = styled.label`
-  font-size: 14px;
-  font-weight: 500;
-  color: #222;
+  font-size: var(--font-size-14);
+  font-weight: var(--font-weight-500);
+  color: var(--color-lightblack);
 `;
 
 const FileInputContainer = styled.div`
@@ -78,9 +78,9 @@ const FileInputContainer = styled.div`
 const DisplayInput = styled.input`
   width: 100%;
   padding: 12px 12px 12px 88px;
-  border: 0.75px solid #666;
+  border: 0.75px solid var(--color-gray);
   border-radius: 3.75px;
-  font-size: 14px;
+  font-size: var(--font-size-14);
   outline: none;
   background-color: var(--color-white);
 
@@ -106,8 +106,8 @@ const SelectButton = styled.button`
   color: #374151;
   border: 0.375px solid #000;
   border-radius: 1.5px;
-  font-size: 14px;
-  font-weight: 400;
+  font-size: var(--font-size-14);
+  font-weight: var(--font-weight-400);
   white-space: nowrap;
   transition: all 0.1s;
   display: flex;
@@ -121,6 +121,11 @@ const SelectButton = styled.button`
 
   &:active {
     background: #e5e7eb;
+  }
+
+  &:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 0.5px #8b5cf6;
   }
 `;
 

@@ -1,5 +1,8 @@
 import React, { useCallback, useEffect } from 'react';
 import styled from 'styled-components';
+
+// @ts-expect-error - verbatimModuleSyntax
+import FocusTrap from 'focus-trap-react';
 import Button from './Button';
 
 interface BaseModalProps {
@@ -9,7 +12,7 @@ interface BaseModalProps {
   children: React.ReactNode;
   onSubmit?: () => void;
   submitText?: string;
-  submitDisabled?: boolean;
+  submitDisabled?: boolean; 
 }
 
 export const UploadBaseModal: React.FC<BaseModalProps> = ({
@@ -19,7 +22,7 @@ export const UploadBaseModal: React.FC<BaseModalProps> = ({
   children,
   onSubmit,
   submitText = '저장',
-  submitDisabled = false,
+  submitDisabled = false, 
 }) => {
   useEffect(() => {
     const handleEscape = (event: KeyboardEvent) => {
@@ -57,35 +60,36 @@ export const UploadBaseModal: React.FC<BaseModalProps> = ({
   if (!isOpen) return null;
 
   return (
-    <ModalOverlay onClick={handleOverlayClick}>
-      <ModalContainer>
-        <ModalHeader>
-          <h2>{title}</h2>
-          <CloseButton
-            onClick={onClose}
-            type="button"
-          >
-            ×
-          </CloseButton>
-        </ModalHeader>
+    <FocusTrap active={isOpen}>
+      <ModalOverlay onClick={handleOverlayClick}>
+        <ModalContainer>
+          <ModalHeader>
+            <h2>{title}</h2>
+            <CloseButton
+              onClick={onClose}
+              type="button"
+            >
+              ×
+            </CloseButton>
+          </ModalHeader>
 
-        <ModalContent>{children}</ModalContent>
+          <ModalContent>{children}</ModalContent>
 
-        {onSubmit && (
-          <ModalFooter>
-            <Button
-              variant="primary"
-              text={`${submitText}`}
-              onClick={handleSubmit}
-              disabled={submitDisabled}
-              width="120px"
-              height="44px"
-              fontSize="16px"
-            />
-          </ModalFooter>
-        )}
-      </ModalContainer>
-    </ModalOverlay>
+          {onSubmit && (
+            <ModalFooter>
+              <Button
+                variant="primary"
+                text={`${submitText}`}
+                onClick={handleSubmit}
+                disabled={submitDisabled}
+                height="44px"
+                fontSize="16px"
+              />
+            </ModalFooter>
+          )}
+        </ModalContainer>
+      </ModalOverlay>
+    </FocusTrap>
   );
 };
 
@@ -105,7 +109,7 @@ const ModalOverlay = styled.div`
 
 const ModalContainer = styled.div`
   background: var(--color-white);
-  border-radius: 15px;
+  border-radius: var(--br-15);
   width: 420px;
   height: 740px;
   overflow: hidden;
@@ -122,20 +126,20 @@ const ModalHeader = styled.div`
 
   h2 {
     margin: 0;
-    font-size: 20px;
-    font-weight: 600;
-    color: #222;
+    font-size: var(--font-size-20);
+    font-weight: var(--font-weight-600);
+    color: var(--color-lightblack);
   }
 `;
 
 const CloseButton = styled.button`
   background: none;
   border: none;
-  font-size: 32px;
+  font-size: var(--font-size-32);
   cursor: pointer;
   color: #6b7280;
-  padding: 4px;
-  border-radius: 4px;
+  padding: var(--padding-4);
+  border-radius: var(--br-4);
   transition: color 0.2s ease;
   margin-bottom: 12px;
 
@@ -145,7 +149,7 @@ const CloseButton = styled.button`
 `;
 
 const ModalContent = styled.div`
-  padding: 24px;
+  padding: var(--padding-24);
   flex: 1;
   min-height: 0;
 `;

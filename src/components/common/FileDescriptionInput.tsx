@@ -4,6 +4,7 @@ import styled from 'styled-components';
 interface FileDescriptionInputProps {
   value: string;
   onChange: (value: string) => void;
+  onBlur?: () => void,
   label?: string;
   placeholder?: string;
   rows?: number;
@@ -13,6 +14,7 @@ interface FileDescriptionInputProps {
 export const FileDescriptionInput: React.FC<FileDescriptionInputProps> = ({
   value,
   onChange,
+  onBlur,
   label = "",
   placeholder = "파일에 대한 설명을 입력하세요",
   rows = 4,
@@ -44,6 +46,7 @@ export const FileDescriptionInput: React.FC<FileDescriptionInputProps> = ({
         <Textarea
           value={value}
           onChange={handleChange}
+          onBlur={onBlur}
           placeholder={placeholder}
           rows={rows}
           hasError={hasError}
@@ -69,8 +72,8 @@ const Container = styled.div`
 `;
 
 const Label = styled.label`
-  font-size: 14px;
-  font-weight: 500;
+  font-size: var(--font-size-14);
+  font-weight: var(--font-weight-500);
   color: var(--color-black);
 `;
 
@@ -89,18 +92,18 @@ const BottomRow = styled.div`
 `;
 
 const CharacterCount = styled.span<{ hasError: boolean }>`
-  font-size: 10px;
-  color: #666;
-  font-weight: 400;
+  font-size: var(--font-size-10);
+  color: var(--color-gray);
+  font-weight: var(--font-weight-400);
 `;
 
 const Textarea = styled.textarea<{ hasError: boolean }>`
   width: 100%;
-  padding: 12px;
-  border: 0.75px solid #666;
+  padding: var(--padding-12);
+  border: 0.75px solid var(--color-gray);
   border-radius: 3.75px;
-  font-size: 14px;
-  font-weight: 400;
+  font-size: var(--font-size-14);
+  font-weight: var(--font-weight-400);
   outline: none;
   resize: none;
 
@@ -115,7 +118,7 @@ const Textarea = styled.textarea<{ hasError: boolean }>`
 `;
 
 const Error = styled.span`
-  color: #F0191D;
-  font-size: 10px;
-  font-weight: 400;
+  color: var(--color-error);
+  font-size: var(--font-size-10);
+  font-weight: var(--font-weight-400);
 `;
