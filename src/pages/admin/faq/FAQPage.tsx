@@ -61,5 +61,5 @@ const PaginationContainer = styled.div`
   display: flex;
   justify-content: center;
   margin-top: 12px;
-  margin-bottom: 36px;
+  margin-bottom: 48px;
 `;
