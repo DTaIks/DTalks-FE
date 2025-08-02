@@ -90,7 +90,6 @@ const DropdownButton = styled.div<{ width: string; height: string }>`
   border-radius: 3.75px;
   border: 0.75px solid #CCC;
   padding: 0 12px;
-  font-family: Pretendard;
   font-size: 15px;
   color: #000;
   background: #FFF;
@@ -127,7 +126,6 @@ const DropdownList = styled.div`
 
 const DropdownOption = styled.div<{ isHovered: boolean }>`
   padding: 8px 12px;
-  font-family: Pretendard;
   font-size: 14px;
   color: #000;
   cursor: pointer;

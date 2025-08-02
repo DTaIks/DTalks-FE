@@ -265,7 +265,6 @@ const ModalSection2Header = styled.div`
 // 헤더 제목
 const HeaderTitle = styled.span`
   color: #000;
-  font-family: Pretendard;
   font-size: 16.5px;
   font-style: normal;
   font-weight: 500;
@@ -307,7 +306,6 @@ const TableHeader = styled.div`
 const HeaderCell = styled.div`
   flex: 1;
   color: #000;
-  font-family: Pretendard;
   font-size: 16px;
   font-weight: 600;
   text-align: left;
@@ -349,7 +347,6 @@ const TableRow = styled.div<{ selected?: boolean }>`
 const TableCell = styled.div`
   flex: 1;
   color: #000;
-  font-family: Pretendard;
   font-size: 16px;
   text-align: left;
   

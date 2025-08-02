@@ -1,5 +1,5 @@
 import styled from "styled-components";
-import React, { useState } from "react";
+import React, { useState, useCallback } from "react";
 import CategoryName1 from "../../../assets/faq/CategoryName1.svg";
 import CategoryName2 from "../../../assets/faq/CategoryName2.svg";
 import CategoryName3 from "../../../assets/faq/CategoryName3.svg";
@@ -75,11 +75,11 @@ const FAQCategoryTable: React.FC = () => {
   const [selectedCategory, setSelectedCategory] = useState<FAQCategory | null>(null);
   const [categoryData, setCategoryData] = useState<FAQCategory[]>(CATEGORY_DATA);
 
-  const handleRowClick = (category: FAQCategory) => {
+  const handleRowClick = useCallback((category: FAQCategory) => {
     setSelectedCategory(category);
-  };
+  }, []);
 
-  const handleArchive = (categoryId: string, e: React.MouseEvent) => {
+  const handleArchive = useCallback((categoryId: string, e: React.MouseEvent) => {
     e.stopPropagation();
     setCategoryData(prevData => 
       prevData.map(category => 
@@ -88,9 +88,9 @@ const FAQCategoryTable: React.FC = () => {
           : category
       )
     );
-  };
+  }, []);
 
-  const renderTableRow = (category: FAQCategory) => (
+  const renderTableRow = useCallback((category: FAQCategory) => (
     <TableRow 
       key={category.categoryId}
       onClick={() => handleRowClick(category)}
@@ -117,7 +117,7 @@ const FAQCategoryTable: React.FC = () => {
         </ActionText>
       </ActionCell>
     </TableRow>
-  );
+  ), [selectedCategory, handleRowClick, handleArchive]);
 
   return (
     <TableContainer>
@@ -182,7 +182,6 @@ const TableHeaderRow = styled.div`
 const TableHeaderCell = styled.div<{ width: string }>`
   width: ${props => props.width};
   color: #000;
-  font-family: Pretendard;
   font-size: var(--font-size-16);
   font-weight: 500;
   text-align: center;
@@ -194,7 +193,6 @@ const TableHeaderCell = styled.div<{ width: string }>`
 
 const TableTitle = styled.h2`
   color: #000;
-  font-family: Pretendard;
   font-size: 20px;
   font-weight: 600;
   margin: 0;
@@ -268,21 +266,18 @@ const StatusIcon = styled.img<{ src: string; alt?: string }>`
 
 const DescriptionText = styled.span`
   color: #000;
-  font-family: Pretendard;
   font-size: 15px;
   font-weight: 500;
 `;
 
 const FAQCountText = styled.span`
   color: #000;
-  font-family: Pretendard;
   font-size: 16px;
   font-weight: 500;
 `;
 
 const ActionText = styled.span`
   color: #000;
-  font-family: Pretendard;
   font-size: 16px;
   font-weight: 500;
   cursor: pointer;

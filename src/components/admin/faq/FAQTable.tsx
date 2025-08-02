@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useCallback } from "react";
 import styled from "styled-components";
 import CategoryName1 from "../../../assets/faq/CategoryName1.svg";
 import CategoryName2 from "../../../assets/faq/CategoryName2.svg";
@@ -105,7 +105,7 @@ const FAQTable: React.FC = () => {
   const [selectedCategory, setSelectedCategory] = useState<string>("");
 
   // 이벤트 핸들러
-  const handleRowToggle = (id: number): void => {
+  const handleRowToggle = useCallback((id: number): void => {
     setExpandedRows(prev => {
       const newExpandedRows = new Set(prev);
       if (newExpandedRows.has(id)) {
@@ -115,31 +115,31 @@ const FAQTable: React.FC = () => {
       }
       return newExpandedRows;
     });
-  };
+  }, []);
 
-  const handleArchive = (id: number): void => {
+  const handleArchive = useCallback((id: number): void => {
     setFaqItems(prevItems => 
       prevItems.map(item => 
         item.id === id ? { ...item, isActive: false } : item
       )
     );
-  };
+  }, []);
 
-  const handleEdit = (id: number): void => {
+  const handleEdit = useCallback((id: number): void => {
     console.log('Edit FAQ:', id);
-  };
+  }, []);
 
-  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>): void => {
+  const handleSearch = useCallback((e: React.ChangeEvent<HTMLInputElement>): void => {
     console.log('Search:', e.target.value);
-  };
+  }, []);
 
-  const handleCategoryChange = (value: string): void => {
+  const handleCategoryChange = useCallback((value: string): void => {
     setSelectedCategory(value);
     console.log('Category:', value);
-  };
+  }, []);
 
   // 렌더링 함수들
-  const renderActionButtons = (faq: FAQItem): JSX.Element => (
+  const renderActionButtons = useCallback((faq: FAQItem): JSX.Element => (
     <ActionContainer>
       <ActionText 
         onClick={(e) => {
@@ -159,9 +159,9 @@ const FAQTable: React.FC = () => {
         보관
       </ActionText>
     </ActionContainer>
-  );
+  ), [handleEdit, handleArchive]);
 
-  const renderExpandedContent = (faq: FAQItem): JSX.Element => (
+  const renderExpandedContent = useCallback((faq: FAQItem): JSX.Element => (
     <ExpandedRow>
       <ExpandedBox>
         <ExpandedHeader>
@@ -172,9 +172,9 @@ const FAQTable: React.FC = () => {
         </ExpandedContent>
       </ExpandedBox>
     </ExpandedRow>
-  );
+  ), []);
 
-  const renderTableRow = (faq: FAQItem): JSX.Element => {
+  const renderTableRow = useCallback((faq: FAQItem): JSX.Element => {
     const isExpanded = expandedRows.has(faq.id);
     
     return (
@@ -205,9 +205,9 @@ const FAQTable: React.FC = () => {
         {isExpanded && renderExpandedContent(faq)}
       </React.Fragment>
     );
-  };
+  }, [expandedRows, handleRowToggle, renderActionButtons, renderExpandedContent]);
 
-  const renderTableHeader = (): JSX.Element => (
+  const renderTableHeader = useCallback((): JSX.Element => (
     <TableHeader>
       <TableTitle>FAQ 목록</TableTitle>
       <SearchContainer>
@@ -225,9 +225,9 @@ const FAQTable: React.FC = () => {
         </DropdownContainer>
       </SearchContainer>
     </TableHeader>
-  );
+  ), [selectedCategory, handleSearch, handleCategoryChange]);
 
-  const renderColumnHeaders = (): JSX.Element => (
+  const renderColumnHeaders = useCallback((): JSX.Element => (
     <HeaderBox>
       <TableHeaderRow>
         {TABLE_COLUMNS.map((column) => (
@@ -240,7 +240,7 @@ const FAQTable: React.FC = () => {
         ))}
       </TableHeaderRow>
     </HeaderBox>
-  );
+  ), []);
 
   return (
     <TableContainer>
@@ -255,7 +255,6 @@ const FAQTable: React.FC = () => {
 
 export default FAQTable;
 
-// 스타일 컴포넌트들
 const TableContainer = styled.div`
   width: 1062px;
   min-height: 586px;
@@ -300,7 +299,6 @@ const TableBody = styled.div`
 
 const TableTitle = styled.h2`
   color: #000;
-  font-family: Pretendard;
   font-size: 20px;
   font-weight: 600;
   flex-shrink: 0;
@@ -308,7 +306,6 @@ const TableTitle = styled.h2`
 
 const QuestionText = styled.span`
   color: #000;
-  font-family: Pretendard;
   font-size: 18px;
   font-weight: 600;
   white-space: nowrap;
@@ -322,14 +319,12 @@ const QuestionText = styled.span`
 
 const DateText = styled.span`
   color: #000;
-  font-family: Pretendard;
   font-size: 16px;
   font-weight: 500;
 `;
 
 const ExpandedTitle = styled.h3`
   color: #000;
-  font-family: Pretendard;
   font-size: var(--font-size-20);
   font-weight: 600;
   margin-left: 36px;
@@ -337,7 +332,6 @@ const ExpandedTitle = styled.h3`
 
 const ExpandedAnswer = styled.p`
   color: #333;
-  font-family: Pretendard;
   font-size: var(--font-size-15);
   font-weight: 400;
   line-height: 1.6;
@@ -408,7 +402,6 @@ const ExpandedContent = styled.div``;
 const TableHeaderCell = styled.div<{ width: string }>`
   width: ${props => props.width};
   color: #000;
-  font-family: Pretendard;
   font-size: var(--font-size-16);
   font-weight: 500;
   padding-left: ${({ width }) => {
@@ -490,7 +483,6 @@ const ActionDivider = styled.div`
 
 const ActionText = styled.span`
   color: #000;
-  font-family: Pretendard;
   font-size: 16px;
   font-weight: 500;
   cursor: pointer;
@@ -521,7 +513,7 @@ const SearchInput = styled.input`
   border-radius: 3.75px;
   border: 0.75px solid #CCC;
   padding: 0 12px;
-  font-family: Pretendard;
+
   font-size: 14px;
   color: #000;
   background: #FFF;
