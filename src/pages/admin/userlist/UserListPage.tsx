@@ -1,7 +1,7 @@
 import styled from "styled-components";
 import TitleContainer from "../../../layout/TitleContainer";
 import UserTable from "../../../components/admin/userlist/UserListTable";
-import Pagination from "../../../components/admin/Pagination";
+import Pagination from "../../../components/common/Pagination";
 
 const UserListPage = () => {
   return (

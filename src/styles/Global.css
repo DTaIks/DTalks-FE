@@ -34,6 +34,13 @@ body {
   --color-black: #000;
   --color-white: #fff;
   --color-ghostwhite: #f8f2fb;
+  --color-divider: #E5E5E5;
+  --table-header-color: #2D1457;
+  --table-header-font: Pretendard;
+  --table-header-font-size: 18px;
+  --table-header-font-weight: 600;
+  --table-header-line-height: normal;
+  --table-header-font-style: normal;
 
   /* 간격 설정 */
   --gap-4: 4px;
@@ -47,6 +54,7 @@ body {
   --gap-26: 26px;
   --gap-27: 27px;
   --gap-32: 32px;
+  --gap-36: 36px;
   --gap-40: 40px;
   --gap-48: 48px;
 
@@ -95,6 +103,7 @@ body {
   --font-size-28: 28px;
   --font-size-32: 32px;
   --font-size-36: 36px;
+  --font-size-39: 39px;
   --font-size-42: 42px;
   --font-size-52: 52px;
 
@@ -106,43 +115,62 @@ body {
 
 
   /* 페이지 크기 조절 - 기본값 (큰 화면용) */
-  --page-scale: 1;
+  --page-scale: 0.7;
 }
 
 /* 화면 크기별 반응형 조절 */
-
-/* 작은 화면 (1436x766) - 더 작게 조절 */
+/*
+>>>>>>> origin/main
 @media screen and (max-width: 1440px) and (max-height: 800px) {
   :root {
-    --page-scale: 0.75;
+    --page-scale: 0.7;
   }
 }
+*/
 
 /* 중간 크기 화면 (1596x851) - 조절 */
+/*
 @media screen and (min-width: 1441px) and (max-width: 1600px) and (max-height: 900px) {
   :root {
-    --page-scale: 0.75;
+    --page-scale: 0.7;
   }
 }
+*/
 
 /* 중간 화면 (1915x1022) - 적당히 조절 */
+/*
 @media screen and (min-width: 1441px) and (max-width: 1920px) and (max-height: 1100px) {
   :root {
-    --page-scale: 0.75;
+    --page-scale: 0.7;
   }
 }
+*/
 
 /* 큰 화면 - 원본 크기 */
+/*
 @media screen and (min-width: 1921px) {
   :root {
-    --page-scale: 0.75;
+    --page-scale: 0.7;
   }
 }
+*/
 
 /* 페이지 크기 조절 적용 */
+/*
 .page-scale {
   transform: scale(var(--page-scale));
   transform-origin: center top;
   width: calc(100% / var(--page-scale));
   margin-left: calc((100% - 100% / var(--page-scale)) / 2);
 }
+*/
+
+/* 모달 전용 스타일 - 페이지 축소 영향 제거 */
+/*
+.modal-overlay {
+  transform: scale(calc(1 / var(--page-scale)));
+  transform-origin: center center;
+}
+*/
+
+

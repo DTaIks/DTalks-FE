@@ -77,16 +77,17 @@ export default Button;
 
 const LoginButtonText = styled.div`
   position: relative;
-  font-size: var(--font-size-22);
+  font-size: 18px;
   line-height: 24px;
   font-weight: 600;
   font-family: var(--font-pretendard);
   color: var(--color-white);
-  text-align: left;
-  @media screen and (max-width: 450px) {
-    font-size: var(--font-size-18);
-    line-height: 19px;
-  }
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  width: 100%;
 `;
 
 const LoginButtonInner = styled.div`
@@ -94,13 +95,14 @@ const LoginButtonInner = styled.div`
   border-radius: var(--br-8);
   background-color: var(--color-mediumpurple-300);
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   align-items: center;
   justify-content: center;
   padding: var(--padding-12);
   box-sizing: border-box;
   max-width: 100%;
   transition: all 0.2s ease;
+  height: 100%;
 `;
 
 const StyledButton = styled.button<{
@@ -113,28 +115,28 @@ const StyledButton = styled.button<{
 }>`
   display: flex;
   width: ${props => {
-    if (props.variant === 'submit') return '508px';
-    if (props.variant === 'login') return '509.5px';
-    return props.width || '110px';
+    if (props.variant === 'submit') return '381px';
+    if (props.variant === 'login') return '382.125px';
+    return props.width || '82.5px';
   }};
   height: ${props => {
-    if (props.variant === 'submit') return '46px';
-    if (props.variant === 'login') return '46px';
-    return props.height || '46px';
+    if (props.variant === 'submit') return '34.5px'; 
+    if (props.variant === 'login') return '34.5px';
+    return props.height || '34.5px';
   }};
   padding: ${props => {
-    if (props.variant === 'submit') return '12px';
-    if (props.variant === 'login') return '0.5px 0px 0px';
-    return '8px 16px';
+    if (props.variant === 'submit') return '9px';
+    if (props.variant === 'login') return '0.375px 0px 0px';
+    return '6px 12px';
   }};
   flex-direction: ${props => props.variant === 'login' ? 'row' : 'column'};
   justify-content: ${props => props.variant === 'login' ? 'flex-start' : 'center'};
   align-items: ${props => props.variant === 'login' ? 'flex-start' : 'center'};
   flex-shrink: 0;
   border-radius: ${props => {
-    if (props.variant === 'submit') return '8px';
-    if (props.variant === 'login') return 'var(--br-8)';
-    return '6px';
+    if (props.variant === 'submit') return '6px';
+    if (props.variant === 'login') return '6px';
+    return '4.5px';
   }};
   background-color: ${props => {
     if (props.variant === 'submit') {
@@ -149,7 +151,7 @@ const StyledButton = styled.button<{
   border: ${props => props.variant === 'secondary' ? '1px solid #d0d0d0' : 'none'};
   color: ${props => props.variant === 'secondary' ? '#333' : 'white'};
   font-weight: 600;
-  font-size: ${props => props.fontSize || (props.variant === 'login' ? 'var(--font-size-22)' : '12px')};
+  font-size: ${props => props.fontSize || (props.variant === 'login' ? 'var(--font-size-22)' : '9px')}; /* 12 * 0.75 */
   cursor: ${props => props.disabled ? 'not-allowed' : 'pointer'};
   transition: ${props => props.variant === 'login' ? 'transform 0.2s ease' : 'all 0.2s ease'};
   white-space: nowrap;
@@ -158,26 +160,23 @@ const StyledButton = styled.button<{
   box-sizing: border-box;
   max-width: 100%;
   z-index: ${props => props.variant === 'login' ? '1' : 'auto'};
-  
   &:hover:not(:disabled) {
     ${props => props.variant === 'login' ? `
       transform: scale(1.02);
       ${LoginButtonInner} {
         background-color: #7742A7;
-        box-shadow: 0 4px 8px rgba(119, 66, 167, 0.3);
+        box-shadow: 0 3px 6px rgba(119, 66, 167, 0.3);
         transform: scale(1.02);
       }
     ` : `
-      transform: translateY(-3px);
+      transform: translateY(-2.25px); /* 3 * 0.75 */
       background-color: ${props.variant === 'submit' ? '#7A52CC' : props.variant === 'secondary' ? '#e0e0e0' : '#7A52CC'};
     `}
   }
-  
   &:disabled {
     cursor: not-allowed;
   }
-  
   &:active:not(:disabled) {
-    transform: ${props => props.variant === 'login' ? 'scale(0.98)' : 'translateY(1px)'};
+    transform: ${props => props.variant === 'login' ? 'scale(0.98)' : 'translateY(0.75px)'};
   }
 `; 

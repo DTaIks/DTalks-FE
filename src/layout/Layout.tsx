@@ -1,46 +1,33 @@
-import styled from "styled-components";
-import { useAuthStore } from "../store/authStore";
-import Sidebar from "./Sidebar";
-import Navbar from "./Navbar";
+import Sidebar from './Sidebar';
+import styled from 'styled-components';
+import { Outlet } from 'react-router-dom';
 
-interface LayoutProps {
-  children: React.ReactNode;
-}
-
-const Layout = ({ children }: LayoutProps) => {
-  const { isAuthenticated } = useAuthStore();
-
-  if (!isAuthenticated) {
-    return <>{children}</>;
-  }
-
+export default function Layout() {
   return (
     <LayoutContainer>
       <Sidebar />
       <MainContent>
-        <Navbar />
         <ContentArea>
-          {children}
+          <Outlet />
         </ContentArea>
       </MainContent>
     </LayoutContainer>
   );
-};
-
-export default Layout;
+}
 
 const LayoutContainer = styled.div`
   display: flex;
   min-height: 100vh;
+  overflow-y: auto;
 `;
 
 const MainContent = styled.div`
-  flex: 1;
   display: flex;
   flex-direction: column;
 `;
 
 const ContentArea = styled.div`
-  flex: 1;
-  background-color: var(--color-lightgray-100);
+  margin-left: 316px;
+  margin-top: 140px;
+  background: var(--color-lightgray-100);
 `; 

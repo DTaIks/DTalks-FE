@@ -62,25 +62,25 @@ export const KeywordAnalysisCard: React.FC<KeywordAnalysisCardProps> = ({ keywor
 };
 
 const Container = styled.div`
-  width: 695px;
-  height: 720px;
+  width: 521.25px;
+  height: 540px;
   flex-shrink: 0;
-  border-radius: var(--br-25);
+  border-radius: 18.75px;
   background: var(--color-white);
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 0 7.5px rgba(0, 0, 0, 0.05);
 `;
 
 const CardHeader = styled.div`
   width: 100%;
-  height: 98px;
-  border-radius: 26px 26px 0 0;
-  border-bottom: 2px solid #e9e0f0;
+  height: 73.5px;
+  border-radius: 19.5px 19.5px 0 0;
+  border-bottom: 1.5px solid #e9e0f0;
   background: var(--color-white);
 `;
 
 const CardTitle = styled.h1`
-  padding: 32px 381px 35px 48px;
-  font-size: var(--font-size-26);
+  padding: 24px 285.75px 26.25px 36px;
+  font-size: var(--font-size-20);
   font-weight: 600;
   color: var(--color-black);
 `;
@@ -88,19 +88,19 @@ const CardTitle = styled.h1`
 
 
 const RankingTitle = styled.h2`
-  margin: 30px 30px 30px 52px;
-  font-size: var(--font-size-24);
+  margin: 22.5px 22.5px 22.5px 39px;
+  font-size: var(--font-size-18);
   font-weight: 600;
   color: var(--color-black);
 `;
 
 const RankingCard = styled.div`
-  width: 615px;
-  height: 150px;
-  border-radius: var(--br-25);
+  width: 461.25px;
+  height: 112.5px;
+  border-radius: 18.75px;
   background: var(--color-white);
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
-  margin: 12px auto;
+  box-shadow: 0 0 7.5px rgba(0, 0, 0, 0.05);
+  margin: 9px auto 9px 40px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -110,13 +110,13 @@ const RankingContent = styled.div`
   display: flex;
   align-items: center;
   width: 100%;
-  padding: 0 40px;
-  gap: var(--gap-24);
+  padding: 0 30px;
+  gap: 18px;
 `;
 
 const IconWrapper = styled.div`
-  width: 48px;
-  height: 48px;
+  width: 36px;
+  height: 36px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -136,12 +136,12 @@ const Stats = styled.div`
 `;
 
 const Keyword = styled.div`
-  font-size: var(--font-size-28);
+  font-size: var(--font-size-21);
   font-weight: 600;
   color: var(--color-black);
 `;
 
 const Count = styled(Keyword)`
-  margin-right: 44px;
+  margin-right: 33px;
   text-align: right;
 `;

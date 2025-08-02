@@ -5,8 +5,8 @@ import '../../styles/Global.css';
 
 
 export interface ResponseTime {
-  avg: number;        
-  zones: number[];   
+  avg: number;
+  zones: number[];
 }
 
 interface Zone {
@@ -90,7 +90,7 @@ export const ResponseTimeChart: React.FC<ResponseTimeChartProps> = ({ responseTi
     labels: groupedZones.map((d) => d.range),
     legend: { show: false },
     dataLabels: { enabled: false },
-    
+
     states: {
       hover: {
         filter: {
@@ -98,7 +98,7 @@ export const ResponseTimeChart: React.FC<ResponseTimeChartProps> = ({ responseTi
         }
       }
     },
-    
+
     tooltip: {
       enabled: true,
       y: {
@@ -125,7 +125,7 @@ export const ResponseTimeChart: React.FC<ResponseTimeChartProps> = ({ responseTi
 
       <CardContent>
         <ChartWrapper>
-          <Chart options={donutChartOptions} series={donutChartSeries} type="donut" width={320} height={320} />
+          <Chart options={donutChartOptions} series={donutChartSeries} type="donut" width={240} height={240} />
           <CenterContent>
             <AverageTime color={getAverageTimeColor(avg)}>{avg}초</AverageTime>
             <AverageLabel>평균 응답 시간</AverageLabel>
@@ -151,27 +151,27 @@ export const ResponseTimeChart: React.FC<ResponseTimeChartProps> = ({ responseTi
 
 const BaseCard = styled.div`
   flex-shrink: 0;
-  border-radius: var(--br-25);
+  border-radius: var(--br-18);
   background: var(--color-white);
   box-shadow: 0 8px 24px rgba(125, 93, 246, 0.1);
 `;
 
 const ResponseTimeCard = styled(BaseCard)`
-  width: 1417px;
-  height: 615px;
+  width: 1062.75px;
+  height: 461.25px;
 `;
 
 const CardHeader = styled.div`
   width: 100%;
-  height: 98px;
-  border-radius: 26px 26px 0 0;
-  border-bottom: 2px solid #e9e0f0;
+  height: 73.5px;
+  border-radius: var(--br-18) var(--br-18) 0 0;
+  border-bottom: 1.5px solid #e9e0f0;
   background: var(--color-white);
 `;
 
 const CardTitle = styled.h1`
-  padding: 32px 381px 35px 48px;
-  font-size: var(--font-size-26);
+  padding: 24px 285.75px 26.25px 36px;
+  font-size: var(--font-size-20);
   font-weight: 600;
   color: var(--color-black);
 `;
@@ -180,16 +180,15 @@ const CardContent = styled.div`
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 60px 80px;
-  height: calc(100% - 98px);
+  padding: 16px 60px 45px 60px;
+  height: calc(100% - 110px);
 `;
 
 const ChartWrapper = styled.div`
   position: relative;
-  width: 320px;
-  height: 320px;
-  margin-left: 60px;
-  margin-bottom: 120px;
+  width: 240px;
+  height: 240px;
+  margin-left: 45px;
 `;
 
 const CenterContent = styled.div`
@@ -202,37 +201,36 @@ const CenterContent = styled.div`
 
 const AverageTime = styled.div<{ color: string }>`
   color: ${({ color }) => color};
-  font-size: var(--font-size-52);
+  font-size: var(--font-size-36);
   font-weight: 700;
-  margin-bottom: 8px;
+  margin-bottom: 6px;
 `;
 
 const AverageLabel = styled.div`
   color: var(--color-gray);
-  font-size: var(--font-size-24);
+  font-size: var(--font-size-18);
   font-weight: 500;
 `;
 
 const LegendContainer = styled.div`
   display: flex;
   flex-direction: column;
-  gap: var(--gap-24);
+  gap: var(--gap-18);
   flex: 0.8;
-  margin-bottom: 120px;
 `;
 
 const LegendItem = styled.div`
   display: flex;
   align-items: center;
-  gap: var(--gap-16);
-  border-bottom: 1px solid #d9d9d9;
-  padding-bottom: 24px;
-  margin-bottom: 12px;
+  gap: var(--gap-12);
+  border-bottom: 0.75px solid #d9d9d9;
+  height: 42px;
+  padding-bottom: 12px;
 `;
 
 const LegendDot = styled.div<{ color: string }>`
-  width: 16px;
-  height: 16px;
+  width: 12px;
+  height: 12px;
   border-radius: 50%;
   background-color: ${({ color }) => color};
   flex-shrink: 0;
@@ -240,9 +238,9 @@ const LegendDot = styled.div<{ color: string }>`
 
 const LegendRange = styled.span`
   color: var(--color-gray);
-  font-size: var(--font-size-18);
+  font-size: var(--font-size-14);
   font-weight: 500;
-  min-width: 80px;
+  min-width: 60px;
 `;
 
 const LegendStats = styled.div`
@@ -254,12 +252,12 @@ const LegendStats = styled.div`
 
 const LegendCount = styled.span`
   color: var(--color-black);
-  font-size: var(--font-size-20);
+  font-size: var(--font-size-15);
   font-weight: 600;
 `;
 
 const LegendPercentage = styled.span`
   color: var(--color-gray);
-  font-size: var(--font-size-16);
+  font-size: var(--font-size-12);
   font-weight: 400;
 `;

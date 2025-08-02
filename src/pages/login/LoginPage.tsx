@@ -100,9 +100,10 @@ export default function LoginPage(): JSX.Element {
       setAuthenticated(true);
       setLoading(false);
       setError(null);
-      
+      setIsLoading(false); // 성공 시에도 false로
     } catch (error) {
       setLoading(false);
+      setIsLoading(false); // 실패 시에도 false로
       setError(error instanceof Error ? error.message : '로그인에 실패했습니다.');
       console.error('로그인 실패:', error);
     }
@@ -117,14 +118,20 @@ export default function LoginPage(): JSX.Element {
   const password = watch('password') || '';
 
   return (
-    <div className="page-scale">
+    <div>
       <LoginPageContainer>
         <LogoImage alt="로고" src={Logo} onClick={() => navigate('/')} />
         <LoginForm 
           email={email}
           password={password}
-          onEmailChange={(e) => setValue('email', e.target.value)}
-          onPasswordChange={(e) => setValue('password', e.target.value)}
+          onEmailChange={(e) => {
+            setValue('email', e.target.value);
+            setError(null);
+          }}
+          onPasswordChange={(e) => {
+            setValue('password', e.target.value);
+            setError(null);
+          }}
           onLogin={handleSubmit(handleLogin)}
           isLoading={isLoading}
           error={error || errors.email?.message || errors.password?.message}
@@ -142,47 +149,46 @@ export default function LoginPage(): JSX.Element {
 
 // styled-components 정의부 (파일 하단)
 const LogoImage = styled.img`
-  position: absolute;
-  top: 152px;
-  left: calc(50% - 67px);
-  width: 135px;
-  height: 134px;
+  width: 101.25px;
+  height: 100.5px;
   object-fit: cover;
   cursor: pointer;
   transition: transform 0.2s ease;
-  
-  &:hover {
-    transform: scale(1.05);
-  }
+  margin-bottom: 32px;
 `;
 
-const SignUpText = styled.span``;
+const SignUpText = styled.span`
+  font-size: var(--font-size-16);
+`;
 
 const SignUpLink = styled.span`
   text-decoration: underline;
   cursor: pointer;
+  font-size: var(--font-size-16);
   &:hover {
     color: var(--color-mediumpurple-300);
   }
 `;
 
 const SignUpContainer = styled.div`
-  position: absolute;
-  top: 888px;
-  left: calc(50% - 260px);
+  margin-top: 32px;
   line-height: 24px;
   display: inline-block;
-  width: 520px;
+  width: 390px;
+  font-size: var(--font-size-16);
 `;
 
 const LoginPageContainer = styled.div`
-  width: 100%;
-  position: relative;
+  width: 100vw;
+  height: 100vh;
   background-color: var(--color-ghostwhite);
-  height: 1080px;
-  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: relative;
   text-align: center;
-  font-size: var(--font-size-22);
+  font-size: var(--font-size-16);
   color: var(--color-black);
   font-family: var(--font-pretendard);
 `; 
