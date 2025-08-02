@@ -16,6 +16,7 @@ interface PermissionUser {
   isActive: string;
 }
 
+//컴포넌트
 const permissionData: PermissionUser[] = [
   {
     roleId: 1,
