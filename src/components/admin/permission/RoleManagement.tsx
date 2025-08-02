@@ -96,13 +96,7 @@ const RoleManagement = ({ open, onClose, selectedUser }: RoleManagementProps) =>
 
 export default RoleManagement;
 
-// 스타일 변수들
-const MODAL_WIDTH = '868px';
-const MODAL_HEIGHT = '678px';
-const SECTION_WIDTH = '796.5px';
-const PADDING_LEFT = '36px';
-const BORDER_RADIUS = '19.5px';
-const SECTION_BORDER_RADIUS = '18.75px';
+
 
 // 모달 오버레이
 const ModalOverlay = styled.div`
@@ -122,20 +116,20 @@ const ModalOverlay = styled.div`
 
 // 모달 컨테이너
 const ModalContainer = styled.div`
-  width: ${MODAL_WIDTH};
-  height: ${MODAL_HEIGHT};
+  width: 868px;
+  height: 678px;
   flex-shrink: 0;
-  border-radius: ${BORDER_RADIUS};
+  border-radius: 19.5px;
   background: #FFF;
   position: relative;
 `;
 
 // 모달 헤더
 const ModalHeader = styled.h2`
-  width: ${MODAL_WIDTH};
+  width: 868px;
   height: 75px;
   flex-shrink: 0;
-  border-radius: ${BORDER_RADIUS} ${BORDER_RADIUS} 0 0;
+  border-radius: 19.5px 19.5px 0 0;
   border-bottom: 1.5px solid #E9E0F0;
   background: #FFF;
   display: flex;
@@ -152,7 +146,7 @@ const ModalTitle = styled.span`
   font-style: normal;
   font-weight: 700;
   line-height: normal;
-  padding-left: ${PADDING_LEFT};
+  padding-left: 36px;
   display: flex;
   align-items: center;
 `;
@@ -168,7 +162,7 @@ const CloseButton = styled.button`
   border-radius: 4px;
   transition: color 0.2s ease;
   margin-left: auto;
-  margin-right: ${PADDING_LEFT};
+  margin-right: 36px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -180,13 +174,13 @@ const CloseButton = styled.button`
 
 // 첫 번째 섹션
 const ModalSection = styled.div`
-  width: ${SECTION_WIDTH};
+  width: 796.5px;
   height: 97.5px;
   flex-shrink: 0;
-  border-radius: ${SECTION_BORDER_RADIUS};
+  border-radius: 18.75px;
   background: #F5F5F5;
   margin-top: 36px;
-  margin-left: ${PADDING_LEFT};
+  margin-left: 36px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -197,7 +191,7 @@ const ModalContent = styled.div`
   display: flex;
   align-items: center;
   gap: 12px;
-  padding-left: ${PADDING_LEFT};
+  padding-left: 36px;
 `;
 
 // 역할 아이콘
@@ -239,39 +233,38 @@ const UserCountText = styled.span`
   font-style: normal;
   font-weight: 500;
   line-height: normal;
-  margin-right: ${PADDING_LEFT};
+  margin-right: 36px;
 `;
 
 // 두 번째 섹션
 const ModalSection2 = styled.div`
-  width: ${SECTION_WIDTH};
+  width: 796.5px;
   height: 328.5px;
   flex-shrink: 0;
-  border-radius: ${SECTION_BORDER_RADIUS};
+  border-radius: 18.75px;
   border: 1.5px solid #E9E9E9;
   margin-top: 24px;
-  margin-left: ${PADDING_LEFT};
+  margin-left: 36px;
 `;
 
 // 섹션 헤더
 const ModalSection2Header = styled.div`
-  width: ${SECTION_WIDTH};
+  width: 796.5px;
   height: 60px;
   flex-shrink: 0;
-  border-radius: ${SECTION_BORDER_RADIUS} ${SECTION_BORDER_RADIUS} 0 0;
+  border-radius: 18.75px 18.75px 0 0;
   border-bottom: 1.5px solid #E9E9E9;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding-left: ${PADDING_LEFT};
-  padding-right: ${PADDING_LEFT};
+  padding-left: 36px;
+  padding-right: 36px;
   box-sizing: border-box;
 `;
 
 // 헤더 제목
 const HeaderTitle = styled.span`
   color: #000;
-  font-family: Pretendard;
   font-size: 16.5px;
   font-style: normal;
   font-weight: 500;
@@ -313,17 +306,17 @@ const TableHeader = styled.div`
 const HeaderCell = styled.div`
   flex: 1;
   color: #000;
-  font-family: Pretendard;
   font-size: 16px;
   font-weight: 600;
   text-align: left;
+  margin-top: -10px;
   
   &:first-child {
-    padding-left: ${PADDING_LEFT};
+    padding-left: 36px;
   }
   
   &:nth-child(3) {
-    padding-left: ${PADDING_LEFT};
+    padding-left: 36px;
   }
 `;
 
@@ -354,16 +347,15 @@ const TableRow = styled.div<{ selected?: boolean }>`
 const TableCell = styled.div`
   flex: 1;
   color: #000;
-  font-family: Pretendard;
   font-size: 16px;
   text-align: left;
   
   &:first-child {
-    padding-left: ${PADDING_LEFT};
+    padding-left: 36px;
   }
   
   &:nth-child(3) {
-    padding-left: ${PADDING_LEFT};
+    padding-left: 36px;
   }
 `;
 

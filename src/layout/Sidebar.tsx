@@ -127,13 +127,27 @@ const menuData: MenuSectionData[] = [
         text: "FAQ 관리",
         isDropdown: true,
         subItems: [
-          { key: MENU_ITEMS.SCHEDULE_LIST, text: "일정 목록" },
-          { key: MENU_ITEMS.SCHEDULE_REGISTER, text: "일정 등록" }
+          { key: MENU_ITEMS.SCHEDULE_LIST, text: "FAQ 목록" },
+          { key: MENU_ITEMS.SCHEDULE_REGISTER, text: "FAQ 카테고리" }
         ]
       }
     ]
   }
 ];
+
+// 네비게이션 매핑
+const NAVIGATION_MAP: Record<string, string> = {
+  [MENU_ITEMS.STATS]: "/admin",
+  [MENU_ITEMS.USER_LIST]: "/admin/users",
+  [MENU_ITEMS.PERMISSION]: "/admin/permission",
+  [MENU_ITEMS.ALL_DOCUMENTS]: "/admin/documents",
+  [MENU_ITEMS.TERMS]: "/admin/terms",
+  [MENU_ITEMS.REGULATIONS]: "/admin/regulations",
+  [MENU_ITEMS.REPORT_FORM]: "/admin/report-form",
+  [MENU_ITEMS.MEDIA]: "/admin/media",
+  [MENU_ITEMS.SCHEDULE_LIST]: "/admin/faq",
+  [MENU_ITEMS.SCHEDULE_REGISTER]: "/admin/faqcategory"
+};
 
 // 프로필 드롭다운 컴포넌트
 const ProfileDropdown: React.FC<{
@@ -165,7 +179,8 @@ const MenuItemComponent: React.FC<{
   hoveredMenu: string;
   onHover: (key: string) => void;
   onLeave: () => void;
-}> = ({ item, isSelected, onMenuClick, onToggle, isOpen, hoveredMenu, onHover, onLeave }) => {
+  getSelectedMenuKey: () => string;
+}> = ({ item, isSelected, onMenuClick, onToggle, isOpen, hoveredMenu, onHover, onLeave, getSelectedMenuKey }) => {
   if (item.isDropdown && item.subItems) {
     return (
       <div>
@@ -179,22 +194,25 @@ const MenuItemComponent: React.FC<{
           <DropdownIcon isOpen={isOpen}>▼</DropdownIcon>
         </MenuItem>
         <SubMenuContainer isOpen={isOpen}>
-          {item.subItems.map((subItem) => (
-            <SubMenuItem
-              key={subItem.key}
-              isSelected={isSelected}
-              onClick={() => onMenuClick(subItem.key)}
-              onMouseEnter={() => onHover(subItem.key)}
-              onMouseLeave={onLeave}
-            >
-              {isSelected
-                ? <SelectedSubMenuItemBackground color="rgba(153, 102, 204, 0.15)" />
-                : hoveredMenu === subItem.key
-                  ? <SelectedSubMenuItemBackground color="rgba(153, 102, 204, 0.08)" />
-                  : null}
-              {subItem.text}
-            </SubMenuItem>
-          ))}
+          {item.subItems.map((subItem) => {
+            const isSubItemSelected = getSelectedMenuKey() === subItem.key;
+            return (
+              <SubMenuItem
+                key={subItem.key}
+                isSelected={isSubItemSelected}
+                onClick={() => onMenuClick(subItem.key)}
+                onMouseEnter={() => onHover(subItem.key)}
+                onMouseLeave={onLeave}
+              >
+                {isSubItemSelected
+                  ? <SelectedSubMenuItemBackground color="rgba(153, 102, 204, 0.15)" />
+                  : hoveredMenu === subItem.key
+                    ? <SelectedSubMenuItemBackground color="rgba(153, 102, 204, 0.08)" />
+                    : null}
+                {subItem.text}
+              </SubMenuItem>
+            );
+          })}
         </SubMenuContainer>
       </div>
     );
@@ -234,9 +252,22 @@ const Sidebar: React.FC<SidebarProps> = ({ className = "" }) => {
 
   // 현재 선택된 메뉴 키 반환
   const getSelectedMenuKey = (): string => {
-    if (location.pathname === "/admin") return MENU_ITEMS.STATS;
-    if (location.pathname.startsWith("/admin/users")) return MENU_ITEMS.USER_LIST;
-    if (location.pathname.startsWith("/admin/permission")) return MENU_ITEMS.PERMISSION;
+    const pathname = location.pathname;
+    
+    // 더 구체적인 경로부터 확인
+    const sortedEntries = Object.entries(NAVIGATION_MAP).sort((a, b) => {
+      const aPath = a[1];
+      const bPath = b[1];
+      // 더 긴 경로를 먼저 확인
+      return bPath.length - aPath.length;
+    });
+    
+    for (const [menuKey, path] of sortedEntries) {
+      if (pathname === path || pathname.startsWith(path + '/')) {
+        return menuKey;
+      }
+    }
+    
     return "";
   };
 
@@ -251,13 +282,7 @@ const Sidebar: React.FC<SidebarProps> = ({ className = "" }) => {
   };
 
   const handleMenuClick = (menuKey: string) => {
-    const navigationMap: Record<string, string> = {
-      [MENU_ITEMS.STATS]: "/admin",
-      [MENU_ITEMS.USER_LIST]: "/admin/users",
-      [MENU_ITEMS.PERMISSION]: "/admin/permission"
-    };
-
-    const targetPath = navigationMap[menuKey];
+    const targetPath = NAVIGATION_MAP[menuKey];
     if (targetPath) {
       navigate(targetPath);
     }
@@ -308,6 +333,7 @@ const Sidebar: React.FC<SidebarProps> = ({ className = "" }) => {
                   hoveredMenu={hoveredMenu}
                   onHover={setHoveredMenu}
                   onLeave={() => setHoveredMenu("")}
+                  getSelectedMenuKey={getSelectedMenuKey}
                 />
               </DropdownMenuWrapper>
             ))}

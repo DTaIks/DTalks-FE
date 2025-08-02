@@ -57,6 +57,23 @@ body {
   --gap-36: 36px;
   --gap-40: 40px;
   --gap-48: 48px;
+  --gap-60: 60px;
+
+  /* 버튼 크기 */
+  --button-width: 172px;
+  --button-height: 44px;
+  --button-default-width: 82.5px;
+  --button-default-height: 34.5px;
+
+  /* 버튼 색상 */
+  --color-disabled: #CCC;
+  --color-hover: #6b4f8f;
+  --color-hover-secondary: #e0e0e0;
+  --color-active: var(--color-mediumpurple-200);
+  --color-active-secondary: #d0d0d0;
+
+  /* 폰트 크기 */
+  --font-size-default: 9px;
 
   /* 패딩 값들 */
   --padding-1: 1px;
@@ -76,6 +93,8 @@ body {
   --padding-40: 40px;
   --padding-60: 60px;
   --padding-100: 100px;
+  --padding-9: 9px;
+  --padding-login: 0.375px 0px 0px;
 
   /* 모서리 둥글기 */
   --br-4: 4px;
@@ -171,5 +190,20 @@ body {
   transform-origin: center center;
 }
 */
+
+/* 드롭다운 옵션 호버 스타일 강제 적용 */
+select option:hover,
+select option:focus,
+select option:active,
+select option:checked {
+  background-color: #F8F2FB !important;
+  color: #000 !important;
+}
+
+/* 웹킷 브라우저용 드롭다운 스타일 */
+select option::-webkit-select-placeholder {
+  background-color: #F8F2FB !important;
+  color: #000 !important;
+}
 
 

@@ -83,7 +83,6 @@ const Divider = styled.div`
 const TableHeader = styled.div`
   ${TableGrid}
   color: #2D1457;
-  font-family: Pretendard;
   font-size: 18px;
   font-style: normal;
   font-weight: 600;

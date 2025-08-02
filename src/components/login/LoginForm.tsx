@@ -45,10 +45,10 @@ const LoginForm: React.FC<LoginFormProps> = ({
           type="email"
           value={email}
           onChange={onEmailChange}
-          inputWidth="382.5px"
+          inputWidth="380px"
         />
         <InputField
-          inputWidth="382.5px"
+          inputWidth="380px"
           inputAlignSelf="unset"
           title="비밀번호"
           placeholder="비밀번호를 입력하세요."
@@ -65,6 +65,8 @@ const LoginForm: React.FC<LoginFormProps> = ({
             text="로그인"
             type="submit"
             variant="login"
+            width="380px"
+            height="36px"
             disabled={isLoading}
             isLoading={isLoading}
           />

@@ -4,6 +4,8 @@ import LoginPage from '../pages/login/LoginPage';
 import SignUpPage from '../pages/signup/SignUpPage';
 import UserListPage from '../pages/admin/userlist/UserListPage';
 import PermissionPage from '../pages/admin/permission/PermissionPage';
+import FAQPage from '../pages/admin/faq/FAQPage';
+import FAQCategoryPage from '../pages/admin/faq/FAQCategoryPage';
 import ChartPage from '../pages/chart/ChartPage';
 import MediaPage from '../pages/admin/MediaPage';
 import Layout from '../layout/Layout';
@@ -27,7 +29,6 @@ export default function AppRoutes() {
 
   return (
     <Routes>
-      {/* <Route path ="/" element={<div></div>} /> <-- 삭제 */}
       <Route path="/chart" element={<ChartPage />} />
       <Route path="/media" element={<MediaPage />} />
       {/* 루트 경로: 로그인 상태에 따라 리다이렉트 */}
@@ -55,6 +56,8 @@ export default function AppRoutes() {
           <Route index element={<ChartPage />} />
           <Route path="users" element={<UserListPage />} />
           <Route path="permission" element={<PermissionPage />} />
+          <Route path="faq" element={<FAQPage />} />
+          <Route path="faqcategory" element={<FAQCategoryPage />} />
           <Route path="settings" element={<ChartPage />} />
         </Route>
       </Route>

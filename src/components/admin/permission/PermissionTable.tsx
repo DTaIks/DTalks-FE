@@ -2,7 +2,7 @@ import styled from "styled-components";
 import Roll1 from '../../../assets/permission/Roll.svg';
 import Roll2 from '../../../assets/permission/Roll2.svg';
 import Roll3 from '../../../assets/permission/Roll3.svg';
-import ActiveIcon from '../../../assets/Permission/Active.svg';
+import ActiveIcon from '../../../assets/common/Active.svg';
 import RoleManagement from './RoleManagement';
 import { usePermissionStore } from '../../../store/permissionStore';
 
@@ -118,6 +118,7 @@ const PermissionTable = () => {
 export default PermissionTable;
 
 const TableWrapper = styled.div`
+  margin-top: -32px;
   width: 100%;
   display: flex;
   justify-content: center;
@@ -125,9 +126,9 @@ const TableWrapper = styled.div`
   padding: 32px 0;
 `;
 const TableBox = styled.div`
-  width: 1052.25px;
+  width: 1052px;
   background: var(--color-white);
-  border-radius: 17.5px;
+  border-radius: 18.5px;
   box-shadow: 0px 0px 10.5px 2.1px rgba(153, 102, 204, 0.05);
   overflow: hidden;
 `;
@@ -140,8 +141,8 @@ const TableHeader = styled.div`
 const HeaderCell = styled.div`
   width: 100%;
   font-weight: 600;
-  font-size: 16.8px;
-  color: var(--color-dimgray);
+  font-size: 18px;
+  color: var(--color-black);
   text-align: center;
   display: flex;
   align-items: center;
@@ -208,7 +209,7 @@ const EngNameText = styled.span`
   text-align: left;
 `;
 const StatusIcon = styled.img`
-  width: 52.5px;
-  height: 29.4px;
+  width: 56px;
+  height: 32px;
   object-fit: contain;
 `; 

@@ -1,33 +1,64 @@
+import React from "react";
 import styled from "styled-components";
 
-const Pagination = () => {
+interface PaginationProps {
+  currentPage: number;
+  totalPages: number;
+  onPageChange: (page: number) => void;
+}
+
+const Pagination: React.FC<PaginationProps> = ({ currentPage, totalPages, onPageChange }) => {
+  const handlePrevClick = (): void => {
+    if (currentPage > 1) {
+      onPageChange(currentPage - 1);
+    }
+  };
+
+  const handleNextClick = (): void => {
+    if (currentPage < totalPages) {
+      onPageChange(currentPage + 1);
+    }
+  };
+
+  const handlePageClick = (page: number): void => {
+    onPageChange(page);
+  };
+
   return (
     <PaginationContainer>
-      <PrevButtonContainer>
+      <PrevButtonContainer onClick={handlePrevClick} disabled={currentPage === 1}>
         <PrevButtonBackground />
         <InactivePageNumber>
           이전
         </InactivePageNumber>
       </PrevButtonContainer>
-      <ActivePageContainer>
-        <ActivePageBackground />
-        <ActivePageNumber>
-          1
-        </ActivePageNumber>
-      </ActivePageContainer>
-      <PageContainer2>
-        <InactivePageBackground />
-        <InactivePageNumber>
-          2
-        </InactivePageNumber>
-      </PageContainer2>
-      <PageContainer3>
-        <InactivePageBackground />
-        <InactivePageNumber>
-          3
-        </InactivePageNumber>
-      </PageContainer3>
-      <NextButtonContainer>
+      
+      {Array.from({ length: totalPages }, (_, index) => {
+        const pageNumber = index + 1;
+        const isActive = pageNumber === currentPage;
+        
+        return (
+          <PageContainer 
+            key={pageNumber}
+            onClick={() => handlePageClick(pageNumber)}
+            isActive={isActive}
+          >
+            {isActive ? (
+              <>
+                <ActivePageBackground />
+                <ActivePageNumber>{pageNumber}</ActivePageNumber>
+              </>
+            ) : (
+              <>
+                <InactivePageBackground />
+                <InactivePageNumber>{pageNumber}</InactivePageNumber>
+              </>
+            )}
+          </PageContainer>
+        );
+      })}
+      
+      <NextButtonContainer onClick={handleNextClick} disabled={currentPage === totalPages}>
         <NextButtonBackground />
         <InactivePageNumber>
           다음
@@ -54,17 +85,7 @@ const ActivePageNumber = styled.div`
   position: absolute;
   top: 0.422rem;
   left: 0.704rem;
-`;
-
-const ActivePageContainer = styled.div`
-  width: 1.78rem;
-  height: 1.78rem;
   color: var(--color-white);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  position: relative;
-  margin-right: 4px;
 `;
 
 const InactivePageBackground = styled.div`
@@ -84,10 +105,14 @@ const InactivePageNumber = styled.div`
   position: absolute;
   top: 0.422rem;
   left: 0.656rem;
-  
+  color: var(--color-silver);
 `;
 
-const PageContainer2 = styled.div`
+interface PageContainerProps {
+  isActive?: boolean;
+}
+
+const PageContainer = styled.div<PageContainerProps>`
   width: 1.78rem;
   height: 1.78rem;
   display: flex;
@@ -95,15 +120,11 @@ const PageContainer2 = styled.div`
   justify-content: center;
   position: relative;
   margin-right: 4px;
-`;
-
-const PageContainer3 = styled.div`
-  width: 1.78rem;
-  height: 1.78rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  position: relative;
+  cursor: pointer;
+  
+  &:last-of-type {
+    margin-right: 0;
+  }
 `;
 
 const NextButtonBackground = styled.div`
@@ -118,7 +139,7 @@ const NextButtonBackground = styled.div`
   height: 1.78rem;
 `;
 
-const NextButtonContainer = styled.div`
+const NextButtonContainer = styled.div<{ disabled?: boolean }>`
   width: 2.81rem;
   height: 1.78rem;
   display: flex;
@@ -126,6 +147,8 @@ const NextButtonContainer = styled.div`
   justify-content: center;
   position: relative;
   margin-left: 4px;
+  cursor: ${props => props.disabled ? 'not-allowed' : 'pointer'};
+  opacity: ${props => props.disabled ? 0.5 : 1};
 `;
 
 const PrevButtonBackground = styled.div`
@@ -138,10 +161,9 @@ const PrevButtonBackground = styled.div`
   box-sizing: border-box;
   width: 2.81rem;
   height: 1.78rem;
-
 `;
 
-const PrevButtonContainer = styled.div`
+const PrevButtonContainer = styled.div<{ disabled?: boolean }>`
   width: 2.81rem;
   height: 1.78rem;
   color: var(--color-silver);
@@ -150,6 +172,8 @@ const PrevButtonContainer = styled.div`
   justify-content: center;
   position: relative;
   margin-right: 4px;
+  cursor: ${props => props.disabled ? 'not-allowed' : 'pointer'};
+  opacity: ${props => props.disabled ? 0.5 : 1};
 `;
 
 const PaginationContainer = styled.div`

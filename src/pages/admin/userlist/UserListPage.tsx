@@ -8,7 +8,7 @@ const UserListPage = () => {
     <Container>
       <TitleContainer title="사용자 목록" subtitle="등록한 사용자들을 관리하세요" />
       <UserTable />
-      <Pagination />
+      <Pagination currentPage={1} totalPages={10} onPageChange={() => {}} />
     </Container>
   );
 };

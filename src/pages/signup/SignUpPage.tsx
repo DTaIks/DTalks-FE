@@ -385,8 +385,10 @@ export default function SignUpPage(): JSX.Element {
               text="회원가입"
               type="submit"
               variant="submit"
+              width="380px"
+
               disabled={!isSubmitEnabled()}
-              fontSize="22px"
+              fontSize="16px"
               style={{ marginTop: '60px' }}
             />
           </form>
@@ -430,8 +432,8 @@ const LogoImage = styled.img`
 const FormWrapper = styled.div`
   background: #FFF;
   border-radius: 16px;
-  width: 770px;
-  height: 960px;
+  width: 577.5px;
+  height: 720px;
   flex-shrink: 0;
   border-radius: 25px;
 `;
@@ -439,36 +441,36 @@ const FormWrapper = styled.div`
 const Title = styled.h2`
   color: #000;
   text-align: center;
-  font-size: 32px;
+  font-size: 24px;
   font-style: normal;
   font-weight: 700;
-  line-height: 28px; /* 87.5% */
-  margin-top: 68px;
-  margin-bottom: 73px;
+  line-height: 21px;
+  margin-top: 51px;
+  margin-bottom: 54.75px;
 `;
 
 const BottomText = styled.p`
   color: #000;
   text-align: center;
-  font-size: 22px;
+  font-size: 16.5px;
   font-weight: 400;
-  line-height: 24px;
-  margin-top: 27px;
+  line-height: 18px;
+  margin-top: 20.25px;
 `;
 
 const BottomLink = styled.a`
   color: #96C;
-  font-size: 22px;
+  font-size: 16.5px;
   font-weight: 600;
-  line-height: 24px;
+  line-height: 18px;
   cursor: pointer;
 `;
 
 const TimerText = styled.div`
-  font-size: 12px;
+  font-size: 9px;
   color: #F0191D;
   text-align: center;
-  margin-top: 4px;
+  margin-top: 3px;
   font-weight: 500;
 `;
 
