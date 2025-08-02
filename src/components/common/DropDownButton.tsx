@@ -7,7 +7,7 @@ interface DropdownItem {
 }
 
 interface DropDownButtonProps {
-  items?: DropdownItem[];
+  items: DropdownItem[];
 }
 
 const DropDownButton: React.FC<DropDownButtonProps> = ({ items }) => {
@@ -16,29 +16,6 @@ const DropDownButton: React.FC<DropDownButtonProps> = ({ items }) => {
   const handleToggle = () => {
     setIsOpen(!isOpen);
   };
-
-  const defaultDropdownItems: DropdownItem[] = [
-    {
-      label: '다운로드',
-      onClick: () => {
-        setIsOpen(false);
-      }
-    },
-    {
-      label: '버전 관리',
-      onClick: () => {
-        setIsOpen(false);
-      }
-    },
-    {
-      label: '보관',
-      onClick: () => {
-        setIsOpen(false);
-      }
-    }
-  ];
-
-  const dropdownItems = items || defaultDropdownItems;
 
   const handleItemClick = (item: DropdownItem) => {
     item.onClick();
@@ -59,21 +36,21 @@ const DropDownButton: React.FC<DropDownButtonProps> = ({ items }) => {
           </DotsContainer>
           <Hover />
         </MenuButton>
-                
+                      
         {isOpen && (
           <DropdownMenu>
-            {dropdownItems.map((item, index) => (
-              <DropdownItem
+            {items.map((item, index) => (
+              <DropdownItemButton
                 key={index}
                 onClick={() => handleItemClick(item)}
               >
                 {item.label}
-              </DropdownItem>
+              </DropdownItemButton>
             ))}
           </DropdownMenu>
         )}
       </ButtonContainer>
-            
+                        
       {isOpen && (
         <Backdrop onClick={() => setIsOpen(false)} />
       )}
@@ -89,7 +66,7 @@ const ButtonContainer = styled.div`
 `;
 
 const Container = styled.div`
-  padding: 2rem;
+  padding: var(--padding-32);
 `;
 
 const MenuButton = styled.button`
@@ -97,8 +74,8 @@ const MenuButton = styled.button`
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  width: 2.5rem;
-  height: 2.5rem;
+  width: 40px;
+  height: 40px;
   background-color: transparent;
   border-radius: 50%;
   border: none;
@@ -114,16 +91,16 @@ const MenuButton = styled.button`
 const DotsContainer = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 0.25rem;
+  gap: var(--gap-4);
   position: relative;
   z-index: 2;
 `;
 
 const Dot = styled.div`
-  width: 0.3rem;
-  height: 0.3rem;
+  width: 5px;
+  height: 5px;
   border-radius: 50%;
-  background-color: #666;
+  background-color: var(--color-gray);
 `;
 
 const Hover = styled.div`
@@ -133,7 +110,7 @@ const Hover = styled.div`
   transform: translate(-50%, -50%) scale(0);
   width: 100%;
   height: 100%;
-  background-color: #f5f0fa;
+  background-color: var(--color-lightpurple);
   border-radius: 50%;
   transition: transform 0.2s ease;
   z-index: 1;
@@ -148,31 +125,31 @@ const DropdownMenu = styled.div`
   position: absolute;
   top: 100%;
   left: 0;
-  margin-top: 0.5rem;
+  margin-top: 8px;
   width: 100px;
   height: auto;
-  min-height: 120px;
+  min-height: 15vh;
   flex-shrink: 0;
-  border-radius: 10px;
+  border-radius: var(--br-10);
   border: 1px solid rgba(153, 102, 204, 0.20);
-  background: #FFF;
+  background: var(--color-white);
   z-index: 10;
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
 `;
 
-const DropdownItem = styled.button`
+const DropdownItemButton = styled.button`
   width: 100%;
   text-align: left;
-  padding: 0.75rem 1rem;
-  font-size: 0.875rem;
+  padding: 12px 16px;
+  font-size: var(--font-size-14);
   color: var(--color-black);
   background: none;
   border: none;
   cursor: pointer;
 
   &:hover {
-    background-color: #f5f0fa;
-    color: #9966CC;
+    background-color: var(--color-lightpurple);
+    color: var(--color-mediumpurple-300);
   }
 `;
 
