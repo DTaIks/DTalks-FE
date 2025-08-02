@@ -7,6 +7,7 @@ import Header from '../../../components/admin/media/MediaHeader';
 import MediaFileContent from '../../../components/admin/media/MediaFileContentList';
 import DropdownFilter from '../../../components/common/DropDownFilter';
 import Button from '../../../components/common/Button';
+import Pagination from '../../../components/common/Pagination';
 
 import MediaFileUploadModal, { type MediaUploadData } from '../../../components/admin/mediaModal/MediaFileUploadModal';
 import ConfirmModal from '../../../components/common/ConfirmModal';
@@ -20,6 +21,26 @@ const MediaPage: React.FC = () => {
   const departments = useDepartmentStats();
   const { filters, archive, modals, actions } = useMediaPageState();
   const mediaActions = useMediaActions();
+
+  // 페이지네이션 상태
+  const [currentPage, setCurrentPage] = React.useState(1);
+  const itemsPerPage = 5; // 페이지당 표시할 파일 수
+
+  // 현재 페이지의 파일들 계산
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const currentFiles = filters.filteredFiles.slice(startIndex, endIndex);
+  const totalPages = Math.ceil(filters.filteredFiles.length / itemsPerPage);
+
+  // 페이지 변경 핸들러
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+  };
+
+  // 필터나 부서 변경 시 페이지를 1로 리셋
+  React.useEffect(() => {
+    setCurrentPage(1);
+  }, [filters.selectedDepartment, filters.selectedFileType, archive.isMode]);
 
   // 다운로드 버튼 클릭 핸들러
   const handleDownloadClick = (fileName: string) => {
@@ -125,7 +146,7 @@ const MediaPage: React.FC = () => {
 
             <FileContainer>
               <FileContentWrapper>
-                {filters.filteredFiles.map(file => (
+                {currentFiles.map(file => (
                   <MediaFileContent 
                     key={file.fileId} 
                     file={file}
@@ -135,6 +156,16 @@ const MediaPage: React.FC = () => {
                   />
                 ))}
               </FileContentWrapper>
+              
+              {filters.filteredFiles.length > 0 && (
+                <PaginationContainer>
+                  <Pagination
+                    currentPage={currentPage}
+                    totalPages={totalPages}
+                    onPageChange={handlePageChange}
+                  />
+                </PaginationContainer>
+              )}
             </FileContainer>
           </RightContainer>
         </ContentContainer>
@@ -186,7 +217,7 @@ const PageHeaderContainer = styled.div`
 const ContentContainer = styled.div`
   display: flex;
   width: 100%;
-  height: 760px;;
+  height: 760px;
   position: relative;
   overflow: hidden;
   box-sizing: border-box;
@@ -195,7 +226,7 @@ const ContentContainer = styled.div`
 const LeftContainer = styled.div`
   width: 240px;
   min-width: 240px; 
-  height: 586px
+  height: 586px;
   border-radius: 25px 0 0 25px;
   background: #F8F9FA;
   border: 1px solid #e9e9ef;
@@ -356,9 +387,8 @@ const FileContainer = styled.div`
   position: absolute;
   top: 73px;
   left: 0;
-  overflow-y: hidden;
   display: flex;
-  justify-content: center;
+  flex-direction: column;
 `;
 
 const FileContentWrapper = styled.div`
@@ -366,6 +396,16 @@ const FileContentWrapper = styled.div`
   max-width: 1006px;
   display: flex;
   flex-direction: column;
+  height: calc(100% - 60px);
+`;
+
+const PaginationContainer = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 30px;
+  background: var(--color-white);
+  border-radius: 0 25px 25px 0;
 `;
 
 const FolderIcon = styled.span`

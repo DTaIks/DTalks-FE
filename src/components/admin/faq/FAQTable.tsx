@@ -31,6 +31,11 @@ interface CategoryOption {
   label: string;
 }
 
+interface FAQTableProps {
+  currentPage: number;
+  itemsPerPage: number;
+}
+
 // 상수 데이터
 const FAQ_DATA: FAQItem[] = [
   {
@@ -77,6 +82,33 @@ const FAQ_DATA: FAQItem[] = [
     categoryImage: CategoryName5,
     isActive: false,
     createdAt: "2024-01-16 14:30",
+  },
+  {
+    id: 6,
+    question: "회사 복지 혜택은 어떻게 확인하나요?",
+    answer: "사내 포털 → [복지] → [복지 혜택] 메뉴에서 모든 복지 혜택을 확인할 수 있습니다. 각 부서별로 다른 혜택이 제공될 수 있으니 참고하세요.",
+    category: "복지 / 휴가",
+    categoryImage: CategoryName5,
+    isActive: true,
+    createdAt: "2024-01-17 09:15",
+  },
+  {
+    id: 7,
+    question: "연차 신청은 언제까지 해야 하나요?",
+    answer: "연차 신청은 사용일 기준 최소 3일 전까지 신청해야 합니다. 긴급한 경우에는 팀장 승인 후 사용 가능합니다.",
+    category: "근무 / 근태",
+    categoryImage: CategoryName3,
+    isActive: true,
+    createdAt: "2024-01-17 10:30",
+  },
+  {
+    id: 8,
+    question: "급여 지급일은 언제인가요?",
+    answer: "급여는 매월 25일에 지급됩니다. 공휴일인 경우 전 영업일에 지급됩니다.",
+    category: "급여 / 복리후생",
+    categoryImage: CategoryName4,
+    isActive: true,
+    createdAt: "2024-01-18 11:45",
   }
 ];
 
@@ -98,11 +130,16 @@ const CATEGORY_OPTIONS: CategoryOption[] = [
 ];
 
 // 메인 컴포넌트
-const FAQTable: React.FC = () => {
+const FAQTable: React.FC<FAQTableProps> = ({ currentPage, itemsPerPage }) => {
   // 상태 관리
   const [expandedRows, setExpandedRows] = useState<Set<number>>(new Set());
   const [faqItems, setFaqItems] = useState<FAQItem[]>(FAQ_DATA);
   const [selectedCategory, setSelectedCategory] = useState<string>("");
+
+  // 현재 페이지의 FAQ 항목들 계산
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const currentFAQItems = faqItems.slice(startIndex, endIndex);
 
   // 이벤트 핸들러
   const handleRowToggle = useCallback((id: number): void => {
@@ -247,7 +284,7 @@ const FAQTable: React.FC = () => {
       {renderTableHeader()}
       {renderColumnHeaders()}
       <TableBody>
-        {faqItems.map(renderTableRow)}
+        {currentFAQItems.map(renderTableRow)}
       </TableBody>
     </TableContainer>
   );
@@ -257,7 +294,7 @@ export default FAQTable;
 
 const TableContainer = styled.div`
   width: 1062px;
-  min-height: 586px;
+  min-height: 600px;
   border-radius: var(--br-18);
   background: var(--color-white);
   box-shadow: 0 6px 18px 0 rgba(125, 93, 246, 0.10);
