@@ -8,7 +8,7 @@ import CategoryName5 from "../../../assets/faq/CategoryName5.svg";
 import ActiveIcon from "../../../assets/common/Active.svg";
 import InactiveIcon from "../../../assets/common/InActive.svg";
 
-// Types
+// 타입
 interface FAQCategory {
   categoryId: string;
   categoryName: string;
@@ -18,7 +18,7 @@ interface FAQCategory {
   isActive: boolean;
 }
 
-// Data
+// 데이터
 const CATEGORY_DATA: FAQCategory[] = [
   {
     categoryId: "1",
@@ -70,7 +70,7 @@ const TABLE_COLUMNS = [
   { key: "action", label: "작업", width: "150px" }
 ];
 
-// Component
+// 컴포넌트
 const FAQCategoryTable: React.FC = () => {
   const [selectedCategory, setSelectedCategory] = useState<FAQCategory | null>(null);
   const [categoryData, setCategoryData] = useState<FAQCategory[]>(CATEGORY_DATA);
