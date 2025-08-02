@@ -145,7 +145,6 @@ const FAQCategoryTable: React.FC = () => {
 
 export default FAQCategoryTable;
 
-// Styled Components
 const TableContainer = styled.div`
   width: 1062px;
   height: 586px;
