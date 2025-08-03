@@ -9,150 +9,154 @@ on:
 # 허용 권한 설정
 permissions:
   contents: read
-  actions: read
-  packages: read
-  id-token: write
-  issues: write
-  pull-requests: write
 
 jobs:
-  validate:
+  build:
     runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 22
-          cache: 'npm'
-
-      - name: Install dependencies
-        run: npm ci
-
-  build-and-deploy:
-    needs: validate
-    runs-on: ubuntu-latest
-    timeout-minutes: 30
-
-    env:
-      APP_DIR: dist
-      WEB_SERVER: ${{ secrets.WEB_SERVER }}
-      WEB_DIR: /var/www/html
-      WEB_BACKUP_DIR: /var/www/backups
-      DEPLOY_DIR: /home/ubuntu/deploy
-      NODE_ENV: development
-      DEPLOY_VERSION: ${{ github.sha }}
+    timeout-minutes: 15
+    outputs:
+      build-cache-key: ${{ steps.cache-key.outputs.value }}
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Set up Node.js
+      - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 22
           cache: 'npm'
 
-      - name: Cache dependencies
+      - name: Generate cache key
+        id: cache-key
+        run: echo "value=${{ hashFiles('**/package-lock.json', '**/vite.config.ts', '**/tsconfig.json') }}" >> $GITHUB_OUTPUT
+
+      - name: Cache node_modules
         uses: actions/cache@v4
         with:
-          path: ~/.npm
-          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          path: |
+            node_modules
+            */*/node_modules
+          key: ${{ runner.os }}-node-${{ steps.cache-key.outputs.value }}
           restore-keys: |
             ${{ runner.os }}-node-
 
-      - name: Clean and install dependencies
-        run: |
-          rm -rf node_modules package-lock.json
-          npm install
+      - name: Cache Vite build
+        uses: actions/cache@v4
+        with:
+          path: |
+            dist
+            .vite
+          key: ${{ runner.os }}-vite-${{ steps.cache-key.outputs.value }}
+          restore-keys: |
+            ${{ runner.os }}-vite-
+
+      - name: Install dependencies
+        run: npm ci --prefer-offline --no-audit
 
       - name: Build app
-        run: npx vite build --mode development || true
+        run: npx vite build --mode development
         env:
           DISABLE_ESLINT_PLUGIN: true
           GENERATE_SOURCEMAP: false
 
-      - name: Create version file
-        run: |
-          mkdir -p $APP_DIR
-          cat <<EOF > $APP_DIR/version.json
-          {
-            "version": "${{ env.DEPLOY_VERSION }}",
-            "deployedAt": "$(date -u +'%Y-%m-%dT%H:%M:%SZ')"
-          }
-          EOF
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist-files
+          path: dist/
+          retention-days: 1
 
-      - name: Save SSH private key
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    env:
+      WEB_SERVER: ${{ secrets.WEB_SERVER }}
+      WEB_DIR: /var/www/html
+      WEB_BACKUP_DIR: /var/www/backups
+      DEPLOY_DIR: /home/ubuntu/deploy
+
+    steps:
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: dist-files
+          path: dist/
+
+      - name: Setup SSH
         run: |
           echo "${{ secrets.SSH_PRIVATE_KEY }}" > private_key
           chmod 600 private_key
-
-      - name: Add known hosts
-        run: |
           mkdir -p ~/.ssh
           ssh-keyscan -H ${{ env.WEB_SERVER }} >> ~/.ssh/known_hosts
 
-      - name: Test SSH connection to Web Server
-        run: ssh -i private_key -o ConnectTimeout=10 ubuntu@${{ env.WEB_SERVER }} 'echo "Web Server SSH connection successful"'
-
       - name: Prepare deployment directory
-        run: ssh -i private_key ubuntu@${{ env.WEB_SERVER }} '
-          sudo mkdir -p ${{ env.DEPLOY_DIR }} &&
-          sudo chown ubuntu:ubuntu ${{ env.DEPLOY_DIR }} &&
-          sudo chmod 755 ${{ env.DEPLOY_DIR }} &&
-          rm -rf ${{ env.DEPLOY_DIR }}/*
+        run: |
+          ssh -i private_key ubuntu@${{ env.WEB_SERVER }} '
+            sudo mkdir -p ${{ env.DEPLOY_DIR }} ${{ env.WEB_BACKUP_DIR }}
+            sudo chown ubuntu:ubuntu ${{ env.DEPLOY_DIR }}
+            sudo chmod 755 ${{ env.DEPLOY_DIR }}
+            rm -rf ${{ env.DEPLOY_DIR }}/*
           '
 
       - name: Deploy to Web Server
         run: |
           rsync -avz --delete --progress \
-            -e "ssh -i private_key" \
-            $APP_DIR/ ubuntu@${{ env.WEB_SERVER }}:${{ env.DEPLOY_DIR }}/
+            -e "ssh -i private_key -o BatchMode=yes" \
+            dist/ ubuntu@${{ env.WEB_SERVER }}:${{ env.DEPLOY_DIR }}/
 
+      - name: Backup and Deploy
+        run: |
           ssh -i private_key ubuntu@${{ env.WEB_SERVER }} '
+            set -e
             echo "배포 시작..."
-            sudo mkdir -p ${{ env.WEB_BACKUP_DIR }}
+            
+            # 백업 생성
             BACKUP_DIR=${{ env.WEB_BACKUP_DIR }}/backup_$(date +%Y%m%d_%H%M%S)
             sudo mkdir -p $BACKUP_DIR
-            sudo cp -r ${{ env.WEB_DIR }}/* $BACKUP_DIR/ 2>/dev/null || true
-            echo $BACKUP_DIR > /tmp/latest_backup
-            echo "백업 완료: $BACKUP_DIR"
+            if [ -d "${{ env.WEB_DIR }}" ] && [ "$(ls -A ${{ env.WEB_DIR }})" ]; then
+              sudo cp -r ${{ env.WEB_DIR }}/* $BACKUP_DIR/
+              echo $BACKUP_DIR > /tmp/latest_backup
+              echo "백업 완료: $BACKUP_DIR"
+            fi
 
+            # 배포 실행
             if [ -d "${{ env.DEPLOY_DIR }}" ] && [ "$(ls -A ${{ env.DEPLOY_DIR }})" ]; then
               sudo rm -rf ${{ env.WEB_DIR }}/*
               sudo cp -r ${{ env.DEPLOY_DIR }}/* ${{ env.WEB_DIR }}/
               sudo chown -R www-data:www-data ${{ env.WEB_DIR }}
+              sudo chmod -R 755 ${{ env.WEB_DIR }}
               sudo rm -rf ${{ env.DEPLOY_DIR }}/*
               echo "배포 완료"
             else
               echo "배포할 파일이 없습니다"
               exit 1
             fi
-            '
+          '
 
       - name: Restart Nginx
-        run: ssh -i private_key ubuntu@${{ env.WEB_SERVER }} 'sudo systemctl restart nginx'
-
-      - name: Verify Nginx status
         run: |
-          ssh -i private_key ubuntu@${{ env.WEB_SERVER }} 'sudo systemctl is-active nginx || (echo "Nginx is not running" && exit 1)'
-          ssh -i private_key ubuntu@${{ env.WEB_SERVER }} 'sudo nginx -t || (echo "Nginx configuration test failed" && exit 1)'
+          ssh -i private_key ubuntu@${{ env.WEB_SERVER }} '
+            sudo nginx -t
+            sudo systemctl restart nginx
+            sudo systemctl is-active nginx
+          '
 
       - name: Health check
         run: |
-          for i in {1..10}; do
-            if ssh -i private_key ubuntu@${{ env.WEB_SERVER }} 'curl -f http://localhost/'; then
-              echo "Health check passed"
+          for i in {1..5}; do
+            if ssh -i private_key ubuntu@${{ env.WEB_SERVER }} 'curl -f -s --max-time 10 http://localhost/' > /dev/null; then
+              echo "Health check passed on attempt $i"
               break
             fi
-            if [ $i -eq 10 ]; then
-              echo "Health check failed after 10 attempts"
+            if [ $i -eq 5 ]; then
+              echo "Health check failed after 5 attempts"
               exit 1
             fi
-            echo "Attempt $i: Health check failed, retrying in 10 seconds..."
-            sleep 10
+            echo "Attempt $i: Health check failed, retrying in 5 seconds..."
+            sleep 5
           done
 
       - name: Rollback on failure
@@ -166,6 +170,7 @@ jobs:
                 sudo rm -rf ${{ env.WEB_DIR }}/*
                 sudo cp -r $LATEST_BACKUP/* ${{ env.WEB_DIR }}/
                 sudo chown -R www-data:www-data ${{ env.WEB_DIR }}
+                sudo chmod -R 755 ${{ env.WEB_DIR }}
                 sudo systemctl restart nginx
                 echo "롤백 완료: $LATEST_BACKUP"
               else
@@ -174,11 +179,15 @@ jobs:
             else
               echo "백업 정보를 찾을 수 없습니다"
             fi
-            '
+          '
 
       - name: Clean old backups
         if: success()
-        run: ssh -i private_key ubuntu@${{ env.WEB_SERVER }} "sudo find ${{ env.WEB_BACKUP_DIR }}/backup_* -maxdepth 0 -mtime +7 -exec rm -rf {} \; 2>/dev/null || true"
+        run: |
+          ssh -i private_key ubuntu@${{ env.WEB_SERVER }} '
+            sudo find ${{ env.WEB_BACKUP_DIR }}/backup_* -maxdepth 0 -mtime +7 -exec rm -rf {} \; 2>/dev/null || true
+            echo "오래된 백업 정리 완료"
+          '
 
       - name: Clean up
         if: always()
