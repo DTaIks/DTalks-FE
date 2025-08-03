@@ -121,6 +121,7 @@ body {
   --font-size-22: 22px;
   --font-size-24: 24px;
   --font-size-26: 26px;
+  --font-size-27: 27px;
   --font-size-28: 28px;
   --font-size-32: 32px;
   --font-size-36: 36px;
@@ -207,5 +208,3 @@ select option::-webkit-select-placeholder {
   background-color: #F8F2FB !important;
   color: #000 !important;
 }
-
-

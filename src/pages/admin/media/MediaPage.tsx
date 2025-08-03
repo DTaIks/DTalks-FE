@@ -8,7 +8,7 @@ import MediaFileContent from '../../../components/admin/media/MediaFileContentLi
 import DropdownFilter from '../../../components/common/DropDownFilter';
 import Button from '../../../components/common/Button';
 
-import MediaFileUploadModal, { type MediaUploadData } from '../../../components/admin/mediaModal/MediaFileUploadModal';
+import MediaFileUploadModal, { type MediaUploadData } from '../../../components/admin/media/MediaFileUploadModal';
 import ConfirmModal from '../../../components/common/ConfirmModal';
 
 import { useDepartmentStats } from '../../../hooks/media/useMediaFile';
@@ -186,7 +186,7 @@ const PageHeaderContainer = styled.div`
 const ContentContainer = styled.div`
   display: flex;
   width: 100%;
-  height: 760px;;
+  height: 760px;
   position: relative;
   overflow: hidden;
   box-sizing: border-box;
@@ -195,7 +195,7 @@ const ContentContainer = styled.div`
 const LeftContainer = styled.div`
   width: 240px;
   min-width: 240px; 
-  height: 586px
+  height: 586px;
   border-radius: 25px 0 0 25px;
   background: #F8F9FA;
   border: 1px solid #e9e9ef;

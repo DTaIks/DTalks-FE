@@ -3,7 +3,7 @@ import styled from 'styled-components';
 
 // @ts-expect-error - verbatimModuleSyntax
 import FocusTrap from 'focus-trap-react';
-import Button from './Button';
+import Button from '../common/Button';
 
 interface BaseModalProps {
   isOpen: boolean;
