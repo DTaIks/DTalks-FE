@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 
-import { UploadBaseModal } from '../../common/UploadBaseModal';
-import { FileSelectInput } from '../../common/FileSelectInput';
-import { FileNameInput } from '../../common/FileNameInput';
-import { FileDescriptionInput } from '../../common/FileDescriptionInput';
-import { VersionInput } from '../../common/VersionInput';
-import { PublicSetting } from '../../common/FilePublicSetting';
-import { UploadInfoCard } from '../../common/UploadInfoCard';
+import { UploadBaseModal } from '../../modal/UploadBaseModal';
+import { FileSelectInput } from '../../modal/FileSelectInput';
+import { FileNameInput } from '../../modal/FileNameInput';
+import { FileDescriptionInput } from '../../modal/FileDescriptionInput';
+import { VersionInput } from '../../modal/VersionInput';
+import { PublicSetting } from '../../modal/FilePublicSetting';
+import { UploadInfoCard } from '../../modal/UploadInfoCard';
 
 interface MediaUploadModalProps {
   isOpen: boolean;

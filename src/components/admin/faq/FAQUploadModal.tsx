@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 
-import { UploadBaseModal } from '../../common/UploadBaseModal';
-import { FileNameInput } from '../../common/FileNameInput';
-import { FileDescriptionInput } from '../../common/FileDescriptionInput';
-import { FileCategory } from '../../common/FileCategoryDropdownMenu';
-import { UploadInfoCard } from '../../common/UploadInfoCard';
+import { UploadBaseModal } from '../../modal/UploadBaseModal';
+import { FileNameInput } from '../../modal/FileNameInput';
+import { FileDescriptionInput } from '../../modal/FileDescriptionInput';
+import { FileCategory } from '../../modal/FileCategoryDropdownMenu';
+import { UploadInfoCard } from '../../modal/UploadInfoCard';
 
 interface FAQUploadModalProps {
   isOpen: boolean;

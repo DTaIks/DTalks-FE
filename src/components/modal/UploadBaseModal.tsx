@@ -3,7 +3,7 @@ import styled from 'styled-components';
 
 // @ts-expect-error - verbatimModuleSyntax
 import FocusTrap from 'focus-trap-react';
-import Button from './Button';
+import Button from '../common/Button';
 
 interface BaseModalProps {
   isOpen: boolean;
@@ -82,6 +82,7 @@ export const UploadBaseModal: React.FC<BaseModalProps> = ({
                 text={`${submitText}`}
                 onClick={handleSubmit}
                 disabled={submitDisabled}
+                width="132px"
                 height="44px"
                 fontSize="16px"
               />
