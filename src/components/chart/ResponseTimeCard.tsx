@@ -224,8 +224,7 @@ const LegendItem = styled.div`
   align-items: center;
   gap: var(--gap-12);
   border-bottom: 0.75px solid #d9d9d9;
-  height: 42px;
-  padding-bottom: 12px;
+  height: 68px;
 `;
 
 const LegendDot = styled.div<{ color: string }>`
