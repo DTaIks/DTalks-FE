@@ -8,8 +8,8 @@ import CategoryName5 from "../../../assets/faq/CategoryName5.svg";
 import ActiveIcon from "../../../assets/common/Active.svg";
 import InactiveIcon from "../../../assets/common/InActive.svg";
 import CustomDropdown from "../../common/CustomDropdown";
+import ConfirmModal from "../../common/ConfirmModal";
 
-// 타입 정의
 interface FAQItem {
   id: number;
   question: string;
@@ -36,7 +36,6 @@ interface FAQTableProps {
   itemsPerPage: number;
 }
 
-// 상수 데이터
 const FAQ_DATA: FAQItem[] = [
   {
     id: 1,
@@ -129,20 +128,22 @@ const CATEGORY_OPTIONS: CategoryOption[] = [
   { value: "welfare", label: "복지 / 휴가" }
 ];
 
-// 메인 컴포넌트
 const FAQTable: React.FC<FAQTableProps> = ({ currentPage, itemsPerPage }) => {
-  // 상태 관리
   const [expandedRows, setExpandedRows] = useState<Set<number>>(new Set());
   const [faqItems, setFaqItems] = useState<FAQItem[]>(FAQ_DATA);
   const [selectedCategory, setSelectedCategory] = useState<string>("");
+  const [confirmModal, setConfirmModal] = useState({
+    isOpen: false,
+    type: null as 'archive' | null,
+    faqId: null as number | null,
+    faqName: ''
+  });
 
-  // 현재 페이지의 FAQ 항목들 계산
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
   const currentFAQItems = faqItems.slice(startIndex, endIndex);
 
-  // 이벤트 핸들러
-  const handleRowToggle = useCallback((id: number): void => {
+  const handleRowToggle = useCallback((id: number) => {
     setExpandedRows(prev => {
       const newExpandedRows = new Set(prev);
       if (newExpandedRows.has(id)) {
@@ -154,7 +155,7 @@ const FAQTable: React.FC<FAQTableProps> = ({ currentPage, itemsPerPage }) => {
     });
   }, []);
 
-  const handleArchive = useCallback((id: number): void => {
+  const handleArchive = useCallback((id: number) => {
     setFaqItems(prevItems => 
       prevItems.map(item => 
         item.id === id ? { ...item, isActive: false } : item
@@ -162,21 +163,50 @@ const FAQTable: React.FC<FAQTableProps> = ({ currentPage, itemsPerPage }) => {
     );
   }, []);
 
-  const handleEdit = useCallback((id: number): void => {
+  const handleEdit = useCallback((id: number) => {
     console.log('Edit FAQ:', id);
   }, []);
 
-  const handleSearch = useCallback((e: React.ChangeEvent<HTMLInputElement>): void => {
+  const handleSearch = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     console.log('Search:', e.target.value);
   }, []);
 
-  const handleCategoryChange = useCallback((value: string): void => {
+  const handleCategoryChange = useCallback((value: string) => {
     setSelectedCategory(value);
     console.log('Category:', value);
   }, []);
 
-  // 렌더링 함수들
-  const renderActionButtons = useCallback((faq: FAQItem): JSX.Element => (
+  const handleArchiveClick = useCallback((faq: FAQItem) => {
+    setConfirmModal({
+      isOpen: true,
+      type: 'archive',
+      faqId: faq.id,
+      faqName: faq.question
+    });
+  }, []);
+
+  const handleConfirmAction = useCallback(() => {
+    if (confirmModal.type === 'archive' && confirmModal.faqId) {
+      handleArchive(confirmModal.faqId);
+    }
+    setConfirmModal({
+      isOpen: false,
+      type: null,
+      faqId: null,
+      faqName: ''
+    });
+  }, [confirmModal, handleArchive]);
+
+  const handleCloseConfirmModal = useCallback(() => {
+    setConfirmModal({
+      isOpen: false,
+      type: null,
+      faqId: null,
+      faqName: ''
+    });
+  }, []);
+
+  const renderActionButtons = useCallback((faq: FAQItem) => (
     <ActionContainer>
       <ActionText 
         onClick={(e) => {
@@ -190,15 +220,15 @@ const FAQTable: React.FC<FAQTableProps> = ({ currentPage, itemsPerPage }) => {
       <ActionText 
         onClick={(e) => {
           e.stopPropagation();
-          handleArchive(faq.id);
+          handleArchiveClick(faq);
         }}
       >
         보관
       </ActionText>
     </ActionContainer>
-  ), [handleEdit, handleArchive]);
+  ), [handleEdit, handleArchiveClick]);
 
-  const renderExpandedContent = useCallback((faq: FAQItem): JSX.Element => (
+  const renderExpandedContent = useCallback((faq: FAQItem) => (
     <ExpandedRow>
       <ExpandedBox>
         <ExpandedHeader>
@@ -211,7 +241,7 @@ const FAQTable: React.FC<FAQTableProps> = ({ currentPage, itemsPerPage }) => {
     </ExpandedRow>
   ), []);
 
-  const renderTableRow = useCallback((faq: FAQItem): JSX.Element => {
+  const renderTableRow = useCallback((faq: FAQItem) => {
     const isExpanded = expandedRows.has(faq.id);
     
     return (
@@ -244,49 +274,53 @@ const FAQTable: React.FC<FAQTableProps> = ({ currentPage, itemsPerPage }) => {
     );
   }, [expandedRows, handleRowToggle, renderActionButtons, renderExpandedContent]);
 
-  const renderTableHeader = useCallback((): JSX.Element => (
-    <TableHeader>
-      <TableTitle>FAQ 목록</TableTitle>
-      <SearchContainer>
-        <SearchInput 
-          type="text" 
-          placeholder="질문으로 검색"
-          onChange={handleSearch}
-        />
-        <DropdownContainer>
-          <CustomDropdown
-            options={CATEGORY_OPTIONS}
-            value={selectedCategory}
-            onChange={handleCategoryChange}
-          />
-        </DropdownContainer>
-      </SearchContainer>
-    </TableHeader>
-  ), [selectedCategory, handleSearch, handleCategoryChange]);
-
-  const renderColumnHeaders = useCallback((): JSX.Element => (
-    <HeaderBox>
-      <TableHeaderRow>
-        {TABLE_COLUMNS.map((column) => (
-          <TableHeaderCell 
-            key={column.key} 
-            width={column.width}
-          >
-            {column.label}
-          </TableHeaderCell>
-        ))}
-      </TableHeaderRow>
-    </HeaderBox>
-  ), []);
-
   return (
-    <TableContainer>
-      {renderTableHeader()}
-      {renderColumnHeaders()}
-      <TableBody>
-        {currentFAQItems.map(renderTableRow)}
-      </TableBody>
-    </TableContainer>
+    <>
+      <TableContainer>
+        <TableHeader>
+          <TableTitle>FAQ 목록</TableTitle>
+          <SearchContainer>
+            <SearchInput 
+              type="text" 
+              placeholder="질문으로 검색"
+              onChange={handleSearch}
+            />
+            <DropdownContainer>
+              <CustomDropdown
+                options={CATEGORY_OPTIONS}
+                value={selectedCategory}
+                onChange={handleCategoryChange}
+              />
+            </DropdownContainer>
+          </SearchContainer>
+        </TableHeader>
+        <HeaderBox>
+          <TableHeaderRow>
+            {TABLE_COLUMNS.map((column) => (
+              <TableHeaderCell 
+                key={column.key} 
+                width={column.width}
+              >
+                {column.label}
+              </TableHeaderCell>
+            ))}
+          </TableHeaderRow>
+        </HeaderBox>
+        <TableBody>
+          {currentFAQItems.map(renderTableRow)}
+        </TableBody>
+      </TableContainer>
+
+      {confirmModal.isOpen && confirmModal.type && (
+        <ConfirmModal
+          isOpen={confirmModal.isOpen}
+          onClose={handleCloseConfirmModal}
+          onConfirm={handleConfirmAction}
+          fileName={confirmModal.faqName}
+          type={confirmModal.type as 'archive' | 'download'}
+        />
+      )}
+    </>
   );
 };
 

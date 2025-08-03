@@ -4,7 +4,7 @@ import TitleContainer from "../../../layout/TitleContainer";
 import FAQTable from "../../../components/admin/faq/FAQTable";
 import Button from "../../../components/common/Button";
 import Pagination from "../../../components/common/Pagination";
-import FAQUploadModal, { type FAQUploadData } from "../../../components/admin/faqModal/FAQUploadModal";
+import FAQUploadModal, { type FAQUploadData } from "../../../components/admin/faq/FAQUploadModal";
 
 const FAQPage = () => {
   const [currentPage, setCurrentPage] = useState<number>(1);
