@@ -85,8 +85,6 @@ const CardTitle = styled.h1`
   color: var(--color-black);
 `;
 
-
-
 const RankingTitle = styled.h2`
   margin: 22.5px 22.5px 22.5px 39px;
   font-size: var(--font-size-18);
@@ -100,7 +98,7 @@ const RankingCard = styled.div`
   border-radius: 18.75px;
   background: var(--color-white);
   box-shadow: 0 0 7.5px rgba(0, 0, 0, 0.05);
-  margin: 9px auto 9px 40px;
+  margin: 15px 30px;
   display: flex;
   align-items: center;
   justify-content: center;
