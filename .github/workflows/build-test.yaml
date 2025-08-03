@@ -103,38 +103,12 @@ jobs:
               comment += '**TypeScript**: 실패\n';
             }
             
-            // Lint 체크 결과 및 상세 내용
+            // Lint 체크 결과
             const lintStatus = '${{ steps.lint.outcome }}';
             const lintFailed = '${{ steps.lint.outputs.LINT_FAILED }}';
             
             if (lintFailed === 'true') {
               comment += '**ESLint**: 문제 발견\n';
-              
-              // ESLint 상세 결과 추가
-              let lintResults = [];
-              try {
-                const data = fs.readFileSync('lint-results.json', 'utf8');
-                lintResults = JSON.parse(data);
-              } catch (error) {
-                console.log('No lint results file found');
-              }
-
-              let hasErrors = false;
-              for (const result of lintResults) {
-                if (result.messages && result.messages.length > 0) {
-                  hasErrors = true;
-                  if (!comment.includes('\n### ESLint 상세')) {
-                    comment += '\n### ESLint 상세\n';
-                  }
-                  comment += `\n**${result.filePath.replace(process.cwd() + '/', '')}**\n`;
-                  
-                  for (const message of result.messages) {
-                    const severity = message.severity === 2 ? 'Error' : 'Warning';
-                    comment += `- ${severity} (Line ${message.line}:${message.column}): ${message.message}\n`;
-                    comment += `  \`${message.ruleId || 'unknown'}\`\n`;
-                  }
-                }
-              }
             } else if (lintStatus === 'success') {
               comment += '**ESLint**: 통과\n';
             } else {
@@ -168,6 +142,34 @@ jobs:
               comment += '**Artifacts**: 업로드 완료\n';
             } else {
               comment += '**Artifacts**: 업로드 실패\n';
+            }
+            
+            // ESLint 상세 결과 
+            if (lintFailed === 'true') {
+              let lintResults = [];
+              try {
+                const data = fs.readFileSync('lint-results.json', 'utf8');
+                lintResults = JSON.parse(data);
+              } catch (error) {
+                console.log('No lint results file found');
+              }
+
+              let hasErrors = false;
+              for (const result of lintResults) {
+                if (result.messages && result.messages.length > 0) {
+                  hasErrors = true;
+                  if (!comment.includes('\n### ESLint 상세')) {
+                    comment += '\n### ESLint 상세\n';
+                  }
+                  comment += `\n**${result.filePath.replace(process.cwd() + '/', '')}**\n`;
+                  
+                  for (const message of result.messages) {
+                    const severity = message.severity === 2 ? 'Error' : 'Warning';
+                    comment += `- ${severity} (Line ${message.line}:${message.column}): ${message.message}\n`;
+                    comment += `  \`${message.ruleId || 'unknown'}\`\n`;
+                  }
+                }
+              }
             }
             
             await github.rest.issues.createComment({
