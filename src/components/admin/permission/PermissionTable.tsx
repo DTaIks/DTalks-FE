@@ -1,7 +1,7 @@
 import styled from "styled-components";
-import Roll1 from '../../../assets/permission/Roll.svg';
-import Roll2 from '../../../assets/permission/Roll2.svg';
-import Roll3 from '../../../assets/permission/Roll3.svg';
+import Roll1 from '../../../assets/Permission/Roll.svg';
+import Roll2 from '../../../assets/Permission/Roll2.svg';
+import Roll3 from '../../../assets/Permission/Roll3.svg';
 import ActiveIcon from '../../../assets/common/Active.svg';
 import RoleManagement from './RoleManagement';
 import { usePermissionStore } from '../../../store/permissionStore';
@@ -16,6 +16,7 @@ interface PermissionUser {
   isActive: string;
 }
 
+//컴포넌트
 const permissionData: PermissionUser[] = [
   {
     roleId: 1,

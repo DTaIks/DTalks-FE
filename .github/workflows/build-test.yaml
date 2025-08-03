@@ -1,0 +1,180 @@
+name: Build Test
+
+on:
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  build-test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: 'npm'
+
+      - name: Generate cache key
+        id: cache-key
+        run: echo "value=${{ hashFiles('**/package-lock.json', '**/vite.config.ts', '**/tsconfig.json') }}" >> $GITHUB_OUTPUT
+
+      - name: Cache node_modules
+        uses: actions/cache@v4
+        with:
+          path: |
+            node_modules
+            */*/node_modules
+          key: ${{ runner.os }}-node-${{ steps.cache-key.outputs.value }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+
+      - name: Install dependencies
+        run: |
+          rm -rf node_modules package-lock.json
+          npm install --no-audit
+
+      - name: Type check
+        id: type-check
+        run: npx tsc --noEmit
+
+      - name: Lint check
+        id: lint
+        run: |
+          npx eslint . --ext .ts,.tsx --max-warnings 0 --format json > lint-results.json || {
+            echo "LINT_FAILED=true" >> $GITHUB_OUTPUT
+            echo "Lint issues found, but continuing build..."
+          }
+        continue-on-error: true
+
+      - name: Build app
+        id: build
+        run: npx vite build --mode development
+        env:
+          DISABLE_ESLINT_PLUGIN: true
+          GENERATE_SOURCEMAP: false
+
+      - name: Build size check
+        run: |
+          BUILD_SIZE_KB=$(du -sk dist | cut -f1)
+          BUILD_SIZE_MB=$((BUILD_SIZE_KB / 1024))
+          echo "Build size: ${BUILD_SIZE_MB}MB"
+          
+          if [ $BUILD_SIZE_MB -gt 10 ]; then
+            echo "Build size is larger than 10MB: ${BUILD_SIZE_MB}MB"
+            echo "Consider code splitting or removing unused dependencies"
+          elif [ $BUILD_SIZE_MB -gt 5 ]; then
+            echo "Build size is moderate: ${BUILD_SIZE_MB}MB"
+          else
+            echo "Build size is optimal: ${BUILD_SIZE_MB}MB"
+          fi
+
+      - name: Upload build artifacts
+        id: artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-test-files
+          path: dist/
+          retention-days: 1
+
+      - name: Comment build results on PR
+        if: always()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            
+            let comment = '### 빌드 테스트 결과\n\n';
+            
+            // TypeScript 체크 결과
+            const typeCheckStatus = '${{ steps.type-check.outcome }}';
+            if (typeCheckStatus === 'success') {
+              comment += '**TypeScript**: 통과\n';
+            } else {
+              comment += '**TypeScript**: 실패\n';
+            }
+            
+            // Lint 체크 결과
+            const lintStatus = '${{ steps.lint.outcome }}';
+            const lintFailed = '${{ steps.lint.outputs.LINT_FAILED }}';
+            
+            if (lintFailed === 'true') {
+              comment += '**ESLint**: 문제 발견\n';
+            } else if (lintStatus === 'success') {
+              comment += '**ESLint**: 통과\n';
+            } else {
+              comment += '**ESLint**: 실패\n';
+            }
+            
+            // 빌드 결과
+            const buildStatus = '${{ steps.build.outcome }}';
+            if (buildStatus === 'success') {
+              comment += '**Build**: 성공\n';
+              
+              // 빌드 크기 정보
+              try {
+                const stats = fs.statSync('dist');
+                if (stats.isDirectory()) {
+                  const { execSync } = require('child_process');
+                  const sizeKB = execSync('du -sk dist | cut -f1', { encoding: 'utf8' }).trim();
+                  const sizeMB = Math.round(parseInt(sizeKB) / 1024);
+                  comment += `**Build Size**: ${sizeMB}MB\n`;
+                }
+              } catch (error) {
+                comment += '**Build Size**: 측정 불가\n';
+              }
+            } else {
+              comment += '**Build**: 실패\n';
+            }
+            
+            // 아티팩트 업로드 결과
+            const artifactStatus = '${{ steps.artifact.outcome }}';
+            if (artifactStatus === 'success') {
+              comment += '**Artifacts**: 업로드 완료\n';
+            } else {
+              comment += '**Artifacts**: 업로드 실패\n';
+            }
+            
+            // ESLint 상세 결과 
+            if (lintFailed === 'true') {
+              let lintResults = [];
+              try {
+                const data = fs.readFileSync('lint-results.json', 'utf8');
+                lintResults = JSON.parse(data);
+              } catch (error) {
+                console.log('No lint results file found');
+              }
+
+              let hasErrors = false;
+              for (const result of lintResults) {
+                if (result.messages && result.messages.length > 0) {
+                  hasErrors = true;
+                  if (!comment.includes('\n### ESLint 상세')) {
+                    comment += '\n### ESLint 상세\n';
+                  }
+                  comment += `\n**${result.filePath.replace(process.cwd() + '/', '')}**\n`;
+                  
+                  for (const message of result.messages) {
+                    const severity = message.severity === 2 ? 'Error' : 'Warning';
+                    comment += `- ${severity} (Line ${message.line}:${message.column}): ${message.message}\n`;
+                    comment += `  \`${message.ruleId || 'unknown'}\`\n`;
+                  }
+                }
+              }
+            }
+            
+            await github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: comment
+            });

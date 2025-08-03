@@ -1,5 +1,4 @@
 import { useMutation, useQuery } from '@tanstack/react-query';
-import { authAPI } from '../api/authAPI';
 import { useAuthStore } from '../store/authStore';
 
 // 더미 사용자 데이터
@@ -60,17 +59,17 @@ const mockAPI = {
     };
   },
   
-  checkEmailDuplicate: async (email: string) => {
+  checkEmailDuplicate: async (_email: string) => {
     await new Promise(resolve => setTimeout(resolve, 500));
     return { isDuplicate: false };
   },
   
-  sendAuthCode: async (email: string) => {
+  sendAuthCode: async (_email: string) => {
     await new Promise(resolve => setTimeout(resolve, 500));
     return { message: '인증번호가 발송되었습니다.' };
   },
   
-  verifyAuthCode: async (email: string, code: string) => {
+  verifyAuthCode: async (_email: string, code: string) => {
     await new Promise(resolve => setTimeout(resolve, 500));
     return { isValid: code === '123456' }; // 임시로 123456이 유효한 코드
   }

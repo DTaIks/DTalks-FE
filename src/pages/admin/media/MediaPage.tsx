@@ -1,6 +1,6 @@
 import React from 'react';
-import Sidebar from '../../../layout/Sidebar';
 import styled from 'styled-components';
+import TitleContainer from '../../../layout/TitleContainer';
 
 import DepartmentBox from '../../../components/admin/media/DepartmentList';
 import Header from '../../../components/admin/media/MediaHeader';
@@ -45,25 +45,25 @@ const MediaPage: React.FC = () => {
 
   return (
     <PageContainer>
-      <Sidebar />
       <Main>
         <PageHeaderContainer>
-          <PageTitleContainer>
-            <PageTitle>미디어 파일 관리</PageTitle>
-            <PageDescription>파일을 체계적으로 관리하고 버전을 추적하세요</PageDescription>
-          </PageTitleContainer>
-          
-          {!archive.isMode && (
-            <Button
+          <TitleContainer 
+            title="미디어 파일 관리" 
+            subtitle="파일을 체계적으로 관리하고 버전을 추적하세요"
+          />
+        </PageHeaderContainer>
+        
+        {!archive.isMode && (
+          <ButtonContainer>
+            <StyledUploadButton 
               text="파일 업로드"
               onClick={modals.uploadModal.open}
               variant="primary"
-              width="172px"
-              height="44px"
-              fontSize="18px"
+              width="var(--button-width)"
+              height="var(--button-height)"
             />
-          )}
-        </PageHeaderContainer>
+          </ButtonContainer>
+        )}
         
         <ContentContainer>
           <LeftContainer>
@@ -160,17 +160,16 @@ const MediaPage: React.FC = () => {
 export default MediaPage;
 
 const PageContainer = styled.div`
-  width: 100vw;
-  min-width: 1200px; 
-  min-height: 100vh;
+  width: 1062px;
+  height: 586px;
   background: var(--color-ghostwhite);
   display: flex;
+  flex-direction: column;
   overflow-x: hidden; 
 `;
 
 const Main = styled.div`
-  width: calc(100vw - 320px);
-  min-width: 880px; 
+  width: 100%;
   display: flex;
   flex-direction: column;
   overflow-x: hidden; 
@@ -181,36 +180,25 @@ const PageHeaderContainer = styled.div`
   justify-content: space-between;
   align-items: flex-end;
   width: 100%;
-  min-width: 880px; 
-  padding: 0 40px;
-  margin-top: 160px;
   box-sizing: border-box;
-`;
-
-const PageTitleContainer = styled.div`
-  display: flex;
-  flex-direction: column;
 `;
 
 const ContentContainer = styled.div`
   display: flex;
   width: 100%;
-  min-width: 880px; 
-  height: calc(100vh - 280px);
-  padding: 20px 40px;
+  height: 760px;
   position: relative;
-  overflow: visible;
+  overflow: hidden;
   box-sizing: border-box;
 `;
 
 const LeftContainer = styled.div`
   width: 240px;
   min-width: 240px; 
-  height: calc(100% - 32px);
+  height: 586px;
   border-radius: 25px 0 0 25px;
   background: #F8F9FA;
   border: 1px solid #e9e9ef;
-  margin-top: 32px;
   flex-shrink: 0;
   display: flex;
   flex-direction: column;
@@ -221,6 +209,7 @@ const LeftContainer = styled.div`
 const DepartmentListContainer = styled.div`
   flex: 1;
   overflow-y: auto;
+  overflow-x: hidden;
   min-height: 0;
 `;
 
@@ -324,10 +313,9 @@ const ArchiveText = styled.span`
 const RightContainer = styled.div`
   flex: 1;
   min-width: 600px;
-  height: calc(100% - 32px);
+  height: 586px;
   border-radius: 0 25px 25px 0;
   background: var(--color-white);
-  margin-top: 32px;
   position: relative;
   flex-shrink: 0;
 `;
@@ -368,7 +356,7 @@ const FileContainer = styled.div`
   position: absolute;
   top: 73px;
   left: 0;
-  overflow-y: auto;
+  overflow-y: hidden;
   display: flex;
   justify-content: center;
 `;
@@ -392,19 +380,21 @@ const Title = styled.h2`
   padding: 16px 120px 12px 32px;
 `;
 
-const PageTitle = styled.h1`
-  color: #323232;
-  font-size: var(--font-size-32);
-  font-weight: var(--font-weight-700);
-  margin: 0;
+const ButtonContainer = styled.div`
+  position: absolute;
+  top: var(--gap-60);
+  margin-left: 888px;
 `;
 
-const PageDescription = styled.p`
-  color: #323232;
-  font-size: var(--font-size-18);
-  font-weight: var(--font-weight-400);
-  margin: 0;
-  margin-top: 8px;
+const StyledUploadButton = styled(Button)`
+  && {
+    color: var(--color-white);
+    font-family: var(--font-pretendard);
+    font-size: var(--font-size-18);
+    font-style: normal;
+    font-weight: var(--table-header-font-weight);
+    line-height: normal;
+  }
 `;
 
 const Divider = styled.div`

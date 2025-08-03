@@ -294,7 +294,6 @@ const TableHeaderRow = styled.div`
 const TableBody = styled.div`
   display: flex;
   flex-direction: column;
-  padding-bottom: 13px;
 `;
 
 const TableTitle = styled.h2`
