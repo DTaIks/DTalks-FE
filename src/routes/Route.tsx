@@ -30,7 +30,6 @@ export default function AppRoutes() {
   return (
     <Routes>
       <Route path="/chart" element={<ChartPage />} />
-      <Route path="/media" element={<MediaPage />} />
       {/* 루트 경로: 로그인 상태에 따라 리다이렉트 */}
       <Route path="/" element={
         isAuthenticated
@@ -58,6 +57,7 @@ export default function AppRoutes() {
           <Route path="permission" element={<PermissionPage />} />
           <Route path="faq" element={<FAQPage />} />
           <Route path="faqcategory" element={<FAQCategoryPage />} />
+          <Route path="media" element={<MediaPage />} />
           <Route path="settings" element={<ChartPage />} />
         </Route>
       </Route>
