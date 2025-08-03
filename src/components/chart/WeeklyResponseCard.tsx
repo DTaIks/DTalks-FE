@@ -40,7 +40,7 @@ const WeeklyResponseCard: React.FC<WeeklyResponseStatCardProps> = ({ data }) => 
       <BarChartWrapper>
         <BarChart
           data={chartData}
-          width={1200}
+          width={1100}
           height={320}
           margin={{
             top: 40,
@@ -92,7 +92,7 @@ const Container = styled.div`
   border-radius: 18.75px;
   background: var(--color-white);
   box-shadow: 0px 6px 18px 0px rgba(125, 93, 246, 0.1);
-  margin: 45px 0 0px;
+  margin: 60px 0px;
   display: flex;
   flex-direction: column;
 `;
@@ -113,7 +113,7 @@ const CardHeader = styled.div`
 
 const CardTitle = styled.h2`
   font-size: var(--font-size-20);
-  font-weight: 600;
+  font-weight: var(--font-weight-600);
   color: var(--color-black);
   margin: 0;
 `;
@@ -142,16 +142,17 @@ const Count = styled.div`
 const CountInline = styled.div`
   display: flex;
   align-items: baseline;
-  gap: 6px;
+  gap: var(--gap-6);
 `;
 
 const Label = styled.div`
   font-size: var(--font-size-12);
   color: var(--color-black);
+  margin-bottom: 14.5px;
 `;
 
 const DailyAverage = styled.div`
   font-size: var(--font-size-27);
-  font-weight: 700;
-  color: #9966CC;
+  font-weight: var(--font-weight-700);
+  color: var(--color-mediumpurple-300);
 `;
