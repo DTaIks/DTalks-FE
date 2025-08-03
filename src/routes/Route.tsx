@@ -7,7 +7,7 @@ import PermissionPage from '../pages/admin/permission/PermissionPage';
 import FAQPage from '../pages/admin/faq/FAQPage';
 import FAQCategoryPage from '../pages/admin/faq/FAQCategoryPage';
 import ChartPage from '../pages/chart/ChartPage';
-import MediaPage from '../pages/admin/MediaPage';
+import MediaPage from '../pages/admin/media/MediaPage';
 import Layout from '../layout/Layout';
 
 // 인증이 필요한 라우트
