@@ -103,6 +103,7 @@ body {
   --br-8: 8px;
   --br-10: 10px;
   --br-15: 15px;
+  --br-18: 18px;
   --br-25: 25px;
 
   /* 폰트 설정 */
@@ -205,5 +206,3 @@ select option::-webkit-select-placeholder {
   background-color: #F8F2FB !important;
   color: #000 !important;
 }
-
-
