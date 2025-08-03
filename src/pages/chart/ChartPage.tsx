@@ -35,7 +35,7 @@ const ChartPage: React.FC = () => {
     <>
       <TitleContainer title="통계" subtitle="챗봇 성능과 사용자 데이터를 분석하세요" />
       <div>
-        <div style={{ display: "flex", flexWrap: "wrap", gap: "var(--gap-36)", paddingBottom: 60 }}>
+        <div style={{ display: "flex", flexWrap: "wrap", gap: "var(--gap-36)", paddingBottom: 46.6 }}>
           {statCards.map((card, index) => (
             <StatCard 
               key={index}
@@ -46,7 +46,7 @@ const ChartPage: React.FC = () => {
 
         <ResponseTimeChart responseTime={responseTime} />
 
-        <div style={{ display: "flex", gap: "var(--gap-27)", marginTop: 60 }}>
+        <div style={{ display: "flex", gap: "var(--gap-20)", marginTop: 60 }}>
           <PromptTemplateCard data={promptTemplate} />
           <KeywordAnalysisCard keyword={keyword} />
         </div>
