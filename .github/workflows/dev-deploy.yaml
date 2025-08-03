@@ -52,7 +52,9 @@ jobs:
             ${{ runner.os }}-vite-
 
       - name: Install dependencies
-        run: npm ci --prefer-offline --no-audit
+        run: |
+          rm -rf node_modules package-lock.json
+          npm install --no-audit
 
       - name: Build app
         run: npx vite build --mode development
