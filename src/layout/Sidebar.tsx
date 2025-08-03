@@ -6,8 +6,7 @@ import ProfileImageSrc from "../assets/common/Profile.png";
 import SettingIcon from "../assets/common/setting.svg";
 import LogoutModal from "../components/common/LogoutModal";
 
-// 타입 정의
-export type SidebarProps = {
+type SidebarProps = {
   className?: string;
 };
 
@@ -31,7 +30,19 @@ interface ProfileMenuAction {
   hasArrow?: boolean;
 }
 
-// 상수 정의
+interface MenuDataItem {
+  key: string;
+  text: string;
+  className?: string;
+  isDropdown?: boolean;
+  subItems?: MenuDataItem[];
+}
+
+interface MenuSectionData {
+  title: string;
+  items: MenuDataItem[];
+}
+
 const MENU_ITEMS = {
   STATS: "stats",
   USER_LIST: "userList",
@@ -57,21 +68,6 @@ const PROFILE_MENU_ACTIONS: ProfileMenuAction[] = [
   { key: 'logout', label: '로그아웃', icon: '' }
 ];
 
-// 메뉴 데이터 타입
-interface MenuDataItem {
-  key: string;
-  text: string;
-  className?: string;
-  isDropdown?: boolean;
-  subItems?: MenuDataItem[];
-}
-
-interface MenuSectionData {
-  title: string;
-  items: MenuDataItem[];
-}
-
-// 메뉴 데이터
 const menuData: MenuSectionData[] = [
   {
     title: "메인",
@@ -135,7 +131,6 @@ const menuData: MenuSectionData[] = [
   }
 ];
 
-// 네비게이션 매핑
 const NAVIGATION_MAP: Record<string, string> = {
   [MENU_ITEMS.STATS]: "/admin",
   [MENU_ITEMS.USER_LIST]: "/admin/users",
@@ -149,7 +144,6 @@ const NAVIGATION_MAP: Record<string, string> = {
   [MENU_ITEMS.SCHEDULE_REGISTER]: "/admin/faqcategory"
 };
 
-// 프로필 드롭다운 컴포넌트
 const ProfileDropdown: React.FC<{
   isOpen: boolean;
   onMenuClick: (action: string) => void;
@@ -169,7 +163,6 @@ const ProfileDropdown: React.FC<{
   );
 };
 
-// 메뉴 아이템 컴포넌트
 const MenuItemComponent: React.FC<{
   item: MenuDataItem;
   isSelected: boolean;
@@ -235,12 +228,10 @@ const MenuItemComponent: React.FC<{
   );
 };
 
-// 메인 사이드바 컴포넌트
 const Sidebar: React.FC<SidebarProps> = ({ className = "" }) => {
   const navigate = useNavigate();
   const location = useLocation();
   
-  // 상태 관리
   const [openMenus, setOpenMenus] = useState<Record<string, boolean>>({
     [DROPDOWN_MENUS.DOCUMENT]: false,
     [DROPDOWN_MENUS.FAQ]: false,
@@ -250,15 +241,12 @@ const Sidebar: React.FC<SidebarProps> = ({ className = "" }) => {
   const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false);
   const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
 
-  // 현재 선택된 메뉴 키 반환
   const getSelectedMenuKey = (): string => {
     const pathname = location.pathname;
     
-    // 더 구체적인 경로부터 확인
     const sortedEntries = Object.entries(NAVIGATION_MAP).sort((a, b) => {
       const aPath = a[1];
       const bPath = b[1];
-      // 더 긴 경로를 먼저 확인
       return bPath.length - aPath.length;
     });
     
@@ -271,7 +259,24 @@ const Sidebar: React.FC<SidebarProps> = ({ className = "" }) => {
     return "";
   };
 
-  // 이벤트 핸들러들
+  const getOpenMenus = (): Record<string, boolean> => {
+    const selectedMenu = getSelectedMenuKey();
+    const openMenusState = { ...openMenus };
+    
+    for (const section of menuData) {
+      for (const item of section.items) {
+        if (item.isDropdown && item.subItems) {
+          const hasSelectedSubItem = item.subItems.some(subItem => subItem.key === selectedMenu);
+          if (hasSelectedSubItem) {
+            openMenusState[item.key] = true;
+          }
+        }
+      }
+    }
+    
+    return openMenusState;
+  };
+
   const handleLogoClick = () => navigate("/");
 
   const handleMenuToggle = (menuKey: string) => {
@@ -310,6 +315,7 @@ const Sidebar: React.FC<SidebarProps> = ({ className = "" }) => {
   };
 
   const selectedMenu = getSelectedMenuKey();
+  const currentOpenMenus = getOpenMenus();
 
   return (
     <SidebarRoot className={className}>
@@ -329,7 +335,7 @@ const Sidebar: React.FC<SidebarProps> = ({ className = "" }) => {
                   isSelected={selectedMenu === item.key}
                   onMenuClick={handleMenuClick}
                   onToggle={handleMenuToggle}
-                  isOpen={openMenus[item.key] || false}
+                  isOpen={currentOpenMenus[item.key] || false}
                   hoveredMenu={hoveredMenu}
                   onHover={setHoveredMenu}
                   onLeave={() => setHoveredMenu("")}
@@ -362,7 +368,6 @@ const Sidebar: React.FC<SidebarProps> = ({ className = "" }) => {
 
 export default Sidebar;
 
-// Styled Components
 const SidebarRoot = styled.div`
   width: 248px;
   position: fixed;
@@ -464,7 +469,7 @@ const DropdownIcon = styled.span<DropdownIconProps>`
 `;
 
 const SubMenuContainer = styled.div<{ isOpen: boolean }>`
-  max-height: ${({ isOpen }) => isOpen ? '100px' : '0'};
+  max-height: ${({ isOpen }) => isOpen ? '150px' : '0'};
   overflow: hidden;
   transition: max-height 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   background: none;
@@ -503,7 +508,7 @@ const MenuContent = styled.div`
   flex: 1;
   display: flex;
   flex-direction: column;
-  padding-bottom: 56px;
+  padding-bottom: 20px;
 `;
 
 const ProfileDivider = styled.div`
