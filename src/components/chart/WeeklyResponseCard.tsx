@@ -146,7 +146,7 @@ const CountInline = styled.div`
 `;
 
 const Label = styled.div`
-  font-size: var(--font-size-12);
+  font-size: var(--font-size-15);
   color: var(--color-black);
   margin-bottom: 14.5px;
 `;
