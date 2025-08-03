@@ -1,0 +1,75 @@
+name: Build Test
+
+on:
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  build-test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: 'npm'
+
+      - name: Generate cache key
+        id: cache-key
+        run: echo "value=${{ hashFiles('**/package-lock.json', '**/vite.config.ts', '**/tsconfig.json') }}" >> $GITHUB_OUTPUT
+
+      - name: Cache node_modules
+        uses: actions/cache@v4
+        with:
+          path: |
+            node_modules
+            */*/node_modules
+          key: ${{ runner.os }}-node-${{ steps.cache-key.outputs.value }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+
+      - name: Install dependencies
+        run: npm ci --prefer-offline --no-audit
+
+      - name: Type check
+        run: npx tsc --noEmit
+
+      - name: Lint check
+        run: npx eslint . --ext .ts,.tsx --max-warnings 0 --format compact
+
+      - name: Build app
+        run: npx vite build --mode development
+        env:
+          DISABLE_ESLINT_PLUGIN: true
+          GENERATE_SOURCEMAP: false
+
+      - name: Build size check
+        run: |
+          BUILD_SIZE_KB=$(du -sk dist | cut -f1)
+          BUILD_SIZE_MB=$((BUILD_SIZE_KB / 1024))
+          echo "Build size: ${BUILD_SIZE_MB}MB"
+          
+          if [ $BUILD_SIZE_MB -gt 10 ]; then
+            echo "⚠️ Build size is larger than 10MB: ${BUILD_SIZE_MB}MB"
+            echo "Consider code splitting or removing unused dependencies"
+          elif [ $BUILD_SIZE_MB -gt 5 ]; then
+            echo "📊 Build size is moderate: ${BUILD_SIZE_MB}MB"
+          else
+            echo "✅ Build size is optimal: ${BUILD_SIZE_MB}MB"
+          fi
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-test-files
+          path: dist/
+          retention-days: 1
