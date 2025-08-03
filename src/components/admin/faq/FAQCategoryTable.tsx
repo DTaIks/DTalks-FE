@@ -80,7 +80,7 @@ const FAQCategoryTable: React.FC = () => {
   const [categoryData, setCategoryData] = useState<FAQCategory[]>(CATEGORY_DATA);
   const [confirmModal, setConfirmModal] = useState({
     isOpen: false,
-    type: null as 'archive' | 'download' | null,
+    type: null as 'archive' | 'download' | 'restore' | null,
     categoryId: null as string | null,
     categoryName: ''
   });
@@ -103,14 +103,14 @@ const FAQCategoryTable: React.FC = () => {
     e.stopPropagation();
     setConfirmModal({
       isOpen: true,
-      type: category.isActive ? 'archive' : 'download',
+      type: category.isActive ? 'archive' : 'restore',
       categoryId: category.categoryId,
       categoryName: category.categoryName
     });
   }, []);
 
   const handleConfirmAction = useCallback(() => {
-    if ((confirmModal.type === 'archive' || confirmModal.type === 'download') && confirmModal.categoryId) {
+    if ((confirmModal.type === 'archive' || confirmModal.type === 'restore') && confirmModal.categoryId) {
       handleArchive(confirmModal.categoryId);
     }
     setConfirmModal({
@@ -188,7 +188,7 @@ const FAQCategoryTable: React.FC = () => {
           onClose={handleCloseConfirmModal}
           onConfirm={handleConfirmAction}
           fileName={confirmModal.categoryName}
-          type={confirmModal.type as 'archive' | 'download'}
+          type={confirmModal.type as 'archive' | 'download' | 'restore'}
         />
       )}
     </>

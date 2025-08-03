@@ -7,7 +7,7 @@ interface ConfirmModalProps {
   onClose: () => void;
   onConfirm: () => void;
   fileName: string;
-  type: 'archive' | 'download';
+  type: 'archive' | 'download' | 'restore';
 }
 
 const ConfirmModal: React.FC<ConfirmModalProps> = ({
@@ -31,7 +31,16 @@ const ConfirmModal: React.FC<ConfirmModalProps> = ({
   };
 
   const getActionText = () => {
-    return type === 'archive' ? '보관합니다' : '복원합니다';
+    switch (type) {
+      case 'archive':
+        return '보관합니다';
+      case 'download':
+        return '다운로드합니다';
+      case 'restore':
+        return '복원합니다';
+      default:
+        return '처리합니다';
+    }
   };
 
   return (
@@ -100,7 +109,7 @@ const ModalContainer = styled.div`
   border-radius: 11.25px;
   padding: var(--padding-32);
   width: 504px;
-  height: 140px;
+  height: 132px;
   flex-shrink: 0;
   position: relative;
 `;
@@ -116,10 +125,14 @@ const CloseButton = styled.button`
   font-size: var(--font-size-32);
   color: #6b7280;
   border-radius: var(--br-4);
+
+  &:hover {
+    color: #1f2937;
+  }
 `;
 
 const ModalContent = styled.div`
-  width:400px;
+  width: 400px;
   height: 44px;
 `;
 
@@ -127,7 +140,7 @@ const MessageText = styled.p`
   font-size: var(--font-size-20);
   color: #222;
   font-weight: var(--font-weight-500);
-  margin-top: 24px;
+  margin-top: 8px;
   margin-left: 4px;
 `;
 

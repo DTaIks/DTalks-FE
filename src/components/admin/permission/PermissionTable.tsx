@@ -1,10 +1,7 @@
 import styled from "styled-components";
-import Roll1 from '../../../assets/permission/Roll.svg';
-import Roll2 from '../../../assets/permission/Roll2.svg';
-import Roll3 from '../../../assets/permission/Roll3.svg';
-import ActiveIcon from '../../../assets/common/Active.svg';
-import RoleManagement from './RoleManagement';
-import { usePermissionStore } from '../../../store/permissionStore';
+import ActiveIcon from "../../../assets/common/Active.svg";
+import RoleManagement from "./RoleManagement";
+import { usePermissionStore } from "../../../store/permissionStore";
 
 interface PermissionUser {
   roleId: number;
@@ -20,7 +17,7 @@ interface PermissionUser {
 const permissionData: PermissionUser[] = [
   {
     roleId: 1,
-    image: Roll1,
+    image: '/src/assets/permission/Roll.svg',
     roleName: "관리자",
     roleNameEn: "Administrator",
     description: "시스템 관리 및 전체 권한 보유",
@@ -29,7 +26,7 @@ const permissionData: PermissionUser[] = [
   },
   {
     roleId: 2,
-    image: Roll2,
+    image: '/src/assets/permission/Roll2.svg',
     roleName: "편집자",
     roleNameEn: "Editor",
     description: "콘텐츠 관리, 편집 및 게시 권한",
@@ -38,7 +35,7 @@ const permissionData: PermissionUser[] = [
   },
   {
     roleId: 3,
-    image: Roll3,
+    image: '/src/assets/permission/Roll3.svg',
     roleName: "사용자",
     roleNameEn: "User",
     description: "기본 읽기 및 제한된 쓰기 권한",
