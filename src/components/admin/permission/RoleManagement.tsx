@@ -1,6 +1,6 @@
 import styled from 'styled-components';
 import React from 'react';
-import Roll1 from '../../../assets/permission/Roll.svg';
+import Roll1 from '../../../assets/Permission/Roll.svg';
 import { usePermissionStore } from '../../../store/permissionStore';
 
 interface PermissionUser {

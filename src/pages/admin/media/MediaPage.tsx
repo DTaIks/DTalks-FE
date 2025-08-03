@@ -9,7 +9,7 @@ import DropdownFilter from '../../../components/common/DropDownFilter';
 import Button from '../../../components/common/Button';
 import Pagination from '../../../components/common/Pagination';
 
-import MediaFileUploadModal, { type MediaUploadData } from '../../../components/admin/mediaModal/MediaFileUploadModal';
+import MediaFileUploadModal, { type MediaUploadData } from '../../../components/admin/media/MediaFileUploadModal';
 import ConfirmModal from '../../../components/common/ConfirmModal';
 
 import { useDepartmentStats } from '../../../hooks/media/useMediaFile';

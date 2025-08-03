@@ -29,6 +29,7 @@ export default function AppRoutes() {
 
   return (
     <Routes>
+      <Route path="/chart" element={<ChartPage />} />
       {/* 루트 경로: 로그인 상태에 따라 리다이렉트 */}
       <Route path="/" element={
         isAuthenticated
