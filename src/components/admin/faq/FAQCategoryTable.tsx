@@ -1,5 +1,5 @@
-import styled from "styled-components";
 import React, { useState, useCallback } from "react";
+import styled from "styled-components";
 import CategoryName1 from "../../../assets/faq/CategoryName1.svg";
 import CategoryName2 from "../../../assets/faq/CategoryName2.svg";
 import CategoryName3 from "../../../assets/faq/CategoryName3.svg";
@@ -7,8 +7,8 @@ import CategoryName4 from "../../../assets/faq/CategoryName4.svg";
 import CategoryName5 from "../../../assets/faq/CategoryName5.svg";
 import ActiveIcon from "../../../assets/common/Active.svg";
 import InactiveIcon from "../../../assets/common/InActive.svg";
+import ConfirmModal from "../../common/ConfirmModal";
 
-// 타입
 interface FAQCategory {
   categoryId: string;
   categoryName: string;
@@ -18,7 +18,12 @@ interface FAQCategory {
   isActive: boolean;
 }
 
-// 데이터
+interface TableColumn {
+  key: string;
+  label: string;
+  width: string;
+}
+
 const CATEGORY_DATA: FAQCategory[] = [
   {
     categoryId: "1",
@@ -62,7 +67,7 @@ const CATEGORY_DATA: FAQCategory[] = [
   }
 ];
 
-const TABLE_COLUMNS = [
+const TABLE_COLUMNS: TableColumn[] = [
   { key: "categoryName", label: "카테고리명", width: "200px" },
   { key: "description", label: "설명", width: "400px" },
   { key: "isActive", label: "상태", width: "150px" },
@@ -70,17 +75,21 @@ const TABLE_COLUMNS = [
   { key: "action", label: "작업", width: "150px" }
 ];
 
-// 컴포넌트
 const FAQCategoryTable: React.FC = () => {
   const [selectedCategory, setSelectedCategory] = useState<FAQCategory | null>(null);
   const [categoryData, setCategoryData] = useState<FAQCategory[]>(CATEGORY_DATA);
+  const [confirmModal, setConfirmModal] = useState({
+    isOpen: false,
+    type: null as 'archive' | 'download' | 'restore' | null,
+    categoryId: null as string | null,
+    categoryName: ''
+  });
 
   const handleRowClick = useCallback((category: FAQCategory) => {
     setSelectedCategory(category);
   }, []);
 
-  const handleArchive = useCallback((categoryId: string, e: React.MouseEvent) => {
-    e.stopPropagation();
+  const handleArchive = useCallback((categoryId: string) => {
     setCategoryData(prevData => 
       prevData.map(category => 
         category.categoryId === categoryId 
@@ -88,6 +97,37 @@ const FAQCategoryTable: React.FC = () => {
           : category
       )
     );
+  }, []);
+
+  const handleArchiveClick = useCallback((category: FAQCategory, e: React.MouseEvent) => {
+    e.stopPropagation();
+    setConfirmModal({
+      isOpen: true,
+      type: category.isActive ? 'archive' : 'restore',
+      categoryId: category.categoryId,
+      categoryName: category.categoryName
+    });
+  }, []);
+
+  const handleConfirmAction = useCallback(() => {
+    if ((confirmModal.type === 'archive' || confirmModal.type === 'restore') && confirmModal.categoryId) {
+      handleArchive(confirmModal.categoryId);
+    }
+    setConfirmModal({
+      isOpen: false,
+      type: null,
+      categoryId: null,
+      categoryName: ''
+    });
+  }, [confirmModal, handleArchive]);
+
+  const handleCloseConfirmModal = useCallback(() => {
+    setConfirmModal({
+      isOpen: false,
+      type: null,
+      categoryId: null,
+      categoryName: ''
+    });
   }, []);
 
   const renderTableRow = useCallback((category: FAQCategory) => (
@@ -112,34 +152,46 @@ const FAQCategoryTable: React.FC = () => {
         <FAQCountText>{category.faqCount}개</FAQCountText>
       </FAQCountCell>
       <ActionCell>
-        <ActionText onClick={(e) => handleArchive(category.categoryId, e)}>
+        <ActionText onClick={(e) => handleArchiveClick(category, e)}>
           {category.isActive ? "보관" : "복원"}
         </ActionText>
       </ActionCell>
     </TableRow>
-  ), [selectedCategory, handleRowClick, handleArchive]);
+  ), [selectedCategory, handleRowClick, handleArchiveClick]);
 
   return (
-    <TableContainer>
-      <TableHeader>
-        <TableTitle>카테고리 목록</TableTitle>
-      </TableHeader>
-      <HeaderBox>
-        <TableHeaderRow>
-          {TABLE_COLUMNS.map((column) => (
-            <TableHeaderCell 
-              key={column.key} 
-              width={column.width}
-            >
-              {column.label}
-            </TableHeaderCell>
-          ))}
-        </TableHeaderRow>
-      </HeaderBox>
-      <TableBody>
-        {categoryData.map(renderTableRow)}
-      </TableBody>
-    </TableContainer>
+    <>
+      <TableContainer>
+        <TableHeader>
+          <TableTitle>카테고리 목록</TableTitle>
+        </TableHeader>
+        <HeaderBox>
+          <TableHeaderRow>
+            {TABLE_COLUMNS.map((column) => (
+              <TableHeaderCell 
+                key={column.key} 
+                width={column.width}
+              >
+                {column.label}
+              </TableHeaderCell>
+            ))}
+          </TableHeaderRow>
+        </HeaderBox>
+        <TableBody>
+          {categoryData.map(renderTableRow)}
+        </TableBody>
+      </TableContainer>
+
+      {confirmModal.isOpen && confirmModal.type && (
+        <ConfirmModal
+          isOpen={confirmModal.isOpen}
+          onClose={handleCloseConfirmModal}
+          onConfirm={handleConfirmAction}
+          fileName={confirmModal.categoryName}
+          type={confirmModal.type as 'archive' | 'download' | 'restore'}
+        />
+      )}
+    </>
   );
 };
 

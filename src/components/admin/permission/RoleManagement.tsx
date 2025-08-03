@@ -41,8 +41,8 @@ const RoleManagement = ({ open, onClose, selectedUser }: RoleManagementProps) =>
   if (!open) return null;
 
   return (
-    <ModalOverlay>
-      <ModalContainer>
+    <ModalOverlay onClick={onClose}>
+      <ModalContainer onClick={(e) => e.stopPropagation()}>
         <ModalHeader>
           <ModalTitle>{selectedUser?.roleName || "관리자"} 관리</ModalTitle>
           <CloseButton onClick={onClose}>×</CloseButton>
@@ -105,13 +105,12 @@ const ModalOverlay = styled.div`
   left: 0;
   right: 0;
   bottom: 0;
-  width: 100vw;
-  height: 100vh;
-  background: rgba(0, 0, 0, 0.5);
+  background-color: rgba(0, 0, 0, 0.35);
   display: flex;
-  align-items: center;
   justify-content: center;
-  z-index: 2000;
+  align-items: center;
+  backdrop-filter: blur(3.75px);
+  z-index: 1000;
 `;
 
 // 모달 컨테이너

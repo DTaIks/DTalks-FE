@@ -8,8 +8,8 @@ import CategoryName5 from "../../../assets/faq/CategoryName5.svg";
 import ActiveIcon from "../../../assets/common/Active.svg";
 import InactiveIcon from "../../../assets/common/InActive.svg";
 import CustomDropdown from "../../common/CustomDropdown";
+import ConfirmModal from "../../common/ConfirmModal";
 
-// 타입 정의
 interface FAQItem {
   id: number;
   question: string;
@@ -31,7 +31,11 @@ interface CategoryOption {
   label: string;
 }
 
-// 상수 데이터
+interface FAQTableProps {
+  currentPage: number;
+  itemsPerPage: number;
+}
+
 const FAQ_DATA: FAQItem[] = [
   {
     id: 1,
@@ -77,6 +81,33 @@ const FAQ_DATA: FAQItem[] = [
     categoryImage: CategoryName5,
     isActive: false,
     createdAt: "2024-01-16 14:30",
+  },
+  {
+    id: 6,
+    question: "회사 복지 혜택은 어떻게 확인하나요?",
+    answer: "사내 포털 → [복지] → [복지 혜택] 메뉴에서 모든 복지 혜택을 확인할 수 있습니다. 각 부서별로 다른 혜택이 제공될 수 있으니 참고하세요.",
+    category: "복지 / 휴가",
+    categoryImage: CategoryName5,
+    isActive: true,
+    createdAt: "2024-01-17 09:15",
+  },
+  {
+    id: 7,
+    question: "연차 신청은 언제까지 해야 하나요?",
+    answer: "연차 신청은 사용일 기준 최소 3일 전까지 신청해야 합니다. 긴급한 경우에는 팀장 승인 후 사용 가능합니다.",
+    category: "근무 / 근태",
+    categoryImage: CategoryName3,
+    isActive: true,
+    createdAt: "2024-01-17 10:30",
+  },
+  {
+    id: 8,
+    question: "급여 지급일은 언제인가요?",
+    answer: "급여는 매월 25일에 지급됩니다. 공휴일인 경우 전 영업일에 지급됩니다.",
+    category: "급여 / 복리후생",
+    categoryImage: CategoryName4,
+    isActive: true,
+    createdAt: "2024-01-18 11:45",
   }
 ];
 
@@ -97,15 +128,22 @@ const CATEGORY_OPTIONS: CategoryOption[] = [
   { value: "welfare", label: "복지 / 휴가" }
 ];
 
-// 메인 컴포넌트
-const FAQTable: React.FC = () => {
-  // 상태 관리
+const FAQTable: React.FC<FAQTableProps> = ({ currentPage, itemsPerPage }) => {
   const [expandedRows, setExpandedRows] = useState<Set<number>>(new Set());
   const [faqItems, setFaqItems] = useState<FAQItem[]>(FAQ_DATA);
   const [selectedCategory, setSelectedCategory] = useState<string>("");
+  const [confirmModal, setConfirmModal] = useState({
+    isOpen: false,
+    type: null as 'archive' | null,
+    faqId: null as number | null,
+    faqName: ''
+  });
 
-  // 이벤트 핸들러
-  const handleRowToggle = useCallback((id: number): void => {
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const currentFAQItems = faqItems.slice(startIndex, endIndex);
+
+  const handleRowToggle = useCallback((id: number) => {
     setExpandedRows(prev => {
       const newExpandedRows = new Set(prev);
       if (newExpandedRows.has(id)) {
@@ -117,7 +155,7 @@ const FAQTable: React.FC = () => {
     });
   }, []);
 
-  const handleArchive = useCallback((id: number): void => {
+  const handleArchive = useCallback((id: number) => {
     setFaqItems(prevItems => 
       prevItems.map(item => 
         item.id === id ? { ...item, isActive: false } : item
@@ -125,21 +163,50 @@ const FAQTable: React.FC = () => {
     );
   }, []);
 
-  const handleEdit = useCallback((id: number): void => {
+  const handleEdit = useCallback((id: number) => {
     console.log('Edit FAQ:', id);
   }, []);
 
-  const handleSearch = useCallback((e: React.ChangeEvent<HTMLInputElement>): void => {
+  const handleSearch = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     console.log('Search:', e.target.value);
   }, []);
 
-  const handleCategoryChange = useCallback((value: string): void => {
+  const handleCategoryChange = useCallback((value: string) => {
     setSelectedCategory(value);
     console.log('Category:', value);
   }, []);
 
-  // 렌더링 함수들
-  const renderActionButtons = useCallback((faq: FAQItem): JSX.Element => (
+  const handleArchiveClick = useCallback((faq: FAQItem) => {
+    setConfirmModal({
+      isOpen: true,
+      type: 'archive',
+      faqId: faq.id,
+      faqName: faq.question
+    });
+  }, []);
+
+  const handleConfirmAction = useCallback(() => {
+    if (confirmModal.type === 'archive' && confirmModal.faqId) {
+      handleArchive(confirmModal.faqId);
+    }
+    setConfirmModal({
+      isOpen: false,
+      type: null,
+      faqId: null,
+      faqName: ''
+    });
+  }, [confirmModal, handleArchive]);
+
+  const handleCloseConfirmModal = useCallback(() => {
+    setConfirmModal({
+      isOpen: false,
+      type: null,
+      faqId: null,
+      faqName: ''
+    });
+  }, []);
+
+  const renderActionButtons = useCallback((faq: FAQItem) => (
     <ActionContainer>
       <ActionText 
         onClick={(e) => {
@@ -153,15 +220,15 @@ const FAQTable: React.FC = () => {
       <ActionText 
         onClick={(e) => {
           e.stopPropagation();
-          handleArchive(faq.id);
+          handleArchiveClick(faq);
         }}
       >
         보관
       </ActionText>
     </ActionContainer>
-  ), [handleEdit, handleArchive]);
+  ), [handleEdit, handleArchiveClick]);
 
-  const renderExpandedContent = useCallback((faq: FAQItem): JSX.Element => (
+  const renderExpandedContent = useCallback((faq: FAQItem) => (
     <ExpandedRow>
       <ExpandedBox>
         <ExpandedHeader>
@@ -174,7 +241,7 @@ const FAQTable: React.FC = () => {
     </ExpandedRow>
   ), []);
 
-  const renderTableRow = useCallback((faq: FAQItem): JSX.Element => {
+  const renderTableRow = useCallback((faq: FAQItem) => {
     const isExpanded = expandedRows.has(faq.id);
     
     return (
@@ -207,49 +274,53 @@ const FAQTable: React.FC = () => {
     );
   }, [expandedRows, handleRowToggle, renderActionButtons, renderExpandedContent]);
 
-  const renderTableHeader = useCallback((): JSX.Element => (
-    <TableHeader>
-      <TableTitle>FAQ 목록</TableTitle>
-      <SearchContainer>
-        <SearchInput 
-          type="text" 
-          placeholder="질문으로 검색"
-          onChange={handleSearch}
-        />
-        <DropdownContainer>
-          <CustomDropdown
-            options={CATEGORY_OPTIONS}
-            value={selectedCategory}
-            onChange={handleCategoryChange}
-          />
-        </DropdownContainer>
-      </SearchContainer>
-    </TableHeader>
-  ), [selectedCategory, handleSearch, handleCategoryChange]);
-
-  const renderColumnHeaders = useCallback((): JSX.Element => (
-    <HeaderBox>
-      <TableHeaderRow>
-        {TABLE_COLUMNS.map((column) => (
-          <TableHeaderCell 
-            key={column.key} 
-            width={column.width}
-          >
-            {column.label}
-          </TableHeaderCell>
-        ))}
-      </TableHeaderRow>
-    </HeaderBox>
-  ), []);
-
   return (
-    <TableContainer>
-      {renderTableHeader()}
-      {renderColumnHeaders()}
-      <TableBody>
-        {faqItems.map(renderTableRow)}
-      </TableBody>
-    </TableContainer>
+    <>
+      <TableContainer>
+        <TableHeader>
+          <TableTitle>FAQ 목록</TableTitle>
+          <SearchContainer>
+            <SearchInput 
+              type="text" 
+              placeholder="질문으로 검색"
+              onChange={handleSearch}
+            />
+            <DropdownContainer>
+              <CustomDropdown
+                options={CATEGORY_OPTIONS}
+                value={selectedCategory}
+                onChange={handleCategoryChange}
+              />
+            </DropdownContainer>
+          </SearchContainer>
+        </TableHeader>
+        <HeaderBox>
+          <TableHeaderRow>
+            {TABLE_COLUMNS.map((column) => (
+              <TableHeaderCell 
+                key={column.key} 
+                width={column.width}
+              >
+                {column.label}
+              </TableHeaderCell>
+            ))}
+          </TableHeaderRow>
+        </HeaderBox>
+        <TableBody>
+          {currentFAQItems.map(renderTableRow)}
+        </TableBody>
+      </TableContainer>
+
+      {confirmModal.isOpen && confirmModal.type && (
+        <ConfirmModal
+          isOpen={confirmModal.isOpen}
+          onClose={handleCloseConfirmModal}
+          onConfirm={handleConfirmAction}
+          fileName={confirmModal.faqName}
+          type={confirmModal.type as 'archive' | 'download'}
+        />
+      )}
+    </>
   );
 };
 
@@ -257,7 +328,7 @@ export default FAQTable;
 
 const TableContainer = styled.div`
   width: 1062px;
-  min-height: 586px;
+  min-height: 600px;
   border-radius: var(--br-18);
   background: var(--color-white);
   box-shadow: 0 6px 18px 0 rgba(125, 93, 246, 0.10);

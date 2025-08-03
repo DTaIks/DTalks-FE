@@ -7,7 +7,7 @@ interface ConfirmModalProps {
   onClose: () => void;
   onConfirm: () => void;
   fileName: string;
-  type: 'archive' | 'download';
+  type: 'archive' | 'download' | 'restore';
 }
 
 const ConfirmModal: React.FC<ConfirmModalProps> = ({
@@ -31,20 +31,29 @@ const ConfirmModal: React.FC<ConfirmModalProps> = ({
   };
 
   const getActionText = () => {
-    return type === 'archive' ? '보관합니다' : '다운로드합니다';
+    switch (type) {
+      case 'archive':
+        return '보관합니다';
+      case 'download':
+        return '다운로드합니다';
+      case 'restore':
+        return '복원합니다';
+      default:
+        return '처리합니다';
+    }
   };
 
   return (
     <ModalOverlay onClick={handleBackdropClick}>
       <ModalContainer>
         <CloseButton onClick={onClose}>×</CloseButton>
-        
+
         <ModalContent>
           <MessageText>
             {fileName}을 {getActionText()}.
           </MessageText>
         </ModalContent>
-        
+
         <ButtonContainer>
           <Button
             text="취소"
@@ -97,34 +106,40 @@ const ModalOverlay = styled.div`
 
 const ModalContainer = styled.div`
   background: var(--color-white);
-  border-radius: 11.25px;
+  border-radius: 12px;
   padding: var(--padding-32);
   width: 540px;
-  height: 180px;
+  height: 160px;
   flex-shrink: 0;
   position: relative;
 `;
 
 const CloseButton = styled.button`
   position: absolute;
-  top: 24px;
-  right: 24px;
+  top: 18px;
+  right: 18px;
   background: none;
   border: none;
   cursor: pointer;
-  padding: var(--padding-4);
   font-size: var(--font-size-32);
   color: #6b7280;
   border-radius: var(--br-4);
+
+  &:hover {
+    color: #1f2937;
+  }
 `;
 
-const ModalContent = styled.div``;
+const ModalContent = styled.div`
+  width: 400px;
+  height: 44px;
+`;
 
 const MessageText = styled.p`
   font-size: var(--font-size-20);
   color: #222;
   font-weight: var(--font-weight-500);
-  margin-top: 52px;
+  margin-top: 40px;
   margin-left: 4px;
 `;
 
@@ -132,5 +147,5 @@ const ButtonContainer = styled.div`
   display: flex;
   gap: var(--gap-12);
   justify-content: flex-end;
-  margin-top: 72px;
+  margin-top: 48px;
 `;

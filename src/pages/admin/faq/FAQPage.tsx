@@ -4,31 +4,66 @@ import TitleContainer from "../../../layout/TitleContainer";
 import FAQTable from "../../../components/admin/faq/FAQTable";
 import Button from "../../../components/common/Button";
 import Pagination from "../../../components/common/Pagination";
+import FAQUploadModal, { type FAQUploadData } from "../../../components/admin/faq/FAQUploadModal";
 
 const FAQPage = () => {
   const [currentPage, setCurrentPage] = useState<number>(1);
-  const totalPages = 3; // 예시로 3페이지 설정
+  const itemsPerPage = 5; // 페이지당 표시할 FAQ 수
+  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+
+  // 전체 FAQ 데이터 (실제로는 API에서 가져올 데이터)
+  const totalFAQItems = 8; // 예시 데이터 개수
+  const totalPages = Math.ceil(totalFAQItems / itemsPerPage);
 
   const handlePageChange = (page: number): void => {
     setCurrentPage(page);
-    // TODO: 페이지 변경 시 데이터 로딩 로직 추가
     console.log('Page changed to:', page);
+  };
+
+  const handleModalOpen = (): void => {
+    setIsModalOpen(true);
+  };
+
+  const handleModalClose = (): void => {
+    setIsModalOpen(false);
+  };
+
+  const handleFAQSubmit = (data: FAQUploadData): void => {
+    console.log('FAQ 추가:', data);
+    // TODO: API 호출하여 FAQ 추가
+    handleModalClose();
   };
 
   return (
     <Container>
       <TitleContainer title="FAQ 관리" subtitle="자주 묻는 질문들을 관리하고 편집하세요" />
       <ButtonContainer>
-        <StyledFAQButton text="FAQ 추가" width="var(--button-width)" height="var(--button-height)" />
-      </ButtonContainer>
-      <FAQTable />
-      <PaginationContainer>
-        <Pagination 
-          currentPage={currentPage}
-          totalPages={totalPages}
-          onPageChange={handlePageChange}
+        <StyledFAQButton 
+          text="FAQ 추가" 
+          width="var(--button-width)" 
+          height="var(--button-height)"
+          onClick={handleModalOpen}
         />
-      </PaginationContainer>
+      </ButtonContainer>
+      <FAQTable 
+        currentPage={currentPage}
+        itemsPerPage={itemsPerPage}
+      />
+      {totalFAQItems > 0 && (
+        <PaginationContainer>
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={handlePageChange}
+          />
+        </PaginationContainer>
+      )}
+
+      <FAQUploadModal
+        isOpen={isModalOpen}
+        onClose={handleModalClose}
+        onSubmit={handleFAQSubmit}
+      />
     </Container>
   );
 };
@@ -60,6 +95,7 @@ const StyledFAQButton = styled(Button)`
 const PaginationContainer = styled.div`
   display: flex;
   justify-content: center;
+  align-items: center;
   margin-top: 12px;
   margin-bottom: 48px;
 `;
