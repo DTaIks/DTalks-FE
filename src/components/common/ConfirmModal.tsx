@@ -106,22 +106,21 @@ const ModalOverlay = styled.div`
 
 const ModalContainer = styled.div`
   background: var(--color-white);
-  border-radius: 11.25px;
+  border-radius: 12px;
   padding: var(--padding-32);
-  width: 504px;
-  height: 132px;
+  width: 540px;
+  height: 160px;
   flex-shrink: 0;
   position: relative;
 `;
 
 const CloseButton = styled.button`
   position: absolute;
-  top: 24px;
-  right: 24px;
+  top: 18px;
+  right: 18px;
   background: none;
   border: none;
   cursor: pointer;
-  padding: var(--padding-4);
   font-size: var(--font-size-32);
   color: #6b7280;
   border-radius: var(--br-4);
@@ -140,7 +139,7 @@ const MessageText = styled.p`
   font-size: var(--font-size-20);
   color: #222;
   font-weight: var(--font-weight-500);
-  margin-top: 8px;
+  margin-top: 40px;
   margin-left: 4px;
 `;
 
@@ -148,5 +147,5 @@ const ButtonContainer = styled.div`
   display: flex;
   gap: var(--gap-12);
   justify-content: flex-end;
-  margin-top: 50px;
+  margin-top: 48px;
 `;
