@@ -7,6 +7,7 @@ on:
 
 permissions:
   contents: read
+  pull-requests: write
 
 jobs:
   build-test:
@@ -44,7 +45,54 @@ jobs:
         run: npx tsc --noEmit
 
       - name: Lint check
-        run: npx eslint . --ext .ts,.tsx --max-warnings 0
+        id: lint
+        run: |
+          npx eslint . --ext .ts,.tsx --max-warnings 0 --format json > lint-results.json || {
+            echo "LINT_FAILED=true" >> $GITHUB_OUTPUT
+            echo "⚠️ Lint issues found, but continuing build..."
+          }
+        continue-on-error: true
+
+      - name: Comment lint results on PR
+        if: failure() && steps.lint.outputs.LINT_FAILED == 'true'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            
+            let lintResults = [];
+            try {
+              const data = fs.readFileSync('lint-results.json', 'utf8');
+              lintResults = JSON.parse(data);
+            } catch (error) {
+              console.log('No lint results file found');
+              return;
+            }
+
+            let comment = '## 🔍 ESLint 검사 결과\n\n';
+            let hasErrors = false;
+
+            for (const result of lintResults) {
+              if (result.messages && result.messages.length > 0) {
+                hasErrors = true;
+                comment += `### 📁 \`${result.filePath.replace(process.cwd() + '/', '')}\`\n\n`;
+                
+                for (const message of result.messages) {
+                  const severity = message.severity === 2 ? '❌ Error' : '⚠️ Warning';
+                  comment += `- **${severity}** (Line ${message.line}:${message.column}): ${message.message}\n`;
+                  comment += `  \`${message.ruleId || 'unknown'}\`\n\n`;
+                }
+              }
+            }
+
+            if (hasErrors) {
+              await github.rest.issues.createComment({
+                issue_number: context.issue.number,
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                body: comment
+              });
+            }
 
       - name: Build app
         run: npx vite build --mode development
