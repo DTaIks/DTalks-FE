@@ -75,17 +75,17 @@ const CardHeader = styled.div`
 const CardTitle = styled.h1`
   padding: 24px 285.75px 26.25px 36px;
   font-size: var(--font-size-20);
-  font-weight: 600;
+  font-weight: var(--font-weight-600);
   color: var(--color-black);
   white-space: nowrap;
 `;
 
 const DonutGrid = styled.div`
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: var(--gap-18);
-  padding: var(--padding-27);
-  justify-items: center;
+  height: 452.15px;
+  grid-template-columns: 225px 225px; 
+  gap: var(--gap-20);
+  justify-content: center;
   align-items: center;
-  padding-bottom: 64px
+  align-content: center;
 `;
