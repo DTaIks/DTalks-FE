@@ -45,7 +45,7 @@ export const FileCategory: React.FC<FileCategoryProps> = ({
     setIsOpen(false);
   };
 
-  const filteredOptions = options.filter(option => option !== value);
+  const filteredOptions = options;
 
   return (
     <Container ref={dropdownRef}>
@@ -73,6 +73,7 @@ export const FileCategory: React.FC<FileCategoryProps> = ({
             <DropdownItem
               key={index}
               onClick={() => handleOptionClick(option)}
+              isSelected={option === value}
             >
               {option}
             </DropdownItem>
@@ -157,11 +158,17 @@ const DropdownList = styled.ul`
   box-sizing: border-box;
 `;
 
-const DropdownItem = styled.li`
+const DropdownItem = styled.li<{ isSelected?: boolean }>`
   padding: 12px;
   font-size: 14px;
   color: #374151;
   cursor: pointer;
+
+  ${props => props.isSelected && `
+    background: rgba(153, 102, 204, 0.1);
+    color: #9966CC;
+    font-weight: 500;
+  `}
 
   &:hover {
     background: rgba(153, 102, 204, 0.05);

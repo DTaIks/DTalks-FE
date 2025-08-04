@@ -25,9 +25,9 @@ export interface FAQUploadData {
 const CATEGORY = [
   '사내 규정',
   'IT/시스템',
-  '근무/근태',
-  '급여/복리후생',
-  '복지/휴가',
+  '근무 / 근태',
+  '급여 / 복리후생',
+  '복지 / 휴가',
 ];
 
 const FAQ_UPLOAD_INFO = [
@@ -58,6 +58,11 @@ const FAQUploadModal: React.FC<FAQUploadModalProps> = ({
     if (isOpen && initialData && isEdit) {
       setFormData(initialData);
     } else if (!isOpen) {
+      setFormData({
+        question: '',
+        answer: '',
+        category: '',
+      });
       setTouched({
         question: false,
         answer: false

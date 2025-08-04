@@ -6,29 +6,49 @@ import CustomDropdown from "../../common/CustomDropdown";
 import ConfirmModal from "../../common/ConfirmModal";
 import FAQUploadModal from "./FAQUploadModal";
 import { useFAQData, type FAQItem } from "../../../hooks/faq/useFAQData";
+import type { FAQUploadData } from "./FAQUploadModal";
 
+// Types
 interface FAQTableProps {
   currentPage: number;
   itemsPerPage: number;
 }
 
+interface ConfirmModalState {
+  isOpen: boolean;
+  type: 'archive' | null;
+  faqId: number | null;
+  faqName: string;
+}
+
+interface EditModalState {
+  isOpen: boolean;
+  faqData: FAQUploadData | undefined;
+  faqId: number | null;
+}
+
+// Constants
+const INITIAL_CONFIRM_MODAL: ConfirmModalState = {
+  isOpen: false,
+  type: null,
+  faqId: null,
+  faqName: ''
+};
+
+const INITIAL_EDIT_MODAL: EditModalState = {
+  isOpen: false,
+  faqData: undefined,
+  faqId: null
+};
+
 const FAQTable: React.FC<FAQTableProps> = ({ currentPage, itemsPerPage }) => {
+  // State
   const [expandedRows, setExpandedRows] = useState<Set<number>>(new Set());
-  const [confirmModal, setConfirmModal] = useState({
-    isOpen: false,
-    type: null as 'archive' | null,
-    faqId: null as number | null,
-    faqName: ''
-  });
+  const [confirmModal, setConfirmModal] = useState<ConfirmModalState>(INITIAL_CONFIRM_MODAL);
+  const [editModal, setEditModal] = useState<EditModalState>(INITIAL_EDIT_MODAL);
 
-  const [editModal, setEditModal] = useState({
-    isOpen: false,
-    faqData: null as any,
-    faqId: null as number | null
-  });
-
+  // Hooks
   const {
-    faqItems,
     selectedCategory,
     searchTerm,
     handleArchive,
@@ -42,6 +62,7 @@ const FAQTable: React.FC<FAQTableProps> = ({ currentPage, itemsPerPage }) => {
 
   const { paginatedData: currentFAQItems } = getFilteredData(currentPage, itemsPerPage);
 
+  // Event Handlers
   const handleRowToggle = useCallback((id: number) => {
     setExpandedRows(prev => {
       const newExpandedRows = new Set(prev);
@@ -79,32 +100,18 @@ const FAQTable: React.FC<FAQTableProps> = ({ currentPage, itemsPerPage }) => {
     if (confirmModal.type === 'archive' && confirmModal.faqId) {
       handleArchive(confirmModal.faqId);
     }
-    setConfirmModal({
-      isOpen: false,
-      type: null,
-      faqId: null,
-      faqName: ''
-    });
+    setConfirmModal(INITIAL_CONFIRM_MODAL);
   }, [confirmModal, handleArchive]);
 
   const handleCloseConfirmModal = useCallback(() => {
-    setConfirmModal({
-      isOpen: false,
-      type: null,
-      faqId: null,
-      faqName: ''
-    });
+    setConfirmModal(INITIAL_CONFIRM_MODAL);
   }, []);
 
   const handleCloseEditModal = useCallback(() => {
-    setEditModal({
-      isOpen: false,
-      faqData: null,
-      faqId: null
-    });
+    setEditModal(INITIAL_EDIT_MODAL);
   }, []);
 
-  const handleSubmitEdit = useCallback((data: any) => {
+  const handleSubmitEdit = useCallback((data: FAQUploadData) => {
     if (editModal.faqId) {
       handleUpdateFAQ(editModal.faqId, data);
       console.log('FAQ 수정 완료:', data);
@@ -112,6 +119,7 @@ const FAQTable: React.FC<FAQTableProps> = ({ currentPage, itemsPerPage }) => {
     handleCloseEditModal();
   }, [handleCloseEditModal, editModal.faqId, handleUpdateFAQ]);
 
+  // Render Functions
   const renderActionButtons = useCallback((faq: FAQItem) => (
     <ActionContainer>
       <ActionText 
@@ -180,48 +188,36 @@ const FAQTable: React.FC<FAQTableProps> = ({ currentPage, itemsPerPage }) => {
     );
   }, [expandedRows, handleRowToggle, renderActionButtons, renderExpandedContent]);
 
-  return (
-    <>
-      <TableContainer>
-        <TableHeader>
-          <TableTitle>FAQ 목록</TableTitle>
-          <SearchContainer>
-            <SearchInput 
-              type="text" 
-              placeholder="질문으로 검색"
-              value={searchTerm}
-              onChange={handleSearch}
-            />
-            <DropdownContainer>
-              <CustomDropdown
-                options={categoryOptions}
-                value={selectedCategory}
-                onChange={handleCategoryChange}
-              />
-            </DropdownContainer>
-          </SearchContainer>
-        </TableHeader>
-                  <TableHead>
-            <TableRow>
-              {tableColumns.map((column) => (
-                <TableCell key={column.key}>
-                  {column.label}
-                </TableCell>
-              ))}
-            </TableRow>
-          </TableHead>
-        <TableBody>
-          {currentFAQItems.map(renderTableRow)}
-        </TableBody>
-      </TableContainer>
+  const renderTableHeader = useCallback(() => (
+    <TableHeader>
+      <TableTitle>FAQ 목록</TableTitle>
+      <SearchContainer>
+        <SearchInput 
+          type="text" 
+          placeholder="질문으로 검색"
+          value={searchTerm}
+          onChange={handleSearch}
+        />
+        <DropdownContainer>
+          <CustomDropdown
+            options={categoryOptions}
+            value={selectedCategory}
+            onChange={handleCategoryChange}
+          />
+        </DropdownContainer>
+      </SearchContainer>
+    </TableHeader>
+  ), [searchTerm, selectedCategory, handleSearch, handleCategoryChange, categoryOptions]);
 
+  const renderModals = useCallback(() => (
+    <>
       {confirmModal.isOpen && confirmModal.type && (
         <ConfirmModal
           isOpen={confirmModal.isOpen}
           onClose={handleCloseConfirmModal}
           onConfirm={handleConfirmAction}
           fileName={confirmModal.faqName}
-          type={confirmModal.type as 'archive' | 'download'}
+          type={confirmModal.type}
         />
       )}
 
@@ -234,6 +230,27 @@ const FAQTable: React.FC<FAQTableProps> = ({ currentPage, itemsPerPage }) => {
           isEdit={true}
         />
       )}
+    </>
+  ), [confirmModal, editModal, handleCloseConfirmModal, handleConfirmAction, handleCloseEditModal, handleSubmitEdit]);
+
+  return (
+    <>
+      <TableContainer>
+        {renderTableHeader()}
+        <TableHead>
+          <TableRow>
+            {tableColumns.map((column) => (
+              <TableCell key={column.key}>
+                {column.label}
+              </TableCell>
+            ))}
+          </TableRow>
+        </TableHead>
+        <TableBody>
+          {currentFAQItems.map(renderTableRow)}
+        </TableBody>
+      </TableContainer>
+      {renderModals()}
     </>
   );
 };
