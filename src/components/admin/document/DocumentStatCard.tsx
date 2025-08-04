@@ -39,8 +39,8 @@ const StatContainer = styled.div`
 `;
 
 const StatBox = styled.div`
-  width: 300px;
-  height: 80px;
+  width: 290px;
+  height: 64px;
   flex-shrink: 0;
   background: var(--color-white);
   border-radius: var(--br-18);
@@ -66,7 +66,7 @@ const RightSection = styled.div`
 
 const StatTitle = styled.div`
   color: var(--color-black);
-  font-size: var(--font-size-18);
+  font-size: var(--font-size-16);
   font-style: normal;
   font-weight: 600;
   line-height: normal;
@@ -74,7 +74,7 @@ const StatTitle = styled.div`
 
 const AdditionalInfo = styled.div`
   color: #22C55E;
-  font-size: var(--font-size-18);
+  font-size: var(--font-size-16);
   font-style: normal;
   font-weight: 500;
   line-height: normal;
@@ -82,6 +82,6 @@ const AdditionalInfo = styled.div`
 
 const StatValue = styled.div`
   color: var(--color-black);
-  font-size: 32px;
+  font-size: var(--font-size-28);
   font-weight: 600;
 `; 
