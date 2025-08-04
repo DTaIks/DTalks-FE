@@ -1,7 +1,7 @@
 import styled from "styled-components";
 import { CircularProgressbar, buildStyles } from "react-circular-progressbar";
 import "react-circular-progressbar/dist/styles.css";
-import '../../styles/Global.css';
+import '../../../styles/Global.css';
 
 // 프롬프트 템플릿 종류
 const TEMPLATE_TYPES = {

@@ -1,7 +1,7 @@
 import React from 'react';
 import { BarChart, Bar, XAxis, YAxis, Cell } from 'recharts';
 import styled from 'styled-components';
-import '../../styles/Global.css';
+import '../../../styles/Global.css';
 
 export type WeeklyResponse = {
   values: Array<{ day: string; count: number }>;

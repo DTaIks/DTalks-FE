@@ -124,8 +124,8 @@ const Hover = styled.div`
 
 const DropdownMenu = styled.div`
   position: absolute;
-  top: 100%;
-  left: -68px;
+  top: -125%;
+  left: -250%;
   margin-top: 8px;
   width: 100px;
   height: auto;
