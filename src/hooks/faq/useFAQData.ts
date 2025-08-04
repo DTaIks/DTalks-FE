@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useMemo } from "react";
 import CategoryName1 from "../../assets/faq/CategoryName1.svg";
 import CategoryName2 from "../../assets/faq/CategoryName2.svg";
 import CategoryName3 from "../../assets/faq/CategoryName3.svg";
@@ -122,38 +122,8 @@ export const useFAQData = () => {
   const [selectedCategory, setSelectedCategory] = useState<string>("");
   const [searchTerm, setSearchTerm] = useState<string>("");
 
-  const handleArchive = useCallback((id: number) => {
-    setFaqItems(prevItems => 
-      prevItems.map(item => 
-        item.id === id ? { ...item, isActive: false } : item
-      )
-    );
-  }, []);
-
-  const handleUpdateFAQ = useCallback((id: number, updatedData: { question: string; answer: string; category: string }) => {
-    setFaqItems(prevItems => 
-      prevItems.map(item => 
-        item.id === id ? { 
-          ...item, 
-          question: updatedData.question,
-          answer: updatedData.answer,
-          category: updatedData.category
-        } : item
-      )
-    );
-  }, []);
-
-  const handleCategoryChange = useCallback((value: string) => {
-    setSelectedCategory(value);
-    console.log('Category:', value);
-  }, []);
-
-  const handleSearch = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchTerm(e.target.value);
-    console.log('Search:', e.target.value);
-  }, []);
-
-  const getFilteredData = useCallback((currentPage: number, itemsPerPage: number) => {
+  // 필터링된 데이터만 반환하는 함수
+  const getFilteredDataOnly = useMemo(() => {
     let filteredData = faqItems;
 
     // 검색 필터링
@@ -183,15 +153,53 @@ export const useFAQData = () => {
       });
     }
 
+    return filteredData;
+  }, [faqItems, searchTerm, selectedCategory]);
+
+  const getFilteredData = useCallback((currentPage: number, itemsPerPage: number) => {
+    const filteredData = getFilteredDataOnly;
+    
+    // 전체 필터링된 데이터의 길이
+    const totalItems = filteredData.length;
+
     // 페이지네이션
     const startIndex = (currentPage - 1) * itemsPerPage;
     const endIndex = startIndex + itemsPerPage;
     
     return {
       paginatedData: filteredData.slice(startIndex, endIndex),
-      totalItems: filteredData.length
+      totalItems: totalItems
     };
-  }, [faqItems, searchTerm, selectedCategory]);
+  }, [getFilteredDataOnly]);
+
+  const handleArchive = useCallback((id: number) => {
+    setFaqItems(prevItems => 
+      prevItems.map(item => 
+        item.id === id ? { ...item, isActive: false } : item
+      )
+    );
+  }, []);
+
+  const handleUpdateFAQ = useCallback((id: number, updatedData: { question: string; answer: string; category: string }) => {
+    setFaqItems(prevItems => 
+      prevItems.map(item => 
+        item.id === id ? { 
+          ...item, 
+          question: updatedData.question,
+          answer: updatedData.answer,
+          category: updatedData.category
+        } : item
+      )
+    );
+  }, []);
+
+  const handleCategoryChange = useCallback((value: string) => {
+    setSelectedCategory(value);
+  }, []);
+
+  const handleSearch = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchTerm(e.target.value);
+  }, []);
 
   return {
     faqItems,
@@ -203,8 +211,9 @@ export const useFAQData = () => {
     handleCategoryChange,
     handleSearch,
     getFilteredData,
+    getFilteredDataOnly,
     tableColumns: TABLE_COLUMNS,
-    categoryOptions: CATEGORY_OPTIONS
+    categoryOptions: CATEGORY_OPTIONS,
   };
 };
 

@@ -109,17 +109,14 @@ export const useDocumentData = () => {
 
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(e.target.value);
-    console.log('Search:', e.target.value);
   };
 
   const handleCategoryChange = (value: string) => {
     setSelectedCategory(value);
-    console.log('Category:', value);
   };
 
   const handleStatusChange = (value: string) => {
     setSelectedStatus(value);
-    console.log('Status:', value);
   };
 
   const handleArchive = (documentId: number) => {
@@ -130,28 +127,17 @@ export const useDocumentData = () => {
           : doc
       )
     );
-    console.log('보관 처리:', documentId);
-  };
-
-  const handleDownload = (documentId: number) => {
-    console.log('다운로드:', documentId);
-  };
-
-  const handleVersionManage = (documentId: number) => {
-    console.log('버전 관리:', documentId);
   };
 
   const getFilteredData = (currentPage: number, itemsPerPage: number) => {
     let filteredData = documents;
 
-    // 검색 필터링
     if (searchTerm) {
       filteredData = filteredData.filter(doc => 
         doc.name.toLowerCase().includes(searchTerm.toLowerCase())
       );
     }
 
-    // 카테고리 필터링
     if (selectedCategory) {
       filteredData = filteredData.filter(doc => {
         switch (selectedCategory) {
@@ -167,7 +153,6 @@ export const useDocumentData = () => {
       });
     }
 
-    // 상태 필터링
     if (selectedStatus) {
       filteredData = filteredData.filter(doc => {
         switch (selectedStatus) {
@@ -175,15 +160,12 @@ export const useDocumentData = () => {
             return doc.status === "활성";
           case "inactive":
             return doc.status === "비활성";
-          case "archived":
-            return doc.status === "보관";
           default:
             return true;
         }
       });
     }
 
-    // 페이지네이션
     const startIndex = (currentPage - 1) * itemsPerPage;
     const endIndex = startIndex + itemsPerPage;
     
@@ -201,8 +183,6 @@ export const useDocumentData = () => {
     handleCategoryChange,
     handleStatusChange,
     handleArchive,
-    handleDownload,
-    handleVersionManage,
     getFilteredData,
     categoryOptions: CATEGORY_OPTIONS,
     statusOptions: STATUS_OPTIONS,

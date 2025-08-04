@@ -5,7 +5,7 @@ import InactiveIcon from "../../../assets/common/InActive.svg";
 import CustomDropdown from "../../common/CustomDropdown";
 import ConfirmModal from "../../common/ConfirmModal";
 import FAQUploadModal from "./FAQUploadModal";
-import { useFAQData, type FAQItem } from "../../../hooks/faq/useFAQData";
+import { useFAQStore, type FAQItem } from "../../../store/faqStore";
 import type { FAQUploadData } from "./FAQUploadModal";
 
 // Types
@@ -42,27 +42,45 @@ const INITIAL_EDIT_MODAL: EditModalState = {
 };
 
 const FAQTable: React.FC<FAQTableProps> = ({ currentPage, itemsPerPage }) => {
-  // State
+  // 로컬 상태 관리
   const [expandedRows, setExpandedRows] = useState<Set<number>>(new Set());
   const [confirmModal, setConfirmModal] = useState<ConfirmModalState>(INITIAL_CONFIRM_MODAL);
   const [editModal, setEditModal] = useState<EditModalState>(INITIAL_EDIT_MODAL);
 
-  // Hooks
+  // Zustand store에서 데이터와 함수 가져오기
   const {
     selectedCategory,
     searchTerm,
-    handleArchive,
-    handleUpdateFAQ,
-    handleCategoryChange,
-    handleSearch,
-    getFilteredData,
-    tableColumns,
-    categoryOptions
-  } = useFAQData();
+    setSelectedCategory,
+    setSearchTerm,
+    updateFAQItem,
+    archiveFAQItem,
+    getFilteredData
+  } = useFAQStore();
 
+  // 페이지네이션된 데이터 가져오기
   const { paginatedData: currentFAQItems } = getFilteredData(currentPage, itemsPerPage);
 
-  // Event Handlers
+  // 카테고리 옵션 설정
+  const categoryOptions = [
+    { value: "", label: "전체 카테고리" },
+    { value: "it", label: "IT/시스템" },
+    { value: "policy", label: "사내 규정" },
+    { value: "work", label: "근무 / 근태" },
+    { value: "salary", label: "급여 / 복리후생" },
+    { value: "welfare", label: "복지 / 휴가" }
+  ];
+
+  // 테이블 컬럼 설정
+  const tableColumns = [
+    { key: "question", label: "질문" },
+    { key: "answer", label: "카테고리" },
+    { key: "category", label: "상태" },
+    { key: "isActive", label: "최종 수정일" },
+    { key: "action", label: "작업" }
+  ];
+
+  // 행 토글 핸들러
   const handleRowToggle = useCallback((id: number) => {
     setExpandedRows(prev => {
       const newExpandedRows = new Set(prev);
@@ -75,6 +93,7 @@ const FAQTable: React.FC<FAQTableProps> = ({ currentPage, itemsPerPage }) => {
     });
   }, []);
 
+  // 수정 핸들러
   const handleEdit = useCallback((faq: FAQItem) => {
     setEditModal({
       isOpen: true,
@@ -87,6 +106,7 @@ const FAQTable: React.FC<FAQTableProps> = ({ currentPage, itemsPerPage }) => {
     });
   }, []);
 
+  // 보관 클릭 핸들러
   const handleArchiveClick = useCallback((faq: FAQItem) => {
     setConfirmModal({
       isOpen: true,
@@ -96,13 +116,15 @@ const FAQTable: React.FC<FAQTableProps> = ({ currentPage, itemsPerPage }) => {
     });
   }, []);
 
+  // 확인 액션 핸들러
   const handleConfirmAction = useCallback(() => {
     if (confirmModal.type === 'archive' && confirmModal.faqId) {
-      handleArchive(confirmModal.faqId);
+      archiveFAQItem(confirmModal.faqId);
     }
     setConfirmModal(INITIAL_CONFIRM_MODAL);
-  }, [confirmModal, handleArchive]);
+  }, [confirmModal, archiveFAQItem]);
 
+  // 모달 닫기 핸들러들
   const handleCloseConfirmModal = useCallback(() => {
     setConfirmModal(INITIAL_CONFIRM_MODAL);
   }, []);
@@ -111,15 +133,25 @@ const FAQTable: React.FC<FAQTableProps> = ({ currentPage, itemsPerPage }) => {
     setEditModal(INITIAL_EDIT_MODAL);
   }, []);
 
+  // 수정 제출 핸들러
   const handleSubmitEdit = useCallback((data: FAQUploadData) => {
     if (editModal.faqId) {
-      handleUpdateFAQ(editModal.faqId, data);
-      console.log('FAQ 수정 완료:', data);
+      updateFAQItem(editModal.faqId, data);
     }
     handleCloseEditModal();
-  }, [handleCloseEditModal, editModal.faqId, handleUpdateFAQ]);
+  }, [handleCloseEditModal, editModal.faqId, updateFAQItem]);
 
-  // Render Functions
+  // 카테고리 변경 핸들러
+  const handleCategoryChange = useCallback((value: string) => {
+    setSelectedCategory(value);
+  }, [setSelectedCategory]);
+
+  // 검색 핸들러
+  const handleSearch = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchTerm(e.target.value);
+  }, [setSearchTerm]);
+
+  // 액션 버튼 렌더링
   const renderActionButtons = useCallback((faq: FAQItem) => (
     <ActionContainer>
       <ActionText 
@@ -142,6 +174,7 @@ const FAQTable: React.FC<FAQTableProps> = ({ currentPage, itemsPerPage }) => {
     </ActionContainer>
   ), [handleEdit, handleArchiveClick]);
 
+  // 확장된 내용 렌더링
   const renderExpandedContent = useCallback((faq: FAQItem) => (
     <ExpandedRow>
       <ExpandedBox>
@@ -155,6 +188,7 @@ const FAQTable: React.FC<FAQTableProps> = ({ currentPage, itemsPerPage }) => {
     </ExpandedRow>
   ), []);
 
+  // 테이블 행 렌더링
   const renderTableRow = useCallback((faq: FAQItem) => {
     const isExpanded = expandedRows.has(faq.id);
     
@@ -162,7 +196,7 @@ const FAQTable: React.FC<FAQTableProps> = ({ currentPage, itemsPerPage }) => {
       <React.Fragment key={faq.id}>
         <TableRow 
           onClick={() => handleRowToggle(faq.id)} 
-          isExpanded={isExpanded}
+          $isExpanded={isExpanded}
         >
           <TableCell>
             <QuestionText>{faq.question}</QuestionText>
@@ -188,6 +222,7 @@ const FAQTable: React.FC<FAQTableProps> = ({ currentPage, itemsPerPage }) => {
     );
   }, [expandedRows, handleRowToggle, renderActionButtons, renderExpandedContent]);
 
+  // 테이블 헤더 렌더링
   const renderTableHeader = useCallback(() => (
     <TableHeader>
       <TableTitle>FAQ 목록</TableTitle>
@@ -209,6 +244,7 @@ const FAQTable: React.FC<FAQTableProps> = ({ currentPage, itemsPerPage }) => {
     </TableHeader>
   ), [searchTerm, selectedCategory, handleSearch, handleCategoryChange, categoryOptions]);
 
+  // 모달 렌더링
   const renderModals = useCallback(() => (
     <>
       {confirmModal.isOpen && confirmModal.type && (
@@ -340,7 +376,7 @@ const ExpandedAnswer = styled.p`
   min-height: 82px;
 `;
 
-const TableRow = styled.div<{ isExpanded?: boolean }>`
+const TableRow = styled.div<{ $isExpanded?: boolean }>`
   display: flex;
   align-items: center;
   transition: background-color 0.2s ease;
@@ -351,7 +387,7 @@ const TableRow = styled.div<{ isExpanded?: boolean }>`
     background-color: rgba(153, 102, 204, 0.05);
   }
   
-  ${props => props.isExpanded && `
+  ${props => props.$isExpanded && `
     background-color: rgba(153, 102, 204, 0.05);
     border-bottom: none;
   `}

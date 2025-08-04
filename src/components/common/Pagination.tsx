@@ -7,6 +7,7 @@ interface PaginationProps {
   onPageChange: (page: number) => void;
 }
 
+// 페이지네이션 컴포넌트
 const Pagination: React.FC<PaginationProps> = ({ currentPage, totalPages, onPageChange }) => {
   const handlePrevClick = (): void => {
     if (currentPage > 1) {
@@ -112,7 +113,9 @@ interface PageContainerProps {
   isActive?: boolean;
 }
 
-const PageContainer = styled.div<PageContainerProps>`
+const PageContainer = styled.div.withConfig({
+  shouldForwardProp: (prop) => prop !== 'isActive'
+})<PageContainerProps>`
   width: 28px;
   height: 28px;
   display: flex;

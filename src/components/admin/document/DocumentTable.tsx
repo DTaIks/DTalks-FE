@@ -1,8 +1,8 @@
-import React from "react";
+import React, { useCallback } from "react";
 import styled from "styled-components";
 import CustomDropdown from "../../common/CustomDropdown";
 import DropDownButton from "../../common/DropDownButton";
-import { useDocumentData } from "../../../hooks/document/useDocumentData";
+import { useDocumentStore } from "../../../store/documentStore";
 
 interface DocumentTableProps {
   currentPage: number;
@@ -10,96 +10,114 @@ interface DocumentTableProps {
 }
 
 const DocumentTable: React.FC<DocumentTableProps> = ({ currentPage, itemsPerPage }) => {
+  // Zustand store에서 데이터와 함수 가져오기
   const {
     searchTerm,
     selectedCategory,
-    selectedStatus,
-    handleSearch,
-    handleCategoryChange,
-    handleStatusChange,
-    handleArchive,
-    handleDownload,
-    handleVersionManage,
-    getFilteredData,
-    categoryOptions,
-    statusOptions,
-    columnHeaders
-  } = useDocumentData();
+    setSelectedCategory,
+    setSearchTerm,
+    archiveDocumentItem,
+    getFilteredData
+  } = useDocumentStore();
 
+  // 페이지네이션된 데이터 가져오기
   const { paginatedData } = getFilteredData(currentPage, itemsPerPage);
 
+  // 카테고리 옵션 설정
+  const categoryOptions = [
+    { value: "", label: "전체 카테고리" },
+    { value: "policy", label: "사내 규정" },
+    { value: "manual", label: "매뉴얼" },
+    { value: "dictionary", label: "용어사전" }
+  ];
+
+  // 테이블 컬럼 헤더
+  const columnHeaders = [
+    "문서명",
+    "카테고리", 
+    "버전",
+    "작성자",
+    "최종 수정일",
+    "상태",
+    "작업"
+  ];
+
+  // 검색 핸들러
+  const handleSearch = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchTerm(e.target.value);
+  }, [setSearchTerm]);
+
+  // 카테고리 변경 핸들러
+  const handleCategoryChange = useCallback((value: string) => {
+    setSelectedCategory(value);
+  }, [setSelectedCategory]);
+
+  // 보관 핸들러
+  const handleArchive = useCallback((id: number) => {
+    archiveDocumentItem(id);
+  }, [archiveDocumentItem]);
+
   return (
-    <>
-      <TableContainer>
-        <TableHeader>
-          <TableTitle>문서 목록</TableTitle>
-          <SearchContainer>
-            <SearchInput 
-              type="text" 
-              placeholder="문서명으로 검색"
-              value={searchTerm}
-              onChange={handleSearch}
+    <TableContainer>
+      <TableHeader>
+        <TableTitle>문서 목록</TableTitle>
+        <SearchContainer>
+          <SearchInput 
+            type="text" 
+            placeholder="문서명으로 검색"
+            value={searchTerm}
+            onChange={handleSearch}
+          />
+          <DropdownContainer>
+            <CustomDropdown
+              options={categoryOptions}
+              value={selectedCategory}
+              onChange={handleCategoryChange}
             />
-            <DropdownContainer>
-              <CustomDropdown
-                options={categoryOptions}
-                value={selectedCategory}
-                onChange={handleCategoryChange}
-              />
-            </DropdownContainer>
-            <DropdownContainer>
-              <CustomDropdown
-                options={statusOptions}
-                value={selectedStatus}
-                onChange={handleStatusChange}
-              />
-            </DropdownContainer>
-          </SearchContainer>
-        </TableHeader>
-        <Table>
-          <TableHead>
-            <TableRow>
-              {columnHeaders.map((header, index) => (
-                <TableCell key={index}>{header}</TableCell>
-              ))}
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {paginatedData.map((document) => (
-              <TableRow key={document.id}>
-                <TableCell>
-                  <DocumentName>{document.name}</DocumentName>
-                </TableCell>
-                <TableCell>
-                  <CategoryImage src={document.categoryImage} alt={document.category} />
-                </TableCell>
-                <TableCell>
-                  <VersionText>{document.version}</VersionText>
-                </TableCell>
-                <TableCell>
-                  <AuthorText>{document.author}</AuthorText>
-                </TableCell>
-                <TableCell>
-                  <DateText>{document.lastModified}</DateText>
-                </TableCell>
-                <TableCell>
-                  <StatusIcon src={document.statusIcon} alt={document.status} />
-                </TableCell>
-                <TableCell>
-                  <DropDownButton 
-                    items={[
-                      { label: "다운로드", onClick: () => handleDownload(document.id) },
-                      { label: "버전 관리", onClick: () => handleVersionManage(document.id) },
-                      { label: "보관", onClick: () => handleArchive(document.id) },
-                    ]}
-                  />
-                </TableCell>
-              </TableRow>
+          </DropdownContainer>
+        </SearchContainer>
+      </TableHeader>
+      <Table>
+        <TableHead>
+          <TableRow>
+            {columnHeaders.map((header, index) => (
+              <TableCell key={index}>{header}</TableCell>
             ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
-    </>
+          </TableRow>
+        </TableHead>
+        <TableBody>
+          {paginatedData.map((document) => (
+            <TableRow key={document.id}>
+              <TableCell>
+                <DocumentName>{document.name}</DocumentName>
+              </TableCell>
+              <TableCell>
+                <CategoryImage src={document.categoryImage} alt={document.category} />
+              </TableCell>
+              <TableCell>
+                <VersionText>{document.version}</VersionText>
+              </TableCell>
+              <TableCell>
+                <AuthorText>{document.author}</AuthorText>
+              </TableCell>
+              <TableCell>
+                <DateText>{document.lastModified}</DateText>
+              </TableCell>
+              <TableCell>
+                <StatusIcon src={document.statusIcon} alt={document.status} />
+              </TableCell>
+              <TableCell>
+                <DropDownButton 
+                  items={[
+                    { label: "다운로드", onClick: () => handleArchive(document.id) },
+                  ]}
+                />
+              </TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+    </TableContainer>
   );
 };
 

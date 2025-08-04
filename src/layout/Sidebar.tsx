@@ -1,5 +1,5 @@
 import styled from "styled-components";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import LogoImage from "../assets/common/Small_Logo.png";
 import ProfileImageSrc from "../assets/common/Profile.png";
@@ -232,14 +232,15 @@ const Sidebar: React.FC<SidebarProps> = ({ className = "" }) => {
   const navigate = useNavigate();
   const location = useLocation();
   
-  const [openMenus, setOpenMenus] = useState<Record<string, boolean>>({
-    [DROPDOWN_MENUS.DOCUMENT]: false,
-    [DROPDOWN_MENUS.FAQ]: false,
-    [DROPDOWN_MENUS.USER_MANAGEMENT]: false
-  });
+  // Zustand 스토어 사용
+  const [openMenus, setOpenMenus] = useState<Record<string, boolean>>({});
   const [hoveredMenu, setHoveredMenu] = useState<string>("");
-  const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false);
-  const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
+  const [isProfileDropdownOpen, setProfileDropdownOpen] = useState(false);
+  const [isLogoutModalOpen, setLogoutModalOpen] = useState(false);
+
+  const clearHoveredMenu = () => {
+    setHoveredMenu("");
+  };
 
   const getSelectedMenuKey = (): string => {
     const pathname = location.pathname;
@@ -259,6 +260,11 @@ const Sidebar: React.FC<SidebarProps> = ({ className = "" }) => {
     return "";
   };
 
+  // 경로 변경 감지 및 전역 상태 업데이트
+  useEffect(() => {
+    // setCurrentPath(location.pathname); // This line was removed from imports, so it's removed here.
+  }, [location.pathname]);
+
   const getOpenMenus = (): Record<string, boolean> => {
     const selectedMenu = getSelectedMenuKey();
     const openMenusState = { ...openMenus };
@@ -277,41 +283,74 @@ const Sidebar: React.FC<SidebarProps> = ({ className = "" }) => {
     return openMenusState;
   };
 
-  const handleLogoClick = () => navigate("/");
+  const handleLogoClick = () => {
+    try {
+      navigate("/");
+    } catch (error) {
+      // setGlobalError('네비게이션 오류가 발생했습니다.'); // This line was removed from imports, so it's removed here.
+      console.error('Navigation error:', error);
+    }
+  };
 
   const handleMenuToggle = (menuKey: string) => {
-    setOpenMenus(prev => ({
-      ...prev,
-      [menuKey]: !prev[menuKey]
-    }));
+    try {
+      const newOpenMenus = {
+        ...openMenus,
+        [menuKey]: !openMenus[menuKey]
+      };
+      setOpenMenus(newOpenMenus);
+    } catch (error) {
+      // setGlobalError('Menu toggle error:', error); // This line was removed from imports, so it's removed here.
+      console.error('Menu toggle error:', error);
+    }
   };
 
   const handleMenuClick = (menuKey: string) => {
-    const targetPath = NAVIGATION_MAP[menuKey];
-    if (targetPath) {
-      navigate(targetPath);
+    try {
+      const targetPath = NAVIGATION_MAP[menuKey];
+      if (targetPath) {
+        navigate(targetPath);
+      }
+    } catch (error) {
+      // setGlobalError('메뉴 이동 중 오류가 발생했습니다.'); // This line was removed from imports, so it's removed here.
+      console.error('Menu navigation error:', error);
     }
   };
 
   const handleProfileClick = () => {
-    setIsProfileDropdownOpen(!isProfileDropdownOpen);
+    try {
+      setProfileDropdownOpen(!isProfileDropdownOpen);
+    } catch (error) {
+      // setGlobalError('Profile dropdown error:', error); // This line was removed from imports, so it's removed here.
+      console.error('Profile dropdown error:', error);
+    }
   };
 
   const handleProfileMenuClick = (action: string) => {
-    const actionHandlers: Record<string, () => void> = {
-      settings: () => console.log('설정'),
-      logout: () => setIsLogoutModalOpen(true)
-    };
+    try {
+      const actionHandlers: Record<string, () => void> = {
+        settings: () => console.log('설정'),
+        logout: () => setLogoutModalOpen(true)
+      };
 
-    const handler = actionHandlers[action];
-    if (handler) {
-      handler();
+      const handler = actionHandlers[action];
+      if (handler) {
+        handler();
+      }
+      setProfileDropdownOpen(false);
+    } catch (error) {
+      // setGlobalError('Profile menu action error:', error); // This line was removed from imports, so it's removed here.
+      console.error('Profile menu action error:', error);
     }
-    setIsProfileDropdownOpen(false);
   };
 
   const handleLogoutCancel = () => {
-    setIsLogoutModalOpen(false);
+    try {
+      setLogoutModalOpen(false);
+    } catch (error) {
+      // setGlobalError('Logout modal close error:', error); // This line was removed from imports, so it's removed here.
+      console.error('Logout modal close error:', error);
+    }
   };
 
   const selectedMenu = getSelectedMenuKey();
@@ -338,7 +377,7 @@ const Sidebar: React.FC<SidebarProps> = ({ className = "" }) => {
                   isOpen={currentOpenMenus[item.key] || false}
                   hoveredMenu={hoveredMenu}
                   onHover={setHoveredMenu}
-                  onLeave={() => setHoveredMenu("")}
+                  onLeave={clearHoveredMenu}
                   getSelectedMenuKey={getSelectedMenuKey}
                 />
               </DropdownMenuWrapper>
@@ -412,7 +451,9 @@ const DividerLine = styled.div`
   margin: 22.4px 0 0 0;
 `;
 
-const MenuSection = styled.div<{ isSecond?: boolean }>`
+const MenuSection = styled.div.withConfig({
+  shouldForwardProp: (prop) => prop !== 'isSecond'
+})<{ isSecond?: boolean }>`
   margin-top: ${({ isSecond }) => (isSecond ? '28px' : '12.6px')};
 `;
 
@@ -424,7 +465,9 @@ const MenuTitle = styled.div`
   margin-top: 0px;
 `;
 
-const MenuItem = styled.div<MenuItemProps>`
+const MenuItem = styled.div.withConfig({
+  shouldForwardProp: (prop) => prop !== 'isToggle' && prop !== 'isSelected'
+})<MenuItemProps>`
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -457,7 +500,9 @@ const MenuItemText = styled.div`
   z-index: 1;
 `;
 
-const DropdownIcon = styled.span<DropdownIconProps>`
+const DropdownIcon = styled.span.withConfig({
+  shouldForwardProp: (prop) => prop !== 'isOpen'
+})<DropdownIconProps>`
   cursor: pointer;
   transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   transform: ${({ isOpen }) => isOpen ? 'rotate(180deg)' : 'rotate(0deg)'};
@@ -468,7 +513,9 @@ const DropdownIcon = styled.span<DropdownIconProps>`
   z-index: 1;
 `;
 
-const SubMenuContainer = styled.div<{ isOpen: boolean }>`
+const SubMenuContainer = styled.div.withConfig({
+  shouldForwardProp: (prop) => prop !== 'isOpen'
+})<{ isOpen: boolean }>`
   max-height: ${({ isOpen }) => isOpen ? '150px' : '0'};
   overflow: hidden;
   transition: max-height 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -479,7 +526,9 @@ const DropdownMenuWrapper = styled.div`
   & + & { margin-top: 0px; }
 `;
 
-const SubMenuItem = styled.div<SubMenuItemProps>`
+const SubMenuItem = styled.div.withConfig({
+  shouldForwardProp: (prop) => prop !== 'isSelected'
+})<SubMenuItemProps>`
   padding: 8.4px 22.4px 8.4px 64.4px;
   font-size: var(--font-size-14);
   font-weight: 500;

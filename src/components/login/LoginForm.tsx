@@ -46,6 +46,7 @@ const LoginForm: React.FC<LoginFormProps> = ({
           value={email}
           onChange={onEmailChange}
           inputWidth="380px"
+          autocomplete="username"
         />
         <InputField
           inputWidth="380px"
@@ -55,6 +56,7 @@ const LoginForm: React.FC<LoginFormProps> = ({
           type="password"
           value={password}
           onChange={onPasswordChange}
+          autocomplete="current-password"
         />
         {error && <ErrorMessage>{error}</ErrorMessage>}
         <ForgotPasswordLink href="/forgot-password">

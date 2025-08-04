@@ -2,12 +2,12 @@ import React from 'react';
 import styled from 'styled-components';
 
 interface InputFieldProps {
-  variant?: 'login' | 'signup'; // 로그인용/회원가입용 스타일 구분
-  label?: string; // 회원가입용 라벨
-  title?: string; // 로그인용 타이틀
+  variant?: 'login' | 'signup';
+  label?: string;
+  title?: string;
   placeholder: string;
-  inputProps?: React.InputHTMLAttributes<HTMLInputElement>; // 회원가입용
-  type?: string; // 로그인용
+  inputProps?: React.InputHTMLAttributes<HTMLInputElement>;
+  type?: string;
   value?: string;
   onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
   infoText?: string;
@@ -18,8 +18,10 @@ interface InputFieldProps {
   className?: string;
   inputWidth?: string;
   inputAlignSelf?: string;
+  autocomplete?: string;
 }
 
+// 입력 필드 컴포넌트
 const InputField: React.FC<InputFieldProps> = ({
   variant = 'login',
   label,
@@ -37,11 +39,11 @@ const InputField: React.FC<InputFieldProps> = ({
   className = '',
   inputWidth,
   inputAlignSelf,
+  autocomplete,
 }) => {
   const hasButton = !!buttonText;
   
   if (variant === 'signup') {
-    // 회원가입용 스타일
     return (
       <SignupInputRow>
         <SignupLabel>{label}</SignupLabel>
@@ -50,6 +52,7 @@ const InputField: React.FC<InputFieldProps> = ({
             {...inputProps}
             placeholder={placeholder}
             hasButton={hasButton}
+            autoComplete={autocomplete}
           />
           {hasButton && (
             <SignupButton
@@ -66,7 +69,6 @@ const InputField: React.FC<InputFieldProps> = ({
     );
   }
 
-  // 로그인용 스타일 (기본)
   return (
     <LoginInputRoot inputWidth={inputWidth} inputAlignSelf={inputAlignSelf} className={className}>
       <LoginTitle>{title}</LoginTitle>
@@ -76,14 +78,19 @@ const InputField: React.FC<InputFieldProps> = ({
           placeholder={placeholder}
           value={inputProps?.value || value}
           onChange={inputProps?.onChange || onChange}
+          autoComplete={autocomplete}
         />
       </LoginTextfield>
     </LoginInputRoot>
   );
 };
 
-// 로그인용 스타일 컴포넌트들
-const LoginInputRoot = styled.div<{ inputWidth?: string; inputAlignSelf?: string }>`
+export default InputField;
+
+// 로그인용 스타일
+const LoginInputRoot = styled.div.withConfig({
+  shouldForwardProp: (prop) => prop !== 'inputWidth' && prop !== 'inputAlignSelf'
+})<{ inputWidth?: string; inputAlignSelf?: string }>`
   width: 382.5px;
   overflow: hidden;
   display: flex;
@@ -128,21 +135,21 @@ const LoginText = styled.input`
 
 const LoginTextfield = styled.div`
   align-self: stretch;
-  border-radius: 4.5px; /* 6 * 0.75 */
+  border-radius: 4.5px;
   background-color: var(--color-white);
-  border: 0.75px solid var(--color-gray-200); /* 1 * 0.75 */
+  border: 0.75px solid var(--color-gray-200);
   box-sizing: border-box;
-  height: 34.5px; /* 46 * 0.75 */
+  height: 34.5px;
   display: flex;
   flex-direction: row;
   align-items: center;
   justify-content: flex-start;
-  padding: 6px 9px; /* 8, 12 * 0.75 */
+  padding: 6px 9px;
   font-size: var(--font-size-20);
   color: var(--color-gray-100);
 `;
 
-// 회원가입용 스타일 컴포넌트들
+// 회원가입용 스타일
 const SignupInputRow = styled.div`
   margin-bottom: 15px;
   position: relative;
@@ -226,6 +233,4 @@ const SignupInfoText = styled.div<{ color?: string }>`
   margin-top: 3.75px;
   margin-right: auto;
   padding-left: calc((100% - 381px) / 2 + 9px);
-`;
-
-export default InputField; 
+`; 
