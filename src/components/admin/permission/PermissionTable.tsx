@@ -13,7 +13,6 @@ interface PermissionUser {
   isActive: string;
 }
 
-//컴포넌트
 const permissionData: PermissionUser[] = [
   {
     roleId: 1,
@@ -44,14 +43,6 @@ const permissionData: PermissionUser[] = [
   }
 ];
 
-const columns = [
-  { key: 'roleName', label: '역할명', width: '22%' },
-  { key: 'description', label: '설명', width: '32%' },
-  { key: 'roleUserCount', label: '사용자 수', width: '14%' },
-  { key: 'isActive', label: '상태', width: '14%' },
-  { key: 'action', label: '작업', width: '14%' },
-];
-
 const PermissionTable = () => {
   const { selectedUser, isModalOpen, setSelectedUser, setModalOpen } = usePermissionStore();
 
@@ -69,38 +60,42 @@ const PermissionTable = () => {
     <>
       <TableWrapper>
         <TableBox>
-          <TableHeader>
-            {columns.map((col, idx) => (
-              <HeaderCell
-                key={col.key}
-                style={{ width: col.width, marginRight: idx === 0 ? '48px' : 0 }}
-              >
-                {col.label}
-              </HeaderCell>
-            ))}
-          </TableHeader>
-          <Divider />
-          <TableBody>
-            {permissionData.map((user) => (
-              <TableRow key={user.roleId}>
-                <BodyCell style={{ width: columns[0].width, justifyContent: 'flex-start', paddingLeft: '48px' }}>
-                  <RoleImage src={user.image} alt={user.roleName} />
-                  <NameTextBox>
-                    <NameText>{user.roleName}</NameText>
-                    <EngNameText>{user.roleNameEn}</EngNameText>
-                  </NameTextBox>
-                </BodyCell>
-                <BodyCell style={{ width: columns[1].width, border: "none" }}>{user.description}</BodyCell>
-                <BodyCell style={{ width: columns[2].width, border: "none"}}>{user.roleUserCount}명</BodyCell>
-                <BodyCell style={{ width: columns[3].width, border: "none" }}>
-                  <StatusIcon src={ActiveIcon} alt={user.isActive} />
-                </BodyCell>
-                <BodyCell style={{ width: columns[4].width }}>
-                  <ActionText onClick={() => handleEditClick(user)}>수정</ActionText>
-                </BodyCell>
-              </TableRow>
-            ))}
-          </TableBody>
+          <Table>
+                         <TableHead>
+               <TableRow>
+                 <TableCell>역할명</TableCell>
+                 <TableCell>설명</TableCell>
+                 <TableCell>사용자 수</TableCell>
+                 <TableCell>상태</TableCell>
+                 <TableCell>작업</TableCell>
+               </TableRow>
+             </TableHead>
+            <TableBody>
+              {permissionData.map((user) => (
+                <TableRow key={user.roleId}>
+                  <TableCell>
+                    <RoleImage src={user.image} alt={user.roleName} />
+                    <NameTextBox>
+                      <NameText>{user.roleName}</NameText>
+                      <EngNameText>{user.roleNameEn}</EngNameText>
+                    </NameTextBox>
+                  </TableCell>
+                  <TableCell>
+                    <DescriptionText>{user.description}</DescriptionText>
+                  </TableCell>
+                  <TableCell>
+                    <UserCountText>{user.roleUserCount}명</UserCountText>
+                  </TableCell>
+                  <TableCell center>
+                    <StatusIcon src={ActiveIcon} alt={user.isActive} />
+                  </TableCell>
+                  <TableCell>
+                    <ActionText onClick={() => handleEditClick(user)}>수정</ActionText>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
         </TableBox>
       </TableWrapper>
 
@@ -116,62 +111,130 @@ const PermissionTable = () => {
 export default PermissionTable;
 
 const TableWrapper = styled.div`
-  margin-top: -32px;
   width: 100%;
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 32px 0;
 `;
+
 const TableBox = styled.div`
   width: 1052px;
   background: var(--color-white);
   border-radius: 18.5px;
   box-shadow: 0px 0px 10.5px 2.1px rgba(153, 102, 204, 0.05);
   overflow: hidden;
+  padding-bottom: 28px;
 `;
-const TableHeader = styled.div`
-  display: flex;
+
+const Table = styled.div`
   width: 100%;
-  padding: 24px 0 24px 0;
-  background: transparent;
 `;
-const HeaderCell = styled.div`
-  width: 100%;
-  font-weight: 600;
-  font-size: 18px;
-  color: var(--color-black);
-  text-align: center;
+
+const TableHead = styled.div`
+  height: 60px;
+  border-bottom: 1.5px solid #E9E0F0;
+  background: #FFF;
   display: flex;
   align-items: center;
-  justify-content: center;
 `;
-const Divider = styled.div`
-  width: 100%;
-  border-top: 0.35px solid var(--color-darkgray);
-  margin-bottom: 4px;
-`;
+
 const TableBody = styled.div`
-  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 56px;
+  padding-top: 28px;
 `;
+
 const TableRow = styled.div`
+  width: 1052px;
   display: flex;
-  width: 100%;
-  min-height: 72px;
   align-items: center;
-  margin-bottom: 12px;
+  transition: background-color 0.2s ease;
 `;
-const BodyCell = styled.div`
-  width: 100%;
+
+const TableCell = styled.div<{ center?: boolean }>`
   display: flex;
   align-items: center;
-  justify-content: center;
+  padding-left: 36px;
+  justify-content: ${({ center }) => center ? 'center' : 'flex-start'};
+  color: #000;
+  font-size: var(--font-size-16);
   font-weight: 500;
-  font-size: 16.8px;
-  color: var(--color-black);
-  height: 72px;
-  gap: 10px;
+  
+  &:nth-child(1) {
+    width: 24%;
+  }
+  
+  &:nth-child(2) {
+    width: 36%;
+  }
+  
+  &:nth-child(3) {
+    width: 8%;
+  }
+  
+  &:nth-child(4) {
+    width: 20%;
+    justify-content: center;
+  }
+  
+  &:nth-child(5) {
+    width: 8%;
+  }
 `;
+
+const RoleImage = styled.img`
+  width: 33.6px;
+  height: 33.6px;
+  border-radius: 8.4px;
+  background: #ffa800;
+  object-fit: cover;
+  margin-right: 10px;
+`;
+
+const NameTextBox = styled.div`
+  display: flex;
+  flex-direction: column;
+`;
+
+const NameText = styled.span`
+  font-size: 16.8px;
+  font-weight: 700;
+  color: var(--color-black);
+  width: 100%;
+  text-align: left;
+`;
+
+const EngNameText = styled.span`
+  font-size: 14px;
+  color: #888;
+  width: 100%;
+  text-align: left;
+`;
+
+const DescriptionText = styled.span`
+  color: #000;
+  font-size: 16px;
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+`;
+
+const UserCountText = styled.span`
+  color: #000;
+  font-size: 16px;
+  font-weight: 500;
+  white-space: nowrap;
+`;
+
+const StatusIcon = styled.img`
+  width: 56px;
+  height: 32px;
+  object-fit: contain;
+`;
+
 const ActionText = styled.span`
   color: var(--color-black);
   font-size: 16.8px;
@@ -182,32 +245,3 @@ const ActionText = styled.span`
     color: var(--color-mediumpurple-300);
   }
 `;
-const RoleImage = styled.img`
-  width: 33.6px;
-  height: 33.6px;
-  border-radius: 8.4px;
-  background: #ffa800;
-  object-fit: cover;
-`;
-const NameTextBox = styled.div`
-  display: flex;
-  flex-direction: column;
-`;
-const NameText = styled.span`
-  font-size: 16.8px;
-  font-weight: 700;
-  color: var(--color-black);
-  width: 100%;
-  text-align: left;
-`;
-const EngNameText = styled.span`
-  font-size: 14px;
-  color: #888;
-  width: 100%;
-  text-align: left;
-`;
-const StatusIcon = styled.img`
-  width: 56px;
-  height: 32px;
-  object-fit: contain;
-`; 

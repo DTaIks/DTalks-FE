@@ -18,12 +18,6 @@ interface FAQCategory {
   isActive: boolean;
 }
 
-interface TableColumn {
-  key: string;
-  label: string;
-  width: string;
-}
-
 const CATEGORY_DATA: FAQCategory[] = [
   {
     categoryId: "1",
@@ -65,14 +59,6 @@ const CATEGORY_DATA: FAQCategory[] = [
     faqCount: 12,
     isActive: true
   }
-];
-
-const TABLE_COLUMNS: TableColumn[] = [
-  { key: "categoryName", label: "카테고리명", width: "200px" },
-  { key: "description", label: "설명", width: "400px" },
-  { key: "isActive", label: "상태", width: "150px" },
-  { key: "faqCount", label: "FAQ 수", width: "150px" },
-  { key: "action", label: "작업", width: "150px" }
 ];
 
 const FAQCategoryTable: React.FC = () => {
@@ -136,26 +122,26 @@ const FAQCategoryTable: React.FC = () => {
       onClick={() => handleRowClick(category)}
       selected={selectedCategory?.categoryId === category.categoryId}
     >
-      <CategoryNameCell>
+      <TableCell>
         <CategoryImage src={category.categoryNameImage} alt={category.categoryName} />
-      </CategoryNameCell>
-      <DescriptionCell>
+      </TableCell>
+      <TableCell>
         <DescriptionText>{category.description}</DescriptionText>
-      </DescriptionCell>
-      <StatusCell>
+      </TableCell>
+      <TableCell center>
         <StatusIcon 
           src={category.isActive ? ActiveIcon : InactiveIcon} 
           alt={category.isActive ? "활성" : "비활성"} 
         />
-      </StatusCell>
-      <FAQCountCell>
+      </TableCell>
+      <TableCell>
         <FAQCountText>{category.faqCount}개</FAQCountText>
-      </FAQCountCell>
-      <ActionCell>
+      </TableCell>
+      <TableCell>
         <ActionText onClick={(e) => handleArchiveClick(category, e)}>
           {category.isActive ? "보관" : "복원"}
         </ActionText>
-      </ActionCell>
+      </TableCell>
     </TableRow>
   ), [selectedCategory, handleRowClick, handleArchiveClick]);
 
@@ -165,21 +151,20 @@ const FAQCategoryTable: React.FC = () => {
         <TableHeader>
           <TableTitle>카테고리 목록</TableTitle>
         </TableHeader>
-        <HeaderBox>
-          <TableHeaderRow>
-            {TABLE_COLUMNS.map((column) => (
-              <TableHeaderCell 
-                key={column.key} 
-                width={column.width}
-              >
-                {column.label}
-              </TableHeaderCell>
-            ))}
-          </TableHeaderRow>
-        </HeaderBox>
-        <TableBody>
-          {categoryData.map(renderTableRow)}
-        </TableBody>
+        <Table>
+          <TableHead>
+            <TableRow>
+              <TableCell>카테고리명</TableCell>
+              <TableCell>설명</TableCell>
+              <TableCell center>상태</TableCell>
+              <TableCell>FAQ 수</TableCell>
+              <TableCell>작업</TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {categoryData.map(renderTableRow)}
+          </TableBody>
+        </Table>
       </TableContainer>
 
       {confirmModal.isOpen && confirmModal.type && (
@@ -207,40 +192,15 @@ const TableContainer = styled.div`
 `;
 
 const TableHeader = styled.div`
-  width: 1062.75px;
-  height: 75px;
+  width: 1062px;
+  height: 76px;
   border-radius: 19.5px 19.5px 0 0;
   border-bottom: 1.5px solid #E9E0F0;
   background: var(--color-white);
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 0 0 0 var(--padding-36);
-`;
-
-const HeaderBox = styled.div`
-  width: 1062px;
-  height: 60px;
-  border-bottom: 1.5px solid #E9E0F0;
-  background: #FFF;
-`;
-
-const TableHeaderRow = styled.div`
-  display: flex;
-  align-items: center;
-  height: 100%;
-`;
-
-const TableHeaderCell = styled.div<{ width: string }>`
-  width: ${props => props.width};
-  color: #000;
-  font-size: var(--font-size-16);
-  font-weight: 500;
-  text-align: center;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: var(--padding-16) var(--padding-24);
+  padding: 0 0 0 36px;
 `;
 
 const TableTitle = styled.h2`
@@ -248,6 +208,18 @@ const TableTitle = styled.h2`
   font-size: 20px;
   font-weight: 600;
   margin: 0;
+`;
+
+const Table = styled.div`
+  width: 100%;
+`;
+
+const TableHead = styled.div`
+  height: 60px;
+  border-bottom: 1.5px solid #E9E0F0;
+  background: #FFF;
+  display: flex;
+  align-items: center;
 `;
 
 const TableBody = styled.div`
@@ -262,46 +234,41 @@ const TableRow = styled.div<{ selected?: boolean }>`
   display: flex;
   align-items: center;
   transition: background-color 0.2s ease;
+  padding-left: 36px;
 `;
 
-const CategoryNameCell = styled.div`
-  width: 200px;
-  padding: var(--padding-16) var(--padding-24);
+const TableCell = styled.div<{ center?: boolean }>`
   display: flex;
   align-items: center;
-  justify-content: center;
-`;
-
-const DescriptionCell = styled.div`
-  width: 400px;
-  padding: var(--padding-16) var(--padding-24);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-`;
-
-const StatusCell = styled.div`
-  width: 150px;
-  padding: var(--padding-16) var(--padding-24);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-`;
-
-const FAQCountCell = styled.div`
-  width: 150px;
-  padding: var(--padding-16) var(--padding-24);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-`;
-
-const ActionCell = styled.div`
-  width: 150px;
-  padding: var(--padding-16) var(--padding-24);
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  justify-content: ${({ center }) => center ? 'center' : 'flex-start'};
+  color: #000;
+  font-size: var(--font-size-16);
+  font-weight: 500;
+  
+  &:nth-child(1) {
+    width: 200px;
+    padding-left: 0;
+  }
+  
+  &:nth-child(2) {
+    width: 380px;
+    padding-left: 0;
+  }
+  
+  &:nth-child(3) {
+    width: 220px;
+    padding-left: 0;
+  }
+  
+  &:nth-child(4) {
+    width: 125px;
+    padding-left: 0;
+  }
+  
+  &:nth-child(5) {
+    width: 125px;
+    padding-left: 0;
+  }
 `;
 
 const CategoryImage = styled.img<{ alt?: string }>`
@@ -318,8 +285,12 @@ const StatusIcon = styled.img<{ src: string; alt?: string }>`
 
 const DescriptionText = styled.span`
   color: #000;
-  font-size: 15px;
+  font-size: 16px;
   font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 380px;
 `;
 
 const FAQCountText = styled.span`

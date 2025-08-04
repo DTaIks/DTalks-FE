@@ -40,7 +40,7 @@ const FAQ_DATA: FAQItem[] = [
   {
     id: 1,
     question: "계정 비밀번호를 변경하는 방법은? 계정 비밀번호를 변경하는 방법은?",
-    answer: "회사 메일 포털 → [설정] → [비밀번호 변경] 메뉴에서 직접 변경 가능합니다. 보안을 위해 3개월마다 비밀번호 변경을 권장합니다.",
+    answer: "회사 메일 포털 → [설정] → [비밀번호 변경] 메뉴에서 직접 변경 가능합니다. 보안을 위해 3개월마다 비밀번호 변경을 권장합니다. [비밀번호 변경] 메뉴에서 직접 변경 가능합니다. 보안을 위해 3개월마다 비밀번호 변경을 권장합니다.",
     category: "IT/시스템",
     categoryImage: CategoryName1,
     isActive: true,
@@ -85,7 +85,7 @@ const FAQ_DATA: FAQItem[] = [
   {
     id: 6,
     question: "회사 복지 혜택은 어떻게 확인하나요?",
-    answer: "사내 포털 → [복지] → [복지 혜택] 메뉴에서 모든 복지 혜택을 확인할 수 있습니다. 각 부서별로 다른 혜택이 제공될 수 있으니 참고하세요.",
+    answer: "사내 포털 → [복지] → [복지 혜택] 메뉴에서 모든 복지 혜택을 확인할 수 있습니다. 각 부서별로 다른 혜택이 제공될 수 있으니 참고하세요. ㅁㄴㅇㄹㅁㄴㅇㄹㅁㄴㅇㄹㅁㄴㅇㄹㅁㄴㅇㄹㅁㄴㅇㄹ",
     category: "복지 / 휴가",
     categoryImage: CategoryName5,
     isActive: true,
@@ -369,14 +369,14 @@ const TableBody = styled.div`
 
 const TableTitle = styled.h2`
   color: #000;
-  font-size: 20px;
+  font-size: 16px;
   font-weight: 600;
   flex-shrink: 0;
 `;
 
 const QuestionText = styled.span`
   color: #000;
-  font-size: 18px;
+  font-size: 16px;
   font-weight: 600;
   white-space: nowrap;
   overflow: hidden;
@@ -395,20 +395,22 @@ const DateText = styled.span`
 
 const ExpandedTitle = styled.h3`
   color: #000;
-  font-size: var(--font-size-20);
+  font-size: var(--font-size-16);
   font-weight: 600;
   margin-left: 36px;
 `;
 
 const ExpandedAnswer = styled.p`
   color: #333;
-  font-size: var(--font-size-15);
+  font-size: var(--font-size-16);
   font-weight: 400;
-  line-height: 1.6;
+  line-height: 1.2;
   margin: 0;
   white-space: pre-wrap;
   margin-left: 36px;
-  margin-top: 24px;
+  margin-right: 36px;
+  padding: 20px 0;
+  align-items: center;
 `;
 
 const TableRow = styled.div<{ isExpanded?: boolean }>`
@@ -449,7 +451,7 @@ const ExpandedRow = styled.div`
 
 const ExpandedBox = styled.div`
   width: 974px;
-  height: 142px;
+  height: 152px;
   flex-shrink: 0;
   border-radius: 18.75px;
   background: #FFF;

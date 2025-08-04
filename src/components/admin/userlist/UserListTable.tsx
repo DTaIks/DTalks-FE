@@ -96,7 +96,7 @@ const TableHeader = styled.div`
 const TableRow = styled.div`  ${TableGrid}
   margin-top: 8px;
   font-weight: 500;
-  font-size: 18px;
+  font-size: 16px;
   color: var(--color-black);
   background: transparent;
   min-height: 48px;
