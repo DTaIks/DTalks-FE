@@ -89,8 +89,8 @@ const DropdownContainer = styled.div`
 const DropdownButton = styled.button<{ isExpanded: boolean }>`
   width: 160px;
   height: 40px;
-  padding: 0.75rem 1rem;
-  font-size: 0.875rem;
+  padding: 12px 16px;
+  font-size: 14px;
   color: var(--color-black);
   background: var(--color-white);
   border: 1px solid #ccc;
@@ -140,8 +140,8 @@ const DropdownContent = styled.div`
 const DropdownItem = styled.button`
   width: 100%;
   text-align: left;
-  padding: 0.75rem 1rem;
-  font-size: 0.875rem;
+  padding: 12px 16px;
+  font-size: 14px;
   color: var(--color-black);
   background: none;
   border: none;
