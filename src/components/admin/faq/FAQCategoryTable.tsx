@@ -205,7 +205,7 @@ const TableHeader = styled.div`
 
 const TableTitle = styled.h2`
   color: #000;
-  font-size: 20px;
+  font-size: 18px;
   font-weight: 600;
   margin: 0;
 `;

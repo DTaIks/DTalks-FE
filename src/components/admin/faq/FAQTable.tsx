@@ -331,7 +331,7 @@ const TableBody = styled.div`
 
 const TableTitle = styled.h2`
   color: #000;
-  font-size: 16px;
+  font-size: 18px;
   font-weight: 600;
   flex-shrink: 0;
 `;

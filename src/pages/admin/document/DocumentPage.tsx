@@ -56,6 +56,6 @@ const PaginationContainer = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-  margin-top: 12px;
-  margin-bottom: 48px;
+  margin-top: 4px;
+  margin-bottom: 24px;
 `;
