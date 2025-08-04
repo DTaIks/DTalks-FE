@@ -1,10 +1,11 @@
-import { useState, useMemo } from "react";
+import { useState } from "react";
 import styled from "styled-components";
 import TitleContainer from "../../../layout/TitleContainer";
 import DocumentStatCard from "../../../components/admin/document/DocumentStatCard";
 import DocumentTable from "../../../components/admin/document/DocumentTable";
 import Pagination from "../../../components/common/Pagination";
 import useDocumentStats from "../../../hooks/document/useDocumentStats";
+import { useDocumentData } from "../../../hooks/document/useDocumentData";
 
 const DocumentPage = () => {
   const [currentPage, setCurrentPage] = useState(1);
@@ -12,8 +13,8 @@ const DocumentPage = () => {
   const stats = formatStatsForDisplay();
   const itemsPerPage = 4;
 
-  // 총 페이지 수 계산 (실제 데이터 개수)
-  const totalItems = 5; // 실제로는 API에서 받아온 총 데이터 수
+  const { getFilteredData } = useDocumentData();
+  const { totalItems } = getFilteredData(currentPage, itemsPerPage);
   const totalPages = Math.ceil(totalItems / itemsPerPage);
 
   const handlePageChange = (page: number) => {

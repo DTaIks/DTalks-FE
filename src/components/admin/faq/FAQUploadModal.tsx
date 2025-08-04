@@ -12,6 +12,8 @@ interface FAQUploadModalProps {
   onClose: () => void;
   onSubmit: (data: FAQUploadData) => void;
   isSubmitting?: boolean;
+  initialData?: FAQUploadData;
+  isEdit?: boolean;
 }
 
 export interface FAQUploadData {
@@ -38,6 +40,8 @@ const FAQUploadModal: React.FC<FAQUploadModalProps> = ({
   isOpen,
   onClose,
   onSubmit,
+  initialData,
+  isEdit = false,
 }) => {
   const [formData, setFormData] = useState<FAQUploadData>({
     question: '',
@@ -51,13 +55,15 @@ const FAQUploadModal: React.FC<FAQUploadModalProps> = ({
   });
 
   useEffect(() => {
-    if (!isOpen) {
+    if (isOpen && initialData && isEdit) {
+      setFormData(initialData);
+    } else if (!isOpen) {
       setTouched({
         question: false,
         answer: false
       });
     }
-  }, [isOpen]);
+  }, [isOpen, initialData, isEdit]);
 
   const handleSubmit = () => {
     if (isFormValid()) {
@@ -108,7 +114,7 @@ const FAQUploadModal: React.FC<FAQUploadModalProps> = ({
     <UploadBaseModal
       isOpen={isOpen}
       onClose={handleClose}
-      title="FAQ 추가"
+      title={isEdit ? "FAQ 수정" : "FAQ 추가"}
       onSubmit={handleSubmit}
       submitDisabled={!isFormValid()}
     >
@@ -140,7 +146,7 @@ const FAQUploadModal: React.FC<FAQUploadModalProps> = ({
       </InputRow>
 
       <UploadInfoCard
-        title="FAQ 추가"
+        title={isEdit ? "FAQ 수정" : "FAQ 추가"}
         texts={FAQ_UPLOAD_INFO}
       />
     </UploadBaseModal>

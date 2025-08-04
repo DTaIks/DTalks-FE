@@ -120,6 +120,7 @@ const CATEGORY_OPTIONS: CategoryOption[] = [
 export const useFAQData = () => {
   const [faqItems, setFaqItems] = useState<FAQItem[]>(FAQ_DATA);
   const [selectedCategory, setSelectedCategory] = useState<string>("");
+  const [searchTerm, setSearchTerm] = useState<string>("");
 
   const handleArchive = useCallback((id: number) => {
     setFaqItems(prevItems => 
@@ -129,17 +130,79 @@ export const useFAQData = () => {
     );
   }, []);
 
+  const handleUpdateFAQ = useCallback((id: number, updatedData: { question: string; answer: string; category: string }) => {
+    setFaqItems(prevItems => 
+      prevItems.map(item => 
+        item.id === id ? { 
+          ...item, 
+          question: updatedData.question,
+          answer: updatedData.answer,
+          category: updatedData.category
+        } : item
+      )
+    );
+  }, []);
+
   const handleCategoryChange = useCallback((value: string) => {
     setSelectedCategory(value);
     console.log('Category:', value);
   }, []);
 
+  const handleSearch = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchTerm(e.target.value);
+    console.log('Search:', e.target.value);
+  }, []);
+
+  const getFilteredData = useCallback((currentPage: number, itemsPerPage: number) => {
+    let filteredData = faqItems;
+
+    // 검색 필터링
+    if (searchTerm) {
+      filteredData = filteredData.filter(faq => 
+        faq.question.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+    }
+
+    // 카테고리 필터링
+    if (selectedCategory) {
+      filteredData = filteredData.filter(faq => {
+        switch (selectedCategory) {
+          case "it":
+            return faq.category === "IT/시스템";
+          case "policy":
+            return faq.category === "사내 규정";
+          case "work":
+            return faq.category === "근무 / 근태";
+          case "salary":
+            return faq.category === "급여 / 복리후생";
+          case "welfare":
+            return faq.category === "복지 / 휴가";
+          default:
+            return true;
+        }
+      });
+    }
+
+    // 페이지네이션
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+    
+    return {
+      paginatedData: filteredData.slice(startIndex, endIndex),
+      totalItems: filteredData.length
+    };
+  }, [faqItems, searchTerm, selectedCategory]);
+
   return {
     faqItems,
     setFaqItems,
     selectedCategory,
+    searchTerm,
     handleArchive,
+    handleUpdateFAQ,
     handleCategoryChange,
+    handleSearch,
+    getFilteredData,
     tableColumns: TABLE_COLUMNS,
     categoryOptions: CATEGORY_OPTIONS
   };

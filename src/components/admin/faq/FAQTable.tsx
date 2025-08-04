@@ -4,6 +4,7 @@ import ActiveIcon from "../../../assets/common/Active.svg";
 import InactiveIcon from "../../../assets/common/InActive.svg";
 import CustomDropdown from "../../common/CustomDropdown";
 import ConfirmModal from "../../common/ConfirmModal";
+import FAQUploadModal from "./FAQUploadModal";
 import { useFAQData, type FAQItem } from "../../../hooks/faq/useFAQData";
 
 interface FAQTableProps {
@@ -20,18 +21,26 @@ const FAQTable: React.FC<FAQTableProps> = ({ currentPage, itemsPerPage }) => {
     faqName: ''
   });
 
+  const [editModal, setEditModal] = useState({
+    isOpen: false,
+    faqData: null as any,
+    faqId: null as number | null
+  });
+
   const {
     faqItems,
     selectedCategory,
+    searchTerm,
     handleArchive,
+    handleUpdateFAQ,
     handleCategoryChange,
+    handleSearch,
+    getFilteredData,
     tableColumns,
     categoryOptions
   } = useFAQData();
 
-  const startIndex = (currentPage - 1) * itemsPerPage;
-  const endIndex = startIndex + itemsPerPage;
-  const currentFAQItems = faqItems.slice(startIndex, endIndex);
+  const { paginatedData: currentFAQItems } = getFilteredData(currentPage, itemsPerPage);
 
   const handleRowToggle = useCallback((id: number) => {
     setExpandedRows(prev => {
@@ -45,12 +54,16 @@ const FAQTable: React.FC<FAQTableProps> = ({ currentPage, itemsPerPage }) => {
     });
   }, []);
 
-  const handleEdit = useCallback((id: number) => {
-    console.log('Edit FAQ:', id);
-  }, []);
-
-  const handleSearch = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    console.log('Search:', e.target.value);
+  const handleEdit = useCallback((faq: FAQItem) => {
+    setEditModal({
+      isOpen: true,
+      faqData: {
+        question: faq.question,
+        answer: faq.answer,
+        category: faq.category
+      },
+      faqId: faq.id
+    });
   }, []);
 
   const handleArchiveClick = useCallback((faq: FAQItem) => {
@@ -83,12 +96,28 @@ const FAQTable: React.FC<FAQTableProps> = ({ currentPage, itemsPerPage }) => {
     });
   }, []);
 
+  const handleCloseEditModal = useCallback(() => {
+    setEditModal({
+      isOpen: false,
+      faqData: null,
+      faqId: null
+    });
+  }, []);
+
+  const handleSubmitEdit = useCallback((data: any) => {
+    if (editModal.faqId) {
+      handleUpdateFAQ(editModal.faqId, data);
+      console.log('FAQ 수정 완료:', data);
+    }
+    handleCloseEditModal();
+  }, [handleCloseEditModal, editModal.faqId, handleUpdateFAQ]);
+
   const renderActionButtons = useCallback((faq: FAQItem) => (
     <ActionContainer>
       <ActionText 
         onClick={(e) => {
           e.stopPropagation();
-          handleEdit(faq.id);
+          handleEdit(faq);
         }}
       >
         수정
@@ -160,6 +189,7 @@ const FAQTable: React.FC<FAQTableProps> = ({ currentPage, itemsPerPage }) => {
             <SearchInput 
               type="text" 
               placeholder="질문으로 검색"
+              value={searchTerm}
               onChange={handleSearch}
             />
             <DropdownContainer>
@@ -192,6 +222,16 @@ const FAQTable: React.FC<FAQTableProps> = ({ currentPage, itemsPerPage }) => {
           onConfirm={handleConfirmAction}
           fileName={confirmModal.faqName}
           type={confirmModal.type as 'archive' | 'download'}
+        />
+      )}
+
+      {editModal.isOpen && (
+        <FAQUploadModal
+          isOpen={editModal.isOpen}
+          onClose={handleCloseEditModal}
+          onSubmit={handleSubmitEdit}
+          initialData={editModal.faqData}
+          isEdit={true}
         />
       )}
     </>
@@ -278,7 +318,9 @@ const ExpandedAnswer = styled.p`
   margin-left: 36px;
   margin-right: 36px;
   padding: 20px 0;
+  display: flex;
   align-items: center;
+  min-height: 82px;
 `;
 
 const TableRow = styled.div<{ isExpanded?: boolean }>`
@@ -319,7 +361,7 @@ const ExpandedRow = styled.div`
 
 const ExpandedBox = styled.div`
   width: 974px;
-  height: 152px;
+  height: 164px;
   flex-shrink: 0;
   border-radius: 18.75px;
   background: #FFF;
@@ -337,7 +379,12 @@ const ExpandedHeader = styled.div`
   align-items: center;
 `;
 
-const ExpandedContent = styled.div``;
+const ExpandedContent = styled.div`
+  display: flex;
+  align-items: center;
+  height: 82px;
+  margin-top: 4px;
+`;
 
 const TableCell = styled.div`
   display: flex;
@@ -353,8 +400,6 @@ const TableCell = styled.div`
   &:nth-child(4) { width: 200px; padding-left: 36px; }
   &:nth-child(5) { width: 150px; }
 `;
-
-
 
 const CategoryImage = styled.img<{ alt?: string }>`
   width: ${({ alt }) => alt?.includes('급여') ? '116.917px' : '97.5px'};

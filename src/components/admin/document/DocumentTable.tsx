@@ -2,101 +2,31 @@ import React from "react";
 import styled from "styled-components";
 import CustomDropdown from "../../common/CustomDropdown";
 import DropDownButton from "../../common/DropDownButton";
-import DocumentCategory1 from "../../../assets/document/DocumentCategory1.svg";
-import DocumentCategory2 from "../../../assets/document/DocumentCategory2.svg";
-import DocumentCategory3 from "../../../assets/document/DocumentCategory3.svg";
-import ActiveIcon from "../../../assets/common/Active.svg";
-
-interface DocumentItem {
-  id: number;
-  name: string;
-  category: string;
-  categoryImage: string;
-  version: string;
-  author: string;
-  lastModified: string;
-  status: string;
-  statusIcon: string;
-}
+import { useDocumentData } from "../../../hooks/document/useDocumentData";
 
 interface DocumentTableProps {
   currentPage: number;
   itemsPerPage: number;
 }
 
-const DOCUMENT_DATA: DocumentItem[] = [
-  {
-    id: 1,
-    name: "개발팀 업무 매뉴얼",
-    category: "매뉴얼",
-    categoryImage: DocumentCategory1,
-    version: "v1.0.0",
-    author: "정지민",
-    lastModified: "2024-08-08 00:00",
-    status: "활성",
-    statusIcon: ActiveIcon
-  },
-  {
-    id: 2,
-    name: "개발팀 업무 매뉴얼",
-    category: "사내 규정",
-    categoryImage: DocumentCategory2,
-    version: "v1.0.0",
-    author: "정지민",
-    lastModified: "2024-08-08 00:00",
-    status: "활성",
-    statusIcon: ActiveIcon
-  },
-  {
-    id: 3,
-    name: "개발팀 업무 매뉴얼",
-    category: "양식",
-    categoryImage: DocumentCategory3,
-    version: "v1.0.0",
-    author: "정지민",
-    lastModified: "2024-08-08 00:00",
-    status: "활성",
-    statusIcon: ActiveIcon
-  },
-  {
-    id: 4,
-    name: "개발팀 업무 매뉴얼",
-    category: "양식",
-    categoryImage: DocumentCategory3,
-    version: "v1.0.0",
-    author: "정지민",
-    lastModified: "2024-08-08 00:00",
-    status: "활성",
-    statusIcon: ActiveIcon
-  },
-  {
-    id: 5,
-    name: "개발팀 업무 매뉴얼",
-    category: "양식",
-    categoryImage: DocumentCategory3,
-    version: "v1.0.0",
-    author: "정지민",
-    lastModified: "2024-08-08 00:00",
-    status: "활성",
-    statusIcon: ActiveIcon
-  },
-];
-
 const DocumentTable: React.FC<DocumentTableProps> = ({ currentPage, itemsPerPage }) => {
-  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
-    console.log('Search:', e.target.value);
-  };
+  const {
+    searchTerm,
+    selectedCategory,
+    selectedStatus,
+    handleSearch,
+    handleCategoryChange,
+    handleStatusChange,
+    handleArchive,
+    handleDownload,
+    handleVersionManage,
+    getFilteredData,
+    categoryOptions,
+    statusOptions,
+    columnHeaders
+  } = useDocumentData();
 
-  const handleCategoryChange = (value: string) => {
-    console.log('Category:', value);
-  };
-
-  const handleStatusChange = (value: string) => {
-    console.log('Status:', value);
-  };
-
-  // 컬럼 헤더 내용 배열
-  const columnHeaders = ['문서명', '카테고리', '버전', '작성자', '최종수정일', '상태', '작업'];
+  const { paginatedData } = getFilteredData(currentPage, itemsPerPage);
 
   return (
     <>
@@ -107,29 +37,20 @@ const DocumentTable: React.FC<DocumentTableProps> = ({ currentPage, itemsPerPage
             <SearchInput 
               type="text" 
               placeholder="문서명으로 검색"
+              value={searchTerm}
               onChange={handleSearch}
             />
             <DropdownContainer>
               <CustomDropdown
-                options={[
-                  { value: "", label: "전체 카테고리" },
-                  { value: "policy", label: "사내 규정" },
-                  { value: "manual", label: "매뉴얼" },
-                  { value: "form", label: "양식" }
-                ]}
-                value=""
+                options={categoryOptions}
+                value={selectedCategory}
                 onChange={handleCategoryChange}
               />
             </DropdownContainer>
             <DropdownContainer>
               <CustomDropdown
-                options={[
-                  { value: "", label: "전체 상태" },
-                  { value: "active", label: "활성" },
-                  { value: "inactive", label: "비활성" },
-                  { value: "archived", label: "보관" }
-                ]}
-                value=""
+                options={statusOptions}
+                value={selectedStatus}
                 onChange={handleStatusChange}
               />
             </DropdownContainer>
@@ -144,9 +65,7 @@ const DocumentTable: React.FC<DocumentTableProps> = ({ currentPage, itemsPerPage
             </TableRow>
           </TableHead>
           <TableBody>
-            {DOCUMENT_DATA
-              .slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage)
-              .map((document) => (
+            {paginatedData.map((document) => (
               <TableRow key={document.id}>
                 <TableCell>
                   <DocumentName>{document.name}</DocumentName>
@@ -169,9 +88,9 @@ const DocumentTable: React.FC<DocumentTableProps> = ({ currentPage, itemsPerPage
                 <TableCell>
                   <DropDownButton 
                     items={[
-                      { label: "다운로드", onClick: () => console.log('다운로드') },
-                      { label: "버전 관리", onClick: () => console.log('버전 관리') },
-                      { label: "보관", onClick: () => console.log('보관') },
+                      { label: "다운로드", onClick: () => handleDownload(document.id) },
+                      { label: "버전 관리", onClick: () => handleVersionManage(document.id) },
+                      { label: "보관", onClick: () => handleArchive(document.id) },
                     ]}
                   />
                 </TableCell>
@@ -327,7 +246,7 @@ const DateText = styled.span`
 `;
 
 const StatusIcon = styled.img`
-  width: 56px;
+  width: ${props => props.alt === "비활성" ? "69px" : "56px"};
   height: 32px;
   object-fit: contain;
 `; 
