@@ -1,4 +1,4 @@
-import type { StatCard } from '../components/common/StatCard';
+import type { StatCard } from '../components/admin/chart/StatCard';
 import type { ResponseTime } from '../components/admin/chart/ResponseTimeCard';
 import type { PromptTemplate } from '../components/admin/chart/PromptTemplateCard';
 import type { Keyword } from '../components/admin/chart/KeywordAnalysisCard';

@@ -82,6 +82,7 @@ const TableContainer = styled.div`
   box-shadow: 0px 0px 11.25px 2.25px rgba(153, 102, 204, 0.05);
   overflow: hidden;
   padding-bottom: 32px;
+  max-height: 586px;
 `;
 
 const Table = styled.div`

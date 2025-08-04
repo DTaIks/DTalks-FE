@@ -8,7 +8,7 @@ import FAQUploadModal, { type FAQUploadData } from "../../../components/admin/fa
 
 const FAQPage = () => {
   const [currentPage, setCurrentPage] = useState<number>(1);
-  const itemsPerPage = 5; // 페이지당 표시할 FAQ 수
+  const itemsPerPage = 4; // 페이지당 표시할 FAQ 수
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
 
   // 전체 FAQ 데이터 (실제로는 API에서 가져올 데이터)

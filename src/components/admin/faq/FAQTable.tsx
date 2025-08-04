@@ -1,143 +1,33 @@
 import React, { useState, useCallback } from "react";
 import styled from "styled-components";
-import CategoryName1 from "../../../assets/faq/CategoryName1.svg";
-import CategoryName2 from "../../../assets/faq/CategoryName2.svg";
-import CategoryName3 from "../../../assets/faq/CategoryName3.svg";
-import CategoryName4 from "../../../assets/faq/CategoryName4.svg";
-import CategoryName5 from "../../../assets/faq/CategoryName5.svg";
 import ActiveIcon from "../../../assets/common/Active.svg";
 import InactiveIcon from "../../../assets/common/InActive.svg";
 import CustomDropdown from "../../common/CustomDropdown";
 import ConfirmModal from "../../common/ConfirmModal";
-
-interface FAQItem {
-  id: number;
-  question: string;
-  answer: string;
-  category: string;
-  categoryImage: string;
-  isActive: boolean;
-  createdAt: string;
-}
-
-interface TableColumn {
-  key: string;
-  label: string;
-  width: string;
-}
-
-interface CategoryOption {
-  value: string;
-  label: string;
-}
+import { useFAQData, type FAQItem } from "../../../hooks/faq/useFAQData";
 
 interface FAQTableProps {
   currentPage: number;
   itemsPerPage: number;
 }
 
-const FAQ_DATA: FAQItem[] = [
-  {
-    id: 1,
-    question: "계정 비밀번호를 변경하는 방법은? 계정 비밀번호를 변경하는 방법은?",
-    answer: "회사 메일 포털 → [설정] → [비밀번호 변경] 메뉴에서 직접 변경 가능합니다. 보안을 위해 3개월마다 비밀번호 변경을 권장합니다. [비밀번호 변경] 메뉴에서 직접 변경 가능합니다. 보안을 위해 3개월마다 비밀번호 변경을 권장합니다.",
-    category: "IT/시스템",
-    categoryImage: CategoryName1,
-    isActive: true,
-    createdAt: "2024-01-16 14:30",
-  },
-  {
-    id: 2,
-    question: "계정 비밀번호를 변경하는 방법은?",
-    answer: "회사 메일 포털 → [설정] → [비밀번호 변경] 메뉴에서 직접 변경 가능합니다. 보안을 위해 3개월마다 비밀번호 변경을 권장합니다.",
-    category: "사내 규정",
-    categoryImage: CategoryName2,
-    isActive: true,
-    createdAt: "2024-01-16 14:30",
-  },
-  {
-    id: 3,
-    question: "계정 비밀번호를 변경하는 방법은?",
-    answer: "회사 메일 포털 → [설정] → [비밀번호 변경] 메뉴에서 직접 변경 가능합니다. 보안을 위해 3개월마다 비밀번호 변경을 권장합니다.",
-    category: "근무 / 근태",
-    categoryImage: CategoryName3,
-    isActive: true,
-    createdAt: "2024-01-16 14:30",
-  },
-  {
-    id: 4,
-    question: "계정 비밀번호를 변경하는 방법은?",
-    answer: "회사 메일 포털 → [설정] → [비밀번호 변경] 메뉴에서 직접 변경 가능합니다. 보안을 위해 3개월마다 비밀번호 변경을 권장합니다.",
-    category: "급여 / 복리후생",
-    categoryImage: CategoryName4,
-    isActive: true,
-    createdAt: "2024-01-16 14:30",
-  },
-  {
-    id: 5,
-    question: "계정 비밀번호를 변경하는 방법은?",
-    answer: "회사 메일 포털 → [설정] → [비밀번호 변경] 메뉴에서 직접 변경 가능합니다. 보안을 위해 3개월마다 비밀번호 변경을 권장합니다.",
-    category: "복지 / 휴가",
-    categoryImage: CategoryName5,
-    isActive: false,
-    createdAt: "2024-01-16 14:30",
-  },
-  {
-    id: 6,
-    question: "회사 복지 혜택은 어떻게 확인하나요?",
-    answer: "사내 포털 → [복지] → [복지 혜택] 메뉴에서 모든 복지 혜택을 확인할 수 있습니다. 각 부서별로 다른 혜택이 제공될 수 있으니 참고하세요. ㅁㄴㅇㄹㅁㄴㅇㄹㅁㄴㅇㄹㅁㄴㅇㄹㅁㄴㅇㄹㅁㄴㅇㄹ",
-    category: "복지 / 휴가",
-    categoryImage: CategoryName5,
-    isActive: true,
-    createdAt: "2024-01-17 09:15",
-  },
-  {
-    id: 7,
-    question: "연차 신청은 언제까지 해야 하나요?",
-    answer: "연차 신청은 사용일 기준 최소 3일 전까지 신청해야 합니다. 긴급한 경우에는 팀장 승인 후 사용 가능합니다.",
-    category: "근무 / 근태",
-    categoryImage: CategoryName3,
-    isActive: true,
-    createdAt: "2024-01-17 10:30",
-  },
-  {
-    id: 8,
-    question: "급여 지급일은 언제인가요?",
-    answer: "급여는 매월 25일에 지급됩니다. 공휴일인 경우 전 영업일에 지급됩니다.",
-    category: "급여 / 복리후생",
-    categoryImage: CategoryName4,
-    isActive: true,
-    createdAt: "2024-01-18 11:45",
-  }
-];
-
-const TABLE_COLUMNS: TableColumn[] = [
-  { key: "question", label: "질문", width: "340px" },
-  { key: "answer", label: "카테고리", width: "120px" },
-  { key: "category", label: "상태", width: "120px" },
-  { key: "isActive", label: "최종 수정일", width: "200px" },
-  { key: "action", label: "작업", width: "150px" }
-];
-
-const CATEGORY_OPTIONS: CategoryOption[] = [
-  { value: "", label: "전체 카테고리" },
-  { value: "it", label: "IT/시스템" },
-  { value: "policy", label: "사내 규정" },
-  { value: "work", label: "근무 / 근태" },
-  { value: "salary", label: "급여 / 복리후생" },
-  { value: "welfare", label: "복지 / 휴가" }
-];
-
 const FAQTable: React.FC<FAQTableProps> = ({ currentPage, itemsPerPage }) => {
   const [expandedRows, setExpandedRows] = useState<Set<number>>(new Set());
-  const [faqItems, setFaqItems] = useState<FAQItem[]>(FAQ_DATA);
-  const [selectedCategory, setSelectedCategory] = useState<string>("");
   const [confirmModal, setConfirmModal] = useState({
     isOpen: false,
     type: null as 'archive' | null,
     faqId: null as number | null,
     faqName: ''
   });
+
+  const {
+    faqItems,
+    selectedCategory,
+    handleArchive,
+    handleCategoryChange,
+    tableColumns,
+    categoryOptions
+  } = useFAQData();
 
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
@@ -155,25 +45,12 @@ const FAQTable: React.FC<FAQTableProps> = ({ currentPage, itemsPerPage }) => {
     });
   }, []);
 
-  const handleArchive = useCallback((id: number) => {
-    setFaqItems(prevItems => 
-      prevItems.map(item => 
-        item.id === id ? { ...item, isActive: false } : item
-      )
-    );
-  }, []);
-
   const handleEdit = useCallback((id: number) => {
     console.log('Edit FAQ:', id);
   }, []);
 
   const handleSearch = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     console.log('Search:', e.target.value);
-  }, []);
-
-  const handleCategoryChange = useCallback((value: string) => {
-    setSelectedCategory(value);
-    console.log('Category:', value);
   }, []);
 
   const handleArchiveClick = useCallback((faq: FAQItem) => {
@@ -250,24 +127,24 @@ const FAQTable: React.FC<FAQTableProps> = ({ currentPage, itemsPerPage }) => {
           onClick={() => handleRowToggle(faq.id)} 
           isExpanded={isExpanded}
         >
-          <QuestionCell>
+          <TableCell>
             <QuestionText>{faq.question}</QuestionText>
-          </QuestionCell>
-          <CategoryCell>
+          </TableCell>
+          <TableCell>
             <CategoryImage src={faq.categoryImage} alt={faq.category} />
-          </CategoryCell>
-          <StatusCell>
+          </TableCell>
+          <TableCell>
             <StatusIcon 
               src={faq.isActive ? ActiveIcon : InactiveIcon} 
               alt={faq.isActive ? "활성" : "비활성"} 
             />
-          </StatusCell>
-          <DateCell>
+          </TableCell>
+          <TableCell>
             <DateText>{faq.createdAt}</DateText>
-          </DateCell>
-          <ActionCell>
+          </TableCell>
+          <TableCell>
             {renderActionButtons(faq)}
-          </ActionCell>
+          </TableCell>
         </TableRow>
         {isExpanded && renderExpandedContent(faq)}
       </React.Fragment>
@@ -287,25 +164,22 @@ const FAQTable: React.FC<FAQTableProps> = ({ currentPage, itemsPerPage }) => {
             />
             <DropdownContainer>
               <CustomDropdown
-                options={CATEGORY_OPTIONS}
+                options={categoryOptions}
                 value={selectedCategory}
                 onChange={handleCategoryChange}
               />
             </DropdownContainer>
           </SearchContainer>
         </TableHeader>
-        <HeaderBox>
-          <TableHeaderRow>
-            {TABLE_COLUMNS.map((column) => (
-              <TableHeaderCell 
-                key={column.key} 
-                width={column.width}
-              >
-                {column.label}
-              </TableHeaderCell>
-            ))}
-          </TableHeaderRow>
-        </HeaderBox>
+                  <TableHead>
+            <TableRow>
+              {tableColumns.map((column) => (
+                <TableCell key={column.key}>
+                  {column.label}
+                </TableCell>
+              ))}
+            </TableRow>
+          </TableHead>
         <TableBody>
           {currentFAQItems.map(renderTableRow)}
         </TableBody>
@@ -328,7 +202,6 @@ export default FAQTable;
 
 const TableContainer = styled.div`
   width: 1062px;
-  min-height: 600px;
   border-radius: var(--br-18);
   background: var(--color-white);
   box-shadow: 0 6px 18px 0 rgba(125, 93, 246, 0.10);
@@ -337,7 +210,7 @@ const TableContainer = styled.div`
 
 const TableHeader = styled.div`
   width: 1062px;
-  height: 75px;
+  height: 76px;
   border-radius: 19.5px 19.5px 0 0;
   border-bottom: 1.5px solid #E9E0F0;
   background: var(--color-white);
@@ -349,17 +222,12 @@ const TableHeader = styled.div`
   position: relative;
 `;
 
-const HeaderBox = styled.div`
-  width: 1062px;
+const TableHead = styled.div`
   height: 60px;
   border-bottom: 1.5px solid #E9E0F0;
   background: #FFF;
-`;
-
-const TableHeaderRow = styled.div`
   display: flex;
   align-items: center;
-  height: 100%;
 `;
 
 const TableBody = styled.div`
@@ -471,63 +339,22 @@ const ExpandedHeader = styled.div`
 
 const ExpandedContent = styled.div``;
 
-const TableHeaderCell = styled.div<{ width: string }>`
-  width: ${props => props.width};
-  color: #000;
-  font-size: var(--font-size-16);
-  font-weight: 500;
-  padding-left: ${({ width }) => {
-    if (width === "340px") return '44px';
-    if (width === "120px") return '24px';
-    if (width === "200px") return '36px';
-    return '0';
-  }};
-  display: flex;
-  align-items: center;
-  justify-content: ${({ width }) => {
-    if (width === "120px") return 'center';
-    if (width === "150px") return 'flex-start';
-    return 'flex-start';
-  }};
-`;
-
-const QuestionCell = styled.div`
-  width: 340px;
-  padding-left: 44px;
-  display: flex;
-  align-items: center;
-  overflow: hidden;
-`;
-
-const CategoryCell = styled.div`
-  width: 120px;
-  display: flex;
-  padding-left: 24px;
-  align-items: center;
-  justify-content: center;
-`;
-
-const StatusCell = styled.div`
-  width: 120px;
-  display: flex;
-  align-items: center;
-  padding-left: 24px;
-  justify-content: center;
-`;
-
-const DateCell = styled.div`
-  width: 200px;
-  display: flex;
-  padding-left: 36px;
-  align-items: center;
-`;
-
-const ActionCell = styled.div`
-  width: 150px;
+const TableCell = styled.div`
   display: flex;
   align-items: center;
   justify-content: flex-start;
+  color: #000;
+  font-size: var(--font-size-16);
+  font-weight: 500;
+  
+  &:nth-child(1) { width: 340px; padding-left: 44px; }
+  &:nth-child(2) { width: 120px; padding-left: 24px; justify-content: center; }
+  &:nth-child(3) { width: 120px; padding-left: 24px; justify-content: center; }
+  &:nth-child(4) { width: 200px; padding-left: 36px; }
+  &:nth-child(5) { width: 150px; }
 `;
+
+
 
 const CategoryImage = styled.img<{ alt?: string }>`
   width: ${({ alt }) => alt?.includes('급여') ? '116.917px' : '97.5px'};
@@ -570,7 +397,7 @@ const SearchContainer = styled.div`
   align-items: center;
   flex-shrink: 0;
   position: absolute;
-  right: 48px;
+  right: 36px;
 `;
 
 const DropdownContainer = styled.div`

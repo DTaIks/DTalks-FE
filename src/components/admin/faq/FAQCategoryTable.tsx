@@ -128,7 +128,7 @@ const FAQCategoryTable: React.FC = () => {
       <TableCell>
         <DescriptionText>{category.description}</DescriptionText>
       </TableCell>
-      <TableCell center>
+      <TableCell>
         <StatusIcon 
           src={category.isActive ? ActiveIcon : InactiveIcon} 
           alt={category.isActive ? "활성" : "비활성"} 
@@ -156,7 +156,7 @@ const FAQCategoryTable: React.FC = () => {
             <TableRow>
               <TableCell>카테고리명</TableCell>
               <TableCell>설명</TableCell>
-              <TableCell center>상태</TableCell>
+              <TableCell>상태</TableCell>
               <TableCell>FAQ 수</TableCell>
               <TableCell>작업</TableCell>
             </TableRow>
@@ -237,38 +237,19 @@ const TableRow = styled.div<{ selected?: boolean }>`
   padding-left: 36px;
 `;
 
-const TableCell = styled.div<{ center?: boolean }>`
+const TableCell = styled.div`
   display: flex;
   align-items: center;
-  justify-content: ${({ center }) => center ? 'center' : 'flex-start'};
+  justify-content: flex-start;
   color: #000;
   font-size: var(--font-size-16);
   font-weight: 500;
   
-  &:nth-child(1) {
-    width: 200px;
-    padding-left: 0;
-  }
-  
-  &:nth-child(2) {
-    width: 380px;
-    padding-left: 0;
-  }
-  
-  &:nth-child(3) {
-    width: 220px;
-    padding-left: 0;
-  }
-  
-  &:nth-child(4) {
-    width: 125px;
-    padding-left: 0;
-  }
-  
-  &:nth-child(5) {
-    width: 125px;
-    padding-left: 0;
-  }
+  &:nth-child(1) { width: 200px; }
+  &:nth-child(2) { width: 380px; }
+  &:nth-child(3) { width: 220px; justify-content: center; }
+  &:nth-child(4) { width: 125px; }
+  &:nth-child(5) { width: 125px; }
 `;
 
 const CategoryImage = styled.img<{ alt?: string }>`

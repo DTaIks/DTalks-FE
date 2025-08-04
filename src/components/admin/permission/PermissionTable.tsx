@@ -118,7 +118,7 @@ const TableWrapper = styled.div`
 `;
 
 const TableBox = styled.div`
-  width: 1052px;
+  width: 1062px;
   background: var(--color-white);
   border-radius: 18.5px;
   box-shadow: 0px 0px 10.5px 2.1px rgba(153, 102, 204, 0.05);
