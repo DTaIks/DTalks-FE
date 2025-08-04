@@ -211,9 +211,21 @@ export const useDocumentStore = create<DocumentState>()(
       formatStatsForDisplay: () => {
         const stats = get().getDocumentStats();
         return [
-          { title: "총 문서 수", value: stats.totalDocuments.toString(), additionalInfo: "" },
-          { title: "활성 문서 수", value: stats.activeDocuments.toString(), additionalInfo: "" },
-          { title: "비활성 문서 수", value: stats.inactiveDocuments.toString(), additionalInfo: "" }
+          { 
+            title: "총 문서 수", 
+            value: `${stats.totalDocuments.toLocaleString()}개`, 
+            additionalInfo: "+2개 이번 주" 
+          },
+          { 
+            title: "활성 문서 수", 
+            value: `${stats.activeDocuments.toLocaleString()}개`, 
+            additionalInfo: "+1개 이번 주" 
+          },
+          { 
+            title: "비활성 문서 수", 
+            value: `${stats.inactiveDocuments.toLocaleString()}개`, 
+            additionalInfo: "+1개 이번 달" 
+          }
         ];
       }
     }),
