@@ -1,6 +1,6 @@
 import React from 'react';
 import TitleContainer from '../../../layout/TitleContainer';
-import StatCard from '../../../components/admin/chart/StatCard';
+import StatCard from '../../../components/common/StatCard';
 import { ResponseTimeChart } from '../../../components/admin/chart/ResponseTimeCard';
 import { KeywordAnalysisCard } from '../../../components/admin/chart/KeywordAnalysisCard';
 import { PromptTemplateCard } from '../../../components/admin/chart/PromptTemplateCard';
