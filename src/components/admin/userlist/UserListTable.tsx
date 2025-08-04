@@ -38,69 +38,133 @@ const UserTable = () => {
       <SearchContainerOutside>
         <SearchInput placeholder="이름으로 검색" />
       </SearchContainerOutside>
-      <Wrapper>
-        <TableHeader>
-          <div>이름</div>
-          <div>부서</div>
-          <div>역할</div>
-          <div>이메일</div>
-        </TableHeader>
-        <Divider />
-        {userData.map((user) => (
-          <TableRow key={user.id}>
-            <div>{user.name}</div>
-            <div>{user.department}</div>
-            <div>{user.role}</div>
-            <div>{user.email}</div>
-          </TableRow>
-        ))}
-      </Wrapper>
+      <TableContainer>
+        <Table>
+          <TableHead>
+            <TableRow>
+              <TableCell>이름</TableCell>
+              <TableCell>부서</TableCell>
+              <TableCell>역할</TableCell>
+              <TableCell>이메일</TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {userData.map((user) => (
+              <TableRow key={user.id}>
+                <TableCell>
+                  <NameText>{user.name}</NameText>
+                </TableCell>
+                <TableCell>
+                  <DepartmentText>{user.department}</DepartmentText>
+                </TableCell>
+                <TableCell>
+                  <RoleText>{user.role}</RoleText>
+                </TableCell>
+                <TableCell>
+                  <EmailText>{user.email}</EmailText>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </TableContainer>
     </>
   );
 };
 
 export default UserTable;
 
-const Wrapper = styled.div`
-  width: 989.33px;
+const TableContainer = styled.div`
+  width: 1062px;
   margin: 0 auto 12px auto;
   background: var(--color-white);
   border-radius: var(--br-18);
   box-shadow: 0px 0px 11.25px 2.25px rgba(153, 102, 204, 0.05);
-  padding: 20px 36px 24px 36px;
-  overflow-x: hidden;
-  position: relative;
+  overflow: hidden;
+  padding-bottom: 32px;
 `;
-const TableGrid = `display: grid; grid-template-columns: 1.5fr 1.5fr 1.5fr 2.2fr; align-items: center; row-gap: 0;`;
-const Divider = styled.div`
-  position: relative;
-  left: -36px;
-  width: calc(100% + 72px);
-  height: 1px;
-  background: var(--color-divider);
-  margin: 0;
+
+const Table = styled.div`
+  width: 100%;
 `;
-const TableHeader = styled.div`
-  ${TableGrid}
-  color: #2D1457;
-  font-size: 18px;
-  font-style: normal;
-  font-weight: 600;
-  line-height: normal;
-  margin-bottom: 0;
-  margin-top: 0px;
-  background: transparent;
-  min-height: 48px;
-  padding: 0 0 16px 0;
-`;
-const TableRow = styled.div`  ${TableGrid}
-  margin-top: 8px;
+
+const TableCell = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  color: #000;
+  font-size: var(--font-size-16);
   font-weight: 500;
-  font-size: 16px;
-  color: var(--color-black);
-  background: transparent;
-  min-height: 48px;
+  
+  &:nth-child(1) {
+    width: 25%;
+  }
+  
+  &:nth-child(2) {
+    width: 25%;
+  }
+  
+  &:nth-child(3) {
+    width: 25%;
+  }
+  
+  &:nth-child(4) {
+    width: 40%;
+  }
 `;
+
+const TableHead = styled.div`
+  height: 60px;
+  border-bottom: 1.5px solid #E9E0F0;
+  background: #FFF;
+  display: flex;
+  align-items: center;
+  font-weight: 600;
+  
+  ${TableCell} {
+    color: #2D1457;
+  }
+`;
+
+const TableBody = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+  padding-top: 28px;
+`;
+
+const TableRow = styled.div`
+  width: 989.33px;
+  display: flex;
+  align-items: center;
+  transition: background-color 0.2s ease;
+  padding-left: 36px;
+`;
+
+const NameText = styled.span`
+  color: var(--color-black);
+  font-size: 16px;
+  font-weight: 500;
+`;
+
+const DepartmentText = styled.span`
+  color: var(--color-black);
+  font-size: 16px;
+  font-weight: 500;
+`;
+
+const RoleText = styled.span`
+  color: var(--color-black);
+  font-size: 16px;
+  font-weight: 500;
+`;
+
+const EmailText = styled.span`
+  color: var(--color-black);
+  font-size: 16px;
+  font-weight: 500;
+`;
+
 const SearchInput = styled.input`
   border-radius: var(--br-8);
   border: 0.75px solid var(--color-darkgray);
@@ -113,6 +177,7 @@ const SearchInput = styled.input`
   outline: none;
   margin-left: 10px;
 `;
+
 const SearchContainerOutside = styled.div`
   display: flex;
   justify-content: flex-end;

@@ -96,8 +96,6 @@ const RoleManagement = ({ open, onClose, selectedUser }: RoleManagementProps) =>
 
 export default RoleManagement;
 
-
-
 // 모달 오버레이
 const ModalOverlay = styled.div`
   position: fixed;

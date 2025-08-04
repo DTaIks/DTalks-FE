@@ -123,7 +123,7 @@ const TableBox = styled.div`
   border-radius: 18.5px;
   box-shadow: 0px 0px 10.5px 2.1px rgba(153, 102, 204, 0.05);
   overflow: hidden;
-  padding-bottom: 28px;
+  padding-bottom: 32px;
 `;
 
 const Table = styled.div`
@@ -142,7 +142,7 @@ const TableBody = styled.div`
   display: flex;
   flex-direction: column;
   gap: 56px;
-  padding-top: 28px;
+  padding-top: 32px;
 `;
 
 const TableRow = styled.div`
