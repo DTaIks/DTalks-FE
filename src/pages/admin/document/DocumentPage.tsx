@@ -4,17 +4,14 @@ import TitleContainer from "../../../layout/TitleContainer";
 import DocumentStatCard from "../../../components/admin/document/DocumentStatCard";
 import DocumentTable from "../../../components/admin/document/DocumentTable";
 import Pagination from "../../../components/common/Pagination";
-import useDocumentStats from "../../../hooks/document/useDocumentStats";
 import { useDocumentStore } from "../../../store/documentStore";
 
 // 문서 관리 페이지
 const DocumentPage = () => {
   const [currentPage, setCurrentPage] = useState(1);
-  const { formatStatsForDisplay } = useDocumentStats();
+  const { formatStatsForDisplay, filteredData } = useDocumentStore();
   const stats = formatStatsForDisplay();
   const itemsPerPage = 4;
-
-  const { filteredData } = useDocumentStore();
   
   const totalItems = filteredData.length;
   const totalPages = totalItems <= itemsPerPage ? 1 : Math.ceil(totalItems / itemsPerPage);

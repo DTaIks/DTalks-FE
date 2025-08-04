@@ -1,11 +1,12 @@
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useMemo } from "react";
 import styled from "styled-components";
 import ActiveIcon from "../../../assets/common/Active.svg";
 import InactiveIcon from "../../../assets/common/InActive.svg";
 import CustomDropdown from "../../common/CustomDropdown";
 import ConfirmModal from "../../common/ConfirmModal";
 import FAQUploadModal from "./FAQUploadModal";
-import { useFAQStore, type FAQItem } from "../../../store/faqStore";
+import { useFAQStore } from "../../../store/faqStore";
+import { type FAQItem } from "../../../store/faqStore";
 import type { FAQUploadData } from "./FAQUploadModal";
 
 // Types
@@ -62,23 +63,23 @@ const FAQTable: React.FC<FAQTableProps> = ({ currentPage, itemsPerPage }) => {
   const { paginatedData: currentFAQItems } = getFilteredData(currentPage, itemsPerPage);
 
   // 카테고리 옵션 설정
-  const categoryOptions = [
+  const categoryOptions = useMemo(() => [
     { value: "", label: "전체 카테고리" },
     { value: "it", label: "IT/시스템" },
     { value: "policy", label: "사내 규정" },
     { value: "work", label: "근무 / 근태" },
     { value: "salary", label: "급여 / 복리후생" },
     { value: "welfare", label: "복지 / 휴가" }
-  ];
+  ], []);
 
   // 테이블 컬럼 설정
-  const tableColumns = [
+  const tableColumns = useMemo(() => [
     { key: "question", label: "질문" },
     { key: "answer", label: "카테고리" },
     { key: "category", label: "상태" },
     { key: "isActive", label: "최종 수정일" },
     { key: "action", label: "작업" }
-  ];
+  ], []);
 
   // 행 토글 핸들러
   const handleRowToggle = useCallback((id: number) => {

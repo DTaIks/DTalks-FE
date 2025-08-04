@@ -18,6 +18,12 @@ interface DocumentItem {
   statusIcon: string;
 }
 
+interface DocumentStats {
+  totalDocuments: number;
+  activeDocuments: number;
+  inactiveDocuments: number;
+}
+
 interface DocumentState {
   documentItems: DocumentItem[];
   selectedCategory: string;
@@ -34,6 +40,13 @@ interface DocumentState {
     paginatedData: DocumentItem[];
     totalItems: number;
   };
+  
+  getDocumentStats: () => DocumentStats;
+  formatStatsForDisplay: () => Array<{
+    title: string;
+    value: string;
+    additionalInfo: string;
+  }>;
 }
 
 const DOCUMENT_DATA: DocumentItem[] = [
@@ -180,6 +193,28 @@ export const useDocumentStore = create<DocumentState>()(
           paginatedData: filteredData.slice(startIndex, endIndex),
           totalItems
         };
+      },
+
+      getDocumentStats: () => {
+        const { documentItems } = get();
+        const total = documentItems.length;
+        const active = documentItems.filter(item => item.status === "활성").length;
+        const inactive = documentItems.filter(item => item.status === "비활성").length;
+
+        return {
+          totalDocuments: total,
+          activeDocuments: active,
+          inactiveDocuments: inactive
+        };
+      },
+
+      formatStatsForDisplay: () => {
+        const stats = get().getDocumentStats();
+        return [
+          { title: "총 문서 수", value: stats.totalDocuments.toString(), additionalInfo: "" },
+          { title: "활성 문서 수", value: stats.activeDocuments.toString(), additionalInfo: "" },
+          { title: "비활성 문서 수", value: stats.inactiveDocuments.toString(), additionalInfo: "" }
+        ];
       }
     }),
     {
