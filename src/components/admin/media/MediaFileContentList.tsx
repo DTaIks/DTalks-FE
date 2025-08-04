@@ -68,7 +68,7 @@ const MediaFileContent: React.FC<MediaFileContentProps> = ({
 export default MediaFileContent;
 
 const Container = styled.div`
-  width: 700px;
+  width: 780px;
   height: 88px;
   flex-shrink: 0;
   background: var(--color-white);
