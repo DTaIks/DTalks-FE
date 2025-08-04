@@ -3,11 +3,10 @@ import styled from "styled-components";
 import CustomDropdown from "../../common/CustomDropdown";
 
 interface DocumentTableProps {
-  currentPage: number;
-  itemsPerPage: number;
+  // 현재는 사용하지 않지만 향후 페이지네이션을 위해 유지
 }
 
-const DocumentTable: React.FC<DocumentTableProps> = ({ currentPage, itemsPerPage }) => {
+const DocumentTable: React.FC<DocumentTableProps> = () => {
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     console.log('Search:', e.target.value);
   };
