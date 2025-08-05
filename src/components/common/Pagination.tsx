@@ -76,8 +76,7 @@ const ActivePageBackground = styled.div`
 const ActivePageNumber = styled.div`
   z-index: 1;
   position: absolute;
-  top: 8px;
-  left: 12px;
+  padding: 5px;
   color: var(--color-white);
 `;
 
@@ -96,8 +95,7 @@ const InactivePageBackground = styled.div`
 const InactivePageNumber = styled.div`
   z-index: 1;
   position: absolute;
-  top: 8px;
-  left: 12px;
+  padding: 5px;
   color: var(--color-silver);
 `;
 
