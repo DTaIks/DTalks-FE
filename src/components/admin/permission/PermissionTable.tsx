@@ -4,9 +4,9 @@ import { usePermissionStore } from "@/store/permissionStore";
 import type { PermissionUser } from "@/types/permission";
 import TableHeader from "@/components/admin/permission/PermissionTableHeader";
 import TableRow from "@/components/admin/permission/PermissionTableRow";
-import Roll1 from '@/assets/permission/Roll.svg';
-import Roll2 from '@/assets/permission/Roll2.svg';
-import Roll3 from '@/assets/permission/Roll3.svg';
+import Roll1 from '@/assets/permission/PermissionRoll1.svg';
+import Roll2 from '@/assets/permission/PermissionRoll2.svg';
+import Roll3 from '@/assets/permission/PermissionRoll3.svg';
 
 const permissionData: PermissionUser[] = [
   {

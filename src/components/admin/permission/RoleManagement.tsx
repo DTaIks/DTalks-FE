@@ -1,6 +1,6 @@
 import styled from 'styled-components';
 import React from 'react';
-import Roll1 from '@/assets/permission/Roll.svg';
+import Roll1 from '@/assets/permission/PermissionRoll1.svg';
 import { usePermissionStore } from '@/store/permissionStore';
 import type { PermissionUser } from '@/types/permission';
 import ModalHeader from '@/components/admin/permission/RoleManagementModalHeader';

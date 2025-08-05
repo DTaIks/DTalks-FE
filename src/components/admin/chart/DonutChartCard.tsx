@@ -57,7 +57,7 @@ export const DonutChart = ({
 
 const Container = styled.div`
   width: 225px;
-  height: 187.5px;
+  height: 188px;
   flex-shrink: 0;
   border-radius: 18.75px;
   background: var(--color-white);
