@@ -1,20 +1,20 @@
 import React from 'react';
 import styled from 'styled-components';
-import TitleContainer from '../../../layout/TitleContainer';
+import TitleContainer from '@/layout/TitleContainer';
 
-import DepartmentBox from '../../../components/admin/media/DepartmentList';
-import Header from '../../../components/admin/media/MediaHeader';
-import MediaFileContent from '../../../components/admin/media/MediaFileContentList';
-import DropdownFilter from '../../../components/common/DropDownFilter';
-import Button from '../../../components/common/Button';
-import Pagination from '../../../components/common/Pagination';
+import DepartmentBox from '@/components/admin/media/DepartmentList';
+import Header from '@/components/admin/media/MediaHeader';
+import MediaFileContent from '@/components/admin/media/MediaFileContentList';
+import DropdownFilter from '@/components/common/DropDownFilter';
+import Button from '@/components/common/Button';
+import Pagination from '@/components/common/Pagination';
 
-import MediaFileUploadModal, { type MediaUploadData } from '../../../components/admin/media/MediaFileUploadModal';
-import ConfirmModal from '../../../components/common/ConfirmModal';
+import MediaFileUploadModal, { type MediaUploadData } from '@/components/admin/media/MediaFileUploadModal';
+import ConfirmModal from '@/components/common/ConfirmModal';
 
-import { useDepartmentStats } from '../../../hooks/media/useMediaFile';
-import { useMediaPageState } from '../../../hooks/media/useMediaPageState';
-import { useMediaActions } from '../../../hooks/media/useMediaActions';
+import { useDepartmentStats } from '@/hooks/media/useMediaFile';
+import { useMediaPageState } from '@/hooks/media/useMediaPageState';
+import { useMediaActions } from '@/hooks/media/useMediaActions';
 
 const MediaPage: React.FC = () => {
   // 데이터 및 상태 관리

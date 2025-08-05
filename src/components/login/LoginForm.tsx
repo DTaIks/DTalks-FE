@@ -1,6 +1,6 @@
 import React from 'react';
-import InputField from "../common/InputField";
-import Button from "../common/Button";
+import InputField from "@/components/common/InputField";
+import Button from "@/components/common/Button";
 import styled from "styled-components";
 
 interface LoginFormProps {

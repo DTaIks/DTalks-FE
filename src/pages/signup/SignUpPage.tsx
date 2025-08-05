@@ -2,9 +2,9 @@ import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
 
-import InputField from '../../components/common/InputField';
-import Button from '../../components/common/Button';
-import Logo from '../../assets/common/Logo.png';
+import InputField from '@/components/common/InputField';
+import Button from '@/components/common/Button';
+import Logo from '@/assets/common/Logo.png';
 
 // 추후에 백엔드 측에서 설정한 시간으로 변경
 const AUTH_TIMEOUT = 180;

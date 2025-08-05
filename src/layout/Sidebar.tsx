@@ -1,10 +1,10 @@
 import styled from "styled-components";
 import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import LogoImage from "../assets/common/Small_Logo.png";
-import ProfileImageSrc from "../assets/common/Profile.png";
-import SettingIcon from "../assets/common/setting.svg";
-import LogoutModal from "../components/common/LogoutModal";
+import LogoImage from "@/assets/common/Small_Logo.png";
+import ProfileImageSrc from "@/assets/common/Profile.png";
+import SettingIcon from "@/assets/common/setting.svg";
+import LogoutModal from "@/components/common/LogoutModal";
 
 type SidebarProps = {
   className?: string;

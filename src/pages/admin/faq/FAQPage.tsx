@@ -1,11 +1,11 @@
 import { useState, useEffect } from "react";
 import styled from "styled-components";
-import TitleContainer from "../../../layout/TitleContainer";
-import FAQTable from "../../../components/admin/faq/FAQTable";
-import Button from "../../../components/common/Button";
-import Pagination from "../../../components/common/Pagination";
-import FAQUploadModal, { type FAQUploadData } from "../../../components/admin/faq/FAQUploadModal";
-import { useFAQStore } from "../../../store/faqStore";
+import TitleContainer from "@/layout/TitleContainer";
+import FAQTable from "@/components/admin/faq/table/FAQTable";
+import Button from "@/components/common/Button";
+import Pagination from "@/components/common/Pagination";
+import FAQUploadModal, { type FAQUploadData } from "@/components/admin/faq/FAQUploadModal";
+import { useFAQStore } from "@/store/faqStore";
 
 // FAQ 관리 페이지
 const FAQPage = () => {

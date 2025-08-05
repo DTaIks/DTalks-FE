@@ -1,10 +1,10 @@
 import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
-import CategoryName1 from "../assets/faq/CategoryName1.svg";
-import CategoryName2 from "../assets/faq/CategoryName2.svg";
-import CategoryName3 from "../assets/faq/CategoryName3.svg";
-import CategoryName4 from "../assets/faq/CategoryName4.svg";
-import CategoryName5 from "../assets/faq/CategoryName5.svg";
+import CategoryName1 from "@/assets/faq/CategoryName1.svg";
+import CategoryName2 from "@/assets/faq/CategoryName2.svg";
+import CategoryName3 from "@/assets/faq/CategoryName3.svg";
+import CategoryName4 from "@/assets/faq/CategoryName4.svg";
+import CategoryName5 from "@/assets/faq/CategoryName5.svg";
 
 interface FAQItem {
   id: number;

@@ -1,7 +1,7 @@
 import { useCallback } from 'react';
-import { useFiles } from './useMediaFile'
-import { useArchivedFilesStore } from '../../store/archivedFileStore';
-import { type MediaUploadData } from '../../components/admin/media/MediaFileUploadModal';
+import { useFiles } from '@/hooks/media/useMediaFile'
+import { useArchivedFilesStore } from '@/store/archivedFileStore';
+import { type MediaUploadData } from '@/components/admin/media/MediaFileUploadModal';
 
 export const useMediaActions = () => {
   const files = useFiles();

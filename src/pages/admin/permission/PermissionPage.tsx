@@ -1,6 +1,6 @@
 import styled from "styled-components";
-import TitleContainer from "../../../layout/TitleContainer";
-import PermissionTable from "../../../components/admin/permission/PermissionTable";
+import TitleContainer from "@/layout/TitleContainer";
+import PermissionTable from "@/components/admin/permission/PermissionTable";
 
 const PermissionPage = () => {
   return (

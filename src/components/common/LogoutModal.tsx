@@ -1,8 +1,8 @@
 import React, { useEffect } from "react";
 import styled from "styled-components";
 import { useNavigate } from "react-router-dom";
-import ProfileImageSrc from "../../assets/common/Profile.png";
-import { useAuthStore } from "../../store/authStore";
+import ProfileImageSrc from "@/assets/common/Profile.png";
+import { useAuthStore } from "@/store/authStore";
 
 interface LogoutModalProps {
   isOpen: boolean;

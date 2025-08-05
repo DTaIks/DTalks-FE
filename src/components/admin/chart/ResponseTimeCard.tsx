@@ -1,7 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import Chart from 'react-apexcharts';
-import '../../../styles/Global.css';
+import '@/styles/Global.css';
 
 
 export interface ResponseTime {

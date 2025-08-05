@@ -1,10 +1,10 @@
 import React from 'react';
 import styled from 'styled-components';
-import '../../../styles/Global.css';
+import '@/styles/Global.css';
 
-import KeywordRanking1 from '../../../assets/chart/KeywordRanking1.svg';
-import KeywordRanking2 from '../../../assets/chart/KeywordRanking2.svg';
-import KeywordRanking3 from '../../../assets/chart/KeywordRanking3.svg';
+import KeywordRanking1 from '@/assets/chart/KeywordRanking1.svg';
+import KeywordRanking2 from '@/assets/chart/KeywordRanking2.svg';
+import KeywordRanking3 from '@/assets/chart/KeywordRanking3.svg';
 
 export interface Keyword {
   count: number;

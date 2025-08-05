@@ -1,10 +1,10 @@
 import { useState, useEffect } from "react";
 import styled from "styled-components";
-import TitleContainer from "../../../layout/TitleContainer";
-import DocumentStatCard from "../../../components/admin/document/DocumentStatCard";
-import DocumentTable from "../../../components/admin/document/DocumentTable";
-import Pagination from "../../../components/common/Pagination";
-import { useDocumentStore } from "../../../store/documentStore";
+import TitleContainer from "@/layout/TitleContainer";
+import DocumentStatCard from "@/components/admin/document/DocumentStatCard";
+import DocumentTable from "@/components/admin/document/DocumentTable";
+import Pagination from "@/components/common/Pagination";
+import { useDocumentStore } from "@/store/documentStore";
 
 // 문서 관리 페이지
 const DocumentPage = () => {

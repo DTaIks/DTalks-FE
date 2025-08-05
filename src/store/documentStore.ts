@@ -1,10 +1,10 @@
 import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
-import DocumentCategory1 from "../assets/document/DocumentCategory1.svg";
-import DocumentCategory2 from "../assets/document/DocumentCategory2.svg";
-import DocumentCategory3 from "../assets/document/DocumentCategory3.svg";
-import ActiveIcon from "../assets/common/Active.svg";
-import InActiveIcon from "../assets/common/InActive.svg";
+import DocumentCategory1 from "@/assets/document/DocumentCategory1.svg";
+import DocumentCategory2 from "@/assets/document/DocumentCategory2.svg";
+import DocumentCategory3 from "@/assets/document/DocumentCategory3.svg";
+import ActiveIcon from "@/assets/common/Active.svg";
+import InActiveIcon from "@/assets/common/InActive.svg";
 
 interface DocumentItem {
   id: number;

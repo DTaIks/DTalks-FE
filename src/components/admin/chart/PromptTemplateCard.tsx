@@ -1,7 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
-import { DonutChart } from './DonutChartCard';
-import '../../../styles/Global.css';
+import { DonutChart } from '@/components/admin/chart/DonutChartCard';
+import '@/styles/Global.css';
 
 export interface DonutChart {
   value: number;

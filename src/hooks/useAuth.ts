@@ -1,5 +1,5 @@
 import { useMutation, useQuery } from '@tanstack/react-query';
-import { useAuthStore } from '../store/authStore';
+import { useAuthStore } from '@/store/authStore';
 
 // 더미 사용자 데이터
 const mockUsers = [

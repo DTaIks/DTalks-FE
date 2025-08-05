@@ -1,15 +1,15 @@
 import { Routes, Route, Navigate, Outlet } from 'react-router-dom';
-import { useAuthStore } from '../store/authStore';
-import LoginPage from '../pages/login/LoginPage';
-import SignUpPage from '../pages/signup/SignUpPage';
-import UserListPage from '../pages/admin/userlist/UserListPage';
-import PermissionPage from '../pages/admin/permission/PermissionPage';
-import FAQPage from '../pages/admin/faq/FAQPage';
-import FAQCategoryPage from '../pages/admin/faq/FAQCategoryPage';
-import ChartPage from '../pages/admin/chart/ChartPage';
-import MediaPage from '../pages/admin/media/MediaPage';
-import DocumentPage from '../pages/admin/document/DocumentPage';
-import Layout from '../layout/Layout';
+import { useAuthStore } from '@/store/authStore';
+import LoginPage from '@/pages/login/LoginPage';
+import SignUpPage from '@/pages/signup/SignUpPage';
+import UserListPage from '@/pages/admin/userlist/UserListPage';
+import PermissionPage from '@/pages/admin/permission/PermissionPage';
+import FAQPage from '@/pages/admin/faq/FAQPage';
+import FAQCategoryPage from '@/pages/admin/faq/FAQCategoryPage';
+import ChartPage from '@/pages/admin/chart/ChartPage';
+import MediaPage from '@/pages/admin/media/MediaPage';
+import DocumentPage from '@/pages/admin/document/DocumentPage';
+import Layout from '@/layout/Layout';
 
 // 인증이 필요한 라우트
 function ProtectedLayout() {

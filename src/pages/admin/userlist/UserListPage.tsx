@@ -1,14 +1,32 @@
+import React from "react";
 import styled from "styled-components";
-import TitleContainer from "../../../layout/TitleContainer";
-import UserTable from "../../../components/admin/userlist/UserListTable";
-import Pagination from "../../../components/common/Pagination";
+import TitleContainer from "@/layout/TitleContainer";
+import UserTable from "@/components/admin/userlist/UserListTable";
+import Pagination from "@/components/common/Pagination";
+import { useUserStore } from "@/store/userStore";
 
 const UserListPage = () => {
+  const {
+    currentPage,
+    setCurrentPage,
+    getFilteredData
+  } = useUserStore();
+
+  const { paginatedData, totalPages } = getFilteredData(currentPage, 5);
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+  };
+
   return (
     <Container>
       <TitleContainer title="사용자 목록" subtitle="등록한 사용자들을 관리하세요" />
       <UserTable />
-      <Pagination currentPage={1} totalPages={10} onPageChange={() => {}} />
+      <Pagination 
+        currentPage={currentPage} 
+        totalPages={totalPages} 
+        onPageChange={handlePageChange} 
+      />
     </Container>
   );
 };

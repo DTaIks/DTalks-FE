@@ -1,7 +1,7 @@
 import React from "react";
 import styled from 'styled-components';
-import DropDownButton from "../../common/DropDownButton";
-import type { MediaFile } from "../../../hooks/media/useMediaFile";
+import DropDownButton from "@/components/common/DropDownButton";
+import type { MediaFile } from "@/hooks/media/useMediaFile";
 
 interface MediaFileContentProps {
   file: MediaFile;

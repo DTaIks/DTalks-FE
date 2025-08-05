@@ -67,17 +67,13 @@ const RightSection = styled.div`
 const StatTitle = styled.div`
   color: var(--color-black);
   font-size: var(--font-size-16);
-  font-style: normal;
   font-weight: 600;
-  line-height: normal;
 `;
 
 const AdditionalInfo = styled.div`
   color: #22C55E;
   font-size: var(--font-size-16);
-  font-style: normal;
   font-weight: 500;
-  line-height: normal;
 `;
 
 const StatValue = styled.div`

@@ -1,5 +1,6 @@
 import React from "react";
 import styled from "styled-components";
+import { usePagination } from "@/hooks/usePagination";
 
 interface PaginationProps {
   currentPage: number;
@@ -7,27 +8,18 @@ interface PaginationProps {
   onPageChange: (page: number) => void;
 }
 
-// 페이지네이션 컴포넌트
 const Pagination: React.FC<PaginationProps> = ({ currentPage, totalPages, onPageChange }) => {
-  const handlePrevClick = (): void => {
-    if (currentPage > 1) {
-      onPageChange(currentPage - 1);
-    }
-  };
-
-  const handleNextClick = (): void => {
-    if (currentPage < totalPages) {
-      onPageChange(currentPage + 1);
-    }
-  };
-
-  const handlePageClick = (page: number): void => {
-    onPageChange(page);
-  };
+  const {
+    handlePrevClick,
+    handleNextClick,
+    handlePageClick,
+    isPrevDisabled,
+    isNextDisabled
+  } = usePagination({ currentPage, totalPages, onPageChange });
 
   return (
     <PaginationContainer>
-      <PrevButtonContainer onClick={handlePrevClick} disabled={currentPage === 1}>
+      <PrevButtonContainer onClick={handlePrevClick} disabled={isPrevDisabled}>
         <PrevButtonBackground />
         <InactivePageNumber>
           이전
@@ -59,7 +51,7 @@ const Pagination: React.FC<PaginationProps> = ({ currentPage, totalPages, onPage
         );
       })}
       
-      <NextButtonContainer onClick={handleNextClick} disabled={currentPage === totalPages}>
+      <NextButtonContainer onClick={handleNextClick} disabled={isNextDisabled}>
         <NextButtonBackground />
         <InactivePageNumber>
           다음
