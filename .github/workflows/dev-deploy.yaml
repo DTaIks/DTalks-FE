@@ -34,27 +34,14 @@ jobs:
       - name: Cache node_modules
         uses: actions/cache@v4
         with:
-          path: |
-            node_modules
-            */*/node_modules
+          path: node_modules
           key: ${{ runner.os }}-node-${{ steps.cache-key.outputs.value }}
           restore-keys: |
+            ${{ runner.os }}-node-${{ hashFiles('package.json') }}
             ${{ runner.os }}-node-
 
-      - name: Cache Vite build
-        uses: actions/cache@v4
-        with:
-          path: |
-            dist
-            .vite
-          key: ${{ runner.os }}-vite-${{ steps.cache-key.outputs.value }}
-          restore-keys: |
-            ${{ runner.os }}-vite-
-
       - name: Install dependencies
-        run: |
-          rm -rf node_modules package-lock.json
-          npm install --no-audit
+        run: npm ci --no-audit
 
       - name: Build app
         run: npx vite build --mode development
@@ -103,7 +90,7 @@ jobs:
             rm -rf ${{ env.DEPLOY_DIR }}/*
           '
 
-      - name: Deploy to Web Server
+      - name: Upload build to remote server
         run: |
           rsync -avz --delete --progress \
             -e "ssh -i private_key -o BatchMode=yes" \
