@@ -3,7 +3,6 @@ import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import LogoImage from "@/assets/common/Small_Logo.png";
 import ProfileImageSrc from "@/assets/common/Profile.png";
-import SettingIcon from "@/assets/common/setting.svg";
 import LogoutModal from "@/components/common/LogoutModal";
 
 type SidebarProps = {
@@ -389,9 +388,6 @@ const Sidebar: React.FC<SidebarProps> = ({ className = "" }) => {
       <ProfileSection onClick={handleProfileClick}>
         <Profile alt="" src={ProfileImageSrc} />
         <AdminText>admin</AdminText>
-        <SettingButton>
-          <SettingImage alt="" src={SettingIcon} />
-        </SettingButton>
         <ProfileDropdown 
           isOpen={isProfileDropdownOpen} 
           onMenuClick={handleProfileMenuClick} 
@@ -596,24 +592,6 @@ const AdminText = styled.div`
   position: absolute;
   left: 50%;
   transform: translateX(-70%);
-`;
-
-const SettingButton = styled.div`
-  position: absolute;
-  right: 10px;
-  width: 32px;
-  height: 32px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 50%;
-  cursor: pointer;
-`;
-
-const SettingImage = styled.img`
-  width: 24px;
-  height: 24px;
-  object-fit: contain;
 `;
 
 const ProfileDropdownContainer = styled.div`
