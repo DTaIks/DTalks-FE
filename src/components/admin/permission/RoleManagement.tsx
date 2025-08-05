@@ -1,17 +1,10 @@
 import styled from 'styled-components';
 import React from 'react';
-import Roll1 from '../../../assets/Permission/Roll.svg';
-import { usePermissionStore } from '../../../store/permissionStore';
-
-interface PermissionUser {
-  roleId: number;
-  image: string;
-  roleName: string;
-  roleNameEn: string;
-  description: string;
-  roleUserCount: number;
-  isActive: string;
-}
+import Roll1 from '@/assets/permission/PermissionRoll1.svg';
+import { usePermissionStore } from '@/store/permissionStore';
+import type { PermissionUser } from '@/types/permission';
+import ModalHeader from '@/components/admin/permission/RoleManagementModalHeader';
+import UserTable from '@/components/admin/permission/RoleManagementUserTable';
 
 interface RoleManagementProps {
   open: boolean;
@@ -20,7 +13,7 @@ interface RoleManagementProps {
 }
 
 const RoleManagement = ({ open, onClose, selectedUser }: RoleManagementProps) => {
-  const { selectedRows, toggleSelectedRow, clearSelectedRows } = usePermissionStore();
+  const { clearSelectedRows } = usePermissionStore();
 
   // 모달이 열릴 때 선택 상태 초기화
   React.useEffect(() => {
@@ -43,10 +36,10 @@ const RoleManagement = ({ open, onClose, selectedUser }: RoleManagementProps) =>
   return (
     <ModalOverlay onClick={onClose}>
       <ModalContainer onClick={(e) => e.stopPropagation()}>
-        <ModalHeader>
-          <ModalTitle>{selectedUser?.roleName || "관리자"} 관리</ModalTitle>
-          <CloseButton onClick={onClose}>×</CloseButton>
-        </ModalHeader>
+        <ModalHeader 
+          title={`${selectedUser?.roleName || "관리자"} 관리`}
+          onClose={onClose}
+        />
         
         <ModalSection>
           <ModalContent>
@@ -65,27 +58,7 @@ const RoleManagement = ({ open, onClose, selectedUser }: RoleManagementProps) =>
             <SearchInput placeholder="사용자를 검색하세요" />
           </ModalSection2Header>
           
-          <UserTable>
-            <TableHeader>
-              {tableHeaders.map((header, index) => (
-                <HeaderCell key={index}>{header}</HeaderCell>
-              ))}
-            </TableHeader>
-            <TableBody>
-              {tableData.map((row, index) => (
-                <TableRow 
-                  key={index}
-                  selected={selectedRows.includes(index)}
-                  onClick={() => toggleSelectedRow(index)}
-                >
-                  <TableCell>{row.name}</TableCell>
-                  <TableCell>{row.email}</TableCell>
-                  <TableCell>{row.department}</TableCell>
-                  <TableCell>{row.role}</TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </UserTable>
+          <UserTable tableHeaders={tableHeaders} tableData={tableData} />
         </ModalSection2>
         
         <ActionButton>저장</ActionButton>
@@ -95,8 +68,6 @@ const RoleManagement = ({ open, onClose, selectedUser }: RoleManagementProps) =>
 };
 
 export default RoleManagement;
-
-
 
 // 모달 오버레이
 const ModalOverlay = styled.div`
@@ -121,54 +92,6 @@ const ModalContainer = styled.div`
   border-radius: 19.5px;
   background: #FFF;
   position: relative;
-`;
-
-// 모달 헤더
-const ModalHeader = styled.h2`
-  width: 868px;
-  height: 75px;
-  flex-shrink: 0;
-  border-radius: 19.5px 19.5px 0 0;
-  border-bottom: 1.5px solid #E9E0F0;
-  background: #FFF;
-  display: flex;
-  align-items: center;
-  margin: 0;
-  padding: 0;
-`;
-
-// 모달 제목
-const ModalTitle = styled.span`
-  color: var(--color-black);
-  font-family: var(--font-pretendard);
-  font-size: var(--font-size-19);
-  font-style: normal;
-  font-weight: 700;
-  line-height: normal;
-  padding-left: 36px;
-  display: flex;
-  align-items: center;
-`;
-
-// 닫기 버튼
-const CloseButton = styled.button`
-  background: none;
-  border: none;
-  font-size: 32px;
-  cursor: pointer;
-  color: #6b7280;
-  padding: 4px;
-  border-radius: 4px;
-  transition: color 0.2s ease;
-  margin-left: auto;
-  margin-right: 36px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  &:hover {
-    color: #1f2937;
-  }
 `;
 
 // 첫 번째 섹션
@@ -229,9 +152,7 @@ const UserCountText = styled.span`
   color: var(--color-black);
   font-family: var(--font-pretendard);
   font-size: var(--font-size-14);
-  font-style: normal;
   font-weight: 500;
-  line-height: normal;
   margin-right: 36px;
 `;
 
@@ -265,9 +186,7 @@ const ModalSection2Header = styled.div`
 const HeaderTitle = styled.span`
   color: #000;
   font-size: 16.5px;
-  font-style: normal;
   font-weight: 500;
-  line-height: normal;
 `;
 
 // 검색 입력창
@@ -284,77 +203,6 @@ const SearchInput = styled.input`
 
   &::placeholder {
     color: #999;
-  }
-`;
-
-// 사용자 테이블
-const UserTable = styled.div`
-  width: 100%;
-  margin-top: 24px;
-`;
-
-// 테이블 헤더
-const TableHeader = styled.div`
-  display: flex;
-  border-bottom: 1px solid #E9E0F0;
-  padding-bottom: 12px;
-  margin-bottom: 8px;
-`;
-
-// 헤더 셀
-const HeaderCell = styled.div`
-  flex: 1;
-  color: #000;
-  font-size: 16px;
-  font-weight: 600;
-  text-align: left;
-  margin-top: -10px;
-  
-  &:first-child {
-    padding-left: 36px;
-  }
-  
-  &:nth-child(3) {
-    padding-left: 36px;
-  }
-`;
-
-// 테이블 바디
-const TableBody = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-`;
-
-// 테이블 행
-const TableRow = styled.div<{ selected?: boolean }>`
-  display: flex;
-  padding: 12px 0;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  border: 1px solid transparent;
-  
-  ${props => props.selected && `
-    border: 1px solid #764ba2;
-    background-color: rgba(118, 75, 162, 0.03);
-    box-shadow: 0 2px 8px rgba(118, 75, 162, 0.1);
-  `}
-`;
-
-// 테이블 셀
-const TableCell = styled.div`
-  flex: 1;
-  color: #000;
-  font-size: 16px;
-  text-align: left;
-  
-  &:first-child {
-    padding-left: 36px;
-  }
-  
-  &:nth-child(3) {
-    padding-left: 36px;
   }
 `;
 

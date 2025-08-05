@@ -1,6 +1,6 @@
 import styled from "styled-components";
-import TitleContainer from "../../../layout/TitleContainer";
-import FAQCategoryTable from "../../../components/admin/faq/FAQCategoryTable";
+import TitleContainer from "@/layout/TitleContainer";
+import FAQCategoryTable from "@/components/admin/faq/category/FAQCategoryTable";
 
 const FAQCategoryPage = () => {
   return (

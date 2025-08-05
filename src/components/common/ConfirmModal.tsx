@@ -1,6 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-import Button from './Button';
+import Button from '@/components/common/Button';
 
 interface ConfirmModalProps {
   isOpen: boolean;
@@ -109,7 +109,7 @@ const ModalContainer = styled.div`
   border-radius: 12px;
   padding: var(--padding-32);
   width: 540px;
-  height: 160px;
+  height: 128px;
   flex-shrink: 0;
   position: relative;
 `;
@@ -132,11 +132,11 @@ const CloseButton = styled.button`
 
 const ModalContent = styled.div`
   width: 400px;
-  height: 44px;
+  height: 16px;
 `;
 
 const MessageText = styled.p`
-  font-size: var(--font-size-20);
+  font-size: var(--font-size-16);
   color: #222;
   font-weight: var(--font-weight-500);
   margin-top: 40px;

@@ -1,23 +1,31 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import styled from "styled-components";
-import TitleContainer from "../../../layout/TitleContainer";
-import FAQTable from "../../../components/admin/faq/FAQTable";
-import Button from "../../../components/common/Button";
-import Pagination from "../../../components/common/Pagination";
-import FAQUploadModal, { type FAQUploadData } from "../../../components/admin/faq/FAQUploadModal";
+import TitleContainer from "@/layout/TitleContainer";
+import FAQTable from "@/components/admin/faq/table/FAQTable";
+import Button from "@/components/common/Button";
+import Pagination from "@/components/common/Pagination";
+import FAQUploadModal, { type FAQUploadData } from "@/components/admin/faq/FAQUploadModal";
+import { useFAQStore } from "@/store/faqStore";
 
+// FAQ 관리 페이지
 const FAQPage = () => {
   const [currentPage, setCurrentPage] = useState<number>(1);
-  const itemsPerPage = 5; // 페이지당 표시할 FAQ 수
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+  const itemsPerPage = 4;
 
-  // 전체 FAQ 데이터 (실제로는 API에서 가져올 데이터)
-  const totalFAQItems = 8; // 예시 데이터 개수
-  const totalPages = Math.ceil(totalFAQItems / itemsPerPage);
+  const { filteredData } = useFAQStore();
+  
+  const totalItems = filteredData.length;
+  const totalPages = totalItems <= itemsPerPage ? 1 : Math.ceil(totalItems / itemsPerPage);
+  
+  useEffect(() => {
+    if (currentPage > totalPages) {
+      setCurrentPage(1);
+    }
+  }, [totalPages, currentPage]);
 
   const handlePageChange = (page: number): void => {
     setCurrentPage(page);
-    console.log('Page changed to:', page);
   };
 
   const handleModalOpen = (): void => {
@@ -30,7 +38,6 @@ const FAQPage = () => {
 
   const handleFAQSubmit = (data: FAQUploadData): void => {
     console.log('FAQ 추가:', data);
-    // TODO: API 호출하여 FAQ 추가
     handleModalClose();
   };
 
@@ -49,9 +56,10 @@ const FAQPage = () => {
         currentPage={currentPage}
         itemsPerPage={itemsPerPage}
       />
-      {totalFAQItems > 0 && (
+      {totalPages >= 1 && (
         <PaginationContainer>
           <Pagination
+            key={totalPages}
             currentPage={currentPage}
             totalPages={totalPages}
             onPageChange={handlePageChange}
@@ -96,6 +104,7 @@ const PaginationContainer = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-  margin-top: 12px;
-  margin-bottom: 48px;
+  margin-top: 4px;
+  margin-bottom: 24px;
 `;
+

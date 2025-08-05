@@ -1,6 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-import { validateSemver, semverInput } from '../../utils/validation';
+import { validateSemver, semverInput } from '@/utils/validation';
 
 interface VersionInputProps {
  version: string;

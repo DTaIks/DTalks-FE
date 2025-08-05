@@ -63,10 +63,11 @@ export default DropDownButton;
 const ButtonContainer = styled.div`
   position: relative;
   display: inline-block;
+  margin-left: 12px;
 `;
 
 const Container = styled.div`
-  padding: var(--padding-32);
+  padding-right: 12px;
 `;
 
 const MenuButton = styled.button`
@@ -123,8 +124,8 @@ const Hover = styled.div`
 
 const DropdownMenu = styled.div`
   position: absolute;
-  top: 100%;
-  left: 0;
+  top: -125%;
+  left: -250%;
   margin-top: 8px;
   width: 100px;
   height: auto;

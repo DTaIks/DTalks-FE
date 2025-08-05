@@ -1,6 +1,6 @@
 import { useState, useCallback, useMemo } from 'react';
-import { useArchivedFilesStore } from '../../store/archivedFileStore';
-import { useFiles, type MediaFile } from './useMediaFile';
+import { useArchivedFilesStore } from '@/store/archivedFileStore';
+import { useFiles, type MediaFile } from '@/hooks/media/useMediaFile';
 
 export const useMediaPageState = () => {
   // UI 상태들

@@ -3,9 +3,9 @@ import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
-import LoginForm from "../../components/login/LoginForm";
-import Logo from "../../assets/common/Logo.png";
-import { useAuthStore } from '../../store/authStore';
+import LoginForm from "@/components/login/LoginForm";
+import Logo from "@/assets/common/Logo.png";
+import { useAuthStore } from '@/store/authStore';
 import styled from "styled-components";
 
 // 유효성 검사 스키마
@@ -147,7 +147,6 @@ export default function LoginPage(): JSX.Element {
   );
 }
 
-// styled-components 정의부 (파일 하단)
 const LogoImage = styled.img`
   width: 101.25px;
   height: 100.5px;

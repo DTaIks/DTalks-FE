@@ -1,5 +1,6 @@
 import React from "react";
 import styled from "styled-components";
+import { usePagination } from "@/hooks/usePagination";
 
 interface PaginationProps {
   currentPage: number;
@@ -8,25 +9,17 @@ interface PaginationProps {
 }
 
 const Pagination: React.FC<PaginationProps> = ({ currentPage, totalPages, onPageChange }) => {
-  const handlePrevClick = (): void => {
-    if (currentPage > 1) {
-      onPageChange(currentPage - 1);
-    }
-  };
-
-  const handleNextClick = (): void => {
-    if (currentPage < totalPages) {
-      onPageChange(currentPage + 1);
-    }
-  };
-
-  const handlePageClick = (page: number): void => {
-    onPageChange(page);
-  };
+  const {
+    handlePrevClick,
+    handleNextClick,
+    handlePageClick,
+    isPrevDisabled,
+    isNextDisabled
+  } = usePagination({ currentPage, totalPages, onPageChange });
 
   return (
     <PaginationContainer>
-      <PrevButtonContainer onClick={handlePrevClick} disabled={currentPage === 1}>
+      <PrevButtonContainer onClick={handlePrevClick} disabled={isPrevDisabled}>
         <PrevButtonBackground />
         <InactivePageNumber>
           이전
@@ -58,7 +51,7 @@ const Pagination: React.FC<PaginationProps> = ({ currentPage, totalPages, onPage
         );
       })}
       
-      <NextButtonContainer onClick={handleNextClick} disabled={currentPage === totalPages}>
+      <NextButtonContainer onClick={handleNextClick} disabled={isNextDisabled}>
         <NextButtonBackground />
         <InactivePageNumber>
           다음
@@ -74,17 +67,17 @@ const ActivePageBackground = styled.div`
   position: absolute;
   top: 0;
   left: 0;
-  border-radius: 3.75px;
+  border-radius: 4px;
   background-color: var(--color-mediumpurple-200);
-  width: 1.78rem;
-  height: 1.78rem;
+  width: 28px;
+  height: 28px;
 `;
 
 const ActivePageNumber = styled.div`
   z-index: 1;
   position: absolute;
-  top: 0.422rem;
-  left: 0.704rem;
+  top: 8px;
+  left: 12px;
   color: var(--color-white);
 `;
 
@@ -92,19 +85,19 @@ const InactivePageBackground = styled.div`
   position: absolute;
   top: 0;
   left: 0;
-  border-radius: 3.75px;
+  border-radius: 4px;
   background: rgba(255, 255, 255, 0.35);
   border: 0.375px solid #CCC;
   box-sizing: border-box;
-  width: 1.78rem;
-  height: 1.78rem;
+  width: 28px;
+  height: 28px;
 `;
 
 const InactivePageNumber = styled.div`
   z-index: 1;
   position: absolute;
-  top: 0.422rem;
-  left: 0.656rem;
+  top: 8px;
+  left: 12px;
   color: var(--color-silver);
 `;
 
@@ -112,9 +105,11 @@ interface PageContainerProps {
   isActive?: boolean;
 }
 
-const PageContainer = styled.div<PageContainerProps>`
-  width: 1.78rem;
-  height: 1.78rem;
+const PageContainer = styled.div.withConfig({
+  shouldForwardProp: (prop) => prop !== 'isActive'
+})<PageContainerProps>`
+  width: 28px;
+  height: 28px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -131,17 +126,17 @@ const NextButtonBackground = styled.div`
   position: absolute;
   top: 0;
   left: 0;
-  border-radius: 3.75px;
+  border-radius: 4px;
   background: #FFF;
-  border: 0.375px solid #CCC;
+  border: 0.4px solid #CCC;
   box-sizing: border-box;
-  width: 2.81rem;
-  height: 1.78rem;
+  width: 44px;
+  height: 28px;
 `;
 
 const NextButtonContainer = styled.div<{ disabled?: boolean }>`
-  width: 2.81rem;
-  height: 1.78rem;
+  width: 44px;
+  height: 28px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -155,23 +150,23 @@ const PrevButtonBackground = styled.div`
   position: absolute;
   top: 0;
   left: 0;
-  border-radius: 3.75px;
+  border-radius: 4px;
   background: rgba(255, 255, 255, 0.35);
-  border: 0.375px solid #CCC;
+  border: 0.4px solid #CCC;
   box-sizing: border-box;
-  width: 2.81rem;
-  height: 1.78rem;
+  width: 44px;
+  height: 28px;
 `;
 
 const PrevButtonContainer = styled.div<{ disabled?: boolean }>`
-  width: 2.81rem;
-  height: 1.78rem;
+  width: 44px;
+  height: 28px;
   color: var(--color-silver);
   display: flex;
   align-items: center;
   justify-content: center;
   position: relative;
-  margin-right: 4px;
+  margin-right: 8px;
   cursor: ${props => props.disabled ? 'not-allowed' : 'pointer'};
   opacity: ${props => props.disabled ? 0.5 : 1};
 `;
@@ -181,8 +176,8 @@ const PaginationContainer = styled.div`
   justify-content: center;
   align-items: center;
   width: 100%;
-  height: 1.78rem;
-  font-size: 0.844rem;
+  height: 28px;
+  font-size: 14px;
   margin-top: 24px;
   position: relative;
 `; 

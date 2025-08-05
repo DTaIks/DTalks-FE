@@ -15,6 +15,7 @@ interface CustomDropdownProps {
   height?: string;
 }
 
+// 커스텀 드롭다운 컴포넌트
 const CustomDropdown: React.FC<CustomDropdownProps> = ({ 
   options, 
   value, 
@@ -58,12 +59,13 @@ const CustomDropdown: React.FC<CustomDropdownProps> = ({
         </DropdownText>
         <DropdownArrow>▼</DropdownArrow>
       </DropdownButton>
+      
       {isOpen && (
         <DropdownList>
           {options.map((option, index) => (
             <DropdownOption
               key={option.value}
-              isHovered={hoveredIndex === index}
+              $isHovered={hoveredIndex === index}
               onClick={() => handleOptionClick(option.value)}
               onMouseEnter={() => handleMouseEnter(index)}
               onMouseLeave={handleMouseLeave}
@@ -124,12 +126,12 @@ const DropdownList = styled.div`
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 `;
 
-const DropdownOption = styled.div<{ isHovered: boolean }>`
+const DropdownOption = styled.div<{ $isHovered: boolean }>`
   padding: 8px 12px;
   font-size: 14px;
   color: #000;
   cursor: pointer;
-  background-color: ${props => props.isHovered ? '#F8F2FB' : '#FFF'};
+  background-color: ${props => props.$isHovered ? '#F8F2FB' : '#FFF'};
   transition: background-color 0.2s ease;
   
   &:hover {

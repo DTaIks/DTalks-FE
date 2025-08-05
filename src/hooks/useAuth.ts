@@ -1,5 +1,5 @@
 import { useMutation, useQuery } from '@tanstack/react-query';
-import { useAuthStore } from '../store/authStore';
+import { useAuthStore } from '@/store/authStore';
 
 // 더미 사용자 데이터
 const mockUsers = [
@@ -59,12 +59,12 @@ const mockAPI = {
     };
   },
   
-  checkEmailDuplicate: async (_email: string) => {
+  checkEmailDuplicate: async () => {
     await new Promise(resolve => setTimeout(resolve, 500));
     return { isDuplicate: false };
   },
   
-  sendAuthCode: async (_email: string) => {
+  sendAuthCode: async () => {
     await new Promise(resolve => setTimeout(resolve, 500));
     return { message: '인증번호가 발송되었습니다.' };
   },
@@ -79,7 +79,7 @@ const mockAPI = {
 export const useCheckEmailDuplicate = (email: string) => {
   return useQuery({
     queryKey: ['email-duplicate', email],
-    queryFn: () => mockAPI.checkEmailDuplicate(email), // 임시 API 사용
+    queryFn: () => mockAPI.checkEmailDuplicate(), // 임시 API 사용
     enabled: !!email && email.includes('@'),
     staleTime: 1000 * 60 * 5, // 5분
   });
@@ -88,7 +88,7 @@ export const useCheckEmailDuplicate = (email: string) => {
 // 인증번호 발송
 export const useSendAuthCode = () => {
   return useMutation({
-    mutationFn: (email: string) => mockAPI.sendAuthCode(email), // 임시 API 사용
+    mutationFn: () => mockAPI.sendAuthCode(), // 임시 API 사용
     onSuccess: () => {
       console.log('인증번호가 발송되었습니다.');
     },

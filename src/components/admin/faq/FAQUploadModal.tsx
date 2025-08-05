@@ -1,17 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 
-import { UploadBaseModal } from '../../modal/UploadBaseModal';
-import { FileNameInput } from '../../modal/FileNameInput';
-import { FileDescriptionInput } from '../../modal/FileDescriptionInput';
-import { FileCategory } from '../../modal/FileCategoryDropdownMenu';
-import { UploadInfoCard } from '../../modal/UploadInfoCard';
+import { UploadBaseModal } from '@/components/modal/UploadBaseModal';
+import { FileNameInput } from '@/components/modal/FileNameInput';
+import { FileDescriptionInput } from '@/components/modal/FileDescriptionInput';
+import { FileCategory } from '@/components/modal/FileCategoryDropdownMenu';
+import { UploadInfoCard } from '@/components/modal/UploadInfoCard';
 
 interface FAQUploadModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSubmit: (data: FAQUploadData) => void;
   isSubmitting?: boolean;
+  initialData?: FAQUploadData;
+  isEdit?: boolean;
 }
 
 export interface FAQUploadData {
@@ -23,9 +25,9 @@ export interface FAQUploadData {
 const CATEGORY = [
   '사내 규정',
   'IT/시스템',
-  '근무/근태',
-  '급여/복리후생',
-  '복지/휴가',
+  '근무 / 근태',
+  '급여 / 복리후생',
+  '복지 / 휴가',
 ];
 
 const FAQ_UPLOAD_INFO = [
@@ -38,6 +40,8 @@ const FAQUploadModal: React.FC<FAQUploadModalProps> = ({
   isOpen,
   onClose,
   onSubmit,
+  initialData,
+  isEdit = false,
 }) => {
   const [formData, setFormData] = useState<FAQUploadData>({
     question: '',
@@ -51,13 +55,20 @@ const FAQUploadModal: React.FC<FAQUploadModalProps> = ({
   });
 
   useEffect(() => {
-    if (!isOpen) {
+    if (isOpen && initialData && isEdit) {
+      setFormData(initialData);
+    } else if (!isOpen) {
+      setFormData({
+        question: '',
+        answer: '',
+        category: '',
+      });
       setTouched({
         question: false,
         answer: false
       });
     }
-  }, [isOpen]);
+  }, [isOpen, initialData, isEdit]);
 
   const handleSubmit = () => {
     if (isFormValid()) {
@@ -108,7 +119,7 @@ const FAQUploadModal: React.FC<FAQUploadModalProps> = ({
     <UploadBaseModal
       isOpen={isOpen}
       onClose={handleClose}
-      title="FAQ 추가"
+      title={isEdit ? "FAQ 수정" : "FAQ 추가"}
       onSubmit={handleSubmit}
       submitDisabled={!isFormValid()}
     >
@@ -140,7 +151,7 @@ const FAQUploadModal: React.FC<FAQUploadModalProps> = ({
       </InputRow>
 
       <UploadInfoCard
-        title="FAQ 추가"
+        title={isEdit ? "FAQ 수정" : "FAQ 추가"}
         texts={FAQ_UPLOAD_INFO}
       />
     </UploadBaseModal>

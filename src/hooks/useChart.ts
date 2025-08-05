@@ -1,8 +1,8 @@
-import type { StatCard } from '../components/chart/StatCard';
-import type { ResponseTime } from '../components/chart/ResponseTimeCard';
-import type { PromptTemplate } from '../components/chart/PromptTemplateCard';
-import type { Keyword } from '../components/chart/KeywordAnalysisCard';
-import type { WeeklyResponse } from '../components/chart/WeeklyResponseCard';
+import type { StatCard } from '@/components/admin/chart/StatCard';
+import type { ResponseTime } from '@/components/admin/chart/ResponseTimeCard';
+import type { PromptTemplate } from '@/components/admin/chart/PromptTemplateCard';
+import type { Keyword } from '@/components/admin/chart/KeywordAnalysisCard';
+import type { WeeklyResponse } from '@/components/admin/chart/WeeklyResponseCard';
 
 export const useDailyChat = (): StatCard => {
   return {

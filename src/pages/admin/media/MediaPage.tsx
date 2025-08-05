@@ -1,20 +1,20 @@
 import React from 'react';
 import styled from 'styled-components';
-import TitleContainer from '../../../layout/TitleContainer';
+import TitleContainer from '@/layout/TitleContainer';
 
-import DepartmentBox from '../../../components/admin/media/DepartmentList';
-import Header from '../../../components/admin/media/MediaHeader';
-import MediaFileContent from '../../../components/admin/media/MediaFileContentList';
-import DropdownFilter from '../../../components/common/DropDownFilter';
-import Button from '../../../components/common/Button';
-import Pagination from '../../../components/common/Pagination';
+import DepartmentBox from '@/components/admin/media/DepartmentList';
+import Header from '@/components/admin/media/MediaHeader';
+import MediaFileContent from '@/components/admin/media/MediaFileContentList';
+import DropdownFilter from '@/components/common/DropDownFilter';
+import Button from '@/components/common/Button';
+import Pagination from '@/components/common/Pagination';
 
-import MediaFileUploadModal, { type MediaUploadData } from '../../../components/admin/media/MediaFileUploadModal';
-import ConfirmModal from '../../../components/common/ConfirmModal';
+import MediaFileUploadModal, { type MediaUploadData } from '@/components/admin/media/MediaFileUploadModal';
+import ConfirmModal from '@/components/common/ConfirmModal';
 
-import { useDepartmentStats } from '../../../hooks/media/useMediaFile';
-import { useMediaPageState } from '../../../hooks/media/useMediaPageState';
-import { useMediaActions } from '../../../hooks/media/useMediaActions';
+import { useDepartmentStats } from '@/hooks/media/useMediaFile';
+import { useMediaPageState } from '@/hooks/media/useMediaPageState';
+import { useMediaActions } from '@/hooks/media/useMediaActions';
 
 const MediaPage: React.FC = () => {
   // 데이터 및 상태 관리
@@ -142,7 +142,6 @@ const MediaPage: React.FC = () => {
                 />
               </DropdownWrapper>
             </HeaderContainer>
-            <Divider />
 
             <FileContainer>
               <FileContentWrapper>
@@ -269,7 +268,6 @@ const ArchiveModal = styled.div`
   bottom: 0;
   background: #F8F9FA;
   border-radius: 25px 0 0 25px;
-  border: 1px solid #e9e9ef;
   overflow: hidden;
   display: flex;
   flex-direction: column;
@@ -288,7 +286,7 @@ const ArchiveModal = styled.div`
 
 const ArchiveHeader = styled.div`
   display: flex;
-  height: 38.5px;
+  height: 39.5px;
   justify-content: space-between;
   align-items: center;
   padding: 16px 20px;
@@ -349,6 +347,7 @@ const RightContainer = styled.div`
   background: var(--color-white);
   position: relative;
   flex-shrink: 0;
+  border: 1px solid #e9e9ef;
 `;
 
 const HeaderContainer = styled.div`
@@ -362,6 +361,7 @@ const HeaderContainer = styled.div`
   position: absolute;
   top: 0;
   left: 0;
+  border-bottom: 1px solid #e0e0e0;
 `;
 
 const DropdownWrapper = styled.div`
@@ -417,7 +417,8 @@ const Title = styled.h2`
   font-size: var(--font-size-16);
   font-weight: var(--font-weight-600);
   line-height: normal;
-  padding: 16px 120px 12px 32px;
+  padding: 16px 120px 24px 32px;
+  border-bottom: 1px solid #e0e0e0;
 `;
 
 const ButtonContainer = styled.div`
@@ -435,15 +436,4 @@ const StyledUploadButton = styled(Button)`
     font-weight: var(--table-header-font-weight);
     line-height: normal;
   }
-`;
-
-const Divider = styled.div`
-  width: 100%;
-  height: 1px;
-  background-color: #e0e0e0;
-  margin: 0; 
-  position: absolute;
-  top: 72px;
-  left: 0;
-  right: 0;
 `;

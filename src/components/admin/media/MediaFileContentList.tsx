@@ -1,7 +1,7 @@
 import React from "react";
 import styled from 'styled-components';
-import DropDownButton from "../../common/DropDownButton";
-import type { MediaFile } from "../../../hooks/media/useMediaFile";
+import DropDownButton from "@/components/common/DropDownButton";
+import type { MediaFile } from "@/hooks/media/useMediaFile";
 
 interface MediaFileContentProps {
   file: MediaFile;
@@ -68,7 +68,7 @@ const MediaFileContent: React.FC<MediaFileContentProps> = ({
 export default MediaFileContent;
 
 const Container = styled.div`
-  width: 700px;
+  width: 780px;
   height: 88px;
   flex-shrink: 0;
   background: var(--color-white);

@@ -1,7 +1,7 @@
 import styled from "styled-components";
 import { CircularProgressbar, buildStyles } from "react-circular-progressbar";
 import "react-circular-progressbar/dist/styles.css";
-import '../../styles/Global.css';
+import '@/styles/Global.css';
 
 // 프롬프트 템플릿 종류
 const TEMPLATE_TYPES = {
@@ -57,7 +57,7 @@ export const DonutChart = ({
 
 const Container = styled.div`
   width: 225px;
-  height: 187.5px;
+  height: 188px;
   flex-shrink: 0;
   border-radius: 18.75px;
   background: var(--color-white);
