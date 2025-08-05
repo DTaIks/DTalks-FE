@@ -67,17 +67,17 @@ const ActivePageBackground = styled.div`
   position: absolute;
   top: 0;
   left: 0;
-  border-radius: 3.75px;
+  border-radius: 4px;
   background-color: var(--color-mediumpurple-200);
-  width: 28.48px;
-  height: 28.48px;
+  width: 28px;
+  height: 28px;
 `;
 
 const ActivePageNumber = styled.div`
   z-index: 1;
   position: absolute;
-  top: 6.752px;
-  left: 11.264px;
+  top: 8px;
+  left: 12px;
   color: var(--color-white);
 `;
 
@@ -85,19 +85,19 @@ const InactivePageBackground = styled.div`
   position: absolute;
   top: 0;
   left: 0;
-  border-radius: 3.75px;
+  border-radius: 4px;
   background: rgba(255, 255, 255, 0.35);
   border: 0.375px solid #CCC;
   box-sizing: border-box;
-  width: 28.48px;
-  height: 28.48px;
+  width: 28px;
+  height: 28px;
 `;
 
 const InactivePageNumber = styled.div`
   z-index: 1;
   position: absolute;
-  top: 6.752px;
-  left: 10.496px;
+  top: 8px;
+  left: 12px;
   color: var(--color-silver);
 `;
 
@@ -126,9 +126,9 @@ const NextButtonBackground = styled.div`
   position: absolute;
   top: 0;
   left: 0;
-  border-radius: 3.75px;
+  border-radius: 4px;
   background: #FFF;
-  border: 0.375px solid #CCC;
+  border: 0.4px solid #CCC;
   box-sizing: border-box;
   width: 44px;
   height: 28px;
@@ -150,9 +150,9 @@ const PrevButtonBackground = styled.div`
   position: absolute;
   top: 0;
   left: 0;
-  border-radius: 3.75px;
+  border-radius: 4px;
   background: rgba(255, 255, 255, 0.35);
-  border: 0.375px solid #CCC;
+  border: 0.4px solid #CCC;
   box-sizing: border-box;
   width: 44px;
   height: 28px;
@@ -177,7 +177,7 @@ const PaginationContainer = styled.div`
   align-items: center;
   width: 100%;
   height: 28px;
-  font-size: 13.504px;
+  font-size: 14px;
   margin-top: 24px;
   position: relative;
 `; 
