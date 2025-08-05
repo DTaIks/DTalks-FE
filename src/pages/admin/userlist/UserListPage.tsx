@@ -1,4 +1,3 @@
-import React from "react";
 import styled from "styled-components";
 import TitleContainer from "@/layout/TitleContainer";
 import UserTable from "@/components/admin/userlist/UserListTable";
@@ -12,7 +11,7 @@ const UserListPage = () => {
     getFilteredData
   } = useUserStore();
 
-  const { paginatedData, totalPages } = getFilteredData(currentPage, 5);
+  const { totalPages } = getFilteredData(currentPage, 5);
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
