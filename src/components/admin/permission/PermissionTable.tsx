@@ -4,11 +4,14 @@ import { usePermissionStore } from "@/store/permissionStore";
 import type { PermissionUser } from "@/types/permission";
 import TableHeader from "@/components/admin/permission/PermissionTableHeader";
 import TableRow from "@/components/admin/permission/PermissionTableRow";
+import Roll1 from '@/assets/permission/Roll.svg';
+import Roll2 from '@/assets/permission/Roll2.svg';
+import Roll3 from '@/assets/permission/Roll3.svg';
 
 const permissionData: PermissionUser[] = [
   {
     roleId: 1,
-    image: '/src/assets/permission/Roll.svg',
+    image: Roll1,
     roleName: "관리자",
     roleNameEn: "Administrator",
     description: "시스템 관리 및 전체 권한 보유",
@@ -17,7 +20,7 @@ const permissionData: PermissionUser[] = [
   },
   {
     roleId: 2,
-    image: '/src/assets/permission/Roll2.svg',
+    image: Roll2,
     roleName: "편집자",
     roleNameEn: "Editor",
     description: "콘텐츠 관리, 편집 및 게시 권한",
@@ -26,7 +29,7 @@ const permissionData: PermissionUser[] = [
   },
   {
     roleId: 3,
-    image: '/src/assets/permission/Roll3.svg',
+    image: Roll3,
     roleName: "사용자",
     roleNameEn: "User",
     description: "기본 읽기 및 제한된 쓰기 권한",
