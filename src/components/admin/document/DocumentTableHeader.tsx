@@ -63,7 +63,7 @@ const TableHeader = styled.div`
 const TableTitle = styled.h2`
   color: #000;
   font-size: 18px;
-  font-weight: 700;
+  font-weight: 600;
 `;
 
 const SearchContainer = styled.div`

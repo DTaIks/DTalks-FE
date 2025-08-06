@@ -19,12 +19,14 @@ const TableHeader = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 0 0 0 36px;
+  padding: 0 36px;
+  box-sizing: border-box;
+  position: relative;
 `;
 
 const TableTitle = styled.h2`
   color: #000;
   font-size: 18px;
   font-weight: 600;
-  margin: 0;
+  flex-shrink: 0;
 `; 

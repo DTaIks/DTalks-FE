@@ -7,7 +7,7 @@ import Pagination from "@/components/common/Pagination";
 
 const UserTable = () => {
   const { currentPage, setCurrentPage, getFilteredData } = useUserStore();
-  const { paginatedData, totalPages } = getFilteredData(currentPage, 8);
+  const { paginatedData, totalPages } = getFilteredData(currentPage, 7);
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
@@ -35,11 +35,10 @@ export default UserTable;
 
 const TableContainer = styled.div`
   width: 1062px;
-  margin: 0 auto 12px auto;
-  background: var(--color-white);
   border-radius: var(--br-18);
-  box-shadow: 0px 0px 11.25px 2.25px rgba(153, 102, 204, 0.05);
-  overflow: hidden;
+  background: var(--color-white);
+  box-shadow: 0 6px 18px 0 rgba(125, 93, 246, 0.10);
+  transition: height 0.3s ease;
   padding-bottom: 32px;
 `;
 

@@ -28,7 +28,7 @@ export default UserTableHeader;
 
 const TableHeader = styled.div`
   width: 1062px;
-  height: 60px;
+  height: 76px;
   border-radius: 19.5px 19.5px 0 0;
   border-bottom: 1.5px solid #E9E0F0;
   background: var(--color-white);

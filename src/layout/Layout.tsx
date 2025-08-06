@@ -24,10 +24,14 @@ const LayoutContainer = styled.div`
 const MainContent = styled.div`
   display: flex;
   flex-direction: column;
+  width: 100%;
+  margin-left: 250px;
 `;
 
 const ContentArea = styled.div`
-  margin-left: 316px;
   margin-top: 140px;
   background: var(--color-lightgray-100);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 `; 

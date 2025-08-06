@@ -3,11 +3,12 @@ import styled from "styled-components";
 interface TitleContainerProps {
   title: string;
   subtitle?: string;
+  marginLeft?: string;
 }
 
-const TitleContainer = ({ title, subtitle }: TitleContainerProps) => {
+const TitleContainer = ({ title, subtitle, marginLeft }: TitleContainerProps) => {
   return (
-    <Container>
+    <Container marginLeft={marginLeft}>
       <Title>{title}</Title>
       {subtitle && <Subtitle>{subtitle}</Subtitle>}
     </Container>
@@ -16,14 +17,15 @@ const TitleContainer = ({ title, subtitle }: TitleContainerProps) => {
 
 export default TitleContainer;
 
-const Container = styled.div`
+const Container = styled.div<{ marginLeft?: string }>`
   position: absolute;
   top: 40px;
-  left: 276px;
+  left: calc(50% + 128px);
+  transform: translateX(-50%);
   width: 1056px;
   height: 64px;
   font-size: 31.5px;
-  margin-left: 45px;
+  margin-left: ${props => props.marginLeft || '0px'};
   color: var(--color-darkslategray);
 `;
 
