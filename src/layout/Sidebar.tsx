@@ -356,7 +356,7 @@ const Sidebar: React.FC<SidebarProps> = ({ className = "" }) => {
   const currentOpenMenus = getOpenMenus();
 
   return (
-    <SidebarRoot className={className}>
+    <SidebarRoot className={`sidebar ${className}`}>
       <LogoRow>
         <Logo alt="" src={LogoImage} onClick={handleLogoClick} />
         <AdminPageTitle>관리자 페이지</AdminPageTitle>
@@ -417,7 +417,7 @@ const SidebarRoot = styled.div`
   display: flex;
   flex-direction: column;
   z-index: 1000;
-  transform-origin: top left;
+
 `;
 
 const LogoRow = styled.div`
