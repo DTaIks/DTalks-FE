@@ -1,6 +1,7 @@
 import { useState, useCallback, useMemo } from 'react';
 import { useArchivedFilesStore } from '@/store/archivedFileStore';
 import { useFiles, type MediaFile } from '@/hooks/media/useMediaFile';
+import type { MediaUploadData } from '@/components/admin/media/MediaFileUploadModal';
 
 export const useMediaPageState = () => {
   // UI 상태들
@@ -15,7 +16,7 @@ export const useMediaPageState = () => {
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState<boolean>(false);
   const [modalType, setModalType] = useState<'archive' | 'download'>('download');
   const [isEditMode, setIsEditMode] = useState<boolean>(false);
-  const [editInitialData, setEditInitialData] = useState<any>(null);
+  const [editInitialData, setEditInitialData] = useState<MediaUploadData | null>(null);
 
   const files = useFiles();
   const { archivedFiles } = useArchivedFilesStore();
@@ -104,7 +105,7 @@ export const useMediaPageState = () => {
     setEditInitialData(null);
   }, []);
 
-  const openEditModal = useCallback((initialData: any): void => {
+  const openEditModal = useCallback((initialData: MediaUploadData): void => {
     setIsEditMode(true);
     setEditInitialData(initialData);
     setIsMediaUploadModalOpen(true);

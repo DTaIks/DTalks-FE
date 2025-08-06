@@ -63,7 +63,7 @@ export const usePassword = () => {
     // 이메일 유효성 검사
     try {
       passwordResetSchema.validateSyncAt('email', { email });
-    } catch (error) {
+    } catch {
       return; // 에러가 있으면 인증 확인을 진행하지 않음
     }
 

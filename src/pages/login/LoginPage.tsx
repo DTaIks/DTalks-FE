@@ -21,7 +21,7 @@ const loginSchema = yup.object({
     .matches(/[A-Z]/, '대문자 1개 이상이 필요합니다.')
     .matches(/[a-z]/, '소문자 1개 이상이 필요합니다.')
     .matches(/\d/, '숫자 1개 이상이 필요합니다.')
-    .matches(/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/, '특수문자 1개 이상이 필요합니다.')
+    .matches(/[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]/, '특수문자 1개 이상이 필요합니다.')
 }).required();
 
 type LoginFormData = yup.InferType<typeof loginSchema>;
