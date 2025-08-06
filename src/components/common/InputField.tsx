@@ -53,6 +53,9 @@ const InputField: React.FC<InputFieldProps> = ({
             placeholder={placeholder}
             hasButton={hasButton}
             autoComplete={autocomplete}
+            value={inputProps?.value || value}
+            onChange={inputProps?.onChange || onChange}
+            type={inputProps?.type || type}
           />
           {hasButton && (
             <SignupButton

@@ -582,6 +582,7 @@ const Profile = styled.img`
   height: 40px;
   object-fit: cover;
   margin-right: 12px;
+  border-radius: 50%;
 `;
 
 const AdminText = styled.div`

@@ -59,8 +59,8 @@ const LoginForm: React.FC<LoginFormProps> = ({
           autocomplete="current-password"
         />
         {error && <ErrorMessage>{error}</ErrorMessage>}
-        <ForgotPasswordLink href="/forgot-password">
-          비밀번호 찾기
+        <ForgotPasswordLink href="/signup">
+          <span>비밀번호 찾기</span>
         </ForgotPasswordLink>
         <LoginButtonWrapper>
           <Button
@@ -105,7 +105,6 @@ const WelcomeTitle = styled.h1`
   font-size: 24px;
   line-height: 28px;
   font-weight: 700;
-  font-family: inherit;
   z-index: 1;
   text-align: center;
 `;
@@ -155,7 +154,7 @@ const LoginFormContainer = styled.div`
 
 const ErrorMessage = styled.div`
   color: #f44336;
-  font-size: 12px;
+  font-size: 14px;
   text-align: center;
   align-self: flex-start;
   width: 100%;
@@ -170,8 +169,12 @@ const ForgotPasswordLink = styled.a`
   width: 382.5px;
   display: block;
   text-align: right;
+  pointer-events: none;
   &:hover {
     text-decoration: underline;
     color: #7742A7;
+  }
+  span {
+    pointer-events: auto;
   }
 `;

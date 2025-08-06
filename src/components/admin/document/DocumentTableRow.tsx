@@ -32,6 +32,8 @@ const DocumentTableRow: React.FC<DocumentTableRowProps> = ({ document, onArchive
         <DropDownButton 
           items={[
             { label: "다운로드", onClick: () => onArchive(document.id) },
+            { label: "버전관리", onClick: () => onArchive(document.id) },
+            { label: "보관", onClick: () => onArchive(document.id) },
           ]}
         />
       </TableCell>
