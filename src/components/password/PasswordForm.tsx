@@ -1,9 +1,9 @@
 import styled from 'styled-components';
 import InputField from '@/components/common/InputField';
 import Button from '@/components/common/Button';
-import { useSignUp } from '@/hooks/useSignUp';
+import { usePassword } from '@/hooks/usePassword';
 
-export default function SignUpForm(): JSX.Element {
+export default function PasswordForm(): JSX.Element {
   const {
     register,
     handleSubmit,
@@ -16,11 +16,11 @@ export default function SignUpForm(): JSX.Element {
     isAuthButtonDisabled,
     isSubmitEnabled,
     formatTimer
-  } = useSignUp();
+  } = usePassword();
 
   return (
     <FormWrapper>
-      <Title>지금 함께 시작해볼까요?</Title>
+      <Title>비밀번호를 잊으셨나요?</Title>
       <form onSubmit={handleSubmit} noValidate>
         <InputField
           variant="signup"
@@ -31,9 +31,9 @@ export default function SignUpForm(): JSX.Element {
             ...register('email'),
             disabled: authState.isEmailVerified
           }}
-          infoText={errors.email?.message || ''}
-          infoTextColor={errors.email ? '#F0191D' : ''}
-          buttonText="중복 확인"
+          infoText={errors.email?.message || authState.emailError || ''}
+          infoTextColor={errors.email || authState.emailError ? '#F0191D' : ''}
+          buttonText="이메일 확인"
           onButtonClick={handleEmailCheck}
           buttonDisabled={!watch('email') || authState.isEmailVerified}
         />
@@ -77,7 +77,7 @@ export default function SignUpForm(): JSX.Element {
 
         <InputField
           variant="signup"
-          label="비밀번호"
+          label="새 비밀번호"
           placeholder="문자, 숫자, 특수문자 포함 8자~20자"
           inputProps={{
             type: 'password',
@@ -89,8 +89,8 @@ export default function SignUpForm(): JSX.Element {
 
         <InputField
           variant="signup"
-          label="비밀번호 확인"
-          placeholder="비밀번호를 다시 입력해 주세요."
+          label="새 비밀번호 확인"
+          placeholder="새 비밀번호를 다시 입력해 주세요."
           inputProps={{
             type: 'password',
             ...register('passwordCheck')
@@ -100,7 +100,7 @@ export default function SignUpForm(): JSX.Element {
         />
 
         <Button
-          text="회원가입"
+          text="비밀번호 재설정"
           type="submit"
           variant="submit"
           width="380px"

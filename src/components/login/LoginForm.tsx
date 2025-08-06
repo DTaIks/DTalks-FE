@@ -59,7 +59,7 @@ const LoginForm: React.FC<LoginFormProps> = ({
           autocomplete="current-password"
         />
         {error && <ErrorMessage>{error}</ErrorMessage>}
-        <ForgotPasswordLink href="/signup">
+        <ForgotPasswordLink href="/password">
           <span>비밀번호 찾기</span>
         </ForgotPasswordLink>
         <LoginButtonWrapper>

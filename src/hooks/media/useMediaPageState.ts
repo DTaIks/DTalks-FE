@@ -14,6 +14,8 @@ export const useMediaPageState = () => {
   const [isMediaUploadModalOpen, setIsMediaUploadModalOpen] = useState<boolean>(false);
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState<boolean>(false);
   const [modalType, setModalType] = useState<'archive' | 'download'>('download');
+  const [isEditMode, setIsEditMode] = useState<boolean>(false);
+  const [editInitialData, setEditInitialData] = useState<any>(null);
 
   const files = useFiles();
   const { archivedFiles } = useArchivedFilesStore();
@@ -98,6 +100,14 @@ export const useMediaPageState = () => {
 
   const closeUploadModal = useCallback((): void => {
     setIsMediaUploadModalOpen(false);
+    setIsEditMode(false);
+    setEditInitialData(null);
+  }, []);
+
+  const openEditModal = useCallback((initialData: any): void => {
+    setIsEditMode(true);
+    setEditInitialData(initialData);
+    setIsMediaUploadModalOpen(true);
   }, []);
 
   const openConfirmModal = useCallback((type: 'archive' | 'download', fileName: string): void => {
@@ -129,7 +139,10 @@ export const useMediaPageState = () => {
     modals: {
       uploadModal: {
         isOpen: isMediaUploadModalOpen,
+        isEditMode,
+        initialData: editInitialData,
         open: openUploadModal,
+        openEdit: openEditModal,
         close: closeUploadModal
       },
       confirmModal: {

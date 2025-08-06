@@ -5,6 +5,9 @@ export interface MediaFile {
   updatedAt: string;
   fileType: 'document' | 'audio' | 'image';
   departmentName?: string;
+  description?: string;
+  fileVersion?: string;
+  isPublic?: boolean;
 }
 
 export interface Department {
@@ -21,7 +24,10 @@ export const useFiles = (): MediaFile[] => {
       fileSize: '15.2MB',
       updatedAt: '2025-07-07 12:30',
       fileType: 'document',
-      departmentName: '마케팅팀'
+      departmentName: '마케팅팀',
+      description: '제품 소개 및 특징을 담은 문서',
+      fileVersion: '1.0.0',
+      isPublic: true
     },
     {
       fileId: 2,

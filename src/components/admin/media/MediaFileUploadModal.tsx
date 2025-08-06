@@ -14,6 +14,8 @@ interface MediaUploadModalProps {
   onClose: () => void;
   onSubmit: (data: MediaUploadData) => void;
   isSubmitting?: boolean;
+  initialData?: MediaUploadData;
+  isEditMode?: boolean;
 }
 
 export interface MediaUploadData {
@@ -34,6 +36,8 @@ const MediaFileUploadModal: React.FC<MediaUploadModalProps> = ({
   isOpen,
   onClose,
   onSubmit,
+  initialData,
+  isEditMode = false
 }) => {
   const [formData, setFormData] = useState<MediaUploadData>({
     uploadFile: undefined,
@@ -60,6 +64,24 @@ const MediaFileUploadModal: React.FC<MediaUploadModalProps> = ({
       });
     }
   }, [isOpen]);
+
+  // 초기 데이터 설정
+  useEffect(() => {
+    if (isOpen && initialData && isEditMode) {
+      setFormData(initialData);
+      setFileDisplayName(initialData.fileName);
+    } else if (isOpen && !isEditMode) {
+      // 새 파일 업로드 모드일 때 초기화
+      setFormData({
+        uploadFile: undefined,
+        fileName: '',
+        description: '',
+        fileVersion: '',
+        isPublic: false
+      });
+      setFileDisplayName('');
+    }
+  }, [isOpen, initialData, isEditMode]);
 
   const handleSubmit = () => {
     if (isFormValid()) {
