@@ -32,6 +32,7 @@ const InfoCard = styled.div`
   border: none;
   padding: var(--padding-18);
   margin: 0 auto;
+  margin-bottom: 4px;
 `;
 
 const InfoTitle = styled.h4`

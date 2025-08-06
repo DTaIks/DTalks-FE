@@ -112,7 +112,6 @@ const ModalContainer = styled.div`
   background: var(--color-white);
   border-radius: var(--br-15);
   width: 420px;
-  height: 740px;
   overflow: hidden;
   display: flex;
   flex-direction: column;
@@ -122,12 +121,12 @@ const ModalHeader = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 24px 24px 0px;
+  padding: 12px 24px 0px;
   flex-shrink: 0;
 
   h2 {
     margin: 0;
-    font-size: var(--font-size-20);
+    font-size: var(--font-size-18);
     font-weight: var(--font-weight-600);
     color: var(--color-lightblack);
   }

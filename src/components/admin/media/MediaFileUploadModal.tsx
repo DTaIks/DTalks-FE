@@ -48,6 +48,7 @@ const MediaFileUploadModal: React.FC<MediaUploadModalProps> = ({
   });
 
   const [fileDisplayName, setFileDisplayName] = useState<string>('');
+  const [fileError, setFileError] = useState<string>('');
 
   const [touched, setTouched] = useState({
     fileName: false,
@@ -62,6 +63,7 @@ const MediaFileUploadModal: React.FC<MediaUploadModalProps> = ({
         description: false,
         fileVersion: false
       });
+      setFileError('');
     }
   }, [isOpen]);
 
@@ -119,7 +121,7 @@ const MediaFileUploadModal: React.FC<MediaUploadModalProps> = ({
 
   const isValidSemver = (version: string): boolean => /^\d+\.\d+\.\d+$/.test(version);
   
-  const hasValidFile = () => formData.uploadFile !== undefined;
+  const hasValidFile = () => formData.uploadFile !== undefined && !fileError;
   const hasValidFileName = () => formData.fileName.trim() !== '';
   const hasValidDescription = () => formData.description.trim() !== '';
   const hasValidVersion = () => isValidSemver(formData.fileVersion);
@@ -140,6 +142,7 @@ const MediaFileUploadModal: React.FC<MediaUploadModalProps> = ({
       isPublic: false
     });
     setFileDisplayName('');
+    setFileError('');
     setTouched({
       fileName: false,
       description: false,
@@ -164,6 +167,9 @@ const MediaFileUploadModal: React.FC<MediaUploadModalProps> = ({
         onFileDisplayNameChange={handleFileDisplayNameChange}
         onFileChange={handleFileChange}
         accept="image/*,audio/*,.pdf,.docx,.xlsx"
+        maxSizeInMB={10}
+        onFileError={setFileError}
+        fileError={fileError}
       />
 
       <FileNameInput
@@ -206,11 +212,13 @@ export default MediaFileUploadModal;
 const InputRow = styled.div`
   display: flex;
   gap: var(--gap-12);
-  margin-bottom: 20px;
+  margin-bottom: 4px;
   > *:first-child {
-    flex: 4.5;
+    flex: 3.5;
+    min-width: 0;
   }
   > *:last-child {
-    flex: 1.5;
+    flex-shrink: 0;
+    width: 120px;
   }
 `;

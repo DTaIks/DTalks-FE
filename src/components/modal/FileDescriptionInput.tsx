@@ -52,7 +52,9 @@ export const FileDescriptionInput: React.FC<FileDescriptionInputProps> = ({
           hasError={hasError}
         />
         <BottomRow>
-          <Error>{error}</Error>
+          <ErrorContainer>
+            {error && <Error>{error}</Error>}
+          </ErrorContainer>
           <CharacterCount hasError={hasError}>
             {value.length}/225
           </CharacterCount>
@@ -64,11 +66,9 @@ export const FileDescriptionInput: React.FC<FileDescriptionInputProps> = ({
 
 const Container = styled.div`
   width: 346px;
-  min-height: 120px;
   display: flex;
   flex-direction: column;
   gap: var(--gap-8);
-  margin-bottom: 4px;
 `;
 
 const Label = styled.label`
@@ -88,7 +88,7 @@ const BottomRow = styled.div`
   justify-content: space-between;
   align-items: center;
   margin-top: 4px;
-  min-height: 16px;
+  min-height: 24px;
 `;
 
 const CharacterCount = styled.span<{ hasError: boolean }>`
@@ -103,7 +103,6 @@ const Textarea = styled.textarea<{ hasError: boolean }>`
   border: 0.75px solid var(--color-gray);
   border-radius: 3.75px;
   font-size: var(--font-size-14);
-  font-weight: var(--font-weight-400);
   outline: none;
   resize: none;
 
@@ -117,8 +116,15 @@ const Textarea = styled.textarea<{ hasError: boolean }>`
   }
 `;
 
+const ErrorContainer = styled.div`
+  min-height: 16px;
+  display: flex;
+  align-items: center;
+  padding-bottom: 8px;
+`;
+
 const Error = styled.span`
   color: var(--color-error);
-  font-size: var(--font-size-10);
+  font-size: var(--font-size-12);
   font-weight: var(--font-weight-400);
 `;
