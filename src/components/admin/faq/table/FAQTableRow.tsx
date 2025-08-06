@@ -92,6 +92,7 @@ const TableRow = styled.div<{ $isExpanded?: boolean }>`
   transition: background-color 0.2s ease;
   cursor: pointer;
   padding: 30px 0;
+  padding-left: 44px;
   
   &:hover {
     background-color: rgba(153, 102, 204, 0.05);
@@ -111,11 +112,11 @@ const TableCell = styled.div`
   font-size: var(--font-size-16);
   font-weight: 500;
   
-  &:nth-child(1) { width: 340px; padding-left: 44px; }
-  &:nth-child(2) { width: 120px; padding-left: 24px; justify-content: center; }
-  &:nth-child(3) { width: 120px; padding-left: 24px; justify-content: center; }
-  &:nth-child(4) { width: 200px; padding-left: 36px; }
-  &:nth-child(5) { width: 150px; }
+  &:nth-child(1) { width: 370px; }
+  &:nth-child(2) { width: 160px; margin-right:-40px; justify-content: center; }
+  &:nth-child(3) { width: 180px; justify-content: center; }
+  &:nth-child(4) { width: 190px; }
+  &:nth-child(5) { width: 120px; }
 `;
 
 const QuestionText = styled.span`

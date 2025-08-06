@@ -30,7 +30,7 @@ const TableRow = styled.div`
   display: flex;
   align-items: center;
   transition: background-color 0.2s ease;
-  padding-left: 36px;
+  padding-left: 44px;
 `;
 
 const TableCell = styled.div`
@@ -41,9 +41,9 @@ const TableCell = styled.div`
   font-size: var(--font-size-16);
   font-weight: 500;
   
-  &:nth-child(1) { width: 340px; padding-left: 44px; }
-  &:nth-child(2) { width: 120px; padding-left: 24px; justify-content: center; }
-  &:nth-child(3) { width: 120px; padding-left: 24px; justify-content: center; }
-  &:nth-child(4) { width: 200px; padding-left: 36px; }
-  &:nth-child(5) { width: 150px; }
+  &:nth-child(1) { width: 370px; }
+  &:nth-child(2) { width: 160px; margin-right:-40px; justify-content: center; }
+  &:nth-child(3) { width: 180px; justify-content: center; }
+  &:nth-child(4) { width: 190px; }
+  &:nth-child(5) { width: 120px; }
 `; 

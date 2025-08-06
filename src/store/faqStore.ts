@@ -37,7 +37,7 @@ interface FAQState {
 const FAQ_DATA: FAQItem[] = [
   {
     id: 1,
-    question: "계정 비밀번호를 변경하는 방법은?",
+    question: "계정 비밀번호를 변경하는 방법은? 계정 비밀번호를 변경하는 방법은?",
     answer: "회사 메일 포털 → [설정] → [비밀번호 변경] 메뉴에서 직접 변경 가능합니다. 보안을 위해 3개월마다 비밀번호 변경을 권장합니다.",
     category: "IT/시스템",
     categoryImage: CategoryName1,
@@ -64,7 +64,7 @@ const FAQ_DATA: FAQItem[] = [
   },
   {
     id: 4,
-    question: "계정 비밀번호를 변경하는 방법은?",
+    question: "계정 비밀번호를 변경하는 방법은? 계정 비밀번호를 변경하는 방법은?",
     answer: "회사 메일 포털 → [설정] → [비밀번호 변경] 메뉴에서 직접 변경 가능합니다. 보안을 위해 3개월마다 비밀번호 변경을 권장합니다.",
     category: "급여 / 복리후생",
     categoryImage: CategoryName4,
