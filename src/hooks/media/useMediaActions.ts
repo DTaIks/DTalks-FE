@@ -13,6 +13,12 @@ export const useMediaActions = () => {
     alert(`미디어 파일 "${data.fileName}"이 업로드되었습니다!`);
   }, []);
 
+  // 파일 수정 핸들러
+  const handleEdit = useCallback((data: MediaUploadData): void => {
+    console.log('미디어 파일 수정 데이터:', data);
+    alert(`미디어 파일 "${data.fileName}"이 수정되었습니다!`);
+  }, []);
+
   // 파일 다운로드 핸들러
   const handleDownload = useCallback((fileName: string): void => {
     alert(`${fileName} 다운로드를 시작합니다.`);
@@ -44,6 +50,7 @@ export const useMediaActions = () => {
 
   return {
     handleUpload,
+    handleEdit,
     handleDownload,
     handleArchive,
     handleConfirmAction

@@ -47,18 +47,18 @@ export const FileNameInput: React.FC<FileNameInputProps> = ({
         placeholder={placeholder}
         hasError={hasError}
       />
-      {error && <Error>{error}</Error>}
+      <ErrorContainer>
+        {error && <Error>{error}</Error>}
+      </ErrorContainer>
     </Container>
   );
 };
 
 const Container = styled.div`
   width: 346px;
-  height: auto;
   display: flex;
   flex-direction: column;
   gap: var(--gap-8);
-  margin-bottom: 20px;
 `;
 
 const Label = styled.label`
@@ -86,7 +86,14 @@ const Input = styled.input<{ hasError?: boolean }>`
   }
 `;
 
+const ErrorContainer = styled.div`
+  min-height: 16px;
+  display: flex;
+  align-items: center;
+`;
+
 const Error = styled.div`
-  font-size: var(--font-size-10);
+  font-size: var(--font-size-12);
   color: var(--color-error);
+  font-weight: var(--font-weight-400);
 `;

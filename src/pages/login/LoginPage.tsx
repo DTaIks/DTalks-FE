@@ -17,7 +17,11 @@ const loginSchema = yup.object({
   password: yup
     .string()
     .required('비밀번호를 입력해 주세요.')
-    .min(6, '비밀번호는 최소 6자 이상이어야 합니다.')
+    .min(8, '비밀번호는 최소 8자 이상이어야 합니다.')
+    .matches(/[A-Z]/, '대문자 1개 이상이 필요합니다.')
+    .matches(/[a-z]/, '소문자 1개 이상이 필요합니다.')
+    .matches(/\d/, '숫자 1개 이상이 필요합니다.')
+    .matches(/[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]/, '특수문자 1개 이상이 필요합니다.')
 }).required();
 
 type LoginFormData = yup.InferType<typeof loginSchema>;
@@ -27,21 +31,21 @@ const mockUsers = [
   {
     id: '1',
     email: 'test@example.com',
-    password: '123456',
+    password: 'Test123!',
     name: '테스트 사용자',
     employeeNumber: 'EMP001'
   },
   {
     id: '2', 
     email: 'admin@dtalks.com',
-    password: 'admin123',
+    password: 'Admin123!',
     name: '관리자',
     employeeNumber: 'EMP002'
   },
   {
     id: '3',
     email: 'user@dtalks.com', 
-    password: 'user123',
+    password: 'User123!',
     name: '일반 사용자',
     employeeNumber: 'EMP003'
   }
@@ -148,12 +152,15 @@ export default function LoginPage(): JSX.Element {
 }
 
 const LogoImage = styled.img`
-  width: 101.25px;
-  height: 100.5px;
+  width: 100px;
+  height: 100px;
   object-fit: cover;
   cursor: pointer;
   transition: transform 0.2s ease;
   margin-bottom: 32px;
+  &:hover {
+    transform: scale(1.05);
+  }
 `;
 
 const SignUpText = styled.span`

@@ -45,11 +45,13 @@ export const VersionInput: React.FC<VersionInputProps> = ({
          placeholder={placeholder}
        />
      </InputWrapper>
-     {showError && (isEmpty || !isCurrentValueValid) && (
-       <Error>
-         {isEmpty ? '버전을 입력하세요' : '올바른 버전 형식을 입력하세요 (ex:1.0.0)'}
-       </Error>
-     )}
+     <ErrorContainer>
+       {showError && (isEmpty || !isCurrentValueValid) && (
+         <Error>
+           {isEmpty ? '버전을 입력하세요' : '올바른 버전 형식을 입력하세요 (ex:1.0.0)'}
+         </Error>
+       )}
+     </ErrorContainer>
    </VersionContainer>
  );
 };
@@ -102,7 +104,14 @@ const Input = styled.input`
  }
 `;
 
+const ErrorContainer = styled.div`
+  min-height: 16px;
+  display: flex;
+  align-items: center;
+`;
+
 const Error = styled.div`
- font-size: var(--font-size-10);
- color: var(--color-error);
+font-size: var(--font-size-12);
+color: var(--color-error);
+font-weight: var(--font-weight-400);
 `;

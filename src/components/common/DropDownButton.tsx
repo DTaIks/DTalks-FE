@@ -98,8 +98,8 @@ const DotsContainer = styled.div`
 `;
 
 const Dot = styled.div`
-  width: 5px;
-  height: 5px;
+  width: 3px;
+  height: 3px;
   border-radius: 50%;
   background-color: var(--color-gray);
 `;

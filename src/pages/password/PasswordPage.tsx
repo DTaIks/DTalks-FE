@@ -1,17 +1,16 @@
 import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
 import Logo from '@/assets/common/Logo.png';
-import SignUpForm from '@/components/signup/SignUpForm';
+import PasswordForm from '@/components/password/PasswordForm';
 
-export default function SignUpPage(): JSX.Element {
+export default function PasswordPage(): JSX.Element {
   const navigate = useNavigate();
 
   return (
     <PageWrapper>
       <LogoImage src={Logo} alt="Logo" onClick={() => navigate('/')} />
-      <SignUpForm />
+      <PasswordForm />
       <BottomText>
-        이미 계정이 있으신가요?{' '}
         <BottomLink href="/login">로그인하기</BottomLink>
       </BottomText>
     </PageWrapper>
@@ -59,4 +58,4 @@ const BottomLink = styled.a`
   font-weight: 600;
   line-height: 18px;
   cursor: pointer;
-`; 
+`;

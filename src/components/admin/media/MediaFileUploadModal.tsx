@@ -14,6 +14,8 @@ interface MediaUploadModalProps {
   onClose: () => void;
   onSubmit: (data: MediaUploadData) => void;
   isSubmitting?: boolean;
+  initialData?: MediaUploadData;
+  isEditMode?: boolean;
 }
 
 export interface MediaUploadData {
@@ -34,6 +36,8 @@ const MediaFileUploadModal: React.FC<MediaUploadModalProps> = ({
   isOpen,
   onClose,
   onSubmit,
+  initialData,
+  isEditMode = false
 }) => {
   const [formData, setFormData] = useState<MediaUploadData>({
     uploadFile: undefined,
@@ -44,6 +48,7 @@ const MediaFileUploadModal: React.FC<MediaUploadModalProps> = ({
   });
 
   const [fileDisplayName, setFileDisplayName] = useState<string>('');
+  const [fileError, setFileError] = useState<string>('');
 
   const [touched, setTouched] = useState({
     fileName: false,
@@ -58,8 +63,27 @@ const MediaFileUploadModal: React.FC<MediaUploadModalProps> = ({
         description: false,
         fileVersion: false
       });
+      setFileError('');
     }
   }, [isOpen]);
+
+  // 초기 데이터 설정
+  useEffect(() => {
+    if (isOpen && initialData && isEditMode) {
+      setFormData(initialData);
+      setFileDisplayName(initialData.fileName);
+    } else if (isOpen && !isEditMode) {
+      // 새 파일 업로드 모드일 때 초기화
+      setFormData({
+        uploadFile: undefined,
+        fileName: '',
+        description: '',
+        fileVersion: '',
+        isPublic: false
+      });
+      setFileDisplayName('');
+    }
+  }, [isOpen, initialData, isEditMode]);
 
   const handleSubmit = () => {
     if (isFormValid()) {
@@ -97,7 +121,7 @@ const MediaFileUploadModal: React.FC<MediaUploadModalProps> = ({
 
   const isValidSemver = (version: string): boolean => /^\d+\.\d+\.\d+$/.test(version);
   
-  const hasValidFile = () => formData.uploadFile !== undefined;
+  const hasValidFile = () => formData.uploadFile !== undefined && !fileError;
   const hasValidFileName = () => formData.fileName.trim() !== '';
   const hasValidDescription = () => formData.description.trim() !== '';
   const hasValidVersion = () => isValidSemver(formData.fileVersion);
@@ -118,6 +142,7 @@ const MediaFileUploadModal: React.FC<MediaUploadModalProps> = ({
       isPublic: false
     });
     setFileDisplayName('');
+    setFileError('');
     setTouched({
       fileName: false,
       description: false,
@@ -142,6 +167,9 @@ const MediaFileUploadModal: React.FC<MediaUploadModalProps> = ({
         onFileDisplayNameChange={handleFileDisplayNameChange}
         onFileChange={handleFileChange}
         accept="image/*,audio/*,.pdf,.docx,.xlsx"
+        maxSizeInMB={10}
+        onFileError={setFileError}
+        fileError={fileError}
       />
 
       <FileNameInput
@@ -184,11 +212,13 @@ export default MediaFileUploadModal;
 const InputRow = styled.div`
   display: flex;
   gap: var(--gap-12);
-  margin-bottom: 20px;
+  margin-bottom: 4px;
   > *:first-child {
-    flex: 4.5;
+    flex: 3.5;
+    min-width: 0;
   }
   > *:last-child {
-    flex: 1.5;
+    flex-shrink: 0;
+    width: 120px;
   }
 `;

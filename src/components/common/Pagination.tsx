@@ -149,7 +149,7 @@ const PrevButtonBackground = styled.div`
   top: 0;
   left: 0;
   border-radius: 4px;
-  background: rgba(255, 255, 255, 0.35);
+  background: #FFF;
   border: 0.4px solid #CCC;
   box-sizing: border-box;
   width: 44px;

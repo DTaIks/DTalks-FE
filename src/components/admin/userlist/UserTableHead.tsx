@@ -57,6 +57,6 @@ const TableHead = styled.div`
   font-weight: 600;
   
   ${TableCell} {
-    color: #2D1457;
+    color: #000;
   }
 `; 

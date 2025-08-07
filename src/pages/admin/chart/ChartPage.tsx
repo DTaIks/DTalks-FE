@@ -33,8 +33,8 @@ const ChartPage: React.FC = () => {
 
   return (
     <>
-      <TitleContainer title="통계" subtitle="챗봇 성능과 사용자 데이터를 분석하세요" />
-      <div>
+      <TitleContainer title="통계" subtitle="챗봇 성능과 사용자 데이터를 분석하세요" marginLeft="8px" />
+      <div style={{ marginLeft: "15px" }}>
         <div style={{ display: "flex", flexWrap: "wrap", gap: "var(--gap-36)", paddingBottom: 46.6 }}>
           {statCards.map((card, index) => (
             <StatCard 

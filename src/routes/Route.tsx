@@ -2,6 +2,7 @@ import { Routes, Route, Navigate, Outlet } from 'react-router-dom';
 import { useAuthStore } from '@/store/authStore';
 import LoginPage from '@/pages/login/LoginPage';
 import SignUpPage from '@/pages/signup/SignUpPage';
+import PasswordPage from '@/pages/password/PasswordPage';
 import UserListPage from '@/pages/admin/userlist/UserListPage';
 import PermissionPage from '@/pages/admin/permission/PermissionPage';
 import FAQPage from '@/pages/admin/faq/FAQPage';
@@ -47,6 +48,11 @@ export default function AppRoutes() {
       <Route path="/signup" element={
         <PublicOnly>
           <SignUpPage />
+        </PublicOnly>
+      } />
+      <Route path="/password" element={
+        <PublicOnly>
+          <PasswordPage />
         </PublicOnly>
       } />
 

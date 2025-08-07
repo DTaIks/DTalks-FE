@@ -9,18 +9,20 @@ import DropdownFilter from '@/components/common/DropDownFilter';
 import Button from '@/components/common/Button';
 import Pagination from '@/components/common/Pagination';
 
-import MediaFileUploadModal, { type MediaUploadData } from '@/components/admin/media/MediaFileUploadModal';
+import MediaFileUploadModal from '@/components/admin/media/MediaFileUploadModal';
 import ConfirmModal from '@/components/common/ConfirmModal';
 
 import { useDepartmentStats } from '@/hooks/media/useMediaFile';
 import { useMediaPageState } from '@/hooks/media/useMediaPageState';
 import { useMediaActions } from '@/hooks/media/useMediaActions';
+import { useMediaHandlers } from '@/hooks/media/useMediaHandlers';
 
 const MediaPage: React.FC = () => {
   // 데이터 및 상태 관리
   const departments = useDepartmentStats();
   const { filters, archive, modals, actions } = useMediaPageState();
   const mediaActions = useMediaActions();
+  const handlers = useMediaHandlers({ modals, mediaActions });
 
   // 페이지네이션 상태
   const [currentPage, setCurrentPage] = React.useState(1);
@@ -42,26 +44,10 @@ const MediaPage: React.FC = () => {
     setCurrentPage(1);
   }, [filters.selectedDepartment, filters.selectedFileType, archive.isMode]);
 
-  // 다운로드 버튼 클릭 핸들러
-  const handleDownloadClick = (fileName: string) => {
-    modals.confirmModal.open('download', fileName);
-  };
-
-  // 보관 버튼 클릭 핸들러
-  const handleArchiveClick = (fileName: string) => {
-    modals.confirmModal.open('archive', fileName);
-  };
-
   // 확인 모달 액션 핸들러
   const handleConfirmAction = () => {
     mediaActions.handleConfirmAction(modals.confirmModal.type, modals.confirmModal.fileName);
     modals.confirmModal.close();
-  };
-
-  // 업로드 모달 핸들러
-  const handleUploadSubmit = (data: MediaUploadData) => {
-    mediaActions.handleUpload(data);
-    modals.uploadModal.close();
   };
 
   return (
@@ -149,8 +135,9 @@ const MediaPage: React.FC = () => {
                   <MediaFileContent 
                     key={file.fileId} 
                     file={file}
-                    onDownloadClick={() => handleDownloadClick(file.fileName)}
-                    onArchiveClick={() => handleArchiveClick(file.fileName)}
+                    onDownloadClick={() => handlers.handleDownloadClick(file.fileName)}
+                    onArchiveClick={() => handlers.handleArchiveClick(file.fileName)}
+                    onEditClick={() => handlers.handleEditClick(file)}
                     isArchiveMode={archive.isMode}
                   />
                 ))}
@@ -173,7 +160,9 @@ const MediaPage: React.FC = () => {
       <MediaFileUploadModal
         isOpen={modals.uploadModal.isOpen}
         onClose={modals.uploadModal.close}
-        onSubmit={handleUploadSubmit}
+        onSubmit={handlers.handleUploadSubmit}
+        initialData={modals.uploadModal.initialData}
+        isEditMode={modals.uploadModal.isEditMode}
       />
 
       <ConfirmModal

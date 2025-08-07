@@ -4,7 +4,9 @@ import '@/styles/Global.css';
 function App() {
 
   return (
-    <AppRoutes />
+    <>
+      <AppRoutes />
+    </>
   );
 }
 

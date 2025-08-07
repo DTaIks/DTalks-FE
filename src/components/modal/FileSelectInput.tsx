@@ -7,6 +7,9 @@ interface FileSelectInputProps {
   onFileChange: (file: File | null) => void;
   accept?: string;
   placeholder?: string;
+  maxSizeInMB?: number;
+  onFileError?: (error: string) => void;
+  fileError?: string;
 }
 
 export const FileSelectInput: React.FC<FileSelectInputProps> = ({
@@ -14,15 +17,32 @@ export const FileSelectInput: React.FC<FileSelectInputProps> = ({
   onFileDisplayNameChange,
   onFileChange,
   accept = "*",
-  placeholder = "선택된 파일 없음"
+  placeholder = "선택된 파일 없음",
+  maxSizeInMB = 10,
+  onFileError,
+  fileError
 }) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0] || null;
     if (file) {
+      // 파일 크기 체크 (MB 단위)
+      const maxSizeInBytes = maxSizeInMB * 1024 * 1024;
+      if (file.size > maxSizeInBytes) {
+        onFileError?.(`파일 크기는 ${maxSizeInMB}MB 이하여야 합니다.`);
+        onFileDisplayNameChange('');
+        onFileChange(null);
+        // 파일 입력 초기화
+        if (fileInputRef.current) {
+          fileInputRef.current.value = '';
+        }
+        return;
+      }
+      
       onFileDisplayNameChange(file.name);
       onFileChange(file);
+      onFileError?.(''); // 에러 메시지 초기화
     } else {
       onFileDisplayNameChange('');
       onFileChange(null);
@@ -53,6 +73,9 @@ export const FileSelectInput: React.FC<FileSelectInputProps> = ({
           onChange={handleFileSelect}
         />
       </FileInputContainer>
+      <ErrorContainer>
+        {fileError && <ErrorMessage>{fileError}</ErrorMessage>}
+      </ErrorContainer>
     </Container>
   );
 };
@@ -61,7 +84,6 @@ const Container = styled.div`
   display: flex;
   flex-direction: column;
   gap: var(--gap-8);
-  margin-bottom: 20px;
 `;
 
 const Label = styled.label`
@@ -131,4 +153,16 @@ const SelectButton = styled.button`
 
 const HiddenFileInput = styled.input`
   display: none;
+`;
+
+const ErrorContainer = styled.div`
+  min-height: 16px;
+  display: flex;
+  align-items: center;
+`;
+
+const ErrorMessage = styled.div`
+  color: var(--color-error);
+  font-size: 12px;
+  font-weight: var(--font-weight-400);
 `;
