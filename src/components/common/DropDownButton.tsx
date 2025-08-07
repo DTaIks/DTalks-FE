@@ -152,6 +152,18 @@ const DropdownItemButton = styled.button`
     background-color: var(--color-lightpurple);
     color: var(--color-mediumpurple-300);
   }
+
+  &:first-child {
+    border-radius: var(--br-10) var(--br-10) 0 0;
+  }
+
+  &:last-child {
+    border-radius: 0 0 var(--br-10) var(--br-10);
+  }
+
+  &:only-child {
+    border-radius: var(--br-10);
+  }
 `;
 
 const Backdrop = styled.div`

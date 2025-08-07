@@ -130,6 +130,7 @@ const FAQUploadModal: React.FC<FAQUploadModalProps> = ({
         label="질문"
         placeholder="자주 묻는 질문을 입력하세요"
         showError={touched.question && !hasValidQuestion()}
+        errorMessage="질문을 작성하세요"
       />
 
       <FileDescriptionInput
@@ -162,6 +163,6 @@ export default FAQUploadModal;
 
 const InputRow = styled.div`
   display: flex;
-  gap: var(--gap-12);
+  gap: var(--gap-16);
   margin-bottom: 40px;
 `;

@@ -7,7 +7,10 @@ interface DocumentTableBodyProps {
   onArchive: (id: number) => void;
 }
 
-const DocumentTableBody: React.FC<DocumentTableBodyProps> = ({ documents, onArchive }) => {
+const DocumentTableBody: React.FC<DocumentTableBodyProps> = ({ 
+  documents, 
+  onArchive 
+}) => {
   return (
     <TableBody>
       {documents.map((document) => (
