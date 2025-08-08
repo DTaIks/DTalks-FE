@@ -46,9 +46,9 @@ export const usePromptTemplate = (): PromptTemplate => {
     totalUse: 8107,
     averageResponseTime: 1.8,
     smallTalk: { value: 87, count: 2657 },
-    dbBased: { value: 50, count: 1589 },
-    keyValueBased: { value: 17, count: 735 },
-    error: { value: 5, count: 201 }
+    qna: { value: 50, count: 1589 },
+    formatSearch: { value: 17, count: 735 },
+    organization: { value: 5, count: 201 }
   };
 };
 

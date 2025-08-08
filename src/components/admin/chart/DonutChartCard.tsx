@@ -6,9 +6,9 @@ import '@/styles/Global.css';
 // 프롬프트 템플릿 종류
 const TEMPLATE_TYPES = {
   smallTalk: 'Small Talk',
-  dbBased: 'DB Based',
-  keyValueBased: 'Key-Value Based',
-  error: 'Error',
+  qna: 'QnA',
+  formatSearch: 'Format Search',
+  organization: 'Organization',
 } as const;
 
 export interface DonutChartProps {
