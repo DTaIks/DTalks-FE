@@ -91,7 +91,7 @@ const TableRow = styled.div<{ $isExpanded?: boolean }>`
   align-items: center;
   transition: background-color 0.2s ease;
   cursor: pointer;
-  padding: 30px 0;
+  padding: 28px 0;
   padding-left: 44px;
   
   &:hover {
@@ -122,7 +122,7 @@ const TableCell = styled.div`
 const QuestionText = styled.span`
   color: #000;
   font-size: 16px;
-  font-weight: 600;
+  font-weight: 500;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;

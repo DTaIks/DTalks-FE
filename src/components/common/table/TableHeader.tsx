@@ -2,28 +2,41 @@ import React from "react";
 import styled from "styled-components";
 import CustomDropdown from "@/components/common/CustomDropdown";
 
-interface GlossaryTableHeaderProps {
+interface TableHeaderProps {
+  title: string;
   searchTerm: string;
   selectedStatus: string;
+  selectedCategory?: string;
   onSearchChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onStatusChange: (value: string) => void;
+  onCategoryChange?: (value: string) => void;
 }
 
-const GlossaryTableHeader: React.FC<GlossaryTableHeaderProps> = ({
+const TableHeader: React.FC<TableHeaderProps> = ({
+  title,
   searchTerm,
   selectedStatus,
+  selectedCategory,
   onSearchChange,
-  onStatusChange
+  onStatusChange,
+  onCategoryChange
 }) => {
   const statusOptions = [
-    { value: "", label: "전체 상태" },
-    { value: "active", label: "활성" },
-    { value: "inactive", label: "비활성" }
+    { value: "전체 상태", label: "전체 상태" },
+    { value: "활성", label: "활성" },
+    { value: "비활성", label: "비활성" }
+  ];
+
+  const categoryOptions = [
+    { value: "전체 카테고리", label: "전체 카테고리" },
+    { value: "용어 사전", label: "용어 사전" },
+    { value: "사내 정책", label: "사내 정책" },
+    { value: "보고서 양식", label: "보고서 양식" },
   ];
 
   return (
-    <TableHeader>
-      <TableTitle>용어사전 목록</TableTitle>
+    <Header>
+      <TableTitle>{title}</TableTitle>
       <SearchContainer>
         <SearchInput 
           type="text" 
@@ -31,6 +44,15 @@ const GlossaryTableHeader: React.FC<GlossaryTableHeaderProps> = ({
           value={searchTerm}
           onChange={onSearchChange}
         />
+        {onCategoryChange && (
+          <DropdownContainer>
+            <CustomDropdown
+              options={categoryOptions}
+              value={selectedCategory || ""}
+              onChange={onCategoryChange}
+            />
+          </DropdownContainer>
+        )}
         <DropdownContainer>
           <CustomDropdown
             options={statusOptions}
@@ -39,13 +61,13 @@ const GlossaryTableHeader: React.FC<GlossaryTableHeaderProps> = ({
           />
         </DropdownContainer>
       </SearchContainer>
-    </TableHeader>
+    </Header>
   );
 };
 
-export default GlossaryTableHeader;
+export default TableHeader;
 
-const TableHeader = styled.div`
+const Header = styled.div`
   width: 1062px;
   height: 76px;
   border-radius: 19.5px 19.5px 0 0;
@@ -82,7 +104,7 @@ const SearchInput = styled.input`
   width: 160px;
   height: 33.75px;
   flex-shrink: 0;
-  border-radius: 3.75px;
+  border-radius: 4px;
   border: 0.75px solid #CCC;
   padding: 0 12px;
   font-size: 14px;

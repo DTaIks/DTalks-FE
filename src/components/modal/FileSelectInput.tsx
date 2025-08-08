@@ -156,9 +156,11 @@ const HiddenFileInput = styled.input`
 `;
 
 const ErrorContainer = styled.div`
-  min-height: 16px;
+  min-height: 20px;
   display: flex;
   align-items: center;
+  margin-top: -6px;
+  margin-bottom: 8px;
 `;
 
 const ErrorMessage = styled.div`

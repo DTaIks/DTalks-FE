@@ -2,6 +2,7 @@ import React, { useCallback, useMemo } from "react";
 import styled from "styled-components";
 import ConfirmModal from "@/components/common/ConfirmModal";
 import FAQUploadModal from "@/components/admin/faq/FAQUploadModal";
+import EmptyState from "@/components/common/EmptyState";
 import { useFAQStore } from "@/store/faqStore";
 import { type FAQItem } from "@/store/faqStore";
 import type { FAQTableProps } from "@/types/faq";
@@ -100,10 +101,16 @@ const FAQTable: React.FC<FAQTableProps> = ({ currentPage, itemsPerPage }) => {
           onCategoryChange={handleCategoryChange}
           categoryOptions={categoryOptions}
         />
-        <FAQTableHead />
-        <TableBody>
-          {currentFAQItems.map(renderTableRow)}
-        </TableBody>
+        {currentFAQItems.length > 0 ? (
+          <>
+            <FAQTableHead />
+            <TableBody>
+              {currentFAQItems.map(renderTableRow)}
+            </TableBody>
+          </>
+        ) : (
+          <EmptyState />
+        )}
       </TableContainer>
       {renderModals()}
     </>
@@ -123,4 +130,5 @@ const TableContainer = styled.div`
 const TableBody = styled.div`
   display: flex;
   flex-direction: column;
+
 `;

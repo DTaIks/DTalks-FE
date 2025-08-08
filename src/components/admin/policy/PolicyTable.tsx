@@ -1,8 +1,9 @@
 import React, { useCallback } from "react";
 import { useDocumentStore } from "@/store/documentStore";
-import DocumentCommonTable from "@/components/common/table/DocumentCommonTable";
+import CommonTable from "@/components/common/table/CommonTable";
+import DocumentCategory2 from "@/assets/document/DocumentCategory2.svg";
 
-interface DocumentTableProps {
+interface PolicyTableProps {
   currentPage: number;
   itemsPerPage: number;
   modals: {
@@ -12,16 +13,14 @@ interface DocumentTableProps {
   };
 }
 
-const DocumentTable: React.FC<DocumentTableProps> = ({ 
+const PolicyTable: React.FC<PolicyTableProps> = ({ 
   currentPage, 
   itemsPerPage,
   modals
 }) => {
   const {
     searchTerm,
-    selectedCategory,
     selectedStatus,
-    setSelectedCategory,
     setSelectedStatus,
     setSearchTerm,
     archiveDocumentItem,
@@ -34,10 +33,6 @@ const DocumentTable: React.FC<DocumentTableProps> = ({
     setSearchTerm(e.target.value);
   }, [setSearchTerm]);
 
-  const handleCategoryChange = useCallback((value: string) => {
-    setSelectedCategory(value);
-  }, [setSelectedCategory]);
-
   const handleStatusChange = useCallback((value: string) => {
     setSelectedStatus(value);
   }, [setSelectedStatus]);
@@ -46,20 +41,19 @@ const DocumentTable: React.FC<DocumentTableProps> = ({
     archiveDocumentItem(id);
   }, [archiveDocumentItem]);
 
-      return (
-      <DocumentCommonTable
-      title="문서 목록"
-      documents={paginatedData}
+  return (
+    <CommonTable
+      title="사내 정책 목록"
+      items={paginatedData}
       searchTerm={searchTerm}
-      selectedCategory={selectedCategory}
       selectedStatus={selectedStatus}
       onSearchChange={handleSearch}
-      onCategoryChange={handleCategoryChange}
       onStatusChange={handleStatusChange}
       onArchive={handleArchive}
+      categoryImage={DocumentCategory2}
       modals={modals}
     />
   );
 };
 
-export default DocumentTable; 
+export default PolicyTable;

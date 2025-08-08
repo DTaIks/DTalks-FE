@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import styled from "styled-components";
 import TitleContainer from "@/layout/TitleContainer";
 import CompareCard from "@/components/common/CompareCard";
-import GlossaryTable from "@/components/admin/glossary/GlossaryTable";
+import PolicyTable from "@/components/admin/policy/PolicyTable";
 import Pagination from "@/components/common/Pagination";
 import ConfirmModal from "@/components/common/ConfirmModal";
 import Button from "@/components/common/Button";
@@ -10,14 +10,14 @@ import DocumentUploadModal from "@/components/common/DocumentUploadModal";
 import { useDocumentStore } from "@/store/documentStore";
 import { useFileUpload } from "@/hooks/useFileUpload";
 
-// 용어사전 관리 페이지
-const GlossaryPage = () => {
+// 사내 정책 관리 페이지
+const PolicyPage = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const { filteredData, setSelectedCategory, setSelectedStatus } = useDocumentStore();
   
-  // 페이지 진입 시 용어사전 카테고리로 필터링하고 전체 상태로 설정
+  // 페이지 진입 시 사내 정책 카테고리로 필터링하고 전체 상태로 설정
   useEffect(() => {
-    setSelectedCategory("용어 사전");
+    setSelectedCategory("사내 정책");
     setSelectedStatus("전체 상태");
   }, [setSelectedCategory, setSelectedStatus]);
   const itemsPerPage = 4;
@@ -34,14 +34,14 @@ const GlossaryPage = () => {
     modals,
     getButtonText
   } = useFileUpload({
-    pageType: 'glossary',
+    pageType: 'policy',
     onUpload: (data) => {
-      // 용어 사전 파일 업로드 처리
-      console.log('용어 사전 업로드:', data);
+      // 사내 정책 파일 업로드 처리
+      console.log('사내 정책 업로드:', data);
     },
     onEdit: (data) => {
-      // 용어 사전 파일 수정 처리
-      console.log('용어 사전 수정:', data);
+      // 사내 정책 파일 수정 처리
+      console.log('사내 정책 수정:', data);
     },
     onArchive: () => {
       // 보관 처리
@@ -66,9 +66,9 @@ const GlossaryPage = () => {
 
   return (
     <Container>
-      <TitleContainer title="용어사전" subtitle="모든 용어 사전 문서를 한 번에 확인하고 정리하세요" />
+      <TitleContainer title="사내 정책" subtitle="모든 사내 정책 문서를 한 번에 확인하고 정리하세요" />
       <ButtonContainer>
-        <StyledGlossaryButton 
+        <StyledPolicyButton 
           text={getButtonText()} 
           width="var(--button-width)" 
           height="var(--button-height)"
@@ -90,7 +90,7 @@ const GlossaryPage = () => {
           // 버전 비교 처리
         }}
       />
-      <GlossaryTable 
+      <PolicyTable 
         currentPage={currentPage} 
         itemsPerPage={itemsPerPage}
         modals={modals}
@@ -110,7 +110,7 @@ const GlossaryPage = () => {
         isOpen={uploadModal.isOpen}
         onClose={handleCloseUploadModal}
         onSubmit={handleSubmit}
-        pageType="glossary"
+        pageType="policy"
       />
 
       <ConfirmModal
@@ -124,7 +124,7 @@ const GlossaryPage = () => {
   );
 };
 
-export default GlossaryPage;
+export default PolicyPage;
 
 const Container = styled.div`
   width: 100%;
@@ -140,7 +140,7 @@ const ButtonContainer = styled.div`
   margin-left: 888px;
 `;
 
-const StyledGlossaryButton = styled(Button)`
+const StyledPolicyButton = styled(Button)`
   && {
     color: var(--color-white);
     font-family: var(--font-pretendard);

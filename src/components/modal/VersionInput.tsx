@@ -60,7 +60,7 @@ const VersionContainer = styled.div`
  width: 370px;
  display: flex;
  flex-direction: column;
- gap: var(--gap-4);
+ gap: var(--gap-8);
 `;
 
 const Label = styled.label`
@@ -108,6 +108,8 @@ const ErrorContainer = styled.div`
   min-height: 20px;
   display: flex;
   align-items: center;
+  margin-top: -6px;
+  margin-bottom: 10px;
 `;
 
 const Error = styled.div`

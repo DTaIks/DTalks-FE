@@ -83,7 +83,9 @@ const MediaPage: React.FC = () => {
         
         <ContentContainer>
           <LeftContainer>
-            <Title>부서별</Title>
+            <TitleContainerWrapper>
+              <Title>부서별</Title>
+            </TitleContainerWrapper>
             <DepartmentListContainer>
               {departments.map(dept => (
                 <DepartmentBox 
@@ -247,6 +249,7 @@ const DepartmentListContainer = styled.div`
 
 const Footer = styled.div<{ isSelected: boolean }>`
   padding: 16px 16px 16px 34px;
+  height: 30px;
   border-top: 1px solid #e0e0e0;
   border-radius: 0 0 0 25px;
   color: ${props => props.isSelected ? 'white' : '#222'};
@@ -288,7 +291,7 @@ const ArchiveModal = styled.div`
 
 const ArchiveHeader = styled.div`
   display: flex;
-  height: 39.5px;
+  height: 40.5px;
   justify-content: space-between;
   align-items: center;
   padding: 16px 20px;
@@ -356,10 +359,9 @@ const HeaderContainer = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  width: 100%;
-  height: 72px;
+  width: 754px;
+  height: 73.5px;
   padding: 0 32px;
-  box-sizing: border-box;
   position: absolute;
   top: 0;
   left: 0;
@@ -385,9 +387,9 @@ const DropdownWrapper = styled.div`
 
 const FileContainer = styled.div`
   width: 100%;
-  height: calc(100% - 73px);
+  height: calc(100% - 74.5px);
   position: absolute;
-  top: 73px;
+  top: 74.5px;
   left: 0;
   display: flex;
   flex-direction: column;
@@ -414,13 +416,20 @@ const FolderIcon = styled.span`
   font-size: var(--font-size-16);
 `;
 
+const TitleContainerWrapper = styled.div`
+  height: 73.5px;
+  display: flex;
+  align-items: center;
+  border-bottom: 1px solid #e0e0e0;
+`;
+
 const Title = styled.h2`
   color: var(--color-lightblack);
   font-size: var(--font-size-16);
   font-weight: var(--font-weight-600);
   line-height: normal;
-  padding: 16px 120px 24px 32px;
-  border-bottom: 1px solid #e0e0e0;
+  padding-left: 32px;
+
 `;
 
 const ButtonContainer = styled.div`

@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
-
 import { UploadBaseModal } from '@/components/modal/UploadBaseModal';
 import { FileSelectInput } from '@/components/modal/FileSelectInput';
 import { FileNameInput } from '@/components/modal/FileNameInput';
@@ -14,6 +13,7 @@ interface DocumentUploadModalProps {
   onClose: () => void;
   onSubmit: (data: DocumentUploadData) => void;
   isSubmitting?: boolean;
+  pageType?: 'policy' | 'report' | 'glossary' | 'document';
 }
 
 export interface DocumentUploadData {
@@ -25,11 +25,9 @@ export interface DocumentUploadData {
 }
 
 const CATEGORY = [
-  '사내 규정',
-  'IT/시스템',
-  '근무/근태',
-  '급여/복리후생',
-  '복지/휴가',
+  '용어 사전',
+  '사내 정책',
+  '보고서 양식',
 ];
 
 const DOCUMENT_UPLOAD_INFO = [
@@ -42,6 +40,7 @@ const DocumentUploadModal: React.FC<DocumentUploadModalProps> = ({
   isOpen,
   onClose,
   onSubmit,
+  pageType = 'document'
 }) => {
   const [formData, setFormData] = useState<DocumentUploadData>({
     uploadFile: undefined,
@@ -58,6 +57,8 @@ const DocumentUploadModal: React.FC<DocumentUploadModalProps> = ({
     description: false,
     fileVersion: false
   });
+
+  const [fileError, setFileError] = useState<string>('');
 
   useEffect(() => {
     if (!isOpen) {
@@ -102,6 +103,10 @@ const DocumentUploadModal: React.FC<DocumentUploadModalProps> = ({
     setFileDisplayName(fileName);
   };
 
+  const handleFileError = (error: string) => {
+    setFileError(error);
+  };
+
   const isValidSemver = (version: string): boolean => /^\d+\.\d+\.\d+$/.test(version);
   
   const hasValidFile = () => formData.uploadFile !== undefined;
@@ -127,6 +132,7 @@ const DocumentUploadModal: React.FC<DocumentUploadModalProps> = ({
       category: '',
     });
     setFileDisplayName('');
+    setFileError('');
     setTouched({
       fileName: false,
       description: false,
@@ -138,20 +144,36 @@ const DocumentUploadModal: React.FC<DocumentUploadModalProps> = ({
     onClose();
   };
 
+  const getModalTitle = () => {
+    switch (pageType) {
+      case 'policy':
+        return '사내 정책 업로드';
+      case 'report':
+        return '보고서 양식 업로드';
+      case 'glossary':
+        return '용어 사전 업로드';
+      default:
+        return '문서 업로드';
+    }
+  };
+
   return (
     <UploadBaseModal
       isOpen={isOpen}
       onClose={handleClose}
-      title="문서 업로드"
+      title={getModalTitle()}
       onSubmit={handleSubmit}
       submitDisabled={!isFormValid()} 
     >
-      <FileSelectInput
-        fileDisplayName={fileDisplayName}
-        onFileDisplayNameChange={handleFileDisplayNameChange}
-        onFileChange={handleFileChange}
-        accept=".pdf,.docx,.xlsx"
-      />
+        <FileSelectInput
+         fileDisplayName={fileDisplayName}
+         onFileDisplayNameChange={handleFileDisplayNameChange}
+         onFileChange={handleFileChange}
+         onFileError={handleFileError}
+         fileError={fileError}
+         accept=".pdf,.docx,.xlsx,.csv"
+         maxSizeInMB={10}
+       />
 
       <FileNameInput
         value={formData.fileName}
@@ -196,5 +218,5 @@ export default DocumentUploadModal;
 const InputRow = styled.div`
   display: flex;
   gap: var(--gap-12);
-  margin-bottom: 32px;
+  margin-bottom: 4px;
 `;

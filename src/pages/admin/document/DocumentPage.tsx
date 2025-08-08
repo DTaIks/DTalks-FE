@@ -11,9 +11,16 @@ import { useDocumentStore } from "@/store/documentStore";
 // 문서 관리 페이지
 const DocumentPage = () => {
   const [currentPage, setCurrentPage] = useState(1);
-  const { formatStatsForDisplay, filteredData } = useDocumentStore();
-  const stats = formatStatsForDisplay();
+  const { getFormattedStats, filteredData } = useDocumentStore();
+  const stats = getFormattedStats();
   const itemsPerPage = 4;
+  
+  // 페이지 진입 시 전체 상태로 설정
+  useEffect(() => {
+    const { setSelectedStatus, setSelectedCategory } = useDocumentStore.getState();
+    setSelectedStatus("전체 상태");
+    setSelectedCategory("전체 카테고리");
+  }, []);
   
   // 확인 모달 상태 관리
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
@@ -66,10 +73,10 @@ const DocumentPage = () => {
       const { archiveDocumentItem } = useDocumentStore.getState();
       // 파일명으로 문서 ID를 찾아서 보관 처리
       const documentToArchive = useDocumentStore.getState().documentItems.find(
-        doc => doc.name === selectedFileName
+        doc => doc.documentName === selectedFileName
       );
       if (documentToArchive) {
-        archiveDocumentItem(documentToArchive.id);
+        archiveDocumentItem(documentToArchive.documentId);
       }
     } else if (modalType === 'download') {
       console.log(`${selectedFileName} 다운로드 처리`);

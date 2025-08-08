@@ -1,9 +1,7 @@
 import React, { useCallback } from "react";
-import styled from "styled-components";
-import { useGlossaryStore } from "@/store/glossaryStore";
-import GlossaryTableHeader from "./GlossaryTableHeader";
-import GlossaryTableHead from "./GlossaryTableHead";
-import GlossaryTableBody from "./GlossaryTableBody";
+import { useDocumentStore } from "@/store/documentStore";
+import CommonTable from "@/components/common/table/CommonTable";
+import DocumentCategory3 from "@/assets/document/DocumentCategory3.svg";
 
 interface GlossaryTableProps {
   currentPage: number;
@@ -25,9 +23,9 @@ const GlossaryTable: React.FC<GlossaryTableProps> = ({
     selectedStatus,
     setSelectedStatus,
     setSearchTerm,
-    archiveGlossaryItem,
+    archiveDocumentItem,
     getFilteredData
-  } = useGlossaryStore();
+  } = useDocumentStore();
 
   const { paginatedData } = getFilteredData(currentPage, itemsPerPage);
 
@@ -40,39 +38,22 @@ const GlossaryTable: React.FC<GlossaryTableProps> = ({
   }, [setSelectedStatus]);
 
   const handleArchive = useCallback((id: number) => {
-    archiveGlossaryItem(id);
-  }, [archiveGlossaryItem]);
+    archiveDocumentItem(id);
+  }, [archiveDocumentItem]);
 
   return (
-    <TableContainer>
-      <GlossaryTableHeader
-        searchTerm={searchTerm}
-        selectedStatus={selectedStatus}
-        onSearchChange={handleSearch}
-        onStatusChange={handleStatusChange}
-      />
-      <Table>
-        <GlossaryTableHead />
-        <GlossaryTableBody 
-          glossaryItems={paginatedData}
-          onArchive={handleArchive}
-          modals={modals}
-        />
-      </Table>
-    </TableContainer>
+    <CommonTable
+      title="용어사전 목록"
+      items={paginatedData}
+      searchTerm={searchTerm}
+      selectedStatus={selectedStatus}
+      onSearchChange={handleSearch}
+      onStatusChange={handleStatusChange}
+      onArchive={handleArchive}
+      categoryImage={DocumentCategory3}
+      modals={modals}
+    />
   );
 };
 
 export default GlossaryTable;
-
-const TableContainer = styled.div`
-  width: 1062px;
-  border-radius: var(--br-18);
-  background: var(--color-white);
-  box-shadow: 0 6px 18px 0 rgba(125, 93, 246, 0.10);
-  transition: height 0.3s ease;
-`;
-
-const Table = styled.div`
-  width: 100%;
-`;

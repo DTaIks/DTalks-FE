@@ -1,254 +1,331 @@
 import { create } from 'zustand';
-import { devtools } from 'zustand/middleware';
-import DocumentCategory1 from "@/assets/document/DocumentCategory1.svg";
-import DocumentCategory2 from "@/assets/document/DocumentCategory2.svg";
-import DocumentCategory3 from "@/assets/document/DocumentCategory3.svg";
-import ActiveIcon from "@/assets/common/Active.svg";
-import InActiveIcon from "@/assets/common/InActive.svg";
+import type { DocumentItem } from "@/types/table";
 
-interface DocumentItem {
-  id: number;
-  name: string;
-  category: string;
-  categoryImage: string;
-  version: string;
-  author: string;
-  lastModified: string;
-  status: string;
-  statusIcon: string;
-}
-
-interface DocumentStats {
-  totalDocuments: number;
-  activeDocuments: number;
-  inactiveDocuments: number;
-}
-
-interface DocumentState {
+interface DocumentStore {
+  // 상태
   documentItems: DocumentItem[];
-  selectedCategory: string;
-  selectedStatus: string;
   searchTerm: string;
+  selectedStatus: string;
+  selectedCategory: string;
+  archivedItems: number[];
   filteredData: DocumentItem[];
-  
-  setSelectedCategory: (category: string) => void;
-  setSelectedStatus: (status: string) => void;
+
+  // 액션
   setSearchTerm: (term: string) => void;
-  updateDocumentItem: (id: number, updatedData: Partial<DocumentItem>) => void;
-  archiveDocumentItem: (id: number) => void;
+  setSelectedStatus: (status: string) => void;
+  setSelectedCategory: (category: string) => void;
+  resetFilters: () => void;
+  addDocumentItem: (item: Omit<DocumentItem, 'documentId'>) => void;
+  updateDocumentItem: (documentId: number, updates: Partial<DocumentItem>) => void;
+  archiveDocumentItem: (documentId: number) => void;
+  deleteDocumentItem: (documentId: number) => void;
   updateFilteredData: () => void;
   
-  getFilteredData: (currentPage: number, itemsPerPage: number) => {
-    paginatedData: DocumentItem[];
-    totalItems: number;
+  // 계산된 값
+  getStats: () => {
+    total: number;
+    active: number;
+    inactive: number;
+    categories: { name: string; count: number }[];
   };
-  
-  getDocumentStats: () => DocumentStats;
-  formatStatsForDisplay: () => Array<{
+  getFormattedStats: () => Array<{
     title: string;
     value: string;
     additionalInfo: string;
   }>;
+  getFilteredData: (currentPage: number, itemsPerPage: number) => {
+    paginatedData: DocumentItem[];
+    totalItems: number;
+    totalPages: number;
+  };
 }
 
+// 초기 데이터 - API 응답 형식에 맞춤
 const DOCUMENT_DATA: DocumentItem[] = [
+  // 사내 정책 데이터
   {
-    id: 1,
-    name: "개발팀 업무 매뉴얼",
-    category: "보고서양식",
-    categoryImage: DocumentCategory1,
-    version: "v1.0.0",
-    author: "정지민",
-    lastModified: "2024-08-08 00:00",
-    status: "활성",
-    statusIcon: ActiveIcon
-  },
-  {
-    id: 2,
-    name: "개발팀 업무 매뉴얼",
+    documentId: 1,
+    documentName: "인사정책",
     category: "사내 정책",
-    categoryImage: DocumentCategory2,
-    version: "v1.0.0",
-    author: "정지민",
-    lastModified: "2024-08-08 00:00",
-    status: "활성",
-    statusIcon: ActiveIcon
+    latestVersion: "v1.0.0",
+    uploaderName: "김인사",
+    fileUrl: "/api/policy/1",
+    lastUpdatedAt: "2024-08-08 14:30",
+    isActive: true
   },
   {
-    id: 3,
-    name: "개발팀 업무 매뉴얼",
-    category: "보고서양식",
-    categoryImage: DocumentCategory3,
-    version: "v1.0.0",
-    author: "정지민",
-    lastModified: "2024-08-08 00:00",
-    status: "활성",
-    statusIcon: ActiveIcon
-  },
-  {
-    id: 4,
-    name: "개발팀 업무 매뉴얼",
-    category: "보고서양식",
-    categoryImage: DocumentCategory3,
-    version: "v1.0.0",
-    author: "정지민",
-    lastModified: "2024-08-08 00:00",
-    status: "활성",
-    statusIcon: ActiveIcon
-  },
-  {
-    id: 5,
-    name: "개발팀 업무 매뉴얼",
+    documentId: 2,
+    documentName: "복리후생정책",
     category: "사내 정책",
-    categoryImage: DocumentCategory3,
-    version: "v1.0.0",
-    author: "정지민",
-    lastModified: "2024-08-08 00:00",
-    status: "활성",
-    statusIcon: ActiveIcon
+    latestVersion: "v1.0.0",
+    uploaderName: "박복리",
+    fileUrl: "/api/policy/2",
+    lastUpdatedAt: "2024-08-08 15:20",
+    isActive: true
   },
   {
-    id: 6,
-    name: "용어 사전",
+    documentId: 3,
+    documentName: "보안정책",
+    category: "사내 정책",
+    latestVersion: "v1.0.0",
+    uploaderName: "이보안",
+    fileUrl: "/api/policy/3",
+    lastUpdatedAt: "2024-08-08 16:10",
+    isActive: true
+  },
+  // 용어사전 데이터
+  {
+    documentId: 4,
+    documentName: "API",
     category: "용어 사전",
-    categoryImage: DocumentCategory1,
-    version: "v1.0.0",
-    author: "정지민",
-    lastModified: "2024-08-08 00:00",
-    status: "비활성",
-    statusIcon: InActiveIcon
+    latestVersion: "v1.0.0",
+    uploaderName: "김개발",
+    fileUrl: "/api/glossary/1",
+    lastUpdatedAt: "2024-08-08 14:30",
+    isActive: true
   },
+  {
+    documentId: 5,
+    documentName: "UI/UX",
+    category: "용어 사전",
+    latestVersion: "v1.0.0",
+    uploaderName: "박디자인",
+    fileUrl: "/api/glossary/2",
+    lastUpdatedAt: "2024-08-08 15:20",
+    isActive: true
+  },
+  {
+    documentId: 6,
+    documentName: "DevOps",
+    category: "용어 사전",
+    latestVersion: "v1.0.0",
+    uploaderName: "이운영",
+    fileUrl: "/api/glossary/3",
+    lastUpdatedAt: "2024-08-08 16:10",
+    isActive: true
+  },
+  // 보고서 양식 데이터
+  {
+    documentId: 7,
+    documentName: "월간보고서",
+    category: "보고서 양식",
+    latestVersion: "v1.0.0",
+    uploaderName: "김보고",
+    fileUrl: "/api/reportform/1",
+    lastUpdatedAt: "2024-08-08 14:30",
+    isActive: true
+  },
+  {
+    documentId: 8,
+    documentName: "분기보고서",
+    category: "보고서 양식",
+    latestVersion: "v1.0.0",
+    uploaderName: "박보고",
+    fileUrl: "/api/reportform/2",
+    lastUpdatedAt: "2024-08-08 15:20",
+    isActive: true
+  },
+  {
+    documentId: 9,
+    documentName: "연간보고서",
+    category: "보고서 양식",
+    latestVersion: "v1.0.0",
+    uploaderName: "이보고",
+    fileUrl: "/api/reportform/3",
+    lastUpdatedAt: "2024-08-08 16:10",
+    isActive: true
+  },
+  // 비활성 데이터
+  {
+    documentId: 10,
+    documentName: "구인사정책",
+    category: "사내 정책",
+    latestVersion: "v0.9.0",
+    uploaderName: "김인사",
+    fileUrl: "/api/policy/4",
+    lastUpdatedAt: "2024-07-15 10:30",
+    isActive: false
+  },
+  {
+    documentId: 11,
+    documentName: "데이터베이스",
+    category: "용어 사전",
+    latestVersion: "v0.8.0",
+    uploaderName: "박개발",
+    fileUrl: "/api/glossary/4",
+    lastUpdatedAt: "2024-07-20 14:20",
+    isActive: false
+  },
+  {
+    documentId: 12,
+    documentName: "주간보고서",
+    category: "보고서 양식",
+    latestVersion: "v0.7.0",
+    uploaderName: "김보고",
+    fileUrl: "/api/reportform/4",
+    lastUpdatedAt: "2024-07-25 09:15",
+    isActive: false
+  }
 ];
 
-// 문서 스토어
-export const useDocumentStore = create<DocumentState>()(
-  devtools(
-    (set, get) => ({
-      documentItems: DOCUMENT_DATA,
-      selectedCategory: "",
-      selectedStatus: "",
-      searchTerm: "",
-      filteredData: DOCUMENT_DATA,
+export const useDocumentStore = create<DocumentStore>((set, get) => ({
+  // 초기 상태
+  documentItems: DOCUMENT_DATA,
+  searchTerm: '',
+  selectedStatus: '전체 상태',
+  selectedCategory: '전체 카테고리',
+  archivedItems: [],
+  filteredData: DOCUMENT_DATA,
 
-      setSelectedCategory: (category: string) => {
-        set({ selectedCategory: category });
-        get().updateFilteredData();
-      },
+  // 액션들
+  setSearchTerm: (term: string) => {
+    set({ searchTerm: term });
+    get().updateFilteredData();
+  },
+  
+  setSelectedStatus: (status: string) => {
+    set({ selectedStatus: status });
+    get().updateFilteredData();
+  },
 
-      setSelectedStatus: (status: string) => {
-        set({ selectedStatus: status });
-        get().updateFilteredData();
-      },
+  setSelectedCategory: (category: string) => {
+    set({ selectedCategory: category });
+    get().updateFilteredData();
+  },
 
-      setSearchTerm: (term: string) => {
-        set({ searchTerm: term });
-        get().updateFilteredData();
-      },
+  resetFilters: () => {
+    set({ 
+      searchTerm: '',
+      selectedStatus: '',
+      selectedCategory: '전체 카테고리'
+    });
+    get().updateFilteredData();
+  },
+  
+  addDocumentItem: (item) => {
+    const newItem: DocumentItem = {
+      ...item,
+      documentId: Math.max(...get().documentItems.map(item => item.documentId)) + 1
+    };
+    set(state => ({
+      documentItems: [...state.documentItems, newItem]
+    }));
+    get().updateFilteredData();
+  },
+  
+  updateDocumentItem: (documentId, updates) => {
+    set(state => ({
+      documentItems: state.documentItems.map(item =>
+        item.documentId === documentId ? { ...item, ...updates } : item
+      )
+    }));
+    get().updateFilteredData();
+  },
+  
+  archiveDocumentItem: (documentId) => {
+    set(state => ({
+      documentItems: state.documentItems.map(item =>
+        item.documentId === documentId ? { ...item, isActive: false } : item
+      )
+    }));
+    get().updateFilteredData();
+  },
+  
+  deleteDocumentItem: (documentId) => {
+    set(state => ({
+      documentItems: state.documentItems.filter(item => item.documentId !== documentId)
+    }));
+    get().updateFilteredData();
+  },
 
-      updateFilteredData: () => {
-        const { documentItems, selectedCategory, searchTerm, selectedStatus } = get();
-        let filteredData = documentItems;
-
-        if (searchTerm) {
-          filteredData = filteredData.filter(doc => 
-            doc.name.toLowerCase().includes(searchTerm.toLowerCase())
-          );
-        }
-
-        if (selectedCategory) {
-          filteredData = filteredData.filter(doc => {
-            switch (selectedCategory) {
-              case "report":
-                return doc.category === "보고서 양식";
-              case "dictionary":
-                return doc.category === "용어 사전";
-              case "policy":
-                return doc.category === "사내 정책";
-              default:
-                return true;
-            }
-          });
-        }
-
-        if (selectedStatus) {
-          filteredData = filteredData.filter(doc => {
-            if (selectedStatus === "활성") return doc.status === "활성";
-            if (selectedStatus === "비활성") return doc.status === "비활성";
-            return true;
-          });
-        }
-
-        set({ filteredData });
-      },
-
-      updateDocumentItem: (id: number, updatedData: Partial<DocumentItem>) => {
-        set(state => ({
-          documentItems: state.documentItems.map(item => 
-            item.id === id ? { ...item, ...updatedData } : item
-          )
-        }));
-        get().updateFilteredData();
-      },
-
-      archiveDocumentItem: (id: number) => {
-        set(state => ({
-          documentItems: state.documentItems.map(item => 
-            item.id === id ? { ...item, status: "비활성", statusIcon: InActiveIcon } : item
-          )
-        }));
-        get().updateFilteredData();
-      },
-
-      getFilteredData: (currentPage: number, itemsPerPage: number) => {
-        const { filteredData } = get();
-        const totalItems = filteredData.length;
-        const startIndex = (currentPage - 1) * itemsPerPage;
-        const endIndex = startIndex + itemsPerPage;
-        
-        return {
-          paginatedData: filteredData.slice(startIndex, endIndex),
-          totalItems
-        };
-      },
-
-      getDocumentStats: () => {
-        const { documentItems } = get();
-        const total = documentItems.length;
-        const active = documentItems.filter(item => item.status === "활성").length;
-        const inactive = documentItems.filter(item => item.status === "비활성").length;
-
-        return {
-          totalDocuments: total,
-          activeDocuments: active,
-          inactiveDocuments: inactive
-        };
-      },
-
-      formatStatsForDisplay: () => {
-        const stats = get().getDocumentStats();
-        return [
-          { 
-            title: "총 문서 수", 
-            value: `${stats.totalDocuments.toLocaleString()}개`, 
-            additionalInfo: "+2개 이번 주" 
-          },
-          { 
-            title: "활성 문서 수", 
-            value: `${stats.activeDocuments.toLocaleString()}개`, 
-            additionalInfo: "+1개 이번 주" 
-          },
-          { 
-            title: "비활성 문서 수", 
-            value: `${stats.inactiveDocuments.toLocaleString()}개`, 
-            additionalInfo: "+1개 이번 달" 
-          }
-        ];
-      }
-    }),
-    {
-      name: 'document-store'
+  updateFilteredData: () => {
+    const { documentItems, searchTerm, selectedStatus, selectedCategory } = get();
+    
+    let filtered = documentItems;
+    
+    // 카테고리 필터링
+    if (selectedCategory && selectedCategory !== '전체 카테고리') {
+      filtered = filtered.filter(item => item.category === selectedCategory);
     }
-  )
-);
+    
+    // 검색어 필터링
+    if (searchTerm) {
+      filtered = filtered.filter(item =>
+        item.documentName.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+    }
+    
+    // 상태 필터링
+    if (selectedStatus && selectedStatus !== "전체 상태") {
+      filtered = filtered.filter(item => {
+        if (selectedStatus === "활성") return item.isActive;
+        if (selectedStatus === "비활성") return !item.isActive;
+        return true;
+      });
+    } else {
+      // 상태 필터가 없거나 "전체"이면 모든 문서 표시 (필터링하지 않음)
+      // filtered는 이미 모든 문서를 포함하고 있으므로 추가 필터링 불필요
+    }
+    
+    set({ filteredData: filtered });
+  },
 
-export type { DocumentItem }; 
+  getStats: () => {
+    const { documentItems } = get();
+    const activeItems = documentItems.filter(item => item.isActive);
+    const inactiveItems = documentItems.filter(item => !item.isActive);
+    
+    const categories = activeItems.reduce((acc, item) => {
+      const existing = acc.find(cat => cat.name === item.category);
+      if (existing) {
+        existing.count++;
+      } else {
+        acc.push({ name: item.category, count: 1 });
+      }
+      return acc;
+    }, [] as { name: string; count: number }[]);
+    
+    return {
+      total: documentItems.length,
+      active: activeItems.length,
+      inactive: inactiveItems.length,
+      categories
+    };
+  },
+
+  getFormattedStats: () => {
+    const statsData = get().getStats();
+    return [
+      {
+        title: "총 문서 수",
+        value: `${statsData.total}개`,
+        additionalInfo: "+2개 이번 주"
+      },
+      {
+        title: "활성 문서 수",
+        value: `${statsData.active}개`,
+        additionalInfo: "+1개 이번 주"
+      },
+      {
+        title: "비활성 문서 수",
+        value: `${statsData.inactive}개`,
+        additionalInfo: "+1개 이번 달"
+      }
+    ];
+  },
+
+  getFilteredData: (currentPage, itemsPerPage) => {
+    const { filteredData } = get();
+    const totalItems = filteredData.length;
+    const totalPages = Math.ceil(totalItems / itemsPerPage);
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+    const paginatedData = filteredData.slice(startIndex, endIndex);
+    
+    return {
+      paginatedData,
+      totalItems,
+      totalPages
+    };
+  }
+})); 
