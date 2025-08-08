@@ -19,6 +19,7 @@ const LayoutContainer = styled.div`
   display: flex;
   min-height: 100vh;
   overflow-y: auto;
+  overflow-x: hidden;
 `;
 
 const MainContent = styled.div`

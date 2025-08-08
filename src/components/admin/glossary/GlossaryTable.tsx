@@ -1,11 +1,11 @@
 import React, { useCallback } from "react";
 import styled from "styled-components";
-import { useDocumentStore } from "@/store/documentStore";
-import DocumentTableHeader from "./DocumentTableHeader";
-import DocumentTableHead from "./DocumentTableHead";
-import DocumentTableBody from "./DocumentTableBody";
+import { useGlossaryStore } from "@/store/glossaryStore";
+import GlossaryTableHeader from "./GlossaryTableHeader";
+import GlossaryTableHead from "./GlossaryTableHead";
+import GlossaryTableBody from "./GlossaryTableBody";
 
-interface DocumentTableProps {
+interface GlossaryTableProps {
   currentPage: number;
   itemsPerPage: number;
   modals: {
@@ -15,21 +15,19 @@ interface DocumentTableProps {
   };
 }
 
-const DocumentTable: React.FC<DocumentTableProps> = ({ 
+const GlossaryTable: React.FC<GlossaryTableProps> = ({ 
   currentPage, 
   itemsPerPage,
   modals
 }) => {
   const {
     searchTerm,
-    selectedCategory,
     selectedStatus,
-    setSelectedCategory,
     setSelectedStatus,
     setSearchTerm,
-    archiveDocumentItem,
+    archiveGlossaryItem,
     getFilteredData
-  } = useDocumentStore();
+  } = useGlossaryStore();
 
   const { paginatedData } = getFilteredData(currentPage, itemsPerPage);
 
@@ -37,32 +35,26 @@ const DocumentTable: React.FC<DocumentTableProps> = ({
     setSearchTerm(e.target.value);
   }, [setSearchTerm]);
 
-  const handleCategoryChange = useCallback((value: string) => {
-    setSelectedCategory(value);
-  }, [setSelectedCategory]);
-
   const handleStatusChange = useCallback((value: string) => {
     setSelectedStatus(value);
   }, [setSelectedStatus]);
 
   const handleArchive = useCallback((id: number) => {
-    archiveDocumentItem(id);
-  }, [archiveDocumentItem]);
+    archiveGlossaryItem(id);
+  }, [archiveGlossaryItem]);
 
   return (
     <TableContainer>
-      <DocumentTableHeader
+      <GlossaryTableHeader
         searchTerm={searchTerm}
-        selectedCategory={selectedCategory}
         selectedStatus={selectedStatus}
         onSearchChange={handleSearch}
-        onCategoryChange={handleCategoryChange}
         onStatusChange={handleStatusChange}
       />
       <Table>
-        <DocumentTableHead />
-        <DocumentTableBody 
-          documents={paginatedData}
+        <GlossaryTableHead />
+        <GlossaryTableBody 
+          glossaryItems={paginatedData}
           onArchive={handleArchive}
           modals={modals}
         />
@@ -71,7 +63,7 @@ const DocumentTable: React.FC<DocumentTableProps> = ({
   );
 };
 
-export default DocumentTable;
+export default GlossaryTable;
 
 const TableContainer = styled.div`
   width: 1062px;
@@ -83,4 +75,4 @@ const TableContainer = styled.div`
 
 const Table = styled.div`
   width: 100%;
-`; 
+`;
