@@ -8,9 +8,18 @@ import DocumentTableBody from "./DocumentTableBody";
 interface DocumentTableProps {
   currentPage: number;
   itemsPerPage: number;
+  modals: {
+    confirmModal: {
+      open: (type: 'archive' | 'download', fileName: string) => void;
+    };
+  };
 }
 
-const DocumentTable: React.FC<DocumentTableProps> = ({ currentPage, itemsPerPage }) => {
+const DocumentTable: React.FC<DocumentTableProps> = ({ 
+  currentPage, 
+  itemsPerPage,
+  modals
+}) => {
   const {
     searchTerm,
     selectedCategory,
@@ -47,6 +56,7 @@ const DocumentTable: React.FC<DocumentTableProps> = ({ currentPage, itemsPerPage
         <DocumentTableBody 
           documents={paginatedData}
           onArchive={handleArchive}
+          modals={modals}
         />
       </Table>
     </TableContainer>

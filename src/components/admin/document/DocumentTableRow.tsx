@@ -3,26 +3,35 @@ import styled from "styled-components";
 import DropDownButton from "@/components/common/DropDownButton";
 import ConfirmModal from "@/components/common/ConfirmModal";
 import type { Document } from "@/types/document";
+import { useCommonHandlers } from "@/hooks/useCommonHandlers";
 
 interface DocumentTableRowProps {
   document: Document;
   onArchive: (id: number) => void;
+  modals: {
+    confirmModal: {
+      open: (type: 'archive' | 'download', fileName: string) => void;
+    };
+  };
 }
 
 const DocumentTableRow: React.FC<DocumentTableRowProps> = ({ 
   document, 
-  onArchive 
+  onArchive,
+  modals
 }) => {
   const [showDownloadModal, setShowDownloadModal] = useState(false);
   const [showArchiveModal, setShowArchiveModal] = useState(false);
+
+  const documentActions = { onArchive };
+  const handlers = useCommonHandlers({ modals, documentActions });
 
   const handleDownload = () => {
     setShowDownloadModal(true);
   };
 
   const handleVersionManagement = () => {
-    // 버전관리 기능은 아직 구현되지 않음
-    console.log("버전관리 기능은 아직 구현되지 않았습니다.");
+    handlers.handleVersionManagementClick(document.name);
   };
 
   const handleArchive = () => {
@@ -36,7 +45,7 @@ const DocumentTableRow: React.FC<DocumentTableRowProps> = ({
   };
 
   const confirmArchive = () => {
-    onArchive(document.id);
+    handlers.handleDocumentArchive(document.id);
   };
 
   return (

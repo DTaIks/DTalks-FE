@@ -5,11 +5,17 @@ import type { Document } from "@/types/document";
 interface DocumentTableBodyProps {
   documents: Document[];
   onArchive: (id: number) => void;
+  modals: {
+    confirmModal: {
+      open: (type: 'archive' | 'download', fileName: string) => void;
+    };
+  };
 }
 
 const DocumentTableBody: React.FC<DocumentTableBodyProps> = ({ 
   documents, 
-  onArchive 
+  onArchive,
+  modals
 }) => {
   return (
     <TableBody>
@@ -18,6 +24,7 @@ const DocumentTableBody: React.FC<DocumentTableBodyProps> = ({
           key={document.id} 
           document={document} 
           onArchive={onArchive}
+          modals={modals}
         />
       ))}
     </TableBody>

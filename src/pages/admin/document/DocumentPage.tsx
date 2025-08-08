@@ -1,9 +1,10 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import styled from "styled-components";
 import TitleContainer from "@/layout/TitleContainer";
 import DocumentStatCard from "@/components/admin/document/DocumentStatCard";
 import DocumentTable from "@/components/admin/document/DocumentTable";
 import Pagination from "@/components/common/Pagination";
+import ConfirmModal from "@/components/common/ConfirmModal";
 import { useDocumentStore } from "@/store/documentStore";
 
 // 문서 관리 페이지
@@ -12,6 +13,11 @@ const DocumentPage = () => {
   const { formatStatsForDisplay, filteredData } = useDocumentStore();
   const stats = formatStatsForDisplay();
   const itemsPerPage = 4;
+  
+  // 모달 상태 관리
+  const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
+  const [modalType, setModalType] = useState<'archive' | 'download'>('download');
+  const [selectedFileName, setSelectedFileName] = useState('');
   
   const totalItems = filteredData.length;
   const totalPages = totalItems <= itemsPerPage ? 1 : Math.ceil(totalItems / itemsPerPage);
@@ -26,11 +32,44 @@ const DocumentPage = () => {
     setCurrentPage(page);
   };
 
+  // 모달 핸들러들
+  const openConfirmModal = useCallback((type: 'archive' | 'download', fileName: string) => {
+    setModalType(type);
+    setSelectedFileName(fileName);
+    setIsConfirmModalOpen(true);
+  }, []);
+
+  const closeConfirmModal = useCallback(() => {
+    setIsConfirmModalOpen(false);
+    setSelectedFileName('');
+  }, []);
+
+  const handleConfirmAction = useCallback(() => {
+    if (modalType === 'archive') {
+      // 보관 로직은 DocumentTable에서 직접 처리됨
+      console.log(`${selectedFileName} 보관 처리`);
+    } else if (modalType === 'download') {
+      console.log(`${selectedFileName} 다운로드 처리`);
+    }
+    closeConfirmModal();
+  }, [modalType, selectedFileName, closeConfirmModal]);
+
+  const modals = {
+    confirmModal: {
+      open: openConfirmModal,
+      close: closeConfirmModal
+    }
+  };
+
   return (
     <Container>
       <TitleContainer title="전체 문서" subtitle="모든 사내 문서를 한 번에 확인하고 정리하세요" />
       <DocumentStatCard stats={stats} />
-      <DocumentTable currentPage={currentPage} itemsPerPage={itemsPerPage} />
+      <DocumentTable 
+        currentPage={currentPage} 
+        itemsPerPage={itemsPerPage}
+        modals={modals}
+      />
       {totalPages >= 1 && (
         <PaginationContainer>
           <Pagination
@@ -41,6 +80,14 @@ const DocumentPage = () => {
           />
         </PaginationContainer>
       )}
+
+      <ConfirmModal
+        isOpen={isConfirmModalOpen}
+        onClose={closeConfirmModal}
+        onConfirm={handleConfirmAction}
+        fileName={selectedFileName}
+        type={modalType}
+      />
     </Container>
   );
 };
