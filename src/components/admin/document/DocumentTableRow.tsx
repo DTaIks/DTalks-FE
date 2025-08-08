@@ -1,7 +1,6 @@
-import React, { useState } from "react";
+import React from "react";
 import styled from "styled-components";
 import DropDownButton from "@/components/common/DropDownButton";
-import ConfirmModal from "@/components/common/ConfirmModal";
 import type { Document } from "@/types/document";
 import { useCommonHandlers } from "@/hooks/useCommonHandlers";
 
@@ -20,14 +19,11 @@ const DocumentTableRow: React.FC<DocumentTableRowProps> = ({
   onArchive,
   modals
 }) => {
-  const [showDownloadModal, setShowDownloadModal] = useState(false);
-  const [showArchiveModal, setShowArchiveModal] = useState(false);
-
   const documentActions = { onArchive };
   const handlers = useCommonHandlers({ modals, documentActions });
 
   const handleDownload = () => {
-    setShowDownloadModal(true);
+    handlers.handleDownloadClick(document.name);
   };
 
   const handleVersionManagement = () => {
@@ -35,67 +31,39 @@ const DocumentTableRow: React.FC<DocumentTableRowProps> = ({
   };
 
   const handleArchive = () => {
-    setShowArchiveModal(true);
-  };
-
-  const confirmDownload = () => {
-    // 실제 다운로드 로직 구현
-    console.log(`다운로드: ${document.name} (ID: ${document.id})`);
-    // 여기에 실제 파일 다운로드 API 호출 등을 추가할 수 있습니다
-  };
-
-  const confirmArchive = () => {
-    handlers.handleDocumentArchive(document.id);
+    handlers.handleArchiveClick(document.name);
   };
 
   return (
-    <>
-      <TableRow>
-        <TableCell>
-          <DocumentName>{document.name}</DocumentName>
-        </TableCell>
-        <TableCell>
-          <CategoryImage src={document.categoryImage} alt={document.category} />
-        </TableCell>
-        <TableCell>
-          <VersionText>{document.version}</VersionText>
-        </TableCell>
-        <TableCell>
-          <AuthorText>{document.author}</AuthorText>
-        </TableCell>
-        <TableCell>
-          <DateText>{document.lastModified}</DateText>
-        </TableCell>
-        <TableCell>
-          <StatusIcon src={document.statusIcon} alt={document.status} />
-        </TableCell>
-        <TableCell>
-          <DropDownButton 
-            items={[
-              { label: "다운로드", onClick: handleDownload },
-              { label: "버전관리", onClick: handleVersionManagement },
-              { label: "보관", onClick: handleArchive },
-            ]}
-          />
-        </TableCell>
-      </TableRow>
-
-      <ConfirmModal
-        isOpen={showDownloadModal}
-        onClose={() => setShowDownloadModal(false)}
-        onConfirm={confirmDownload}
-        fileName={document.name}
-        type="download"
-      />
-
-      <ConfirmModal
-        isOpen={showArchiveModal}
-        onClose={() => setShowArchiveModal(false)}
-        onConfirm={confirmArchive}
-        fileName={document.name}
-        type="archive"
-      />
-    </>
+    <TableRow>
+      <TableCell>
+        <DocumentName>{document.name}</DocumentName>
+      </TableCell>
+      <TableCell>
+        <CategoryImage src={document.categoryImage} alt={document.category} />
+      </TableCell>
+      <TableCell>
+        <VersionText>{document.version}</VersionText>
+      </TableCell>
+      <TableCell>
+        <AuthorText>{document.author}</AuthorText>
+      </TableCell>
+      <TableCell>
+        <DateText>{document.lastModified}</DateText>
+      </TableCell>
+      <TableCell>
+        <StatusIcon src={document.statusIcon} alt={document.status} />
+      </TableCell>
+      <TableCell>
+        <DropDownButton 
+          items={[
+            { label: "다운로드", onClick: handleDownload },
+            { label: "버전관리", onClick: handleVersionManagement },
+            { label: "보관", onClick: handleArchive },
+          ]}
+        />
+      </TableCell>
+    </TableRow>
   );
 };
 
