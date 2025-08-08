@@ -158,20 +158,23 @@ const BaseCard = styled.div`
 
 const ResponseTimeCard = styled(BaseCard)`
   width: 1062.75px;
-  height: 461.25px;
+  height: 463px;
 `;
 
 const CardHeader = styled.div`
   width: 100%;
-  height: 73.5px;
-  border-radius: var(--br-18) var(--br-18) 0 0;
+  height: 76px;
+  border-radius: 19.5px 19.5px 0 0;
   border-bottom: 1.5px solid #e9e0f0;
   background: var(--color-white);
+  display: flex;
+  align-items: center; 
+  box-sizing: border-box;
 `;
 
 const CardTitle = styled.h1`
-  padding: 24px 285.75px 26.25px 36px;
-  font-size: var(--font-size-20);
+  padding: 26px 0px 26px 36px;
+  font-size: var(--font-size-18);
   font-weight: 600;
   color: var(--color-black);
 `;

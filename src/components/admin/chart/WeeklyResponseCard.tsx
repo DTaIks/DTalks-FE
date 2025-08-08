@@ -95,12 +95,22 @@ const Container = styled.div`
   margin: 60px 0px;
   display: flex;
   flex-direction: column;
+  outline: none;
+  
+  &:focus {
+    outline: none;
+  }
+  * {
+    outline: none;
+  }
+  *:focus {
+    outline: none;
+  }
 `;
 
 const CardHeader = styled.div`
   width: 100%;
-  height: 75px;
-  min-height: 75px;
+  height: 76px;
   flex-shrink: 0;
   border-radius: 18.75px 18.75px 0 0;
   border-bottom: 1.5px solid #e9e0f0;
@@ -111,10 +121,11 @@ const CardHeader = styled.div`
   box-sizing: border-box;
 `;
 
-const CardTitle = styled.h2`
-  font-size: var(--font-size-20);
+const CardTitle = styled.h1`
+  font-size: var(--font-size-18);
   font-weight: var(--font-weight-600);
   color: var(--color-black);
+  white-space: nowrap;
   margin: 0;
 `;
 
