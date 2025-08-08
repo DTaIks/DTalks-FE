@@ -16,14 +16,22 @@ import { VersionHistoryModal } from '@/components/common/FileVersionManagementMo
 import { useDepartmentStats } from '@/hooks/media/useMediaFile';
 import { useMediaPageState } from '@/hooks/media/useMediaPageState';
 import { useMediaActions } from '@/hooks/media/useMediaActions';
-import { useMediaHandlers } from '@/hooks/media/useMediaHandlers';
+import { useCommonHandlers } from '@/hooks/useCommonHandlers';
 
 const MediaPage: React.FC = () => {
   // 데이터 및 상태 관리
   const departments = useDepartmentStats();
   const { filters, archive, modals, actions } = useMediaPageState();
   const mediaActions = useMediaActions();
-  const handlers = useMediaHandlers({ modals, mediaActions });
+  
+  const handlers = useCommonHandlers({ 
+    modals: {
+      confirmModal: modals.confirmModal,
+      uploadModal: modals.uploadModal,
+      versionModal: modals.versionModal
+    }, 
+    mediaActions 
+  });
 
   // 페이지네이션 상태
   const [currentPage, setCurrentPage] = React.useState(1);
@@ -136,10 +144,7 @@ const MediaPage: React.FC = () => {
                   <MediaFileContent 
                     key={file.fileId} 
                     file={file}
-                    onDownloadClick={() => handlers.handleDownloadClick(file.fileName)}
-                    onArchiveClick={() => handlers.handleArchiveClick(file.fileName)}
-                    onEditClick={() => handlers.handleEditClick(file)}
-                    onVersionManagementClick={() => handlers.handleVersionClick(file.fileName)}
+                    handlers={handlers}
                     isArchiveMode={archive.isMode}
                   />
                 ))}
@@ -178,9 +183,8 @@ const MediaPage: React.FC = () => {
       <VersionHistoryModal
         isOpen={modals.versionModal.isOpen}
         onClose={modals.versionModal.close}
-        fileName={modals.versionModal.fileName || ''}
+        fileName={modals.versionModal.fileName}
       />
-
     </PageContainer>
   );
 };

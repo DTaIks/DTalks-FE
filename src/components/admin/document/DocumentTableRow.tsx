@@ -1,63 +1,69 @@
-import React, { useState } from "react";
+import React from "react";
 import styled from "styled-components";
 import DropDownButton from "@/components/common/DropDownButton";
-import { VersionHistoryModal } from "@/components/common/FileVersionManagementModal";
 import type { Document } from "@/types/document";
+import { useCommonHandlers } from "@/hooks/useCommonHandlers";
 
 interface DocumentTableRowProps {
   document: Document;
   onArchive: (id: number) => void;
+  modals: {
+    confirmModal: {
+      open: (type: 'archive' | 'download', fileName: string) => void;
+    };
+  };
 }
 
-const DocumentTableRow: React.FC<DocumentTableRowProps> = ({ document, onArchive }) => {
-  const [isVersionModalOpen, setIsVersionModalOpen] = useState(false);
+const DocumentTableRow: React.FC<DocumentTableRowProps> = ({ 
+  document, 
+  onArchive,
+  modals
+}) => {
+  const documentActions = { onArchive };
+  const handlers = useCommonHandlers({ modals, documentActions });
 
-  const handleVersionHistoryClick = () => {
-    setIsVersionModalOpen(true);
+  const handleDownload = () => {
+    handlers.handleDownloadClick(document.name);
   };
 
-  const handleCloseVersionModal = () => {
-    setIsVersionModalOpen(false);
+  const handleVersionManagement = () => {
+    handlers.handleVersionManagementClick(document.name);
+  };
+
+  const handleArchive = () => {
+    handlers.handleArchiveClick(document.name);
   };
 
   return (
-    <>
-      <TableRow>
-        <TableCell>
-          <DocumentName>{document.name}</DocumentName>
-        </TableCell>
-        <TableCell>
-          <CategoryImage src={document.categoryImage} alt={document.category} />
-        </TableCell>
-        <TableCell>
-          <VersionText>{document.version}</VersionText>
-        </TableCell>
-        <TableCell>
-          <AuthorText>{document.author}</AuthorText>
-        </TableCell>
-        <TableCell>
-          <DateText>{document.lastModified}</DateText>
-        </TableCell>
-        <TableCell>
-          <StatusIcon src={document.statusIcon} alt={document.status} />
-        </TableCell>
-        <TableCell>
-          <DropDownButton 
-            items={[
-              { label: "다운로드", onClick: () => onArchive(document.id) },
-              { label: "버전관리", onClick: handleVersionHistoryClick },
-              { label: "보관", onClick: () => onArchive(document.id) },
-            ]}
-          />
-        </TableCell>
-      </TableRow>
-      
-      <VersionHistoryModal
-        isOpen={isVersionModalOpen}
-        onClose={handleCloseVersionModal}
-        fileName={document.name}
-      />
-    </>
+    <TableRow>
+      <TableCell>
+        <DocumentName>{document.name}</DocumentName>
+      </TableCell>
+      <TableCell>
+        <CategoryImage src={document.categoryImage} alt={document.category} />
+      </TableCell>
+      <TableCell>
+        <VersionText>{document.version}</VersionText>
+      </TableCell>
+      <TableCell>
+        <AuthorText>{document.author}</AuthorText>
+      </TableCell>
+      <TableCell>
+        <DateText>{document.lastModified}</DateText>
+      </TableCell>
+      <TableCell>
+        <StatusIcon src={document.statusIcon} alt={document.status} />
+      </TableCell>
+      <TableCell>
+        <DropDownButton 
+          items={[
+            { label: "다운로드", onClick: handleDownload },
+            { label: "버전관리", onClick: handleVersionManagement },
+            { label: "보관", onClick: handleArchive },
+          ]}
+        />
+      </TableCell>
+    </TableRow>
   );
 };
 
@@ -123,4 +129,4 @@ const StatusIcon = styled.img`
   width: ${props => props.alt === "비활성" ? "69px" : "56px"};
   height: 32px;
   object-fit: contain;
-`;
+`; 
