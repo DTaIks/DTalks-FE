@@ -2,39 +2,28 @@ import React from "react";
 import styled from "styled-components";
 import CustomDropdown from "@/components/common/CustomDropdown";
 
-interface DocumentTableHeaderProps {
+interface GlossaryTableHeaderProps {
   searchTerm: string;
-  selectedCategory: string;
   selectedStatus: string;
   onSearchChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  onCategoryChange: (value: string) => void;
   onStatusChange: (value: string) => void;
 }
 
-const DocumentTableHeader: React.FC<DocumentTableHeaderProps> = ({
+const GlossaryTableHeader: React.FC<GlossaryTableHeaderProps> = ({
   searchTerm,
-  selectedCategory,
   selectedStatus,
   onSearchChange,
-  onCategoryChange,
   onStatusChange
 }) => {
-  const categoryOptions = [
-    { value: "", label: "전체 카테고리" },
-    { value: "report", label: "보고서 양식" },
-    { value: "dictionary", label: "용어 사전" },
-    { value: "policy", label: "사내 정책" }
-  ];
-
   const statusOptions = [
     { value: "", label: "전체 상태" },
-    { value: "활성", label: "활성" },
-    { value: "비활성", label: "비활성" }
+    { value: "active", label: "활성" },
+    { value: "inactive", label: "비활성" }
   ];
 
   return (
     <TableHeader>
-      <TableTitle>문서 목록</TableTitle>
+      <TableTitle>용어사전 목록</TableTitle>
       <SearchContainer>
         <SearchInput 
           type="text" 
@@ -42,13 +31,6 @@ const DocumentTableHeader: React.FC<DocumentTableHeaderProps> = ({
           value={searchTerm}
           onChange={onSearchChange}
         />
-        <DropdownContainer>
-          <CustomDropdown
-            options={categoryOptions}
-            value={selectedCategory}
-            onChange={onCategoryChange}
-          />
-        </DropdownContainer>
         <DropdownContainer>
           <CustomDropdown
             options={statusOptions}
@@ -61,7 +43,7 @@ const DocumentTableHeader: React.FC<DocumentTableHeaderProps> = ({
   );
 };
 
-export default DocumentTableHeader;
+export default GlossaryTableHeader;
 
 const TableHeader = styled.div`
   width: 1062px;
@@ -112,4 +94,4 @@ const SearchInput = styled.input`
   &::placeholder {
     color: #999;
   }
-`; 
+`;

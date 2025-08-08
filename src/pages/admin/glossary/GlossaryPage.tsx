@@ -1,16 +1,16 @@
 import { useState, useEffect, useCallback } from "react";
 import styled from "styled-components";
 import TitleContainer from "@/layout/TitleContainer";
-import DocumentStatCard from "@/components/admin/document/DocumentStatCard";
-import DocumentTable from "@/components/admin/document/DocumentTable";
+import GlossaryStatCard from "@/components/admin/glossary/GlossaryStatCard";
+import GlossaryTable from "@/components/admin/glossary/GlossaryTable";
 import Pagination from "@/components/common/Pagination";
 import ConfirmModal from "@/components/common/ConfirmModal";
-import { useDocumentStore } from "@/store/documentStore";
+import { useGlossaryStore } from "@/store/glossaryStore";
 
-// 문서 관리 페이지
-const DocumentPage = () => {
+// 용어사전 관리 페이지
+const GlossaryPage = () => {
   const [currentPage, setCurrentPage] = useState(1);
-  const { formatStatsForDisplay, filteredData } = useDocumentStore();
+  const { formatStatsForDisplay, filteredData } = useGlossaryStore();
   const stats = formatStatsForDisplay();
   const itemsPerPage = 4;
   
@@ -46,15 +46,8 @@ const DocumentPage = () => {
 
   const handleConfirmAction = useCallback(() => {
     if (modalType === 'archive') {
-      // 실제 보관 처리 로직
-      const { archiveDocumentItem } = useDocumentStore.getState();
-      // 파일명으로 문서 ID를 찾아서 보관 처리
-      const documentToArchive = useDocumentStore.getState().documentItems.find(
-        doc => doc.name === selectedFileName
-      );
-      if (documentToArchive) {
-        archiveDocumentItem(documentToArchive.id);
-      }
+      // 보관 로직은 GlossaryTable에서 직접 처리됨
+      console.log(`${selectedFileName} 보관 처리`);
     } else if (modalType === 'download') {
       console.log(`${selectedFileName} 다운로드 처리`);
     }
@@ -70,9 +63,9 @@ const DocumentPage = () => {
 
   return (
     <Container>
-      <TitleContainer title="전체 문서" subtitle="모든 사내 문서를 한 번에 확인하고 정리하세요" />
-      <DocumentStatCard stats={stats} />
-      <DocumentTable 
+      <TitleContainer title="용어사전" subtitle="모든 용어사전 문서를 한 번에 확인하고 정리하세요" />
+      <GlossaryStatCard stats={stats} />
+      <GlossaryTable 
         currentPage={currentPage} 
         itemsPerPage={itemsPerPage}
         modals={modals}
@@ -99,7 +92,7 @@ const DocumentPage = () => {
   );
 };
 
-export default DocumentPage;
+export default GlossaryPage;
 
 const Container = styled.div`
   width: 100%;

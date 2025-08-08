@@ -27,10 +27,12 @@ interface DocumentStats {
 interface DocumentState {
   documentItems: DocumentItem[];
   selectedCategory: string;
+  selectedStatus: string;
   searchTerm: string;
   filteredData: DocumentItem[];
   
   setSelectedCategory: (category: string) => void;
+  setSelectedStatus: (status: string) => void;
   setSearchTerm: (term: string) => void;
   updateDocumentItem: (id: number, updatedData: Partial<DocumentItem>) => void;
   archiveDocumentItem: (id: number) => void;
@@ -53,7 +55,7 @@ const DOCUMENT_DATA: DocumentItem[] = [
   {
     id: 1,
     name: "개발팀 업무 매뉴얼",
-    category: "매뉴얼",
+    category: "보고서양식",
     categoryImage: DocumentCategory1,
     version: "v1.0.0",
     author: "정지민",
@@ -64,7 +66,7 @@ const DOCUMENT_DATA: DocumentItem[] = [
   {
     id: 2,
     name: "개발팀 업무 매뉴얼",
-    category: "사내 규정",
+    category: "사내 정책",
     categoryImage: DocumentCategory2,
     version: "v1.0.0",
     author: "정지민",
@@ -75,7 +77,7 @@ const DOCUMENT_DATA: DocumentItem[] = [
   {
     id: 3,
     name: "개발팀 업무 매뉴얼",
-    category: "양식",
+    category: "보고서양식",
     categoryImage: DocumentCategory3,
     version: "v1.0.0",
     author: "정지민",
@@ -86,7 +88,7 @@ const DOCUMENT_DATA: DocumentItem[] = [
   {
     id: 4,
     name: "개발팀 업무 매뉴얼",
-    category: "양식",
+    category: "보고서양식",
     categoryImage: DocumentCategory3,
     version: "v1.0.0",
     author: "정지민",
@@ -97,7 +99,7 @@ const DOCUMENT_DATA: DocumentItem[] = [
   {
     id: 5,
     name: "개발팀 업무 매뉴얼",
-    category: "양식",
+    category: "사내 정책",
     categoryImage: DocumentCategory3,
     version: "v1.0.0",
     author: "정지민",
@@ -107,8 +109,8 @@ const DOCUMENT_DATA: DocumentItem[] = [
   },
   {
     id: 6,
-    name: "용어사전",
-    category: "용어사전",
+    name: "용어 사전",
+    category: "용어 사전",
     categoryImage: DocumentCategory1,
     version: "v1.0.0",
     author: "정지민",
@@ -124,11 +126,17 @@ export const useDocumentStore = create<DocumentState>()(
     (set, get) => ({
       documentItems: DOCUMENT_DATA,
       selectedCategory: "",
+      selectedStatus: "",
       searchTerm: "",
       filteredData: DOCUMENT_DATA,
 
       setSelectedCategory: (category: string) => {
         set({ selectedCategory: category });
+        get().updateFilteredData();
+      },
+
+      setSelectedStatus: (status: string) => {
+        set({ selectedStatus: status });
         get().updateFilteredData();
       },
 
@@ -138,7 +146,7 @@ export const useDocumentStore = create<DocumentState>()(
       },
 
       updateFilteredData: () => {
-        const { documentItems, selectedCategory, searchTerm } = get();
+        const { documentItems, selectedCategory, searchTerm, selectedStatus } = get();
         let filteredData = documentItems;
 
         if (searchTerm) {
@@ -150,15 +158,23 @@ export const useDocumentStore = create<DocumentState>()(
         if (selectedCategory) {
           filteredData = filteredData.filter(doc => {
             switch (selectedCategory) {
-              case "policy":
-                return doc.category === "사내 규정";
-              case "manual":
-                return doc.category === "매뉴얼";
+              case "report":
+                return doc.category === "보고서 양식";
               case "dictionary":
-                return doc.category === "용어사전";
+                return doc.category === "용어 사전";
+              case "policy":
+                return doc.category === "사내 정책";
               default:
                 return true;
             }
+          });
+        }
+
+        if (selectedStatus) {
+          filteredData = filteredData.filter(doc => {
+            if (selectedStatus === "활성") return doc.status === "활성";
+            if (selectedStatus === "비활성") return doc.status === "비활성";
+            return true;
           });
         }
 
