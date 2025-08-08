@@ -3,11 +3,7 @@ import styled from 'styled-components';
 import Button from '@/components/common/Button';
 import CustomDropdown from '@/components/common/CustomDropdown';
 
-interface GlossaryCompareCardProps {
-  // 용어사전 비교 카드용 props
-}
-
-const GlossaryCompareCard: React.FC<GlossaryCompareCardProps> = () => {
+const GlossaryCompareCard: React.FC = () => {
   const versionOptions = [
     { value: "v1.0.0", label: "v1.0.0" },
     { value: "v1.1.0", label: "v1.1.0" },
