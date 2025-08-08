@@ -29,7 +29,7 @@ const donutChartConfigs = [
 ] as const;
 
 export const PromptTemplateCard: React.FC<PromptTemplateCardProps> = ({ data }) => {
-
+ 
   return (
     <Container>
       <CardHeader>
@@ -66,18 +66,22 @@ const Container = styled.div`
 
 const CardHeader = styled.div`
   width: 100%;
-  height: 73.5px;
+  height: 76px;
   border-radius: 19.5px 19.5px 0 0;
   border-bottom: 1.5px solid #e9e0f0;
   background: var(--color-white);
+  display: flex;
+  align-items: center; 
+  padding: 0 36px;
+  box-sizing: border-box;
 `;
 
 const CardTitle = styled.h1`
-  padding: 24px 285.75px 26.25px 36px;
-  font-size: var(--font-size-20);
+  font-size: var(--font-size-18);
   font-weight: var(--font-weight-600);
   color: var(--color-black);
   white-space: nowrap;
+  margin: 0;
 `;
 
 const DonutGrid = styled.div`
