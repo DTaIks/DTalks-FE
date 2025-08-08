@@ -1,5 +1,7 @@
+import React, { useState } from "react";
 import styled from "styled-components";
 import DropDownButton from "@/components/common/DropDownButton";
+import { VersionHistoryModal } from "@/components/common/FileVersionManagementModal";
 import type { Document } from "@/types/document";
 
 interface DocumentTableRowProps {
@@ -8,36 +10,54 @@ interface DocumentTableRowProps {
 }
 
 const DocumentTableRow: React.FC<DocumentTableRowProps> = ({ document, onArchive }) => {
+  const [isVersionModalOpen, setIsVersionModalOpen] = useState(false);
+
+  const handleVersionHistoryClick = () => {
+    setIsVersionModalOpen(true);
+  };
+
+  const handleCloseVersionModal = () => {
+    setIsVersionModalOpen(false);
+  };
+
   return (
-    <TableRow>
-      <TableCell>
-        <DocumentName>{document.name}</DocumentName>
-      </TableCell>
-      <TableCell>
-        <CategoryImage src={document.categoryImage} alt={document.category} />
-      </TableCell>
-      <TableCell>
-        <VersionText>{document.version}</VersionText>
-      </TableCell>
-      <TableCell>
-        <AuthorText>{document.author}</AuthorText>
-      </TableCell>
-      <TableCell>
-        <DateText>{document.lastModified}</DateText>
-      </TableCell>
-      <TableCell>
-        <StatusIcon src={document.statusIcon} alt={document.status} />
-      </TableCell>
-      <TableCell>
-        <DropDownButton 
-          items={[
-            { label: "다운로드", onClick: () => onArchive(document.id) },
-            { label: "버전관리", onClick: () => onArchive(document.id) },
-            { label: "보관", onClick: () => onArchive(document.id) },
-          ]}
-        />
-      </TableCell>
-    </TableRow>
+    <>
+      <TableRow>
+        <TableCell>
+          <DocumentName>{document.name}</DocumentName>
+        </TableCell>
+        <TableCell>
+          <CategoryImage src={document.categoryImage} alt={document.category} />
+        </TableCell>
+        <TableCell>
+          <VersionText>{document.version}</VersionText>
+        </TableCell>
+        <TableCell>
+          <AuthorText>{document.author}</AuthorText>
+        </TableCell>
+        <TableCell>
+          <DateText>{document.lastModified}</DateText>
+        </TableCell>
+        <TableCell>
+          <StatusIcon src={document.statusIcon} alt={document.status} />
+        </TableCell>
+        <TableCell>
+          <DropDownButton 
+            items={[
+              { label: "다운로드", onClick: () => onArchive(document.id) },
+              { label: "버전관리", onClick: handleVersionHistoryClick },
+              { label: "보관", onClick: () => onArchive(document.id) },
+            ]}
+          />
+        </TableCell>
+      </TableRow>
+      
+      <VersionHistoryModal
+        isOpen={isVersionModalOpen}
+        onClose={handleCloseVersionModal}
+        fileName={document.name}
+      />
+    </>
   );
 };
 
@@ -103,4 +123,4 @@ const StatusIcon = styled.img`
   width: ${props => props.alt === "비활성" ? "69px" : "56px"};
   height: 32px;
   object-fit: contain;
-`; 
+`;

@@ -17,6 +17,7 @@ export const useMediaPageState = () => {
   const [modalType, setModalType] = useState<'archive' | 'download'>('download');
   const [isEditMode, setIsEditMode] = useState<boolean>(false);
   const [editInitialData, setEditInitialData] = useState<MediaUploadData | null>(null);
+  const [isVersionModalOpen, setIsVersionModalOpen] = useState<boolean>(false);
 
   const files = useFiles();
   const { archivedFiles } = useArchivedFilesStore();
@@ -122,6 +123,16 @@ export const useMediaPageState = () => {
     setSelectedFileName('');
   }, []);
 
+  const openVersionModal = useCallback((fileName: string): void => {
+    setSelectedFileName(fileName);
+    setIsVersionModalOpen(true);
+  }, []);
+
+  const closeVersionModal = useCallback((): void => {
+    setIsVersionModalOpen(false);
+    setSelectedFileName('');
+  }, []);
+
   return {
     filters: {
       selectedDepartment,
@@ -152,6 +163,12 @@ export const useMediaPageState = () => {
         fileName: selectedFileName,
         open: openConfirmModal,
         close: closeConfirmModal
+      },
+      versionModal: {
+        isOpen: isVersionModalOpen,
+        fileName: selectedFileName,
+        open: openVersionModal,
+        close: closeVersionModal
       }
     },
     

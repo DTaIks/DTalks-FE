@@ -11,6 +11,9 @@ interface UseMediaHandlersProps {
       isEditMode: boolean;
       close: () => void;
     };
+    versionModal: {
+      open: (fileName: string) => void;
+    };
   };
   mediaActions: {
     handleConfirmAction: (modalType: 'archive' | 'download', fileName: string) => void;
@@ -41,6 +44,11 @@ export const useMediaHandlers = ({ modals, mediaActions }: UseMediaHandlersProps
     modals.uploadModal.openEdit(initialData);
   }, [modals.uploadModal]);
 
+  // 버전관리 클릭 핸들러
+  const handleVersionClick = useCallback((fileName: string) => {
+    modals.versionModal.open(fileName);
+  }, [modals.versionModal]);
+
   // 확인 모달 액션 핸들러
   const handleConfirmAction = useCallback(() => {
     // 이 함수는 MediaPage에서 직접 구현되어야 함
@@ -61,6 +69,7 @@ export const useMediaHandlers = ({ modals, mediaActions }: UseMediaHandlersProps
     handleDownloadClick,
     handleArchiveClick,
     handleEditClick,
+    handleVersionClick, 
     handleConfirmAction,
     handleUploadSubmit
   };

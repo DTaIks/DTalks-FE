@@ -11,6 +11,7 @@ import Pagination from '@/components/common/Pagination';
 
 import MediaFileUploadModal from '@/components/admin/media/MediaFileUploadModal';
 import ConfirmModal from '@/components/common/ConfirmModal';
+import { VersionHistoryModal } from '@/components/common/FileVersionManagementModal';
 
 import { useDepartmentStats } from '@/hooks/media/useMediaFile';
 import { useMediaPageState } from '@/hooks/media/useMediaPageState';
@@ -138,6 +139,7 @@ const MediaPage: React.FC = () => {
                     onDownloadClick={() => handlers.handleDownloadClick(file.fileName)}
                     onArchiveClick={() => handlers.handleArchiveClick(file.fileName)}
                     onEditClick={() => handlers.handleEditClick(file)}
+                    onVersionManagementClick={() => handlers.handleVersionClick(file.fileName)}
                     isArchiveMode={archive.isMode}
                   />
                 ))}
@@ -172,6 +174,13 @@ const MediaPage: React.FC = () => {
         fileName={modals.confirmModal.fileName}
         type={modals.confirmModal.type}
       />
+
+      <VersionHistoryModal
+        isOpen={modals.versionModal.isOpen}
+        onClose={modals.versionModal.close}
+        fileName={modals.versionModal.fileName || ''}
+      />
+
     </PageContainer>
   );
 };
