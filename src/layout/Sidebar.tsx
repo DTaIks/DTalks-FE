@@ -102,7 +102,7 @@ const menuData: MenuSectionData[] = [
         subItems: [
           { key: MENU_ITEMS.ALL_DOCUMENTS, text: "전체 문서" },
           { key: MENU_ITEMS.TERMS, text: "용어 사전" },
-          { key: MENU_ITEMS.REGULATIONS, text: "사내 규정" },
+          { key: MENU_ITEMS.REGULATIONS, text: "사내 정책" },
           { key: MENU_ITEMS.REPORT_FORM, text: "보고서 양식" }
         ]
       }
@@ -136,7 +136,7 @@ const NAVIGATION_MAP: Record<string, string> = {
   [MENU_ITEMS.PERMISSION]: "/admin/permission",
   [MENU_ITEMS.ALL_DOCUMENTS]: "/admin/documents",
   [MENU_ITEMS.TERMS]: "/admin/glossary",
-  [MENU_ITEMS.REGULATIONS]: "/admin/regulations",
+  [MENU_ITEMS.REGULATIONS]: "/admin/policy",
   [MENU_ITEMS.REPORT_FORM]: "/admin/report-form",
   [MENU_ITEMS.MEDIA]: "/admin/media",
   [MENU_ITEMS.SCHEDULE_LIST]: "/admin/faq",

@@ -36,10 +36,8 @@ export const VersionHistoryModal: React.FC<VersionHistoryModalProps> = ({
     [onClose]
   );
 
-  if (!isOpen) return null;
-
   return (
-    <ModalOverlay onClick={handleOverlayClick}>
+    <ModalOverlay isOpen={isOpen} onClick={handleOverlayClick}>
       <ModalContainer isOpen={isOpen}>
         <ModalHeader>
           <HeaderContent>
@@ -70,7 +68,7 @@ export const VersionHistoryModal: React.FC<VersionHistoryModalProps> = ({
   );
 };
 
-const ModalOverlay = styled.div`
+const ModalOverlay = styled.div<{ isOpen: boolean }>`
   position: fixed;
   top: 0;
   left: 0;
@@ -82,6 +80,9 @@ const ModalOverlay = styled.div`
   align-items: center;
   backdrop-filter: blur(4px);
   z-index: 1000;
+  opacity: ${props => props.isOpen ? 1 : 0};
+  visibility: ${props => props.isOpen ? 'visible' : 'hidden'};
+  transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1), visibility 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 `;
 
 const ModalContainer = styled.div<{ isOpen: boolean }>`
@@ -93,7 +94,7 @@ const ModalContainer = styled.div<{ isOpen: boolean }>`
   background-color: var(--color-white);
   box-shadow: -4px 0 16px rgba(0, 0, 0, 0.1);
   transform: ${props => props.isOpen ? 'translateX(0)' : 'translateX(100%)'};
-  transition: transform 0.2s ease;
+  transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
   display: flex;
   flex-direction: column;
   border-radius: 15px 0 0 15px;

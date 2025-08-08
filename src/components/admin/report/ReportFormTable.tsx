@@ -1,9 +1,9 @@
 import React, { useCallback } from "react";
 import { useDocumentStore } from "@/store/documentStore";
 import CommonTable from "@/components/common/table/CommonTable";
-import DocumentCategory3 from "@/assets/document/DocumentCategory3.svg";
+import DocumentCategory1 from "@/assets/document/DocumentCategory1.svg";
 
-interface GlossaryTableProps {
+interface ReportFormTableProps {
   currentPage: number;
   itemsPerPage: number;
   modals: {
@@ -14,7 +14,7 @@ interface GlossaryTableProps {
   };
 }
 
-const GlossaryTable: React.FC<GlossaryTableProps> = ({ 
+const ReportFormTable: React.FC<ReportFormTableProps> = ({ 
   currentPage, 
   itemsPerPage,
   modals
@@ -44,17 +44,17 @@ const GlossaryTable: React.FC<GlossaryTableProps> = ({
 
   return (
     <CommonTable
-      title="용어사전 목록"
+      title="보고서 양식 목록"
       items={paginatedData}
       searchTerm={searchTerm}
       selectedStatus={selectedStatus}
       onSearchChange={handleSearch}
       onStatusChange={handleStatusChange}
       onArchive={handleArchive}
-      categoryImage={DocumentCategory3}
+      categoryImage={DocumentCategory1}
       modals={modals}
     />
   );
 };
 
-export default GlossaryTable;
+export default ReportFormTable;

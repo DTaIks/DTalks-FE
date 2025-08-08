@@ -37,9 +37,9 @@ const TableCell = styled.div`
   display: flex;
   align-items: center;
   justify-content: flex-start;
-  color: #000;
+  color: var(--table-header-color);
   font-size: var(--font-size-16);
-  font-weight: 500;
+  font-weight: 600;
   
   &:nth-child(1) { width: 370px; }
   &:nth-child(2) { width: 160px; margin-right:-40px; justify-content: center; }

@@ -36,9 +36,9 @@ const TableCell = styled.div<{ center?: boolean }>`
   align-items: center;
   padding-left: 36px;
   justify-content: ${({ center }) => center ? 'center' : 'flex-start'};
-  color: #000;
+  color: var(--table-header-color);
   font-size: var(--font-size-16);
-  font-weight: 500;
+  font-weight: 600;
   
   &:nth-child(1) {
     width: 24%;

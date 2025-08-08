@@ -117,10 +117,11 @@ const Textarea = styled.textarea<{ hasError: boolean }>`
 `;
 
 const ErrorContainer = styled.div`
-  min-height: 16px;
+  min-height: 20px;
   display: flex;
   align-items: center;
-  padding-bottom: 8px;
+  margin-top: -6px;
+  margin-bottom: 10px;
 `;
 
 const Error = styled.span`

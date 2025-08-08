@@ -1,5 +1,6 @@
 import { useCallback } from 'react';
 import type { MediaFile } from '@/hooks/media/useMediaFile';
+import { useDocumentStore } from '@/store/documentStore';
 
 interface UseCommonHandlersProps {
   modals: {
@@ -28,6 +29,7 @@ interface UseCommonHandlersProps {
 }
 
 export const useCommonHandlers = ({ modals, mediaActions, documentActions }: UseCommonHandlersProps) => {
+  const { archiveDocumentItem } = useDocumentStore();
   // 다운로드 버튼 클릭 핸들러 (공통)
   const handleDownloadClick = useCallback((fileName: string) => {
     modals.confirmModal.open('download', fileName);
@@ -89,6 +91,25 @@ export const useCommonHandlers = ({ modals, mediaActions, documentActions }: Use
     documentActions.onArchive(documentId);
   }, [documentActions]);
 
+  // 파일명으로 문서를 찾아서 보관하는 핸들러 (공통)
+  const handleArchiveByFileName = useCallback((fileName: string) => {
+    // 파일명으로 문서를 찾아서 보관 처리
+    const documentToArchive = useDocumentStore.getState().documentItems.find(
+      doc => doc.documentName === fileName
+    );
+    
+    if (documentToArchive) {
+      archiveDocumentItem(documentToArchive.documentId);
+    }
+  }, [archiveDocumentItem]);
+
+  // 버전 히스토리 모달 핸들러 (공통)
+  const handleVersionHistoryClick = useCallback((fileName: string) => {
+    if (modals.versionModal) {
+      modals.versionModal.open(fileName);
+    }
+  }, [modals.versionModal]);
+
   return {
     // 공통 핸들러
     handleDownloadClick,
@@ -101,6 +122,8 @@ export const useCommonHandlers = ({ modals, mediaActions, documentActions }: Use
     handleUploadSubmit,
     
     // Document 전용 핸들러
-    handleDocumentArchive
+    handleDocumentArchive,
+    handleArchiveByFileName,
+    handleVersionHistoryClick
   };
 };

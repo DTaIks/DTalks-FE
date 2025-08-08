@@ -4,6 +4,7 @@ import UserTableHeader from "@/components/admin/userlist/UserTableHeader";
 import UserTableHead from "@/components/admin/userlist/UserTableHead";
 import UserTableBody from "@/components/admin/userlist/UserTableBody";
 import Pagination from "@/components/common/Pagination";
+import EmptyState from "@/components/common/EmptyState";
 
 const UserTable = () => {
   const { currentPage, setCurrentPage, getFilteredData } = useUserStore();
@@ -17,16 +18,22 @@ const UserTable = () => {
     <>
       <TableContainer>
         <UserTableHeader />
-        <Table>
-          <UserTableHead />
-          <UserTableBody users={paginatedData} />
-        </Table>
+        {paginatedData.length > 0 ? (
+          <Table>
+            <UserTableHead />
+            <UserTableBody users={paginatedData} />
+          </Table>
+        ) : (
+          <EmptyState />
+        )}
       </TableContainer>
-      <Pagination 
-        currentPage={currentPage} 
-        totalPages={totalPages} 
-        onPageChange={handlePageChange} 
-      />
+      {paginatedData.length > 0 && (
+        <Pagination 
+          currentPage={currentPage} 
+          totalPages={totalPages} 
+          onPageChange={handlePageChange} 
+        />
+      )}
     </>
   );
 };

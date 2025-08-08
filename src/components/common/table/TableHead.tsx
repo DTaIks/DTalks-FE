@@ -1,31 +1,25 @@
 import React from "react";
 import styled from "styled-components";
 
-const DocumentTableHead: React.FC = () => {
-  const columnHeaders = [
-    "문서명",
-    "카테고리", 
-    "버전",
-    "작성자",
-    "최종 수정일",
-    "상태",
-    "작업"
-  ];
+interface TableHeadProps {
+  headers: string[];
+}
 
+const TableHead: React.FC<TableHeadProps> = ({ headers }) => {
   return (
-    <TableHead>
+    <Head>
       <TableRow>
-        {columnHeaders.map((header, index) => (
+        {headers.map((header, index) => (
           <TableCell key={index}>{header}</TableCell>
         ))}
       </TableRow>
-    </TableHead>
+    </Head>
   );
 };
 
-export default DocumentTableHead;
+export default TableHead;
 
-const TableHead = styled.div`
+const Head = styled.div`
   height: 60px;
   border-bottom: 1.5px solid #E9E0F0;
   background: #FFF;
@@ -45,9 +39,9 @@ const TableCell = styled.div`
   display: flex;
   align-items: center;
   justify-content: flex-start;
-  color: #2D1457;
+  color: var(--table-header-color);
   font-size: var(--font-size-16);
-  font-weight: 500;
+  font-weight: 600;
   
   &:nth-child(1) { width: 200px; }
   &:nth-child(2) { width: 200px; justify-content: center; }
@@ -56,4 +50,4 @@ const TableCell = styled.div`
   &:nth-child(5) { width: 190px; }
   &:nth-child(6) { width: 110px; justify-content: center; }
   &:nth-child(7) { width: 110px; justify-content: center; }
-`; 
+`;
