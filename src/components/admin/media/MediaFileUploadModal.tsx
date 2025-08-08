@@ -27,7 +27,7 @@ export interface MediaUploadData {
 }
 
 const MEDIA_UPLOAD_INFO = [
-  "지원 형식: 이미지(JPG, PNG), 음성(MP3), \n문서(pdf, docx, xlsx)",
+  "지원 형식: 이미지(JPG, PNG), 음성(MP3), \n문서(pdf, docx, xlsx, csv)",
   "중복 파일 업로드 시 자동으로 버전 관리됩니다",
   "파일 변경 사항이 자동으로 추적됩니다"
 ];
