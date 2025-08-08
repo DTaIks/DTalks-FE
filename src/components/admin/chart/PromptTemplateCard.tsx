@@ -12,9 +12,9 @@ export interface PromptTemplate {
   totalUse: number;
   averageResponseTime: number;
   smallTalk: DonutChart;
-  dbBased: DonutChart;
-  keyValueBased: DonutChart;
-  error: DonutChart;
+  qna: DonutChart;
+  formatSearch: DonutChart;
+  organization: DonutChart;
 }
 
 interface PromptTemplateCardProps {
@@ -23,9 +23,9 @@ interface PromptTemplateCardProps {
 
 const donutChartConfigs = [
   { key: 'smallTalk', label: 'Small Talk', pathColor: '#9B7EF7' },
-  { key: 'dbBased', label: 'DB Based', pathColor: '#9B7EF7' },
-  { key: 'keyValueBased', label: 'Key-Value Based', pathColor: '#9B7EF7' },
-  { key: 'error', label: 'Error', pathColor: '#9B7EF7' },
+  { key: 'qna', label: 'QnA', pathColor: '#9B7EF7' },
+  { key: 'formatSearch', label: 'Format Search', pathColor: '#9B7EF7' },
+  { key: 'organization', label: 'Organization ', pathColor: '#9B7EF7' },
 ] as const;
 
 export const PromptTemplateCard: React.FC<PromptTemplateCardProps> = ({ data }) => {

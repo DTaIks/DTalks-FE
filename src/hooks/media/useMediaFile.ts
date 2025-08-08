@@ -15,6 +15,16 @@ export interface Department {
   name: string;
 }
 
+export interface VersionData {
+  id: string;
+  version: string;
+  date: string;
+  uploaderName: string;
+  fileSize: string;
+  description?: string;
+  updatedAt: string;
+}
+
 // 테스트용 더미 데이터
 export const useFiles = (): MediaFile[] => {
   const files: MediaFile[] = [
@@ -115,4 +125,55 @@ export const useDepartmentStats = (): Department[] => {
   ];
 
   return departments;
+};
+
+export const useVersionHistory = (fileName: string): VersionData[] => {
+  const versionData: Record<string, VersionData[]> = {
+    '제품소개서.pdf': [
+      {
+        id: '1',
+        version: 'v 3.0.1',
+        date: '2025년 7월 7일',
+        uploaderName: '조선현',
+        fileSize: '15.2MB',
+        updatedAt: '2025-07-07 14:30',
+        description: '최종 검토 완료 후 배포용 버전'
+      },
+      {
+        id: '2',
+        version: 'v 2.1.1',
+        date: '2025년 7월 5일',
+        uploaderName: '전지우',
+        fileSize: '14.8MB',
+        updatedAt: '2025-07-05 16:45',
+        description: '클라이언트 피드백 반영 및 디자인 개선'
+      },
+      {
+        id: '3',
+        version: 'v 2.0.1',
+        date: '2025년 7월 2일',
+        uploaderName: '김동섭',
+        fileSize: '14.1MB',
+        updatedAt: '2025-07-02 11:20',
+        description: '새로운 제품 라인 추가 및 가격 정책 업데이트'
+      },
+      {
+        id: '4',
+        version: 'v 1.0.0',
+        date: '2025년 6월 28일',
+        uploaderName: '김유경',
+        fileSize: '13.5MB',
+        updatedAt: '2025-06-28 09:15',
+        description: '초기 버전 생성'
+      }
+      
+    ],
+  };
+
+  const versions = versionData[fileName] || [];
+  
+  // updatedAt 기준으로 최신 순 정렬
+  return versions.sort((a, b) => {
+    return new Date(b.updatedAt || '').getTime() - new Date(a.updatedAt || '').getTime();
+  });
 };

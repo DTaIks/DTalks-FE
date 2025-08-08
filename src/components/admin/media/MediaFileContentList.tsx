@@ -2,35 +2,26 @@ import React from "react";
 import styled from 'styled-components';
 import DropDownButton from "@/components/common/DropDownButton";
 import type { MediaFile } from "@/hooks/media/useMediaFile";
-import { useCommonHandlers } from "@/hooks/useCommonHandlers";
 
 interface MediaFileContentProps {
   file: MediaFile;
   isArchiveMode?: boolean;
-  modals: {
-    confirmModal: {
-      open: (type: 'archive' | 'download', fileName: string) => void;
-    };
-    uploadModal?: {
-      openEdit: (initialData: { fileName: string; description: string; fileVersion: string; isPublic: boolean }) => void;
-      isEditMode: boolean;
-      close: () => void;
-    };
-  };
-  mediaActions?: {
-    handleConfirmAction: (modalType: 'archive' | 'download', fileName: string) => void;
-    handleEdit: (data: { fileName: string; description: string; fileVersion: string; isPublic: boolean }) => void;
-    handleUpload: (data: { fileName: string; description: string; fileVersion: string; isPublic: boolean }) => void;
+  handlers: { 
+    handleDownloadClick: (fileName: string) => void;
+    handleArchiveClick: (fileName: string) => void;
+    handleVersionManagementClick: (fileName: string) => void;
+    handleEditClick: (file: MediaFile) => void;
+    handleUploadSubmit: (data: { fileName: string; description: string; fileVersion: string; isPublic: boolean }) => void;
+    handleConfirmAction: () => void;
+    handleDocumentArchive: (documentId: number) => void;
   };
 }
 
 const MediaFileContent: React.FC<MediaFileContentProps> = ({ 
-  file, 
+  file,
   isArchiveMode = false,
-  modals,
-  mediaActions
+  handlers
 }) => {
-  const handlers = useCommonHandlers({ modals, mediaActions });
 
   const formatDate = (updatedAt: string) => {
     return updatedAt;

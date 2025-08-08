@@ -5,6 +5,7 @@ import DocumentStatCard from "@/components/admin/document/DocumentStatCard";
 import DocumentTable from "@/components/admin/document/DocumentTable";
 import Pagination from "@/components/common/Pagination";
 import ConfirmModal from "@/components/common/ConfirmModal";
+import { VersionHistoryModal } from "@/components/common/FileVersionManagementModal";
 import { useDocumentStore } from "@/store/documentStore";
 
 // 문서 관리 페이지
@@ -14,10 +15,14 @@ const DocumentPage = () => {
   const stats = formatStatsForDisplay();
   const itemsPerPage = 4;
   
-  // 모달 상태 관리
+  // 확인 모달 상태 관리
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
   const [modalType, setModalType] = useState<'archive' | 'download'>('download');
   const [selectedFileName, setSelectedFileName] = useState('');
+  
+  // 버전 모달 상태 관리
+  const [isVersionModalOpen, setIsVersionModalOpen] = useState(false);
+  const [versionFileName, setVersionFileName] = useState('');
   
   const totalItems = filteredData.length;
   const totalPages = totalItems <= itemsPerPage ? 1 : Math.ceil(totalItems / itemsPerPage);
@@ -32,7 +37,7 @@ const DocumentPage = () => {
     setCurrentPage(page);
   };
 
-  // 모달 핸들러들
+  // 확인 모달 핸들러들
   const openConfirmModal = useCallback((type: 'archive' | 'download', fileName: string) => {
     setModalType(type);
     setSelectedFileName(fileName);
@@ -42,6 +47,17 @@ const DocumentPage = () => {
   const closeConfirmModal = useCallback(() => {
     setIsConfirmModalOpen(false);
     setSelectedFileName('');
+  }, []);
+
+  // 버전 모달 핸들러들 추가
+  const openVersionModal = useCallback((fileName: string) => {
+    setVersionFileName(fileName);
+    setIsVersionModalOpen(true);
+  }, []);
+
+  const closeVersionModal = useCallback(() => {
+    setIsVersionModalOpen(false);
+    setVersionFileName('');
   }, []);
 
   const handleConfirmAction = useCallback(() => {
@@ -58,6 +74,11 @@ const DocumentPage = () => {
     confirmModal: {
       open: openConfirmModal,
       close: closeConfirmModal
+    },
+    versionModal: {
+      open: openVersionModal,
+      close: closeVersionModal,
+      isOpen: isVersionModalOpen
     }
   };
 
@@ -87,6 +108,12 @@ const DocumentPage = () => {
         onConfirm={handleConfirmAction}
         fileName={selectedFileName}
         type={modalType}
+      />
+
+      <VersionHistoryModal
+        isOpen={isVersionModalOpen}
+        onClose={closeVersionModal}
+        fileName={versionFileName}
       />
     </Container>
   );

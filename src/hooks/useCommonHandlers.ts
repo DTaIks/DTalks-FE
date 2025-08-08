@@ -11,6 +11,11 @@ interface UseCommonHandlersProps {
       isEditMode: boolean;
       close: () => void;
     };
+    versionModal?: {  
+      open: (fileName: string) => void;
+      close: () => void;
+      isOpen: boolean;
+    }
   };
   mediaActions?: {
     handleConfirmAction: (modalType: 'archive' | 'download', fileName: string) => void;
@@ -35,9 +40,8 @@ export const useCommonHandlers = ({ modals, mediaActions, documentActions }: Use
 
   // 버전관리 버튼 클릭 핸들러 (공통)
   const handleVersionManagementClick = useCallback((fileName: string) => {
-    console.log(`버전관리 기능은 아직 구현되지 않았습니다: ${fileName}`);
-    // TODO: 버전관리 모달 또는 페이지로 이동하는 로직 구현
-  }, []);
+    modals.versionModal?.open(fileName);  
+  }, [modals.versionModal]); 
 
   // 수정 버튼 클릭 핸들러 (Media 전용)
   const handleEditClick = useCallback((file: MediaFile) => {
