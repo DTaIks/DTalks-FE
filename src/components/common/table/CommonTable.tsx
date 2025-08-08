@@ -28,6 +28,7 @@ interface CommonTableProps {
     confirmModal: {
       open: (type: 'archive' | 'download', fileName: string) => void;
     };
+    handleVersionHistoryClick?: (fileName: string) => void;
   };
 }
 
@@ -52,8 +53,12 @@ const CommonTable: React.FC<CommonTableProps> = ({
   }, [handlers]);
 
   const handleVersionManagement = useCallback((documentName: string) => {
-    handlers.handleVersionManagementClick(documentName);
-  }, [handlers]);
+    if (modals.handleVersionHistoryClick) {
+      modals.handleVersionHistoryClick(documentName);
+    } else {
+      handlers.handleVersionManagementClick(documentName);
+    }
+  }, [handlers, modals]);
 
   const handleArchive = useCallback((documentName: string) => {
     handlers.handleArchiveClick(documentName);

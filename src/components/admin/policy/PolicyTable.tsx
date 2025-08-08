@@ -10,6 +10,7 @@ interface PolicyTableProps {
     confirmModal: {
       open: (type: 'archive' | 'download', fileName: string) => void;
     };
+    handleVersionHistoryClick?: (fileName: string) => void;
   };
 }
 
