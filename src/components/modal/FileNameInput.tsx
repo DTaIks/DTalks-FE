@@ -8,6 +8,7 @@ interface FileNameInputProps {
   label?: string;
   placeholder?: string;
   showError?: boolean;
+  errorMessage?: string;
 }
 
 export const FileNameInput: React.FC<FileNameInputProps> = ({
@@ -16,13 +17,14 @@ export const FileNameInput: React.FC<FileNameInputProps> = ({
   onBlur,
   label = "",
   placeholder = "파일명을 입력하세요",
-  showError = false
+  showError = false,
+  errorMessage
 }) => {
   const getErrorMessage = (): string => {
     if (!showError) return "";
     
     if (value.trim().length === 0) {
-      return "파일명을 입력하세요";
+      return errorMessage || "파일명을 입력하세요";
     }
     return "";
   };
@@ -58,7 +60,7 @@ const Container = styled.div`
   width: 346px;
   display: flex;
   flex-direction: column;
-  gap: var(--gap-8);
+  gap: var(--gap-4);
 `;
 
 const Label = styled.label`
@@ -87,9 +89,11 @@ const Input = styled.input<{ hasError?: boolean }>`
 `;
 
 const ErrorContainer = styled.div`
-  min-height: 16px;
+  min-height: 20px;
   display: flex;
   align-items: center;
+  margin-top: -2px;
+  margin-bottom: 6px;
 `;
 
 const Error = styled.div`

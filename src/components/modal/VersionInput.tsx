@@ -60,7 +60,7 @@ const VersionContainer = styled.div`
  width: 370px;
  display: flex;
  flex-direction: column;
- gap: var(--gap-8);
+ gap: var(--gap-4);
 `;
 
 const Label = styled.label`
@@ -105,7 +105,7 @@ const Input = styled.input`
 `;
 
 const ErrorContainer = styled.div`
-  min-height: 16px;
+  min-height: 20px;
   display: flex;
   align-items: center;
 `;

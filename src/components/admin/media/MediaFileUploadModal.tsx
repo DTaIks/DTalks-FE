@@ -14,7 +14,7 @@ interface MediaUploadModalProps {
   onClose: () => void;
   onSubmit: (data: MediaUploadData) => void;
   isSubmitting?: boolean;
-  initialData?: MediaUploadData;
+  initialData?: MediaUploadData | null;
   isEditMode?: boolean;
 }
 

@@ -2,24 +2,36 @@ import React from "react";
 import styled from 'styled-components';
 import DropDownButton from "@/components/common/DropDownButton";
 import type { MediaFile } from "@/hooks/media/useMediaFile";
+import { useCommonHandlers } from "@/hooks/useCommonHandlers";
 
 interface MediaFileContentProps {
   file: MediaFile;
   isArchiveMode?: boolean;
-  onDownloadClick?: () => void;
-  onArchiveClick?: () => void;
-  onEditClick?: () => void;
-  onVersionManagementClick?: () => void;
+  modals: {
+    confirmModal: {
+      open: (type: 'archive' | 'download', fileName: string) => void;
+    };
+    uploadModal?: {
+      openEdit: (initialData: { fileName: string; description: string; fileVersion: string; isPublic: boolean }) => void;
+      isEditMode: boolean;
+      close: () => void;
+    };
+  };
+  mediaActions?: {
+    handleConfirmAction: (modalType: 'archive' | 'download', fileName: string) => void;
+    handleEdit: (data: { fileName: string; description: string; fileVersion: string; isPublic: boolean }) => void;
+    handleUpload: (data: { fileName: string; description: string; fileVersion: string; isPublic: boolean }) => void;
+  };
 }
 
 const MediaFileContent: React.FC<MediaFileContentProps> = ({ 
   file, 
   isArchiveMode = false,
-  onDownloadClick,
-  onArchiveClick,
-  onEditClick,
-  onVersionManagementClick
+  modals,
+  mediaActions
 }) => {
+  const handlers = useCommonHandlers({ modals, mediaActions });
+
   const formatDate = (updatedAt: string) => {
     return updatedAt;
   };
@@ -27,19 +39,19 @@ const MediaFileContent: React.FC<MediaFileContentProps> = ({
   const dropdownItems = [
     {
       label: "다운로드",
-      onClick: onDownloadClick || (() => console.log("다운로드 클릭"))
+      onClick: () => handlers.handleDownloadClick(file.fileName)
     },
     {
       label: "수정",
-      onClick: onEditClick || (() => console.log("수정 클릭"))
+      onClick: () => handlers.handleEditClick(file)
     },
     {
       label: "보관하기",
-      onClick: onArchiveClick || (() => console.log("보관하기 클릭"))
+      onClick: () => handlers.handleArchiveClick(file.fileName)
     },
     {
       label: "버전 관리",
-      onClick: onVersionManagementClick || (() => console.log("버전관리 클릭"))
+      onClick: () => handlers.handleVersionManagementClick(file.fileName)
     }
   ];
 

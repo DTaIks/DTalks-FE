@@ -1,13 +1,39 @@
+import React from "react";
 import styled from "styled-components";
 import DropDownButton from "@/components/common/DropDownButton";
 import type { Document } from "@/types/document";
+import { useCommonHandlers } from "@/hooks/useCommonHandlers";
 
 interface DocumentTableRowProps {
   document: Document;
   onArchive: (id: number) => void;
+  modals: {
+    confirmModal: {
+      open: (type: 'archive' | 'download', fileName: string) => void;
+    };
+  };
 }
 
-const DocumentTableRow: React.FC<DocumentTableRowProps> = ({ document, onArchive }) => {
+const DocumentTableRow: React.FC<DocumentTableRowProps> = ({ 
+  document, 
+  onArchive,
+  modals
+}) => {
+  const documentActions = { onArchive };
+  const handlers = useCommonHandlers({ modals, documentActions });
+
+  const handleDownload = () => {
+    handlers.handleDownloadClick(document.name);
+  };
+
+  const handleVersionManagement = () => {
+    handlers.handleVersionManagementClick(document.name);
+  };
+
+  const handleArchive = () => {
+    handlers.handleArchiveClick(document.name);
+  };
+
   return (
     <TableRow>
       <TableCell>
@@ -31,9 +57,9 @@ const DocumentTableRow: React.FC<DocumentTableRowProps> = ({ document, onArchive
       <TableCell>
         <DropDownButton 
           items={[
-            { label: "다운로드", onClick: () => onArchive(document.id) },
-            { label: "버전관리", onClick: () => onArchive(document.id) },
-            { label: "보관", onClick: () => onArchive(document.id) },
+            { label: "다운로드", onClick: handleDownload },
+            { label: "버전관리", onClick: handleVersionManagement },
+            { label: "보관", onClick: handleArchive },
           ]}
         />
       </TableCell>
