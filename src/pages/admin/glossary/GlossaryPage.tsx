@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import styled from "styled-components";
 import TitleContainer from "@/layout/TitleContainer";
-import GlossaryStatCard from "@/components/admin/glossary/GlossaryStatCard";
+import GlossaryCompareCard from "@/components/admin/glossary/GlossaryCompareCard";
 import GlossaryTable from "@/components/admin/glossary/GlossaryTable";
 import Pagination from "@/components/common/Pagination";
 import ConfirmModal from "@/components/common/ConfirmModal";
@@ -10,8 +10,7 @@ import { useGlossaryStore } from "@/store/glossaryStore";
 // 용어사전 관리 페이지
 const GlossaryPage = () => {
   const [currentPage, setCurrentPage] = useState(1);
-  const { formatStatsForDisplay, filteredData } = useGlossaryStore();
-  const stats = formatStatsForDisplay();
+  const { filteredData } = useGlossaryStore();
   const itemsPerPage = 4;
   
   // 모달 상태 관리
@@ -64,7 +63,7 @@ const GlossaryPage = () => {
   return (
     <Container>
       <TitleContainer title="용어사전" subtitle="모든 용어사전 문서를 한 번에 확인하고 정리하세요" />
-      <GlossaryStatCard stats={stats} />
+      <GlossaryCompareCard />
       <GlossaryTable 
         currentPage={currentPage} 
         itemsPerPage={itemsPerPage}

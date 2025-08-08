@@ -3,18 +3,11 @@ import styled from 'styled-components';
 import Button from '@/components/common/Button';
 import CustomDropdown from '@/components/common/CustomDropdown';
 
-interface GlossaryStats {
-  total: number;
-  active: number;
-  archived: number;
-  categories: { name: string; count: number }[];
+interface GlossaryCompareCardProps {
+  // 용어사전 비교 카드용 props
 }
 
-interface GlossaryStatCardProps {
-  stats: GlossaryStats;
-}
-
-const GlossaryStatCard: React.FC<GlossaryStatCardProps> = () => {
+const GlossaryCompareCard: React.FC<GlossaryCompareCardProps> = () => {
   const versionOptions = [
     { value: "v1.0.0", label: "v1.0.0" },
     { value: "v1.1.0", label: "v1.1.0" },
@@ -56,7 +49,7 @@ const GlossaryStatCard: React.FC<GlossaryStatCardProps> = () => {
   );
 };
 
-export default GlossaryStatCard;
+export default GlossaryCompareCard;
 
 const Container = styled.div`
   width: 1062px;
