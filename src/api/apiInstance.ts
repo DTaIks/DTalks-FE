@@ -2,7 +2,7 @@ import axios from 'axios';
 import type { AxiosInstance, AxiosResponse, AxiosError } from 'axios';
 
 // API 인스턴스 설정
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://210.109.83.190:8080';
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://dtalks.kro.kr/';
 
 // axios 인스턴스 생성
 const createAxiosInstance = (): AxiosInstance => {

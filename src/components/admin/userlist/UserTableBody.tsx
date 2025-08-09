@@ -1,6 +1,6 @@
 import React from "react";
 import styled from "styled-components";
-import type { User } from "@/types/user";
+import type { User } from "@/types/user"; 
 import UserTableRow from "@/components/admin/userlist/UserTableRow";
 
 interface UserTableBodyProps {
@@ -11,7 +11,7 @@ const UserTableBody: React.FC<UserTableBodyProps> = ({ users }) => {
   return (
     <TableBody>
       {users.map((user) => (
-        <UserTableRow key={user.id} user={user} />
+        <UserTableRow key={user.userId} user={user} />
       ))}
     </TableBody>
   );
@@ -24,4 +24,4 @@ const TableBody = styled.div`
   flex-direction: column;
   gap: 32px;
   padding-top: 28px;
-`; 
+`;

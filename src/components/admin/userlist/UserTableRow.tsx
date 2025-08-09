@@ -1,5 +1,6 @@
+import React from "react";
 import styled from "styled-components";
-import type { User } from "@/types/user";
+import type { User } from "@/types/user"; 
 
 interface UserTableRowProps {
   user: User;
@@ -9,7 +10,7 @@ const UserTableRow: React.FC<UserTableRowProps> = ({ user }) => {
   return (
     <TableRow>
       <TableCell>
-        <NameText>{user.name}</NameText>
+        <NameText>{user.userName}</NameText>
       </TableCell>
       <TableCell>
         <DepartmentText>{user.department}</DepartmentText>
@@ -81,4 +82,4 @@ const EmailText = styled.span`
   color: var(--color-black);
   font-size: 16px;
   font-weight: 500;
-`; 
+`;

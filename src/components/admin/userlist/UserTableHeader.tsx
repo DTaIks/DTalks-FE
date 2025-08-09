@@ -1,12 +1,27 @@
 import styled from "styled-components";
 import type { ChangeEvent } from "react";
-import { useUserStore } from "@/store/userStore";
+import { useState, useEffect } from "react";
+import { useDebouncedSearch } from "@/hooks/useDebouncedSearch";
 
-const UserTableHeader = () => {
-  const { searchTerm, setSearchTerm } = useUserStore();
+interface UserTableHeaderProps {
+  onSearch: (query: string) => void;
+  searchQuery: string;
+}
+
+const UserTableHeader: React.FC<UserTableHeaderProps> = ({
+  onSearch,
+  searchQuery
+}) => {
+  const [localQuery, setLocalQuery] = useState(searchQuery);
+
+  const { debouncedValue } = useDebouncedSearch(localQuery, 500);
+
+  useEffect(() => {
+    onSearch(debouncedValue);
+  }, [debouncedValue, onSearch]);
 
   const handleSearchChange = (e: ChangeEvent<HTMLInputElement>) => {
-    setSearchTerm(e.target.value);
+    setLocalQuery(e.target.value);
   };
 
   return (
@@ -16,7 +31,7 @@ const UserTableHeader = () => {
         <SearchInput
           type="text"
           placeholder="사용자를 검색하세요"
-          value={searchTerm}
+          value={localQuery}
           onChange={handleSearchChange}
         />
       </SearchContainer>
@@ -26,6 +41,7 @@ const UserTableHeader = () => {
 
 export default UserTableHeader;
 
+// 스타일 정의
 const TableHeader = styled.div`
   width: 1062px;
   height: 76px;
@@ -68,4 +84,8 @@ const SearchInput = styled.input`
   &::placeholder {
     color: #999;
   }
-`; 
+  
+  &:focus {
+    border-color: var(--color-primary, #7d5df6);
+  }
+`;
