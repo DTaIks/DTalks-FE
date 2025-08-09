@@ -1,15 +1,13 @@
 import { useState, useCallback } from "react";
 import { useFAQStore } from "@/store/faqStore";
-import { type FAQItem } from "@/store/faqStore";
+import { type FAQItem } from "@/types/faq";
 import type { FAQUploadData } from "@/components/admin/faq/FAQUploadModal";
 import type { FAQConfirmModalState, EditModalState } from "@/types/faq";
 
 export const useFAQTableHandlers = () => {
   const {
     setSelectedCategory,
-    setSearchTerm,
-    updateFAQItem,
-    archiveFAQItem
+    setSearchTerm
   } = useFAQStore();
 
   // 로컬 상태 관리
@@ -65,7 +63,8 @@ export const useFAQTableHandlers = () => {
   // 확인 액션 핸들러
   const handleConfirmAction = useCallback(() => {
     if (confirmModal.type === 'archive' && confirmModal.faqId) {
-      archiveFAQItem(confirmModal.faqId);
+      // TODO: API를 통한 FAQ 보관 처리 구현 필요
+      console.log('FAQ 보관:', confirmModal.faqId);
     }
     setConfirmModal({
       isOpen: false,
@@ -73,7 +72,7 @@ export const useFAQTableHandlers = () => {
       faqId: null,
       faqName: ''
     });
-  }, [confirmModal, archiveFAQItem]);
+  }, [confirmModal]);
 
   // 모달 닫기 핸들러들
   const handleCloseConfirmModal = useCallback(() => {
@@ -96,10 +95,11 @@ export const useFAQTableHandlers = () => {
   // 수정 제출 핸들러
   const handleSubmitEdit = useCallback((data: FAQUploadData) => {
     if (editModal.faqId) {
-      updateFAQItem(editModal.faqId, data);
+      // TODO: API를 통한 FAQ 수정 처리 구현 필요
+      console.log('FAQ 수정:', editModal.faqId, data);
     }
     handleCloseEditModal();
-  }, [handleCloseEditModal, editModal.faqId, updateFAQItem]);
+  }, [handleCloseEditModal, editModal.faqId]);
 
   // 카테고리 변경 핸들러
   const handleCategoryChange = useCallback((value: string) => {

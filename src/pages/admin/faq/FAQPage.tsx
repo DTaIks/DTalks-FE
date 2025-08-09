@@ -5,24 +5,25 @@ import FAQTable from "@/components/admin/faq/table/FAQTable";
 import Button from "@/components/common/Button";
 import Pagination from "@/components/common/Pagination";
 import FAQUploadModal, { type FAQUploadData } from "@/components/admin/faq/FAQUploadModal";
-
-import { useFAQList, useFAQSearch } from "@/hooks/faq/useFAQQueries";
+import { useFAQList, useFAQSearch, useFAQFilter } from "@/hooks/faq/useFAQQueries";
 import { useCreateFAQ } from "@/hooks/faq/useFAQMutations";
 import { useFAQStore } from "@/store/faqStore";
+import { getCategoryNameFromFilter } from "@/utils/faqUtils";
 
 // FAQ 관리 페이지
 const FAQPage = () => {
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
 
-  // 검색 상태 확인
-  const { searchTerm, setSearchTerm } = useFAQStore();
+  // 검색 상태 및 카테고리 상태 확인
+  const { searchTerm, setSearchTerm, selectedCategory, setSelectedCategory } = useFAQStore();
   
   // FAQ 추가 뮤테이션
   const createFAQMutation = useCreateFAQ();
   
-  // 검색 여부에 따른 API 호출
+  // 데이터 조회 모드 결정
   const isSearchMode = searchTerm.trim().length > 0;
+  const isFilterMode = selectedCategory.trim().length > 0;
   
   // 일반 목록 조회
   const { data: faqListResponse, isLoading: isListLoading, error: listError } = useFAQList(currentPage);
@@ -31,13 +32,38 @@ const FAQPage = () => {
   const { data: faqSearchResponse, isLoading: isSearchLoading, error: searchError, isDebouncing } = useFAQSearch(
     searchTerm,
     currentPage,
-    isSearchMode
+    isSearchMode && !isFilterMode
+  );
+  
+  // 카테고리 필터링 조회 (필터 값을 실제 카테고리명으로 변환)
+  const { data: faqFilterResponse, isLoading: isFilterLoading, error: filterError } = useFAQFilter(
+    getCategoryNameFromFilter(selectedCategory),
+    currentPage,
+    isFilterMode && !isSearchMode
   );
   
   // 현재 모드에 따른 데이터 선택
-  const currentResponse = isSearchMode ? faqSearchResponse : faqListResponse;
-  const currentLoading = isSearchMode ? (isSearchLoading || isDebouncing) : isListLoading;
-  const currentError = isSearchMode ? searchError : listError;
+  const getCurrentResponse = () => {
+    if (isFilterMode && !isSearchMode) return faqFilterResponse;
+    if (isSearchMode && !isFilterMode) return faqSearchResponse;
+    return faqListResponse;
+  };
+  
+  const getCurrentLoading = () => {
+    if (isFilterMode && !isSearchMode) return isFilterLoading;
+    if (isSearchMode && !isFilterMode) return isSearchLoading || isDebouncing;
+    return isListLoading;
+  };
+  
+  const getCurrentError = () => {
+    if (isFilterMode && !isSearchMode) return filterError;
+    if (isSearchMode && !isFilterMode) return searchError;
+    return listError;
+  };
+  
+  const currentResponse = getCurrentResponse();
+  const currentLoading = getCurrentLoading();
+  const currentError = getCurrentError();
   
   // API 응답에서 필요한 데이터 추출
   const faqItems = currentResponse?.content || [];
@@ -54,10 +80,10 @@ const FAQPage = () => {
     setCurrentPage(page);
   };
 
-  // 검색어가 변경될 때 페이지를 1로 리셋
+  // 검색어나 카테고리가 변경될 때 페이지를 1로 리셋
   useEffect(() => {
     setCurrentPage(1);
-  }, [searchTerm]);
+  }, [searchTerm, selectedCategory]);
 
   const handleModalOpen = (): void => {
     setIsModalOpen(true);
@@ -78,6 +104,18 @@ const FAQPage = () => {
 
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(e.target.value);
+    // 검색 시 카테고리 필터 초기화
+    if (selectedCategory) {
+      setSelectedCategory("");
+    }
+  };
+
+  const handleCategoryChange = (categoryValue: string) => {
+    setSelectedCategory(categoryValue);
+    // 카테고리 선택 시 검색어 초기화
+    if (searchTerm) {
+      setSearchTerm("");
+    }
   };
 
   return (
@@ -97,16 +135,18 @@ const FAQPage = () => {
         faqItems={faqItems}
         isLoading={currentLoading}
         error={currentError}
-        isSearchMode={isSearchMode}
+        isSearchMode={isSearchMode || isFilterMode}
         searchTerm={searchTerm}
+        selectedCategory={selectedCategory}
         onSearch={handleSearch}
+        onCategoryChange={handleCategoryChange}
       />
-      {totalPages > 1 && (
+      {(faqItems.length > 0 || totalPages > 0) && (
         <PaginationContainer>
           <Pagination
             key={totalPages}
             currentPage={currentPage}
-            totalPages={totalPages}
+            totalPages={Math.max(totalPages, 1)}
             onPageChange={handlePageChange}
           />
         </PaginationContainer>

@@ -16,7 +16,9 @@ const FAQTable: React.FC<FAQTableProps> = ({
   error,
   isSearchMode = false,
   searchTerm = "",
-  onSearch = () => {}
+  selectedCategory = "",
+  onSearch = () => {},
+  onCategoryChange = () => {}
 }) => {
   // props로 받은 API 데이터 사용
   const currentFAQItems = faqItems;
@@ -96,9 +98,9 @@ const FAQTable: React.FC<FAQTableProps> = ({
       <TableContainer>
         <FAQTableHeader
           searchTerm={searchTerm}
-          selectedCategory=""
+          selectedCategory={selectedCategory}
           onSearch={onSearch}
-          onCategoryChange={() => {}}
+          onCategoryChange={onCategoryChange}
           categoryOptions={categoryOptions}
         />
         <EmptyState 
@@ -115,9 +117,9 @@ const FAQTable: React.FC<FAQTableProps> = ({
       <TableContainer>
         <FAQTableHeader
           searchTerm={searchTerm}
-          selectedCategory=""
+          selectedCategory={selectedCategory}
           onSearch={onSearch}
-          onCategoryChange={() => {}}
+          onCategoryChange={onCategoryChange}
           categoryOptions={categoryOptions}
         />
         <EmptyState 
@@ -132,9 +134,9 @@ const FAQTable: React.FC<FAQTableProps> = ({
       <TableContainer>
         <FAQTableHeader
           searchTerm={searchTerm}
-          selectedCategory=""
+          selectedCategory={selectedCategory}
           onSearch={onSearch}
-          onCategoryChange={() => {}}
+          onCategoryChange={onCategoryChange}
           categoryOptions={categoryOptions}
         />
         {currentFAQItems.length > 0 ? (

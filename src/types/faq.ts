@@ -20,7 +20,9 @@ export interface FAQTableProps {
   error?: unknown;
   isSearchMode?: boolean; // 검색 모드 여부
   searchTerm?: string;
+  selectedCategory?: string;
   onSearch?: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  onCategoryChange?: (categoryValue: string) => void;
 }
 
 export interface FAQConfirmModalState {
@@ -100,6 +102,12 @@ export interface FAQListRequest {
 
 export interface FAQSearchRequest {
   keyword: string; // 검색 키워드
+  pageNumber: number; // 0부터 시작
+  size?: number; // 페이지 크기 (기본값: 4)
+}
+
+export interface FAQFilterRequest {
+  categoryName: string; // 카테고리명
   pageNumber: number; // 0부터 시작
   size?: number; // 페이지 크기 (기본값: 4)
 } 

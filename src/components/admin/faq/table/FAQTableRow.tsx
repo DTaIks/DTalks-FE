@@ -2,6 +2,8 @@ import React from "react";
 import styled from "styled-components";
 import ActiveIcon from "@/assets/common/Active.svg";
 import InactiveIcon from "@/assets/common/InActive.svg";
+import { type FAQItem } from "@/types/faq";
+import { useFAQDetail } from "@/hooks/faq/useFAQQueries";
 
 interface FAQTableRowProps {
   faq: FAQItem;
@@ -18,6 +20,12 @@ const FAQTableRow: React.FC<FAQTableRowProps> = ({
   onEdit,
   onArchiveClick
 }) => {
+  // 아코디언이 펼쳐졌을 때만 상세 정보 조회
+  const { data: faqDetail, error: detailError } = useFAQDetail(
+    faq.faqId,
+    isExpanded
+  );
+
   const renderActionButtons = () => (
     <ActionContainer>
       <ActionText 
@@ -40,18 +48,37 @@ const FAQTableRow: React.FC<FAQTableRowProps> = ({
     </ActionContainer>
   );
 
-  const renderExpandedContent = () => (
-    <ExpandedRow>
-      <ExpandedBox>
-        <ExpandedHeader>
-          <ExpandedTitle>답변 내용</ExpandedTitle>
-        </ExpandedHeader>
-        <ExpandedContent>
-          <ExpandedAnswer>{faq.answer}</ExpandedAnswer>
-        </ExpandedContent>
-      </ExpandedBox>
-    </ExpandedRow>
-  );
+  const renderExpandedContent = () => {
+    if (detailError) {
+      return (
+        <ExpandedRow>
+          <ExpandedBox>
+            <ExpandedHeader>
+              <ExpandedTitle>답변 내용</ExpandedTitle>
+            </ExpandedHeader>
+            <ExpandedContent>
+              <ErrorText>답변을 불러오는데 실패했습니다.</ErrorText>
+            </ExpandedContent>
+          </ExpandedBox>
+        </ExpandedRow>
+      );
+    }
+
+    return (
+      <ExpandedRow>
+        <ExpandedBox>
+          <ExpandedHeader>
+            <ExpandedTitle>답변 내용</ExpandedTitle>
+          </ExpandedHeader>
+          <ExpandedContent>
+            <ExpandedAnswer>
+              {faqDetail?.answer || '답변이 없습니다.'}
+            </ExpandedAnswer>
+          </ExpandedContent>
+        </ExpandedBox>
+      </ExpandedRow>
+    );
+  };
 
   return (
     <React.Fragment>
@@ -198,7 +225,7 @@ const ExpandedBox = styled.div`
   flex-shrink: 0;
   border-radius: 18.75px;
   background: #FFF;
-  margin-top: 28px;
+  margin-top: 20px;
   margin-left: 44px;
 `;
 
@@ -233,6 +260,17 @@ const ExpandedAnswer = styled.p`
   line-height: 1.2;
   margin: 0;
   white-space: pre-wrap;
+  margin-left: 36px;
+  margin-right: 36px;
+  padding: 20px 0;
+  display: flex;
+  align-items: center;
+  min-height: 82px;
+`;
+
+const ErrorText = styled.div`
+  color: #e74c3c;
+  font-size: var(--font-size-14);
   margin-left: 36px;
   margin-right: 36px;
   padding: 20px 0;

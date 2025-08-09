@@ -2,7 +2,8 @@ import { apiInstance } from './apiInstance';
 import type { 
   FAQListApiResponse, 
   FAQListRequest, 
-  FAQSearchRequest 
+  FAQSearchRequest,
+  FAQFilterRequest 
 } from '@/types/faq';
 
 // FAQ 관련 API 함수들
@@ -140,56 +141,77 @@ export const faqAPI = {
     }
   },
 
-  // TODO: 다른 개발자가 필요에 따라 추가할 수 있는 API 함수들
-  
-  // FAQ 상세 조회 (예시)
-  // getFAQ: async (faqId: number): Promise<FAQApiItem> => {
-  //   const response = await apiInstance.get<FAQApiItem>(`/admin/faq/${faqId}`);
-  //   return response.data;
-  // },
+  // FAQ 상세 조회
+  getFAQDetail: async (faqId: number): Promise<{ faqId: number; question: string; answer: string; categoryName: string }> => {
+    try {
+      const response = await apiInstance.get(`/admin/faq/${faqId}`, {
+        headers: {
+          'Content-Type': 'application/json',
+          Accept: 'application/json',
+        },
+      });
+      
+      // 백엔드 응답이 { code, status, message, data } 형태인 경우를 처리
+      const payload = (response.data && (response.data as any).data) ? (response.data as any).data : response.data;
+      
+      return payload;
+    } catch (error: unknown) {
+      const axiosError = error as { response?: { data?: { message?: string; error?: string } }; message?: string };
+      const serverMsg = axiosError?.response?.data?.message || axiosError?.response?.data?.error || axiosError?.message;
+      throw new Error(serverMsg || 'FAQ 상세 정보를 불러오는데 실패했습니다.');
+    }
+  },
 
-  // FAQ 생성 (예시)
-  // createFAQ: async (faqData: Omit<FAQApiItem, 'faqId' | 'updatedAt'>): Promise<FAQApiItem> => {
-  //   const response = await apiInstance.post<FAQApiItem>('/admin/faq', faqData);
-  //   return response.data;
-  // },
+  // FAQ 카테고리별 필터링
+  filterFAQsByCategory: async (params: FAQFilterRequest): Promise<FAQListApiResponse> => {
+    const queryParams = new URLSearchParams();
+    
+    // 필수 파라미터
+    queryParams.append('categoryName', params.categoryName);
+    queryParams.append('pageNumber', params.pageNumber.toString());
+    
+    // 선택적 파라미터
+    if (params.size !== undefined) {
+      queryParams.append('size', params.size.toString());
+    } else {
+      queryParams.append('size', '4'); // 기본값 4
+    }
 
-  // FAQ 수정 (예시)
-  // updateFAQ: async (faqId: number, faqData: Partial<Omit<FAQApiItem, 'faqId'>>): Promise<FAQApiItem> => {
-  //   const response = await apiInstance.put<FAQApiItem>(`/admin/faq/${faqId}`, faqData);
-  //   return response.data;
-  // },
+    try {
+      const response = await apiInstance.get(
+        `/admin/faq/filter?${queryParams.toString()}`,
+        {
+          headers: { 
+            'Content-Type': 'application/json', 
+            Accept: 'application/json' 
+          }
+        }
+      );
+      
+      // 백엔드 응답이 { code, status, message, data } 형태인 경우를 처리
+      const payload = (response.data && (response.data as any).data) ? (response.data as any).data : response.data;
+      
+      // 서버 응답 구조 정규화
+      const normalizedResponse = {
+        content: payload?.content || [],
+        totalPages: payload?.totalPages || 0,
+        totalElements: payload?.totalElements || 0,
+        pageable: payload?.pageable || {},
+        last: payload?.last || false,
+        first: payload?.first || true,
+        size: payload?.size || 0,
+        number: payload?.number || 0,
+        numberOfElements: payload?.numberOfElements || 0,
+        empty: payload?.empty || true,
+        sort: payload?.sort || { sorted: false, unsorted: true, empty: true }
+      };
+      
+      return normalizedResponse;
+    } catch (error: unknown) {
+      const axiosError = error as { response?: { data?: { message?: string; error?: string } }; message?: string };
+      const serverMsg = axiosError?.response?.data?.message || axiosError?.response?.data?.error || axiosError?.message;
+      throw new Error(serverMsg || 'FAQ 카테고리 필터링에 실패했습니다.');
+    }
+  },
 
-  // FAQ 삭제 (예시)
-  // deleteFAQ: async (faqId: number): Promise<void> => {
-  //   await apiInstance.delete(`/admin/faq/${faqId}`);
-  // },
-
-  // FAQ 활성화/비활성화 (예시)
-  // toggleFAQStatus: async (faqId: number, isActive: boolean): Promise<FAQApiItem> => {
-  //   const response = await apiInstance.patch<FAQApiItem>(`/admin/faq/${faqId}/status`, { isActive });
-  //   return response.data;
-  // },
-
-  // 카테고리별 FAQ 조회 (예시)
-  // getFAQsByCategory: async (category: string, params: FAQListRequest): Promise<FAQListApiResponse> => {
-  //   const queryParams = new URLSearchParams({
-  //     pageNumber: params.pageNumber.toString(),
-  //     category: category
-  //   });
-  //   const response = await apiInstance.get<FAQListApiResponse>(`/admin/faq?${queryParams.toString()}`);
-  //   return response.data;
-  // },
-
-  // FAQ 검색 (예시)
-  // searchFAQs: async (keyword: string, params: FAQListRequest): Promise<FAQListApiResponse> => {
-  //   const queryParams = new URLSearchParams({
-  //     pageNumber: params.pageNumber.toString(),
-  //     keyword: keyword
-  //   });
-  //   const response = await apiInstance.get<FAQListApiResponse>(`/admin/faq/search?${queryParams.toString()}`);
-  //   return response.data;
-  // }
 };
-
-// FAQListRequest 타입만 export (FAQListApiResponse는 types/faq.ts에서 import)
