@@ -27,13 +27,13 @@ export const useFAQTableHandlers = () => {
   });
 
   // 행 토글 핸들러
-  const handleRowToggle = useCallback((id: number) => {
+  const handleRowToggle = useCallback((faqId: number) => {
     setExpandedRows(prev => {
       const newExpandedRows = new Set(prev);
-      if (newExpandedRows.has(id)) {
-        newExpandedRows.delete(id);
+      if (newExpandedRows.has(faqId)) {
+        newExpandedRows.delete(faqId);
       } else {
-        newExpandedRows.add(id);
+        newExpandedRows.add(faqId);
       }
       return newExpandedRows;
     });
@@ -45,10 +45,10 @@ export const useFAQTableHandlers = () => {
       isOpen: true,
       faqData: {
         question: faq.question,
-        answer: faq.answer,
+        answer: faq.answer || '',
         category: faq.category
       },
-      faqId: faq.id
+      faqId: faq.faqId
     });
   }, []);
 
@@ -57,7 +57,7 @@ export const useFAQTableHandlers = () => {
     setConfirmModal({
       isOpen: true,
       type: 'archive',
-      faqId: faq.id,
+      faqId: faq.faqId,
       faqName: faq.question
     });
   }, []);

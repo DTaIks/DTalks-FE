@@ -1,8 +1,9 @@
 import axios from 'axios';
 import type { AxiosInstance, AxiosResponse, AxiosError } from 'axios';
+import { useAuthStore } from '@/store/authStore';
 
 // API 인스턴스 설정
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://210.109.83.190:8080';
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://dtalks.kro.kr/';
 
 // axios 인스턴스 생성
 const createAxiosInstance = (): AxiosInstance => {
@@ -18,17 +19,24 @@ const createAxiosInstance = (): AxiosInstance => {
   // 요청 인터셉터
   instance.interceptors.request.use(
     (config) => {
-      console.log('Request:', config.method?.toUpperCase(), config.url);
-      console.log('Request Headers:', config.headers);
       return config;
     },
     (error) => Promise.reject(error)
   );
 
-  // 응답 인터셉터: AxiosError를 그대로 전달해 디버깅 정보(error.response)를 보존
+  // 응답 인터셉터: 401 시 전역 로그아웃으로 상태 동기화
   instance.interceptors.response.use(
     (response: AxiosResponse) => response,
-    async (error: AxiosError) => Promise.reject(error)
+    async (error: AxiosError) => {
+      const status = error.response?.status;
+      if (status === 401) {
+        try {
+          const { logout } = useAuthStore.getState();
+          logout();
+        } catch {}
+      }
+      return Promise.reject(error);
+    }
   );
 
   return instance;

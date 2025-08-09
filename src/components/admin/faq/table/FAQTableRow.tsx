@@ -2,12 +2,11 @@ import React from "react";
 import styled from "styled-components";
 import ActiveIcon from "@/assets/common/Active.svg";
 import InactiveIcon from "@/assets/common/InActive.svg";
-import type { FAQItem } from "@/store/faqStore";
 
 interface FAQTableRowProps {
   faq: FAQItem;
   isExpanded: boolean;
-  onRowToggle: (id: number) => void;
+  onRowToggle: (faqId: number) => void;
   onEdit: (faq: FAQItem) => void;
   onArchiveClick: (faq: FAQItem) => void;
 }
@@ -57,7 +56,7 @@ const FAQTableRow: React.FC<FAQTableRowProps> = ({
   return (
     <React.Fragment>
       <TableRow 
-        onClick={() => onRowToggle(faq.id)} 
+        onClick={() => onRowToggle(faq.faqId)} 
         $isExpanded={isExpanded}
       >
         <TableCell>

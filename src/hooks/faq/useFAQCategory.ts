@@ -13,7 +13,7 @@ export const useFAQCategory = () => {
   const CATEGORY_DATA: FAQCategory[] = [
     {
       categoryId: "1",
-      categoryName: "IT/시스템",
+      categoryName: "IT / 시스템",
       categoryNameImage: CategoryName1,
       description: "재택근무, 출입증, 사내 메신저 사용 등 사내 규정 관련 질문",
       faqCount: 3,

@@ -3,16 +3,33 @@ import styled from "styled-components";
 
 interface EmptyStateProps {
   message?: string;
+  subMessage?: string;
+  icon?: string;
 }
 
 const EmptyState: React.FC<EmptyStateProps> = ({ 
-  message = "검색 결과가 없습니다." 
+  message = "검색 결과가 없습니다.",
+  subMessage,
+  icon
 }) => {
+  // 메시지에 따른 기본 서브메시지 설정
+  const getDefaultSubMessage = (msg: string): string => {
+    if (msg.includes("불러오는데 실패")) {
+      return "잠시 후 다시 시도해주세요.";
+    }
+    if (msg.includes("등록된") && msg.includes("없습니다")) {
+      return "새로운 항목을 추가해보세요.";
+    }
+    return "다른 검색어를 입력해보세요.";
+  };
+
+  const finalSubMessage = subMessage || getDefaultSubMessage(message);
+
   return (
     <Container>
-      <EmptyIcon>🔍</EmptyIcon>
+      {icon && <EmptyIcon>{icon}</EmptyIcon>}
       <EmptyMessage>{message}</EmptyMessage>
-      <EmptySubMessage>다른 검색어를 입력해보세요.</EmptySubMessage>
+      <EmptySubMessage>{finalSubMessage}</EmptySubMessage>
     </Container>
   );
 };
@@ -44,6 +61,6 @@ const EmptyMessage = styled.div`
 `;
 
 const EmptySubMessage = styled.div`
-  font-size: 14px;
+  font-size: 12px;
   color: #999;
 `;

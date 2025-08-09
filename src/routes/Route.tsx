@@ -18,15 +18,13 @@ import Layout from '@/layout/Layout';
 // 인증이 필요한 라우트
 function ProtectedLayout() {
   const { isAuthenticated } = useAuthStore();
-  if (!isAuthenticated) return <Navigate to="/login" replace />;
-  return <Outlet />;
+  return isAuthenticated ? <Outlet /> : <Navigate to="/login" replace />;
 }
 
 // 비로그인만 접근 가능한 라우트
 function PublicOnly({ children }: { children: React.ReactNode }) {
   const { isAuthenticated } = useAuthStore();
-  if (isAuthenticated) return <Navigate to="/admin" replace />;
-  return <>{children}</>;
+  return isAuthenticated ? <Navigate to="/admin" replace /> : <>{children}</>;
 }
 
 export default function AppRoutes() {
@@ -37,9 +35,11 @@ export default function AppRoutes() {
       <Route path="/chart" element={<ChartPage />} />
       {/* 루트 경로: 로그인 상태에 따라 리다이렉트 */}
       <Route path="/" element={
-        isAuthenticated
-          ? <Navigate to="/admin" replace />
-          : <Navigate to="/login" replace />
+        isAuthenticated ? (
+          <Navigate to="/admin" replace />
+        ) : (
+          <Navigate to="/login" replace />
+        )
       } />
 
       {/* 비로그인만 접근 */}
