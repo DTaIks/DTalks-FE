@@ -120,7 +120,7 @@ const ErrorContainer = styled.div`
   min-height: 20px;
   display: flex;
   align-items: center;
-  margin-top: -6px;
+  margin-top: -4px;
   margin-bottom: 10px;
 `;
 

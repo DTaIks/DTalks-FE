@@ -23,8 +23,8 @@ export interface FAQUploadData {
 }
 
 const CATEGORY = [
+  'IT / 시스템',
   '사내 규정',
-  'IT/시스템',
   '근무 / 근태',
   '급여 / 복리후생',
   '복지 / 휴가',
@@ -40,6 +40,7 @@ const FAQUploadModal: React.FC<FAQUploadModalProps> = ({
   isOpen,
   onClose,
   onSubmit,
+  isSubmitting,
   initialData,
   isEdit = false,
 }) => {
@@ -73,7 +74,9 @@ const FAQUploadModal: React.FC<FAQUploadModalProps> = ({
   const handleSubmit = () => {
     if (isFormValid()) {
       onSubmit(formData);
-      handleReset();
+      // handleReset()은 제거 - 모달이 성공적으로 닫힐 때 useEffect에서 처리됨
+    } else {
+      // noop
     }
   };
 
@@ -99,17 +102,7 @@ const FAQUploadModal: React.FC<FAQUploadModalProps> = ({
     hasValidCategory()
   );
 
-  const handleReset = () => {
-    setFormData({
-      question: '',
-      answer: '',
-      category: '',
-    });
-    setTouched({
-      question: false,
-      answer: false
-    });
-  };
+  // 내부 초기화 로직은 모달 open/close 효과에서 처리
 
   const handleClose = () => {
     onClose();
@@ -121,7 +114,7 @@ const FAQUploadModal: React.FC<FAQUploadModalProps> = ({
       onClose={handleClose}
       title={isEdit ? "FAQ 수정" : "FAQ 추가"}
       onSubmit={handleSubmit}
-      submitDisabled={!isFormValid()}
+      submitDisabled={!isFormValid() || !!isSubmitting}
     >
       <FileNameInput
         value={formData.question}
