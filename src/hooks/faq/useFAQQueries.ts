@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { faqAPI } from '@/api/faqAPI';
-import { transformFAQApiItems } from '@/utils/faqUtils';
+import { transformFAQApiItems, transformFAQCategoryApiItems } from '@/utils/faqUtils';
 import { useDebouncedSearch } from '@/hooks/useDebouncedSearch';
 
 // FAQ 목록 조회 쿼리 (페이지는 0부터 시작)
@@ -95,6 +95,19 @@ export const useFAQDetail = (faqId: number | null, enabled: boolean = true) => {
     },
     enabled: enabled && !!faqId,
     staleTime: 1000 * 60 * 5, // 5분
+    refetchOnWindowFocus: false,
+  });
+};
+
+// FAQ 카테고리 목록 조회 쿼리
+export const useFAQCategories = () => {
+  return useQuery({
+    queryKey: ['faqCategories'],
+    queryFn: async () => {
+      const categories = await faqAPI.getFAQCategories();
+      return transformFAQCategoryApiItems(categories);
+    },
+    staleTime: 1000 * 60 * 10, // 10분 (카테고리는 자주 변경되지 않으므로)
     refetchOnWindowFocus: false,
   });
 };

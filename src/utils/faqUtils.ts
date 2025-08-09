@@ -1,4 +1,4 @@
-import type { FAQApiItem, FAQItem } from '@/types/faq';
+import type { FAQApiItem, FAQItem, FAQCategoryApiItem, FAQCategory } from '@/types/faq';
 import CategoryName1 from "@/assets/faq/CategoryName1.svg";
 import CategoryName2 from "@/assets/faq/CategoryName2.svg";
 import CategoryName3 from "@/assets/faq/CategoryName3.svg";
@@ -75,4 +75,25 @@ export function getFilterValueFromCategory(categoryName: string): string {
   };
   
   return filterMap[categoryName] || '';
+}
+
+/**
+ * API 응답의 FAQ 카테고리를 클라이언트용으로 변환
+ */
+export function transformFAQCategoryApiItem(apiItem: FAQCategoryApiItem): FAQCategory {
+  return {
+    categoryId: apiItem.categoryId.toString(),
+    categoryName: apiItem.categoryName,
+    categoryNameImage: CATEGORY_IMAGE_MAP[apiItem.categoryName] || DEFAULT_CATEGORY_IMAGE,
+    description: apiItem.description,
+    faqCount: apiItem.faqCount,
+    isActive: apiItem.isActive,
+  };
+}
+
+/**
+ * API 응답의 FAQ 카테고리 배열을 클라이언트용으로 변환
+ */
+export function transformFAQCategoryApiItems(apiItems: FAQCategoryApiItem[]): FAQCategory[] {
+  return apiItems.map(transformFAQCategoryApiItem);
 }

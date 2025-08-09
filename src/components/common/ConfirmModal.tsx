@@ -8,6 +8,7 @@ interface ConfirmModalProps {
   onConfirm: () => void;
   fileName: string;
   type: 'archive' | 'download' | 'restore';
+  isLoading?: boolean;
 }
 
 const ConfirmModal: React.FC<ConfirmModalProps> = ({
@@ -15,7 +16,8 @@ const ConfirmModal: React.FC<ConfirmModalProps> = ({
   onClose,
   onConfirm,
   fileName,
-  type
+  type,
+  isLoading = false
 }) => {
   if (!isOpen) return null;
 
@@ -76,6 +78,7 @@ const ConfirmModal: React.FC<ConfirmModalProps> = ({
             width="76px"
             height="32px"
             fontSize="16px"
+            disabled={isLoading}
             style={{
               borderRadius: '3.75px',
               backgroundColor: '#8061B0',

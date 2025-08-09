@@ -8,7 +8,9 @@ import type { FAQTableProps } from "@/types/faq";
 import FAQTableHeader from "@/components/admin/faq/table/FAQTableHeader";
 import FAQTableHead from "@/components/admin/faq/table/FAQTableHead";
 import FAQTableRow from "@/components/admin/faq/table/FAQTableRow";
-import { useFAQTableHandlers } from "@/hooks/faq/useFAQTableHandlers";
+import { useFAQStore } from "@/store/faqStore";
+import { useUpdateFAQ, useArchiveFAQ } from "@/hooks/faq/useFAQMutations";
+import { faqAPI } from "@/api/faqAPI";
 
 const FAQTable: React.FC<FAQTableProps> = ({ 
   faqItems = [], 
@@ -23,19 +25,95 @@ const FAQTable: React.FC<FAQTableProps> = ({
   // props로 받은 API 데이터 사용
   const currentFAQItems = faqItems;
 
-  // 핸들러 훅 사용
+  // Zustand 스토어에서 UI 상태 가져오기
   const {
     expandedRows,
     confirmModal,
     editModal,
-    handleRowToggle,
-    handleEdit,
-    handleArchiveClick,
-    handleConfirmAction,
-    handleCloseConfirmModal,
-    handleCloseEditModal,
-    handleSubmitEdit
-  } = useFAQTableHandlers();
+    toggleExpandedRow,
+    setConfirmModal,
+    setEditModal,
+    closeConfirmModal,
+    closeEditModal
+  } = useFAQStore();
+
+  // React Query mutations
+  const updateFAQMutation = useUpdateFAQ();
+  const archiveFAQMutation = useArchiveFAQ();
+
+  // 핸들러 함수들
+  const handleRowToggle = useCallback((faqId: number) => {
+    toggleExpandedRow(faqId);
+  }, [toggleExpandedRow]);
+
+  const handleEdit = useCallback(async (faq: FAQItem) => {
+    try {
+      // FAQ 상세 정보를 API로 조회
+      const faqDetail = await faqAPI.getFAQDetail(faq.faqId);
+      
+      setEditModal({
+        isOpen: true,
+        faqData: {
+          question: faqDetail.question,
+          answer: faqDetail.answer || '',
+          category: faqDetail.categoryName || faq.category
+        },
+        faqId: faq.faqId
+      });
+    } catch (error) {
+      console.error('FAQ 상세 정보 조회 실패:', error);
+      // 에러 발생 시 기본 정보로 모달 열기
+      setEditModal({
+        isOpen: true,
+        faqData: {
+          question: faq.question,
+          answer: '',
+          category: faq.category
+        },
+        faqId: faq.faqId
+      });
+    }
+  }, [setEditModal]);
+
+  const handleArchiveClick = useCallback((faq: FAQItem) => {
+    setConfirmModal({
+      isOpen: true,
+      type: 'archive',
+      faqId: faq.faqId,
+      faqName: faq.question,
+      categoryId: null,
+      categoryName: ''
+    });
+  }, [setConfirmModal]);
+
+  const handleConfirmAction = useCallback(async () => {
+    if (confirmModal.type === 'archive' && confirmModal.faqId) {
+      try {
+        await archiveFAQMutation.mutateAsync(confirmModal.faqId);
+      } catch (error) {
+        console.error('FAQ 보관 실패:', error);
+      }
+    }
+    closeConfirmModal();
+  }, [confirmModal, archiveFAQMutation, closeConfirmModal]);
+
+  const handleSubmitEdit = useCallback(async (data: any) => {
+    if (editModal.faqId) {
+      try {
+        await updateFAQMutation.mutateAsync({
+          faqId: editModal.faqId,
+          faqData: {
+            question: data.question,
+            answer: data.answer,
+            category: data.category
+          }
+        });
+        closeEditModal();
+      } catch (error) {
+        console.error('FAQ 수정 실패:', error);
+      }
+    }
+  }, [editModal.faqId, updateFAQMutation, closeEditModal]);
 
   // 카테고리 옵션 설정
   const categoryOptions = useMemo(() => [
@@ -71,24 +149,26 @@ const FAQTable: React.FC<FAQTableProps> = ({
       {confirmModal.isOpen && confirmModal.type && (
         <ConfirmModal
           isOpen={confirmModal.isOpen}
-          onClose={handleCloseConfirmModal}
+          onClose={closeConfirmModal}
           onConfirm={handleConfirmAction}
           fileName={confirmModal.faqName}
           type={confirmModal.type}
+          isLoading={archiveFAQMutation.isPending}
         />
       )}
 
       {editModal.isOpen && (
         <FAQUploadModal
           isOpen={editModal.isOpen}
-          onClose={handleCloseEditModal}
+          onClose={closeEditModal}
           onSubmit={handleSubmitEdit}
           initialData={editModal.faqData}
           isEdit={true}
+          isSubmitting={updateFAQMutation.isPending}
         />
       )}
     </>
-  ), [confirmModal, editModal, handleCloseConfirmModal, handleConfirmAction, handleCloseEditModal, handleSubmitEdit]);
+  ), [confirmModal, editModal, closeConfirmModal, handleConfirmAction, closeEditModal, handleSubmitEdit, archiveFAQMutation.isPending, updateFAQMutation.isPending]);
 
   // 로딩 상태 처리
   if (isLoading) {
@@ -106,6 +186,7 @@ const FAQTable: React.FC<FAQTableProps> = ({
         <EmptyState 
           message={loadingMessage}
           subMessage="잠시만 기다려주세요."
+          icon="⏳"
         />
       </TableContainer>
     );

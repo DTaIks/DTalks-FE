@@ -3,8 +3,28 @@ import type {
   FAQListApiResponse, 
   FAQListRequest, 
   FAQSearchRequest,
-  FAQFilterRequest 
+  FAQFilterRequest,
+  FAQCategoryApiItem
 } from '@/types/faq';
+
+// 공통 헤더
+const JSON_HEADERS = {
+  'Content-Type': 'application/json',
+  Accept: 'application/json'
+};
+
+// 공통 에러 처리 함수
+const handleApiError = (error: unknown, defaultMessage: string): never => {
+  const axiosError = error as { response?: { data?: { message?: string; error?: string } }; message?: string };
+  const serverMsg = axiosError?.response?.data?.message || axiosError?.response?.data?.error || axiosError?.message;
+  throw new Error(serverMsg || defaultMessage);
+};
+
+// 백엔드 응답 데이터 추출 (중첩 구조 처리)
+const extractResponseData = (responseData: any): any => {
+  // 백엔드가 { code, status, message, data } 형태로 응답하는 경우 data 추출
+  return (responseData && responseData.data) ? responseData.data : responseData;
+};
 
 // FAQ 관련 API 함수들
 export const faqAPI = {
@@ -14,203 +34,132 @@ export const faqAPI = {
     
     // 필수 파라미터
     queryParams.append('pageNumber', params.pageNumber.toString());
+    queryParams.append('size', (params.size ?? 4).toString());
     
-    // 페이지 크기: 기본 4
-    const pageSize = params.size !== undefined ? params.size : 4;
-    queryParams.append('size', pageSize.toString());
-    if (params.sort) {
-      queryParams.append('sort', params.sort);
-    }
+    // 선택적 파라미터
+    if (params.sort) queryParams.append('sort', params.sort);
     
     // 기타 동적 파라미터들
     Object.entries(params).forEach(([key, value]) => {
-      if (key !== 'pageNumber' && key !== 'size' && key !== 'sort' && value !== undefined) {
+      if (!['pageNumber', 'size', 'sort'].includes(key) && value !== undefined) {
         queryParams.append(key, value.toString());
       }
     });
 
     try {
-      const response = await apiInstance.get(
-        `/admin/faq?${queryParams.toString()}`,
-        {
-          headers: { 
-            'Content-Type': 'application/json', 
-            Accept: 'application/json' 
-          }
-        }
-      );
-      // 백엔드 응답이 { code, status, message, data } 형태인 경우를 처리
-      const payload = (response.data && (response.data as any).data) ? (response.data as any).data : response.data;
-      
-      // 서버 응답 구조 정규화
-      const normalizedResponse = {
-        content: payload?.content || [],
-        totalPages: payload?.totalPages || 0,
-        totalElements: payload?.totalElements || 0,
-        pageable: payload?.pageable || {},
-        last: payload?.last || false,
-        first: payload?.first || true,
-        size: payload?.size || 0,
-        number: payload?.number || 0,
-        numberOfElements: payload?.numberOfElements || 0,
-        empty: payload?.empty || true,
-        sort: payload?.sort || { sorted: false, unsorted: true, empty: true }
-      };
-      
-      return normalizedResponse;
-    } catch (error: unknown) {
-      const axiosError = error as { response?: { data?: { message?: string; error?: string } }; message?: string };
-      const serverMsg = axiosError?.response?.data?.message || axiosError?.response?.data?.error || axiosError?.message;
-      throw new Error(serverMsg || 'FAQ 목록 조회에 실패했습니다.');
+      const response = await apiInstance.get(`/admin/faq?${queryParams.toString()}`, { headers: JSON_HEADERS });
+      return extractResponseData(response.data);
+    } catch (error) {
+      return handleApiError(error, 'FAQ 목록 조회에 실패했습니다.');
     }
   },
 
   // FAQ 검색
   searchFAQs: async (params: FAQSearchRequest): Promise<FAQListApiResponse> => {
-    const queryParams = new URLSearchParams();
-    
-    // 필수 파라미터
-    queryParams.append('keyword', params.keyword);
-    queryParams.append('pageNumber', params.pageNumber.toString());
-    
-    // 선택적 파라미터
-    if (params.size !== undefined) {
-      queryParams.append('size', params.size.toString());
-    } else {
-      queryParams.append('size', '4'); // 기본값 4
-    }
+    const queryParams = new URLSearchParams({
+      keyword: params.keyword,
+      pageNumber: params.pageNumber.toString(),
+      size: (params.size ?? 4).toString()
+    });
 
     try {
-      const response = await apiInstance.get(
-        `/admin/faq/search?${queryParams.toString()}`,
-        {
-          headers: { 
-            'Content-Type': 'application/json', 
-            Accept: 'application/json' 
-          }
-        }
-      );
-      // 백엔드 응답이 { code, status, message, data } 형태인 경우를 처리
-      const payload = (response.data && (response.data as any).data) ? (response.data as any).data : response.data;
-      
-      // 서버 응답 구조 정규화
-      const normalizedResponse = {
-        content: payload?.content || [],
-        totalPages: payload?.totalPages || 0,
-        totalElements: payload?.totalElements || 0,
-        pageable: payload?.pageable || {},
-        last: payload?.last || false,
-        first: payload?.first || true,
-        size: payload?.size || 0,
-        number: payload?.number || 0,
-        numberOfElements: payload?.numberOfElements || 0,
-        empty: payload?.empty || true,
-        sort: payload?.sort || { sorted: false, unsorted: true, empty: true }
-      };
-      
-      return normalizedResponse;
-    } catch (error: unknown) {
-      const axiosError = error as { response?: { data?: { message?: string; error?: string } }; message?: string };
-      const serverMsg = axiosError?.response?.data?.message || axiosError?.response?.data?.error || axiosError?.message;
-      throw new Error(serverMsg || 'FAQ 검색에 실패했습니다.');
+      const response = await apiInstance.get(`/admin/faq/search?${queryParams.toString()}`, { headers: JSON_HEADERS });
+      return extractResponseData(response.data);
+    } catch (error) {
+      return handleApiError(error, 'FAQ 검색에 실패했습니다.');
     }
   },
 
   // FAQ 추가
   createFAQ: async (faqData: { question: string; answer: string; category: string }): Promise<void> => {
+    const payload = {
+      question: faqData.question?.trim(),
+      answer: faqData.answer?.trim(),
+      category: faqData.category?.trim(),
+    };
+
     try {
-      const payload = {
-        question: faqData.question?.trim(),
-        answer: faqData.answer?.trim(),
-        category: faqData.category?.trim(),
-      };
-      await apiInstance.post(
-        '/admin/faq',
-        payload,
-        {
-          headers: { 
-            'Content-Type': 'application/json', 
-            Accept: 'application/json' 
-          }
-        }
-      );
-    } catch (error: unknown) {
-      const axiosError = error as { response?: { data?: { message?: string; error?: string } }; message?: string };
-      const serverMsg = axiosError?.response?.data?.message || axiosError?.response?.data?.error || axiosError?.message;
-      throw new Error(serverMsg || 'FAQ 추가에 실패했습니다.');
+      await apiInstance.post('/admin/faq', payload, { headers: JSON_HEADERS });
+    } catch (error) {
+      handleApiError(error, 'FAQ 추가에 실패했습니다.');
     }
   },
 
   // FAQ 상세 조회
   getFAQDetail: async (faqId: number): Promise<{ faqId: number; question: string; answer: string; categoryName: string }> => {
     try {
-      const response = await apiInstance.get(`/admin/faq/${faqId}`, {
-        headers: {
-          'Content-Type': 'application/json',
-          Accept: 'application/json',
-        },
-      });
-      
-      // 백엔드 응답이 { code, status, message, data } 형태인 경우를 처리
-      const payload = (response.data && (response.data as any).data) ? (response.data as any).data : response.data;
-      
-      return payload;
-    } catch (error: unknown) {
-      const axiosError = error as { response?: { data?: { message?: string; error?: string } }; message?: string };
-      const serverMsg = axiosError?.response?.data?.message || axiosError?.response?.data?.error || axiosError?.message;
-      throw new Error(serverMsg || 'FAQ 상세 정보를 불러오는데 실패했습니다.');
+      const response = await apiInstance.get(`/admin/faq/${faqId}`, { headers: JSON_HEADERS });
+      return extractResponseData(response.data);
+    } catch (error) {
+      return handleApiError(error, 'FAQ 상세 정보를 불러오는데 실패했습니다.');
+    }
+  },
+
+  // FAQ 수정
+  updateFAQ: async (faqId: number, faqData: { question: string; answer: string; category: string }): Promise<void> => {
+    const payload = {
+      question: faqData.question?.trim(),
+      answer: faqData.answer?.trim(),
+      category: faqData.category?.trim(),
+    };
+
+    try {
+      await apiInstance.put(`/admin/faq/${faqId}`, payload, { headers: JSON_HEADERS });
+    } catch (error) {
+      handleApiError(error, 'FAQ 수정에 실패했습니다.');
+    }
+  },
+
+  // FAQ 보관
+  archiveFAQ: async (faqId: number): Promise<void> => {
+    try {
+      await apiInstance.patch(`/admin/faq/${faqId}/archive`, undefined, { headers: JSON_HEADERS });
+    } catch (error) {
+      handleApiError(error, 'FAQ 보관에 실패했습니다.');
     }
   },
 
   // FAQ 카테고리별 필터링
   filterFAQsByCategory: async (params: FAQFilterRequest): Promise<FAQListApiResponse> => {
-    const queryParams = new URLSearchParams();
-    
-    // 필수 파라미터
-    queryParams.append('categoryName', params.categoryName);
-    queryParams.append('pageNumber', params.pageNumber.toString());
-    
-    // 선택적 파라미터
-    if (params.size !== undefined) {
-      queryParams.append('size', params.size.toString());
-    } else {
-      queryParams.append('size', '4'); // 기본값 4
-    }
+    const queryParams = new URLSearchParams({
+      categoryName: params.categoryName,
+      pageNumber: params.pageNumber.toString(),
+      size: (params.size ?? 4).toString()
+    });
 
     try {
-      const response = await apiInstance.get(
-        `/admin/faq/filter?${queryParams.toString()}`,
-        {
-          headers: { 
-            'Content-Type': 'application/json', 
-            Accept: 'application/json' 
-          }
-        }
-      );
-      
-      // 백엔드 응답이 { code, status, message, data } 형태인 경우를 처리
-      const payload = (response.data && (response.data as any).data) ? (response.data as any).data : response.data;
-      
-      // 서버 응답 구조 정규화
-      const normalizedResponse = {
-        content: payload?.content || [],
-        totalPages: payload?.totalPages || 0,
-        totalElements: payload?.totalElements || 0,
-        pageable: payload?.pageable || {},
-        last: payload?.last || false,
-        first: payload?.first || true,
-        size: payload?.size || 0,
-        number: payload?.number || 0,
-        numberOfElements: payload?.numberOfElements || 0,
-        empty: payload?.empty || true,
-        sort: payload?.sort || { sorted: false, unsorted: true, empty: true }
-      };
-      
-      return normalizedResponse;
-    } catch (error: unknown) {
-      const axiosError = error as { response?: { data?: { message?: string; error?: string } }; message?: string };
-      const serverMsg = axiosError?.response?.data?.message || axiosError?.response?.data?.error || axiosError?.message;
-      throw new Error(serverMsg || 'FAQ 카테고리 필터링에 실패했습니다.');
+      const response = await apiInstance.get(`/admin/faq/filter?${queryParams.toString()}`, { headers: JSON_HEADERS });
+      return extractResponseData(response.data);
+    } catch (error) {
+      return handleApiError(error, 'FAQ 카테고리 필터링에 실패했습니다.');
+    }
+  },
+
+  // FAQ 카테고리 목록 조회
+  getFAQCategories: async (): Promise<FAQCategoryApiItem[]> => {
+    try {
+      const response = await apiInstance.get('/admin/faq/category', { headers: JSON_HEADERS });
+      return extractResponseData(response.data);
+    } catch (error) {
+      return handleApiError(error, 'FAQ 카테고리 목록 조회에 실패했습니다.');
+    }
+  },
+
+  // FAQ 카테고리 보관
+  archiveFAQCategory: async (categoryName: string): Promise<void> => {
+    try {
+      await apiInstance.patch(`/admin/faq/category/archive?categoryName=${encodeURIComponent(categoryName)}`, undefined, { headers: JSON_HEADERS });
+    } catch (error) {
+      handleApiError(error, 'FAQ 카테고리 보관에 실패했습니다.');
+    }
+  },
+
+  // FAQ 카테고리 복원
+  restoreFAQCategory: async (categoryName: string): Promise<void> => {
+    try {
+      await apiInstance.patch(`/admin/faq/category/restore?categoryName=${encodeURIComponent(categoryName)}`, undefined, { headers: JSON_HEADERS });
+    } catch (error) {
+      handleApiError(error, 'FAQ 카테고리 복원에 실패했습니다.');
     }
   },
 

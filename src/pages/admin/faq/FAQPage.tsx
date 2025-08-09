@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import styled from "styled-components";
 import TitleContainer from "@/layout/TitleContainer";
 import FAQTable from "@/components/admin/faq/table/FAQTable";
@@ -42,32 +42,31 @@ const FAQPage = () => {
     isFilterMode && !isSearchMode
   );
   
-  // 현재 모드에 따른 데이터 선택
-  const getCurrentResponse = () => {
+  // 현재 모드에 따른 데이터 선택 (useMemo로 최적화)
+  const currentResponse = useMemo(() => {
     if (isFilterMode && !isSearchMode) return faqFilterResponse;
     if (isSearchMode && !isFilterMode) return faqSearchResponse;
     return faqListResponse;
-  };
+  }, [isFilterMode, isSearchMode, currentPage, faqFilterResponse, faqSearchResponse, faqListResponse]);
   
-  const getCurrentLoading = () => {
+  const currentLoading = useMemo(() => {
     if (isFilterMode && !isSearchMode) return isFilterLoading;
     if (isSearchMode && !isFilterMode) return isSearchLoading || isDebouncing;
     return isListLoading;
-  };
+  }, [isFilterMode, isSearchMode, isFilterLoading, isSearchLoading, isDebouncing, isListLoading]);
   
-  const getCurrentError = () => {
+  const currentError = useMemo(() => {
     if (isFilterMode && !isSearchMode) return filterError;
     if (isSearchMode && !isFilterMode) return searchError;
     return listError;
-  };
+  }, [isFilterMode, isSearchMode, filterError, searchError, listError]);
   
-  const currentResponse = getCurrentResponse();
-  const currentLoading = getCurrentLoading();
-  const currentError = getCurrentError();
-  
-  // API 응답에서 필요한 데이터 추출
-  const faqItems = currentResponse?.content || [];
-  const totalPages = currentResponse?.totalPages || 0;
+  // API 응답에서 필요한 데이터 추출 (useMemo로 최적화)
+  const { faqItems, totalPages } = useMemo(() => {
+    const items = currentResponse?.content || [];
+    const pages = currentResponse?.totalPages || 0;
+    return { faqItems: items, totalPages: pages };
+  }, [currentResponse]);
 
   // 페이지 유효성 검사 (데이터가 로드된 후에만)
   useEffect(() => {

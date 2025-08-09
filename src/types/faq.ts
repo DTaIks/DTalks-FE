@@ -1,3 +1,13 @@
+// API 응답 타입
+export interface FAQCategoryApiItem {
+  categoryId: number;
+  categoryName: string;
+  description: string;
+  isActive: boolean;
+  faqCount: number;
+}
+
+// 클라이언트에서 사용하는 FAQ 카테고리 (UI용 필드 포함)
 export interface FAQCategory {
   categoryId: string;
   categoryName: string;

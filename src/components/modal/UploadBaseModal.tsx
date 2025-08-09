@@ -1,6 +1,5 @@
 import React, { useCallback, useEffect } from 'react';
 import styled from 'styled-components';
-
 // @ts-expect-error - verbatimModuleSyntax
 import FocusTrap from 'focus-trap-react';
 import Button from '@/components/common/Button';

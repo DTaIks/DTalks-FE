@@ -9,7 +9,7 @@ interface FAQTableRowProps {
   faq: FAQItem;
   isExpanded: boolean;
   onRowToggle: (faqId: number) => void;
-  onEdit: (faq: FAQItem) => void;
+  onEdit: (faq: FAQItem) => Promise<void>;
   onArchiveClick: (faq: FAQItem) => void;
 }
 
@@ -29,9 +29,9 @@ const FAQTableRow: React.FC<FAQTableRowProps> = ({
   const renderActionButtons = () => (
     <ActionContainer>
       <ActionText 
-        onClick={(e) => {
+        onClick={async (e) => {
           e.stopPropagation();
-          onEdit(faq);
+          await onEdit(faq);
         }}
       >
         수정
