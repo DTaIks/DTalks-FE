@@ -1,6 +1,6 @@
 import { apiInstance } from './apiInstance';
-import type { 
-  AdminUserListRequest, 
+import type {
+  AdminUserListRequest,
   AdminUserListResponse,
   AdminUserSearchRequest,
   AdminUserSearchResponse
@@ -9,14 +9,13 @@ import type {
 export const adminUserAPI = {
   // 사용자 목록 조회
   getAdminUserList: async (params: AdminUserListRequest): Promise<AdminUserListResponse> => {
-    const apiPageNumber = params.pageNumber - 1;
-    
     const queryParams = new URLSearchParams({
-      pageNumber: apiPageNumber.toString(),
+      pageNumber: params.pageNumber.toString(),
       pageSize: (params.pageSize || 7).toString(),
     });
 
     console.log('사용자 목록 조회 요청:', `/admin/user?${queryParams.toString()}`);
+    console.log('전달받은 params (이미 0-based):', params);
 
     try {
       const response = await apiInstance.get<AdminUserListResponse>(
@@ -56,17 +55,16 @@ export const adminUserAPI = {
     }
   },
 
-  // 사용자 검색 
+  // 사용자 검색
   searchAdminUsers: async (params: AdminUserSearchRequest): Promise<AdminUserSearchResponse> => {
-    const apiPageNumber = params.pageNumber - 1;
-    
     const queryParams = new URLSearchParams({
       name: params.name,
-      pageNumber: apiPageNumber.toString(), 
+      pageNumber: params.pageNumber.toString(),
       pageSize: (params.pageSize || 7).toString(),
     });
 
-    console.log('🔍 사용자 검색 요청:', `/admin/user/search?${queryParams.toString()}`);
+    console.log('사용자 검색 요청:', `/admin/user/search?${queryParams.toString()}`);
+    console.log('전달받은 params (이미 0-based):', params);
 
     try {
       const response = await apiInstance.get<AdminUserSearchResponse>(

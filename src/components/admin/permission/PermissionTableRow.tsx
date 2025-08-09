@@ -2,12 +2,12 @@ import styled from "styled-components";
 import ActiveIcon from "@/assets/common/Active.svg";
 import type { PermissionUser } from "@/types/permission";
 
-interface TableRowProps {
+interface PermissionTableRowProps {
   user: PermissionUser;
   onEditClick: (user: PermissionUser) => void;
 }
 
-const TableRow = ({ user, onEditClick }: TableRowProps) => {
+const PermissionTableRow = ({ user, onEditClick }: PermissionTableRowProps) => {
   return (
     <RowContainer>
       <TableCell>
@@ -23,7 +23,7 @@ const TableRow = ({ user, onEditClick }: TableRowProps) => {
       <TableCell>
         <UserCountText>{user.roleUserCount}명</UserCountText>
       </TableCell>
-      <TableCell center>
+      <TableCell $center>
         <StatusIcon src={ActiveIcon} alt={user.isActive} />
       </TableCell>
       <TableCell>
@@ -33,7 +33,7 @@ const TableRow = ({ user, onEditClick }: TableRowProps) => {
   );
 };
 
-export default TableRow;
+export default PermissionTableRow;
 
 const RowContainer = styled.div`
   width: 1052px;
@@ -42,11 +42,11 @@ const RowContainer = styled.div`
   transition: background-color 0.2s ease;
 `;
 
-const TableCell = styled.div<{ center?: boolean }>`
+const TableCell = styled.div<{ $center?: boolean }>`
   display: flex;
   align-items: center;
   padding-left: 36px;
-  justify-content: ${({ center }) => center ? 'center' : 'flex-start'};
+  justify-content: ${({ $center }) => $center ? 'center' : 'flex-start'};
   color: #000;
   font-size: var(--font-size-16);
   font-weight: 500;
@@ -134,4 +134,4 @@ const ActionText = styled.span`
   &:hover {
     color: var(--color-mediumpurple-300);
   }
-`; 
+`;
