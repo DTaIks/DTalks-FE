@@ -56,6 +56,9 @@ export const useArchiveFAQCategory = () => {
     onSuccess: () => {
       // FAQ 카테고리 목록 쿼리 무효화하여 최신 데이터 반영
       queryClient.invalidateQueries({ queryKey: ['faqCategories'] });
+      queryClient.invalidateQueries({ queryKey: ['faqList'] });
+      queryClient.invalidateQueries({ queryKey: ['faqSearch'] });
+      queryClient.invalidateQueries({ queryKey: ['faqFilter'] });
     },
   });
 };
@@ -68,6 +71,9 @@ export const useRestoreFAQCategory = () => {
     onSuccess: () => {
       // FAQ 카테고리 목록 쿼리 무효화하여 최신 데이터 반영
       queryClient.invalidateQueries({ queryKey: ['faqCategories'] });
+      queryClient.invalidateQueries({ queryKey: ['faqList'] });
+      queryClient.invalidateQueries({ queryKey: ['faqSearch'] });
+      queryClient.invalidateQueries({ queryKey: ['faqFilter'] });
     },
   });
 };

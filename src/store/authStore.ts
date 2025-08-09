@@ -57,7 +57,9 @@ export const useAuthStore = create<AuthState>()(
         if (typeof window !== 'undefined') {
           localStorage.setItem('auth:isAuthenticated', String(Boolean(isAuthenticated)));
         }
-      } catch {}
+      } catch (error) {
+        console.error('localStorage 설정 실패:', error);
+      }
       set({ isAuthenticated });
     },
 
@@ -101,7 +103,9 @@ export const useAuthStore = create<AuthState>()(
         if (typeof window !== 'undefined') {
           localStorage.setItem('auth:isAuthenticated', 'false');
         }
-      } catch {}
+      } catch (error) {
+        console.error('localStorage 설정 실패:', error);
+      }
 
       set({
         user: null,

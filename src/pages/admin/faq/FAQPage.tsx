@@ -47,7 +47,7 @@ const FAQPage = () => {
     if (isFilterMode && !isSearchMode) return faqFilterResponse;
     if (isSearchMode && !isFilterMode) return faqSearchResponse;
     return faqListResponse;
-  }, [isFilterMode, isSearchMode, currentPage, faqFilterResponse, faqSearchResponse, faqListResponse]);
+  }, [isFilterMode, isSearchMode, faqFilterResponse, faqSearchResponse, faqListResponse]);
   
   const currentLoading = useMemo(() => {
     if (isFilterMode && !isSearchMode) return isFilterLoading;
@@ -97,6 +97,7 @@ const FAQPage = () => {
       await createFAQMutation.mutateAsync(data);
       handleModalClose();
     } catch (error) {
+      console.error('FAQ 생성 실패:', error);
       // 에러가 발생해도 모달은 열린 상태로 유지하여 사용자가 재시도할 수 있도록 함
     }
   };

@@ -97,7 +97,7 @@ const FAQTable: React.FC<FAQTableProps> = ({
     closeConfirmModal();
   }, [confirmModal, archiveFAQMutation, closeConfirmModal]);
 
-  const handleSubmitEdit = useCallback(async (data: any) => {
+  const handleSubmitEdit = useCallback(async (data: { question: string; answer: string; category: string }) => {
     if (editModal.faqId) {
       try {
         await updateFAQMutation.mutateAsync({
@@ -186,7 +186,6 @@ const FAQTable: React.FC<FAQTableProps> = ({
         <EmptyState 
           message={loadingMessage}
           subMessage="잠시만 기다려주세요."
-          icon="⏳"
         />
       </TableContainer>
     );

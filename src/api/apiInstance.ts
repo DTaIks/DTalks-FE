@@ -33,7 +33,9 @@ const createAxiosInstance = (): AxiosInstance => {
         try {
           const { logout } = useAuthStore.getState();
           logout();
-        } catch {}
+        } catch (error) {
+          console.error('로그아웃 처리 중 오류:', error);
+        }
       }
       return Promise.reject(error);
     }

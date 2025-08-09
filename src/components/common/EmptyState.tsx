@@ -4,13 +4,11 @@ import styled from "styled-components";
 interface EmptyStateProps {
   message?: string;
   subMessage?: string;
-  icon?: string;
 }
 
 const EmptyState: React.FC<EmptyStateProps> = ({ 
   message = "검색 결과가 없습니다.",
-  subMessage,
-  icon
+  subMessage
 }) => {
   // 메시지에 따른 기본 서브메시지 설정
   const getDefaultSubMessage = (msg: string): string => {
@@ -27,7 +25,6 @@ const EmptyState: React.FC<EmptyStateProps> = ({
 
   return (
     <Container>
-      {icon && <EmptyIcon>{icon}</EmptyIcon>}
       <EmptyMessage>{message}</EmptyMessage>
       <EmptySubMessage>{finalSubMessage}</EmptySubMessage>
     </Container>
@@ -47,20 +44,14 @@ const Container = styled.div`
   height: 240px;
 `;
 
-const EmptyIcon = styled.div`
-  font-size: 48px;
-  margin-bottom: 16px;
-  opacity: 0.6;
-`;
-
 const EmptyMessage = styled.div`
   font-size: 18px;
   font-weight: 600;
   color: #666;
-  margin-bottom: 8px;
+  margin-bottom: 12px;
 `;
 
 const EmptySubMessage = styled.div`
-  font-size: 12px;
+  font-size: 14px;
   color: #999;
 `;

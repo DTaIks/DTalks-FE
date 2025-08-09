@@ -81,7 +81,7 @@ export const useFAQFilter = (categoryName: string, currentPage: number, enabled:
 
 // FAQ 상세 조회 쿼리
 export const useFAQDetail = (faqId: number | null, enabled: boolean = true) => {
-  return useQuery({
+  return useQuery<{ faqId: number; question: string; answer: string; categoryName: string }>({
     queryKey: ['faqDetail', faqId],
     queryFn: async () => {
       if (!faqId) throw new Error('FAQ ID가 필요합니다.');
@@ -89,9 +89,11 @@ export const useFAQDetail = (faqId: number | null, enabled: boolean = true) => {
       const result = await faqAPI.getFAQDetail(faqId);
       
       // 중첩된 응답 구조 처리: { code, status, message, data: {...} }
-      const actualData = result && (result as any).data ? (result as any).data : result;
+      const actualData = result && typeof result === 'object' && 'data' in result 
+        ? (result as { data: unknown }).data 
+        : result;
       
-      return actualData;
+      return actualData as { faqId: number; question: string; answer: string; categoryName: string };
     },
     enabled: enabled && !!faqId,
     staleTime: 1000 * 60 * 5, // 5분

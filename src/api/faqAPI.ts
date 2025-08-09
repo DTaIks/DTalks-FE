@@ -21,9 +21,11 @@ const handleApiError = (error: unknown, defaultMessage: string): never => {
 };
 
 // 백엔드 응답 데이터 추출 (중첩 구조 처리)
-const extractResponseData = (responseData: any): any => {
+const extractResponseData = (responseData: unknown): unknown => {
   // 백엔드가 { code, status, message, data } 형태로 응답하는 경우 data 추출
-  return (responseData && responseData.data) ? responseData.data : responseData;
+  return (responseData && typeof responseData === 'object' && 'data' in responseData) 
+    ? (responseData as { data: unknown }).data 
+    : responseData;
 };
 
 // FAQ 관련 API 함수들
@@ -48,7 +50,7 @@ export const faqAPI = {
 
     try {
       const response = await apiInstance.get(`/admin/faq?${queryParams.toString()}`, { headers: JSON_HEADERS });
-      return extractResponseData(response.data);
+      return extractResponseData(response.data) as FAQListApiResponse;
     } catch (error) {
       return handleApiError(error, 'FAQ 목록 조회에 실패했습니다.');
     }
@@ -64,7 +66,7 @@ export const faqAPI = {
 
     try {
       const response = await apiInstance.get(`/admin/faq/search?${queryParams.toString()}`, { headers: JSON_HEADERS });
-      return extractResponseData(response.data);
+      return extractResponseData(response.data) as FAQListApiResponse;
     } catch (error) {
       return handleApiError(error, 'FAQ 검색에 실패했습니다.');
     }
@@ -89,7 +91,7 @@ export const faqAPI = {
   getFAQDetail: async (faqId: number): Promise<{ faqId: number; question: string; answer: string; categoryName: string }> => {
     try {
       const response = await apiInstance.get(`/admin/faq/${faqId}`, { headers: JSON_HEADERS });
-      return extractResponseData(response.data);
+      return extractResponseData(response.data) as { faqId: number; question: string; answer: string; categoryName: string };
     } catch (error) {
       return handleApiError(error, 'FAQ 상세 정보를 불러오는데 실패했습니다.');
     }
@@ -129,7 +131,7 @@ export const faqAPI = {
 
     try {
       const response = await apiInstance.get(`/admin/faq/filter?${queryParams.toString()}`, { headers: JSON_HEADERS });
-      return extractResponseData(response.data);
+      return extractResponseData(response.data) as FAQListApiResponse;
     } catch (error) {
       return handleApiError(error, 'FAQ 카테고리 필터링에 실패했습니다.');
     }
@@ -139,7 +141,7 @@ export const faqAPI = {
   getFAQCategories: async (): Promise<FAQCategoryApiItem[]> => {
     try {
       const response = await apiInstance.get('/admin/faq/category', { headers: JSON_HEADERS });
-      return extractResponseData(response.data);
+      return extractResponseData(response.data) as FAQCategoryApiItem[];
     } catch (error) {
       return handleApiError(error, 'FAQ 카테고리 목록 조회에 실패했습니다.');
     }

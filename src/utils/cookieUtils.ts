@@ -51,7 +51,7 @@ export const getAllCookies = (): Record<string, string> => {
       if (name && value) {
         try {
           cookies[name] = decodeURIComponent(value);
-        } catch (e) {
+        } catch {
           cookies[name] = value; // decodeURIComponent 실패 시 원본 사용
         }
       }
