@@ -1,6 +1,7 @@
 import React from "react";
 import styled from "styled-components";
-import type { User } from "@/types/user"; 
+import type { User } from "@/types/user";
+
 import UserTableRow from "@/components/admin/userlist/UserTableRow";
 
 interface UserTableBodyProps {

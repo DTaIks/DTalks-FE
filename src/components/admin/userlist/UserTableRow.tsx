@@ -1,6 +1,6 @@
 import React from "react";
 import styled from "styled-components";
-import type { User } from "@/types/user"; 
+import type { User } from "@/types/user";
 
 interface UserTableRowProps {
   user: User;

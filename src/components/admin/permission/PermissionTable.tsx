@@ -1,45 +1,42 @@
 import styled from "styled-components";
 import RoleManagement from "@/components/admin/permission/RoleManagement";
 import { usePermissionStore } from "@/store/permissionStore";
-import type { PermissionUser } from "@/types/permission";
 import TableHeader from "@/components/admin/permission/PermissionTableHeader";
 import TableRow from "@/components/admin/permission/PermissionTableRow";
+import { usePermissions } from "@/query/usePermission";
+import type { PermissionUser } from "@/types/permission";
+
 import Roll1 from '@/assets/permission/PermissionRoll1.svg';
 import Roll2 from '@/assets/permission/PermissionRoll2.svg';
 import Roll3 from '@/assets/permission/PermissionRoll3.svg';
 
-const permissionData: PermissionUser[] = [
+const roleInfo = [
   {
     roleId: 1,
-    image: Roll1,
     roleName: "관리자",
     roleNameEn: "Administrator",
     description: "시스템 관리 및 전체 권한 보유",
-    roleUserCount: 1,
-    isActive: "active",
+    image: Roll1,
   },
   {
     roleId: 2,
-    image: Roll2,
     roleName: "편집자",
     roleNameEn: "Editor",
     description: "콘텐츠 관리, 편집 및 게시 권한",
-    roleUserCount: 5,
-    isActive: "active",
+    image: Roll2,
   },
   {
     roleId: 3,
-    image: Roll3,
     roleName: "사용자",
     roleNameEn: "User",
     description: "기본 읽기 및 제한된 쓰기 권한",
-    roleUserCount: 10,
-    isActive: "active",
-  }
+    image: Roll3,
+  },
 ];
 
 const PermissionTable = () => {
   const { selectedUser, isModalOpen, setSelectedUser, setModalOpen } = usePermissionStore();
+  const { data: permissionData, isLoading, isError } = usePermissions();
 
   const handleEditClick = (user: PermissionUser) => {
     setSelectedUser(user);
@@ -51,6 +48,22 @@ const PermissionTable = () => {
     setSelectedUser(null);
   };
 
+  if (isLoading) return <div>로딩 중...</div>;
+  if (isError) return <div>데이터를 불러오는 데 실패했습니다.</div>;
+
+  const mergedData: PermissionUser[] = (permissionData ?? []).map(item => {
+    const fixed = roleInfo.find(r => r.roleId === item.roleId);
+    return {
+      roleId: item.roleId,
+      roleUserCount: item.roleUserCount,
+      isActive: item.isActive,
+      roleName: fixed?.roleName ?? "",
+      roleNameEn: fixed?.roleNameEn ?? "",
+      description: fixed?.description ?? "",
+      image: fixed?.image ?? "",
+    };
+  });
+
   return (
     <>
       <TableWrapper>
@@ -58,10 +71,10 @@ const PermissionTable = () => {
           <Table>
             <TableHeader />
             <TableBody>
-              {permissionData.map((user) => (
-                <TableRow 
-                  key={user.roleId} 
-                  user={user} 
+              {mergedData.map(user => (
+                <TableRow
+                  key={user.roleId}
+                  user={user}
                   onEditClick={handleEditClick}
                 />
               ))}

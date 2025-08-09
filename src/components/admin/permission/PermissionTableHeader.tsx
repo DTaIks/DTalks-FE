@@ -39,6 +39,7 @@ const TableCell = styled.div<{ center?: boolean }>`
   color: var(--table-header-color);
   font-size: var(--font-size-16);
   font-weight: 600;
+  white-space: nowrap;
   
   &:nth-child(1) {
     width: 24%;
