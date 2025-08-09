@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
@@ -52,7 +52,7 @@ export default function LoginPage(): JSX.Element {
       
       // 성공 시 어드민 페이지로 이동
       navigate('/admin');
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('로그인 실패:', error);
       // 에러는 useLogin 훅에서 이미 처리됨
     }

@@ -37,5 +37,4 @@ const ContentArea = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-  z-index: 500;
 `; 

@@ -57,9 +57,10 @@ export const useLogin = () => {
       setLoading(false);
       setError(null);
     },
-    onError: (error: any) => {
+    onError: (error: unknown) => {
+      const errorMessage = error instanceof Error ? error.message : '로그인에 실패했습니다.';
       setLoading(false);
-      setError(error.message || '로그인에 실패했습니다.');
+      setError(errorMessage);
       console.error('로그인 실패:', error);
     },
   });
@@ -106,11 +107,12 @@ export const useLogout = () => {
     onSuccess: () => {
       logout();
     },
-    onError: (error: any) => {
+    onError: (error: unknown) => {
+      const errorMessage = error instanceof Error ? error.message : '로그아웃에 실패했습니다.';
       console.error('로그아웃 실패:', error);
       // 실패해도 로컬은 초기화하여 세션 끊김 상태 유지 권장 시 아래 주석 해제
       // logout();
-      setError(error.message || '로그아웃에 실패했습니다.');
+      setError(errorMessage);
     },
   });
 };

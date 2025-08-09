@@ -55,19 +55,20 @@ export const adminUserAPI = {
 
       console.log('사용자 목록 조회 성공:', response.data);
       return response.data;
-    } catch (error: any) {
-      const status = error?.response?.status;
-      const serverMsg = error?.response?.data?.message || error?.response?.data?.error || error?.message;
+    } catch (error: unknown) {
+      const axiosError = error as { response?: { status?: number; data?: { message?: string; error?: string } }; message?: string };
+      const status = axiosError?.response?.status;
+      const serverMsg = axiosError?.response?.data?.message || axiosError?.response?.data?.error || axiosError?.message;
       
       console.error('사용자 목록 조회 실패:', {
         message: serverMsg,
         status,
-        response: error?.response?.data,
+        response: axiosError?.response?.data,
         params: queryParams.toString()
       });
 
-      if (serverMsg) error.message = serverMsg;
-      throw error;
+      const errorToThrow = new Error(serverMsg || '사용자 목록 조회에 실패했습니다.');
+      throw errorToThrow;
     }
   },
 

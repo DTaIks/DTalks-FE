@@ -23,7 +23,7 @@ const LogoutModal: React.FC<LogoutModalProps> = ({ isOpen, onClose }) => {
   const handleLogout = async () => {
     try {
       await logoutMutation.mutateAsync();
-    } catch (_) {
+    } catch {
       resetLocal();
     } finally {
       onClose();
@@ -65,7 +65,7 @@ const ModalOverlay = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 1002;
+  z-index: 1050;
 `;
 
 const ModalContent = styled.div`

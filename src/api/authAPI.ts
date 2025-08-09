@@ -53,18 +53,19 @@ export const authAPI = {
 
       console.log('로그인 성공:', response.data);
       return response.data;
-    } catch (error: any) {
-      const status = error?.response?.status;
-      const serverMsg = error?.response?.data?.message || error?.response?.data?.error || error?.message;
+    } catch (error: unknown) {
+      const axiosError = error as { response?: { status?: number; data?: { message?: string; error?: string }; headers?: Record<string, unknown> }; message?: string };
+      const status = axiosError?.response?.status;
+      const serverMsg = axiosError?.response?.data?.message || axiosError?.response?.data?.error || axiosError?.message;
       console.error('로그인 실패 상세:', {
         message: serverMsg,
         status,
-        response: error?.response?.data,
-        headers: error?.response?.headers
+        response: axiosError?.response?.data,
+        headers: axiosError?.response?.headers
       });
 
-      if (serverMsg) error.message = serverMsg;
-      throw error;
+      const errorToThrow = new Error(serverMsg || '로그인에 실패했습니다.');
+      throw errorToThrow;
     }
   },
 
