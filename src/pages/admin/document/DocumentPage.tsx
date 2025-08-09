@@ -1,8 +1,8 @@
 import { useState, useEffect, useCallback } from "react";
 import styled from "styled-components";
 import TitleContainer from "@/layout/TitleContainer";
-import DocumentStatCard from "@/components/admin/document/DocumentStatCard";
-import DocumentTable from "@/components/admin/document/DocumentTable";
+import DocumentStatCard from "@/components/admin/documentAll/DocumentStatCard";
+import DocumentTable from "@/components/admin/documentAll/DocumentTable";
 import Pagination from "@/components/common/Pagination";
 import ConfirmModal from "@/components/common/ConfirmModal";
 import { VersionHistoryModal } from "@/components/common/FileVersionManagementModal";

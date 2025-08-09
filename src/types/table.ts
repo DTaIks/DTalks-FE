@@ -27,4 +27,3 @@ export interface TableHeaderProps {
   selectedCategory?: string;
   onCategoryChange?: (value: string) => void;
 }
-
