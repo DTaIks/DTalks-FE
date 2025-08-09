@@ -98,7 +98,9 @@ const DocumentPage = () => {
 
   return (
     <Container>
-      <TitleContainer title="전체 문서" subtitle="모든 사내 문서를 한 번에 확인하고 정리하세요" />
+      <HeaderWrapper>
+        <TitleContainer title="전체 문서" subtitle="모든 사내 문서를 한 번에 확인하고 정리하세요" />
+      </HeaderWrapper>
       <DocumentStatCard stats={stats} />
       <DocumentTable 
         currentPage={currentPage} 
@@ -141,6 +143,16 @@ const Container = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
+`;
+
+const HeaderWrapper = styled.div`
+  position: relative;
+  width: 1056px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-top: 40px;
+  margin-bottom: 32px;
 `;
 
 const PaginationContainer = styled.div`

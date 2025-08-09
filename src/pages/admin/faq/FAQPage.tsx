@@ -43,15 +43,17 @@ const FAQPage = () => {
 
   return (
     <Container>
-      <TitleContainer title="FAQ 관리" subtitle="자주 묻는 질문들을 관리하고 편집하세요" />
-      <ButtonContainer>
-        <StyledFAQButton 
-          text="FAQ 추가" 
-          width="var(--button-width)" 
-          height="var(--button-height)"
-          onClick={handleModalOpen}
-        />
-      </ButtonContainer>
+      <HeaderWrapper>
+        <TitleContainer title="FAQ 관리" subtitle="자주 묻는 질문들을 관리하고 편집하세요" />
+        <ButtonContainer>
+          <StyledFAQButton 
+            text="FAQ 추가" 
+            width="var(--button-width)" 
+            height="var(--button-height)"
+            onClick={handleModalOpen}
+          />
+        </ButtonContainer>
+      </HeaderWrapper>
       <FAQTable 
         currentPage={currentPage}
         itemsPerPage={itemsPerPage}
@@ -86,10 +88,20 @@ const Container = styled.div`
   align-items: center;
 `;
 
+const HeaderWrapper = styled.div`
+  position: relative;
+  width: 1056px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-top: 40px;
+  margin-bottom: 32px;
+`;
+
 const ButtonContainer = styled.div`
-  position: absolute;
-  top: var(--gap-60);
-  margin-left: 888px;
+  display: flex;
+  align-items: center;
+  height: 64px;
 `;
 
 const StyledFAQButton = styled(Button)`

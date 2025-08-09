@@ -13,6 +13,8 @@ interface AuthState {
   isAuthenticated: boolean;
   isLoading: boolean;
   error: string | null;
+  accessToken?: string | null;
+  refreshToken?: string | null;
   
   // 순수한 상태 변경 액션들 (API 로직 없음)
   setUser: (user: User | null) => void;
@@ -20,6 +22,8 @@ interface AuthState {
   setLoading: (loading: boolean) => void;
   setError: (error: string | null) => void;
   clearError: () => void;
+  setAccessToken: (token: string | null) => void;
+  setRefreshToken: (token: string | null) => void;
   logout: () => void;
 }
 
@@ -30,6 +34,8 @@ export const useAuthStore = create<AuthState>()(
     isAuthenticated: false,
     isLoading: false,
     error: null,
+    accessToken: null,
+    refreshToken: null,
 
     // 순수한 상태 변경 액션들
     setUser: (user) => {
@@ -52,11 +58,21 @@ export const useAuthStore = create<AuthState>()(
       set({ error: null });
     },
 
+    setAccessToken: (token) => {
+      set({ accessToken: token });
+    },
+
+    setRefreshToken: (token) => {
+      set({ refreshToken: token });
+    },
+
     logout: () => {
       set({
         user: null,
         isAuthenticated: false,
         error: null,
+        accessToken: null,
+        refreshToken: null,
       });
     },
   })

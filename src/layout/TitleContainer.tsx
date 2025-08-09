@@ -18,10 +18,7 @@ const TitleContainer = ({ title, subtitle, marginLeft }: TitleContainerProps) =>
 export default TitleContainer;
 
 const Container = styled.div<{ marginLeft?: string }>`
-  position: absolute;
-  top: 40px;
-  left: calc(50% + 128px);
-  transform: translateX(-50%);
+  position: relative;
   width: 1056px;
   height: 64px;
   font-size: 31.5px;

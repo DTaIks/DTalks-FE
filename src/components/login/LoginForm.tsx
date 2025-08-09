@@ -1,4 +1,5 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import InputField from "@/components/common/InputField";
 import Button from "@/components/common/Button";
 import styled from "styled-components";
@@ -24,6 +25,8 @@ const LoginForm: React.FC<LoginFormProps> = ({
   isLoading = false,
   error = null
 }) => {
+  const navigate = useNavigate();
+
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>): void => {
     e.preventDefault();
     if (onLogin && !isLoading) {
@@ -59,7 +62,7 @@ const LoginForm: React.FC<LoginFormProps> = ({
           autocomplete="current-password"
         />
         {error && <ErrorMessage>{error}</ErrorMessage>}
-        <ForgotPasswordLink href="/password">
+        <ForgotPasswordLink onClick={() => navigate('/password')}>
           <span>비밀번호 찾기</span>
         </ForgotPasswordLink>
         <LoginButtonWrapper>
@@ -160,7 +163,7 @@ const ErrorMessage = styled.div`
   width: 100%;
 `;
 
-const ForgotPasswordLink = styled.a`
+const ForgotPasswordLink = styled.div`
   color: var(--color-mediumpurple-300);
   font-size: 14px;
   text-decoration: none;
@@ -169,12 +172,8 @@ const ForgotPasswordLink = styled.a`
   width: 382.5px;
   display: block;
   text-align: right;
-  pointer-events: none;
   &:hover {
     text-decoration: underline;
     color: #7742A7;
-  }
-  span {
-    pointer-events: auto;
   }
 `;

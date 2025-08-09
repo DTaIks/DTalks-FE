@@ -1,3 +1,9 @@
+/* Ensure app uses internal scroll containers to avoid double scrollbars */
+html, body, #root {
+  height: 100%;
+  overflow: hidden; /* body does not scroll; internal containers manage scrolling */
+}
+
 body {
   margin: 0;
   line-height: normal;

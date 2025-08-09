@@ -79,15 +79,17 @@ const GlossaryPage = () => {
 
   return (
     <Container>
-      <TitleContainer title="용어사전" subtitle="모든 용어 사전 문서를 한 번에 확인하고 정리하세요" />
-      <ButtonContainer>
-        <StyledGlossaryButton 
-          text={getButtonText()} 
-          width="var(--button-width)" 
-          height="var(--button-height)"
-          onClick={handleFileUploadClick}
-        />
-      </ButtonContainer>
+      <HeaderWrapper>
+        <TitleContainer title="용어사전" subtitle="모든 용어 사전 문서를 한 번에 확인하고 정리하세요" />
+        <ButtonContainer>
+          <StyledGlossaryButton 
+            text={getButtonText()} 
+            width="var(--button-width)" 
+            height="var(--button-height)"
+            onClick={handleFileUploadClick}
+          />
+        </ButtonContainer>
+      </HeaderWrapper>
       <CompareCard 
         showVersionCompare={true}
         versionOptions={[
@@ -156,10 +158,20 @@ const Container = styled.div`
   align-items: center;
 `;
 
+const HeaderWrapper = styled.div`
+  position: relative;
+  width: 1056px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-top: 40px;
+  margin-bottom: 32px;
+`;
+
 const ButtonContainer = styled.div`
-  position: absolute;
-  top: var(--gap-60);
-  margin-left: 888px;
+  display: flex;
+  align-items: center;
+  height: 64px;
 `;
 
 const StyledGlossaryButton = styled(Button)`

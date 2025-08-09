@@ -79,15 +79,17 @@ const PolicyPage = () => {
 
   return (
     <Container>
-      <TitleContainer title="사내 정책" subtitle="모든 사내 정책 문서를 한 번에 확인하고 정리하세요" />
-      <ButtonContainer>
-        <StyledPolicyButton 
-          text={getButtonText()} 
-          width="var(--button-width)" 
-          height="var(--button-height)"
-          onClick={handleFileUploadClick}
-        />
-      </ButtonContainer>
+      <HeaderWrapper>
+        <TitleContainer title="사내 정책" subtitle="모든 사내 정책 문서를 한 번에 확인하고 정리하세요" />
+        <ButtonContainer>
+          <StyledPolicyButton 
+            text={getButtonText()} 
+            width="var(--button-width)" 
+            height="var(--button-height)"
+            onClick={handleFileUploadClick}
+          />
+        </ButtonContainer>
+      </HeaderWrapper>
       <CompareCard 
         showVersionCompare={true}
         versionOptions={[
@@ -156,10 +158,20 @@ const Container = styled.div`
   align-items: center;
 `;
 
+const HeaderWrapper = styled.div`
+  position: relative;
+  width: 1056px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-top: 40px;
+  margin-bottom: 32px;
+`;
+
 const ButtonContainer = styled.div`
-  position: absolute;
-  top: var(--gap-60);
-  margin-left: 888px;
+  display: flex;
+  align-items: center;
+  height: 64px;
 `;
 
 const StyledPolicyButton = styled(Button)`

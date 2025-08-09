@@ -598,8 +598,9 @@ const AdminText = styled.div`
 const ProfileDropdownContainer = styled.div`
   position: absolute;
   bottom: 100%;
-  left: 0;
-  right: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 220px;
   background: white;
   border-radius: 8px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);

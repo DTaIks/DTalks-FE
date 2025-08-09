@@ -5,7 +5,9 @@ import UserTable from "@/components/admin/userlist/UserListTable";
 const UserListPage = () => {
   return (
     <Container>
-      <TitleContainer title="사용자 목록" subtitle="등록한 사용자들을 관리하세요" />
+      <HeaderWrapper>
+        <TitleContainer title="사용자 목록" subtitle="등록한 사용자들을 관리하세요" />
+      </HeaderWrapper>
       <UserTable />
     </Container>
   );
@@ -19,4 +21,14 @@ const Container = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
+`;
+
+const HeaderWrapper = styled.div`
+  position: relative;
+  width: 1056px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-top: 40px;
+  margin-bottom: 32px;
 `;

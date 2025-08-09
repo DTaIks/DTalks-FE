@@ -1,4 +1,5 @@
 import React from 'react';
+import styled from 'styled-components';
 import TitleContainer from '@/layout/TitleContainer';
 import StatCard from '@/components/admin/chart/StatCard';
 import { ResponseTimeChart } from '@/components/admin/chart/ResponseTimeCard';
@@ -32,29 +33,69 @@ const ChartPage: React.FC = () => {
   ];
 
   return (
-    <>
-      <TitleContainer title="통계" subtitle="챗봇 성능과 사용자 데이터를 분석하세요" marginLeft="8px" />
-      <div style={{ marginLeft: "15px" }}>
-        <div style={{ display: "flex", flexWrap: "wrap", gap: "var(--gap-36)", paddingBottom: 46.6 }}>
+    <Container>
+      <HeaderWrapper>
+        <TitleContainer title="통계" subtitle="챗봇 성능과 사용자 데이터를 분석하세요"/>
+      </HeaderWrapper>
+      <ContentArea>
+        <StatCardsContainer>
           {statCards.map((card, index) => (
             <StatCard 
               key={index}
               data={card.data}
             />
           ))}
-        </div>
+        </StatCardsContainer>
 
         <ResponseTimeChart responseTime={responseTime} />
 
-        <div style={{ display: "flex", gap: "var(--gap-20)", marginTop: 60 }}>
+        <ChartsRow>
           <PromptTemplateCard data={promptTemplate} />
           <KeywordAnalysisCard keyword={keyword} />
-        </div>
+        </ChartsRow>
 
         <WeeklyResponseCard data={weeklyResponse} />
-      </div>
-    </>
+      </ContentArea>
+    </Container>
   );
 };
 
 export default ChartPage;
+
+const Container = styled.div`
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+`;
+
+const HeaderWrapper = styled.div`
+  position: relative;
+  width: 1056px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-top: 40px;
+  margin-bottom: 32px;
+`;
+
+const ContentArea = styled.div`
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+`;
+
+const StatCardsContainer = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--gap-36);
+  padding-bottom: 46.6px;
+`;
+
+const ChartsRow = styled.div`
+  display: flex;
+  gap: var(--gap-20);
+  margin-top: 60px;
+`;
