@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
 import { useCompareStore } from '@/store/compareStore';
-import { type VersionDiffItem } from '@/components/admin/document/DocumentVersionDiffList';
+import { type VersionDiffItem } from '@/components/common/document/DocumentVersionDiffList';
 import DocumentSearch from './DocumentSearch';
 import VersionCompareSection from './DocumentVersionCompare';
 import VersionHistorySection from './DocumentVersionHistory';

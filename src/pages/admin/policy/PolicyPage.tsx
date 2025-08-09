@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import styled from "styled-components";
 import TitleContainer from "@/layout/TitleContainer";
-import CompareCard from "@/components/admin/document/DocumentCompareCard";
+import CompareCard from "@/components/common/document/DocumentCompareCard";
 import PolicyTable from "@/components/admin/policy/PolicyTable";
 import Pagination from "@/components/common/Pagination";
 import ConfirmModal from "@/components/common/ConfirmModal";

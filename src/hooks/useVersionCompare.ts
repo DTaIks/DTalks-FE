@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { type VersionDiffItem } from '@/components/admin/document/DocumentVersionDiffList';
+import { type VersionDiffItem } from '@/components/common/document/DocumentVersionDiffList';
 import { useDebouncedSearch } from '@/hooks/useDebouncedSearch';
 
 interface DocumentVersion {

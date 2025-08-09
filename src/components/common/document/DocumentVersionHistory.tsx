@@ -1,6 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-import VersionDiffList, { type VersionDiffItem } from '@/components/admin/document/DocumentVersionDiffList';
+import VersionDiffList, { type VersionDiffItem } from '@/components/common/document/DocumentVersionDiffList';
 
 interface VersionHistorySectionProps {
   diffData: VersionDiffItem[];
