@@ -2,15 +2,15 @@ import { useMutation, useQuery } from '@tanstack/react-query';
 import { useAuthStore } from '@/store/authStore';
 import { authAPI } from '@/api/authAPI';
 
-// 이메일 중복 확인
-// export const useCheckEmailDuplicate = (email: string) => {
-//   return useQuery({
-//     queryKey: ['email-duplicate', email],
-//     queryFn: () => authAPI.checkEmailDuplicate(email),
-//     enabled: !!email && email.includes('@'),
-//     staleTime: 1000 * 60 * 5, // 5분
-//   });
-// };
+//이메일 중복 확인
+export const useCheckEmailDuplicate = (email: string) => {
+  return useQuery({
+    queryKey: ['email-duplicate', email],
+    queryFn: () => authAPI.checkEmailDuplicate(email),
+    enabled: !!email && email.includes('@'),
+    staleTime: 1000 * 60 * 5, // 5분
+  });
+};
 
 // 인증번호 발송
 // export const useSendAuthCode = () => {

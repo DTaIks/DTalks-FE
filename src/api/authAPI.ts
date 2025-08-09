@@ -80,10 +80,10 @@ export const authAPI = {
   // },
 
   // 이메일 중복 확인
-  // checkEmailDuplicate: async (email: string): Promise<{ isDuplicate: boolean }> => {
-  //   const response = await apiInstance.get<{ isDuplicate: boolean }>(`/admin/auth/check-email?email=${encodeURIComponent(email)}`);
-  //   return response.data;
-  // },
+  checkEmailDuplicate: async (email: string): Promise<{ isDuplicate: boolean }> => {
+     const response = await apiInstance.get<{ isDuplicate: boolean }>(`/admin/auth/check-email?email=${encodeURIComponent(email)}`);
+     return response.data;
+  },
 
   // 인증번호 발송
   // sendAuthCode: async (email: string): Promise<{ message: string }> => {
