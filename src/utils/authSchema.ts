@@ -1,10 +1,29 @@
 import * as yup from 'yup';
 
+// 공통 필드 검증 규칙
+const emailValidation = yup
+  .string()
+  .required('이메일을 입력해 주세요.')
+  .email('올바른 이메일 형식이 아닙니다.');
+
+const passwordValidation = yup
+  .string()
+  .required('비밀번호를 입력해 주세요.')
+  .min(8, '비밀번호는 최소 8자 이상이어야 합니다.')
+  .matches(/[A-Z]/, '대문자 1개 이상이 필요합니다.')
+  .matches(/[a-z]/, '소문자 1개 이상이 필요합니다.')
+  .matches(/\d/, '숫자 1개 이상이 필요합니다.')
+  .matches(/[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]/, '특수문자 1개 이상이 필요합니다.');
+
+// 로그인 스키마
+export const loginSchema = yup.object({
+  email: emailValidation,
+  password: passwordValidation
+}).required();
+
+// 회원가입 스키마
 export const signUpSchema = yup.object({
-  email: yup
-    .string()
-    .required('이메일을 입력해 주세요.')
-    .email('올바른 이메일 형식이 아닙니다.'),
+  email: emailValidation,
   authCode: yup
     .string()
     .required('인증번호를 입력해 주세요.')
@@ -27,4 +46,6 @@ export const signUpSchema = yup.object({
     .oneOf([yup.ref('password')], '비밀번호가 일치하지 않습니다.')
 }).required();
 
+// 타입 정의
+export type LoginFormData = yup.InferType<typeof loginSchema>;
 export type SignUpFormData = yup.InferType<typeof signUpSchema>;

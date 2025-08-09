@@ -1,8 +1,10 @@
-import React, { useEffect } from "react";
+import React from "react";
 import styled from "styled-components";
 import { useNavigate } from "react-router-dom";
 import ProfileImageSrc from "@/assets/common/Profile.png";
 import { useAuthStore } from "@/store/authStore";
+import { useLogout } from "@/hooks/useAuth";
+import { useBodyScrollLock } from "@/hooks/useScrollControl";
 
 interface LogoutModalProps {
   isOpen: boolean;
@@ -12,33 +14,22 @@ interface LogoutModalProps {
 
 const LogoutModal: React.FC<LogoutModalProps> = ({ isOpen, onClose }) => {
   const navigate = useNavigate();
-  const { logout } = useAuthStore();
+  const { logout: resetLocal } = useAuthStore();
+  const logoutMutation = useLogout();
 
-  const handleScrollPrevention = () => {
-    document.body.style.overflow = 'hidden';
-  };
+  // 모달 열릴 때 스크롤 락
+  useBodyScrollLock(isOpen);
 
-  const handleScrollRestoration = () => {
-    document.body.style.overflow = 'unset';
-  };
-
-  const handleLogout = () => {
-    logout();
-    onClose();
-    navigate('/login');
-  };
-
-  useEffect(() => {
-    if (isOpen) {
-      handleScrollPrevention();
-    } else {
-      handleScrollRestoration();
+  const handleLogout = async () => {
+    try {
+      await logoutMutation.mutateAsync();
+    } catch {
+      resetLocal();
+    } finally {
+      onClose();
+      navigate('/login');
     }
-
-    return () => {
-      handleScrollRestoration();
-    };
-  }, [isOpen]);
+  };
 
   if (!isOpen) return null;
 
@@ -54,8 +45,8 @@ const LogoutModal: React.FC<LogoutModalProps> = ({ isOpen, onClose }) => {
         <UserName>admin</UserName>
         <UserEmail>admin@email.com</UserEmail>
         
-        <LogoutButton onClick={handleLogout}>
-          로그아웃
+        <LogoutButton onClick={handleLogout} disabled={logoutMutation.isPending}>
+          {logoutMutation.isPending ? '로그아웃 중...' : '로그아웃'}
         </LogoutButton>
       </ModalContent>
     </ModalOverlay>
@@ -64,7 +55,6 @@ const LogoutModal: React.FC<LogoutModalProps> = ({ isOpen, onClose }) => {
 
 export default LogoutModal;
 
-// Styled Components
 const ModalOverlay = styled.div`
   position: fixed;
   top: 0;
@@ -75,7 +65,7 @@ const ModalOverlay = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 1002;
+  z-index: 1050;
 `;
 
 const ModalContent = styled.div`

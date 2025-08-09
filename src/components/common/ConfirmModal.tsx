@@ -101,7 +101,7 @@ const ModalOverlay = styled.div`
   justify-content: center;
   align-items: center;
   backdrop-filter: blur(3.75px);
-  z-index: 1000;
+  z-index: 1050;
 `;
 
 const ModalContainer = styled.div`

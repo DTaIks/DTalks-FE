@@ -1,8 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
-import { signUpSchema } from '@/utils/signUpSchema';
-import type { SignUpFormData } from '@/utils/signUpSchema';
+import { signUpSchema, type SignUpFormData } from '@/utils/authSchema';
 
 // 추후에 백엔드 측에서 설정한 시간으로 변경
 const AUTH_TIMEOUT = 300;

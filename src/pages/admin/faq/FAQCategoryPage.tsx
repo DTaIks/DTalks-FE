@@ -5,7 +5,9 @@ import FAQCategoryTable from "@/components/admin/faq/category/FAQCategoryTable";
 const FAQCategoryPage = () => {
   return (
     <Container>
-      <TitleContainer title="FAQ 카테고리 관리" subtitle="FAQ 카테고리를 관리하고 편집하세요" />
+      <HeaderWrapper>
+        <TitleContainer title="FAQ 카테고리 관리" subtitle="FAQ 카테고리를 관리하고 편집하세요" />
+      </HeaderWrapper>
       <FAQCategoryTable />
     </Container>
   );
@@ -19,4 +21,14 @@ const Container = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
+`;
+
+const HeaderWrapper = styled.div`
+  position: relative;
+  width: 1056px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-top: 40px;
+  margin-bottom: 32px;
 `; 

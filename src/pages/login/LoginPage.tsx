@@ -1,73 +1,34 @@
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
-import * as yup from 'yup';
 import LoginForm from "@/components/login/LoginForm";
 import Logo from "@/assets/common/Logo.png";
 import { useAuthStore } from '@/store/authStore';
+import { useLogin } from '@/hooks/useAuth';
+import { loginSchema, type LoginFormData } from '@/utils/authSchema';
 import styled from "styled-components";
-
-// 유효성 검사 스키마
-const loginSchema = yup.object({
-  email: yup
-    .string()
-    .required('이메일을 입력해 주세요.')
-    .email('올바른 이메일 형식이 아닙니다.'),
-  password: yup
-    .string()
-    .required('비밀번호를 입력해 주세요.')
-    .min(8, '비밀번호는 최소 8자 이상이어야 합니다.')
-    .matches(/[A-Z]/, '대문자 1개 이상이 필요합니다.')
-    .matches(/[a-z]/, '소문자 1개 이상이 필요합니다.')
-    .matches(/\d/, '숫자 1개 이상이 필요합니다.')
-    .matches(/[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]/, '특수문자 1개 이상이 필요합니다.')
-}).required();
-
-type LoginFormData = yup.InferType<typeof loginSchema>;
-
-// 더미 사용자 데이터
-const mockUsers = [
-  {
-    id: '1',
-    email: 'test@example.com',
-    password: 'Test123!',
-    name: '테스트 사용자',
-    employeeNumber: 'EMP001'
-  },
-  {
-    id: '2', 
-    email: 'admin@dtalks.com',
-    password: 'Admin123!',
-    name: '관리자',
-    employeeNumber: 'EMP002'
-  },
-  {
-    id: '3',
-    email: 'user@dtalks.com', 
-    password: 'User123!',
-    name: '일반 사용자',
-    employeeNumber: 'EMP003'
-  }
-];
 
 export default function LoginPage(): JSX.Element {
   const navigate = useNavigate();
-  const [isLoading, setIsLoading] = useState(false);
   
   // React Hook Form 설정
   const {
     handleSubmit,
     formState: { errors },
     setValue,
-    watch
+    watch,
+    setError: setFormError
   } = useForm<LoginFormData>({
     resolver: yupResolver(loginSchema),
     mode: 'onChange' // 실시간 유효성 검사
   });
 
   // Zustand store에서 상태 가져오기
-  const { isAuthenticated, error, setUser, setAuthenticated, setLoading, setError } = useAuthStore();
+  const { isAuthenticated, error, setError } = useAuthStore();
+
+  // 로그인 뮤테이션 훅 사용
+  const loginMutation = useLogin();
 
   // 이미 로그인된 경우 어드민 페이지로 리다이렉트
   useEffect(() => {
@@ -79,37 +40,21 @@ export default function LoginPage(): JSX.Element {
   // 로그인 함수
   const handleLogin = async (data: LoginFormData): Promise<void> => {
     try {
-      setIsLoading(true);
       setError(null);
+      setFormError('email', { message: '' });
+      setFormError('password', { message: '' });
       
-      // 1초 지연 시뮬레이션
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      // 더미 데이터에서 사용자 찾기
-      const user = mockUsers.find(u => 
-        u.email === data.email && u.password === data.password
-      );
-      
-      if (!user) {
-        throw new Error('이메일 또는 비밀번호가 올바르지 않습니다.');
-      }
-      
-      // 로그인 성공
-      setUser({
-        id: user.id,
-        email: user.email,
-        name: user.name,
-        employeeNumber: user.employeeNumber
+      // 로그인 뮤테이션 실행
+      await loginMutation.mutateAsync({
+        email: data.email,
+        password: data.password
       });
-      setAuthenticated(true);
-      setLoading(false);
-      setError(null);
-      setIsLoading(false); // 성공 시에도 false로
-    } catch (error) {
-      setLoading(false);
-      setIsLoading(false); // 실패 시에도 false로
-      setError(error instanceof Error ? error.message : '로그인에 실패했습니다.');
+      
+      // 성공 시 어드민 페이지로 이동
+      navigate('/admin');
+    } catch (error: unknown) {
       console.error('로그인 실패:', error);
+      // 에러는 useLogin 훅에서 이미 처리됨
     }
   };
 
@@ -137,7 +82,7 @@ export default function LoginPage(): JSX.Element {
             setError(null);
           }}
           onLogin={handleSubmit(handleLogin)}
-          isLoading={isLoading}
+          isLoading={loginMutation.isPending}
           error={error || errors.email?.message || errors.password?.message}
         />
         <SignUpContainer>

@@ -2,9 +2,13 @@ import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
 import Logo from '@/assets/common/Logo.png';
 import SignUpForm from '@/components/signup/SignUpForm';
+import { useScrollControl } from '@/hooks/useScrollControl';
 
 export default function SignUpPage(): JSX.Element {
   const navigate = useNavigate();
+
+  // 세로 스크롤만 허용
+  useScrollControl(true, { allowVerticalScroll: true });
 
   return (
     <PageWrapper>
@@ -12,7 +16,7 @@ export default function SignUpPage(): JSX.Element {
       <SignUpForm />
       <BottomText>
         이미 계정이 있으신가요?{' '}
-        <BottomLink href="/login">로그인하기</BottomLink>
+        <BottomLink onClick={() => navigate('/login')}>로그인하기</BottomLink>
       </BottomText>
     </PageWrapper>
   );
@@ -27,8 +31,9 @@ const PageWrapper = styled.div`
   justify-content: center;
   padding: 20px 20px;
   font-family: 'Pretendard';
-  margin-left: 12px;
+  margin-left: 14px;
   margin-top: 78px;
+  overflow-x: hidden;
 `;
 
 const LogoImage = styled.img`
@@ -53,10 +58,15 @@ const BottomText = styled.p`
   margin-top: 20.25px;
 `;
 
-const BottomLink = styled.a`
+const BottomLink = styled.span`
   color: #96C;
   font-size: 16.5px;
   font-weight: 600;
   line-height: 18px;
   cursor: pointer;
+  text-decoration: underline;
+  
+  &:hover {
+    opacity: 0.8;
+  }
 `; 

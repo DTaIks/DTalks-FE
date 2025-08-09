@@ -62,24 +62,23 @@ const MediaPage: React.FC = () => {
   return (
     <PageContainer>
       <Main>
-        <PageHeaderContainer>
+        <HeaderWrapper>
           <TitleContainer 
             title="미디어 파일 관리" 
             subtitle="파일을 체계적으로 관리하고 버전을 추적하세요"
           />
-        </PageHeaderContainer>
-        
-        {!archive.isMode && (
-          <ButtonContainer>
-            <StyledUploadButton 
-              text="파일 업로드"
-              onClick={modals.uploadModal.open}
-              variant="primary"
-              width="var(--button-width)"
-              height="var(--button-height)"
-            />
-          </ButtonContainer>
-        )}
+          {!archive.isMode && (
+            <ButtonContainer>
+              <StyledUploadButton 
+                text="파일 업로드"
+                onClick={modals.uploadModal.open}
+                variant="primary"
+                width="var(--button-width)"
+                height="var(--button-height)"
+              />
+            </ButtonContainer>
+          )}
+        </HeaderWrapper>
         
         <ContentContainer>
           <LeftContainer>
@@ -195,7 +194,7 @@ export default MediaPage;
 
 const PageContainer = styled.div`
   width: 1062px;
-  height: 586px;
+  min-height: 586px;
   background: var(--color-ghostwhite);
   display: flex;
   flex-direction: column;
@@ -209,18 +208,19 @@ const Main = styled.div`
   overflow-x: hidden; 
 `;
 
-const PageHeaderContainer = styled.div`
+const HeaderWrapper = styled.div`
+  position: relative;
+  width: 1056px;
   display: flex;
+  align-items: flex-start;
   justify-content: space-between;
-  align-items: flex-end;
-  width: 100%;
-  box-sizing: border-box;
+  margin: 40px auto 32px auto;
 `;
 
 const ContentContainer = styled.div`
   display: flex;
   width: 100%;
-  height: 760px;
+  height: 586px;
   position: relative;
   overflow: hidden;
   box-sizing: border-box;
@@ -291,19 +291,18 @@ const ArchiveModal = styled.div`
 
 const ArchiveHeader = styled.div`
   display: flex;
-  height: 40.5px;
+  height: 73.5px;
   justify-content: space-between;
   align-items: center;
-  padding: 16px 20px;
   border-bottom: 1px solid #e0e0e0;
   flex-shrink: 0;
 `;
 
 const ArchiveTitle = styled.h2`
   color: var(--color-lightblack);
-  font-size: var(--font-size-18);
+  font-size: var(--font-size-16);
   padding-top: 4px;
-  padding-left: 12px;
+  padding-left: 24px;
   font-weight: var(--font-weight-600);
   margin: 0;
 `;
@@ -340,8 +339,8 @@ const ArchiveSubtitle = styled.h3`
 `;
 
 const ArchiveText = styled.span`
-  font-size: var(--font-size-14);
-  font-weight: var(--font-weight-500);
+  font-size: var(--font-size-16);
+  font-weight: var(--font-weight-600);
 `;
 
 const RightContainer = styled.div`
@@ -433,9 +432,9 @@ const Title = styled.h2`
 `;
 
 const ButtonContainer = styled.div`
-  position: absolute;
-  top: var(--gap-60);
-  margin-left: 888px;
+  display: flex;
+  align-items: center;
+  height: 64px;
 `;
 
 const StyledUploadButton = styled(Button)`
