@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import styled from "styled-components";
 import TitleContainer from "@/layout/TitleContainer";
-import CompareCard from "@/components/common/CompareCard";
+import CompareCard from "@/components/common/document/DocumentCompareCard";
 import GlossaryTable from "@/components/admin/glossary/GlossaryTable";
 import Pagination from "@/components/common/Pagination";
 import ConfirmModal from "@/components/common/ConfirmModal";
@@ -11,12 +11,29 @@ import { VersionHistoryModal } from "@/components/common/FileVersionManagementMo
 import { useDocumentStore } from "@/store/documentStore";
 import { useFileUpload } from "@/hooks/useFileUpload";
 import { useCommonHandlers } from "@/hooks/useCommonHandlers";
+import { useVersionCompare } from "@/hooks/useVersionCompare";
 
 // 용어사전 관리 페이지
 const GlossaryPage = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [versionModal, setVersionModal] = useState({ isOpen: false, fileName: '' });
   const { filteredData, setSelectedCategory, setSelectedStatus } = useDocumentStore();
+  
+  const { 
+    diffData, 
+    documentSuggestions,
+    versionOptions, 
+    isLoading, 
+    isLoadingDocuments,
+    isLoadingVersions, 
+    error, 
+    searchValue, 
+    selectedDocument,
+    setSearchValue, 
+    selectDocument,
+    compareVersions, 
+    clearError 
+  } = useVersionCompare({ documentType: 'glossary' });
   
   // 공통 핸들러 사용
   const { handleArchiveByFileName, handleVersionHistoryClick } = useCommonHandlers({
@@ -37,6 +54,31 @@ const GlossaryPage = () => {
     setSelectedCategory("용어 사전");
     setSelectedStatus("전체 상태");
   }, [setSelectedCategory, setSelectedStatus]);
+
+  // 검색값 변경 핸들러
+  const handleSearchChange = (value: string) => {
+    setSearchValue(value);
+    // 에러가 있다면 새로운 검색 시 클리어
+    if (error) {
+      clearError();
+    }
+  };
+
+  // 문서 선택 핸들러
+  const handleDocumentSelect = (documentName: string) => {
+    selectDocument(documentName);
+    if (error) {
+      clearError();
+    }
+  };
+
+  // 히스토리 뷰 처리
+  const handleHistoryView = () => {
+    if (error) {
+      clearError();
+    }
+  };
+
   const itemsPerPage = 4;
   
   // 파일 업로드 hook 사용
@@ -88,20 +130,20 @@ const GlossaryPage = () => {
           onClick={handleFileUploadClick}
         />
       </ButtonContainer>
+      
       <CompareCard 
-        showVersionCompare={true}
-        versionOptions={[
-          { value: "v1.0.0", label: "v1.0.0" },
-          { value: "v1.1.0", label: "v1.1.0" },
-          { value: "v2.0.0", label: "v2.0.0" },
-          { value: "v2.1.0", label: "v2.1.0" }
-        ]}
-        onSearch={() => {
-          // 검색 처리
-        }}
-        onVersionCompare={() => {
-          // 버전 비교 처리
-        }}
+        documentSuggestions={documentSuggestions}
+        versionOptions={versionOptions}
+        onSearchChange={handleSearchChange}
+        onDocumentSelect={handleDocumentSelect}
+        onVersionCompare={compareVersions}
+        onHistoryView={handleHistoryView}
+        diffData={diffData}
+        isLoading={isLoading}
+        isLoadingDocuments={isLoadingDocuments}
+        isLoadingVersions={isLoadingVersions}
+        searchValue={searchValue}
+        selectedDocument={selectedDocument}
       />
       <GlossaryTable 
         currentPage={currentPage} 
