@@ -52,12 +52,18 @@ export const useCommonHandlers = ({ modals, mediaActions, documentActions }: Use
       return;
     }
 
+    // 파일명에서 버전 추출 시도 (예: filename_v1.0.0.pdf)
+    const versionMatch = file.fileName.match(/v(\d+\.\d+\.\d+)/);
+    const extractedVersion = versionMatch ? versionMatch[1] : '1.0.0';
+
     const initialData = {
       fileName: file.fileName,
-      description: file.description || '',
-      fileVersion: file.fileVersion || '1.0.0',
-      isPublic: file.isPublic || false
+      description: file.description || `${file.fileName} 파일입니다.`,
+      fileVersion: file.fileVersion || extractedVersion,
+      isPublic: file.isPublic ?? true // 기본값을 true로 설정
     };
+    
+    console.log('수정 모달 초기 데이터:', initialData);
     modals.uploadModal.openEdit(initialData);
   }, [modals.uploadModal, mediaActions]);
 

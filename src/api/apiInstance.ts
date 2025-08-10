@@ -19,6 +19,8 @@ const createAxiosInstance = (): AxiosInstance => {
   // 요청 인터셉터
   instance.interceptors.request.use(
     (config) => {
+      // 쿠키 기반 인증이므로 별도 헤더 설정 불필요
+      // withCredentials: true로 쿠키가 자동으로 포함됨
       return config;
     },
     (error) => Promise.reject(error)

@@ -37,7 +37,8 @@ const MediaFileUploadModal: React.FC<MediaUploadModalProps> = ({
   onClose,
   onSubmit,
   initialData,
-  isEditMode = false
+  isEditMode = false,
+  isSubmitting = false
 }) => {
   const [formData, setFormData] = useState<MediaUploadData>({
     uploadFile: undefined,
@@ -161,6 +162,7 @@ const MediaFileUploadModal: React.FC<MediaUploadModalProps> = ({
       title="파일 업로드"
       onSubmit={handleSubmit}
       submitDisabled={!isFormValid()}
+      isSubmitting={isSubmitting}
     >
       <FileSelectInput
         fileDisplayName={fileDisplayName}

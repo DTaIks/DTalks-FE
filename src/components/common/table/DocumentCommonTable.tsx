@@ -31,6 +31,7 @@ interface DocumentTableProps {
       open: (type: 'archive' | 'download', fileName: string) => void;
     };
   };
+  error?: Error | null;
 }
 
 const DocumentTable: React.FC<DocumentTableProps> = ({
@@ -43,7 +44,8 @@ const DocumentTable: React.FC<DocumentTableProps> = ({
   onStatusChange,
   onCategoryChange,
   onArchive,
-  modals
+  modals,
+  error = null
 }) => {
   const documentActions = { onArchive };
   const handlers = useCommonHandlers({ modals, documentActions });
@@ -116,7 +118,10 @@ const DocumentTable: React.FC<DocumentTableProps> = ({
           </TableBody>
         </Table>
       ) : (
-        <EmptyState />
+        <EmptyState 
+          message={error ? "문서 목록을 불러오는데 실패했습니다." : "표시할 문서가 없습니다"}
+          subMessage={error ? "잠시 후 다시 시도해주세요." : "업로드된 문서가 없거나 필터 조건에 맞는 문서가 없습니다."}
+        />
       )}
     </TableContainer>
   );

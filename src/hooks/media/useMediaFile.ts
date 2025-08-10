@@ -3,8 +3,9 @@ export interface MediaFile {
   fileName: string;
   fileSize: string;
   updatedAt: string;
-  fileType: 'document' | 'audio' | 'image';
+  fileType?: 'document' | 'audio' | 'image';
   departmentName?: string;
+  department?: string;
   description?: string;
   fileVersion?: string;
   isPublic?: boolean;
@@ -25,95 +26,34 @@ export interface VersionData {
   updatedAt: string;
 }
 
-// 테스트용 더미 데이터
-export const useFiles = (): MediaFile[] => {
-  const files: MediaFile[] = [
-    {
-      fileId: 1,
-      fileName: '제품소개서.pdf',
-      fileSize: '15.2MB',
-      updatedAt: '2025-07-07 12:30',
-      fileType: 'document',
-      departmentName: '마케팅팀',
-      description: '제품 소개 및 특징을 담은 문서',
-      fileVersion: '1.0.0',
-      isPublic: true
-    },
-    {
-      fileId: 2,
-      fileName: '벤치마킹 보고서.docx',
-      fileSize: '7.8MB',
-      updatedAt: '2025-07-03 12:30',
-      fileType: 'document',
-      departmentName: '개발팀'
-    },
-    {
-      fileId: 3,
-      fileName: '로고 이미지.png',
-      fileSize: '2.3MB',
-      updatedAt: '2025-07-01 12:30',
-      fileType: 'image',
-      departmentName: '디자인팀'
-    },
-    {
-      fileId: 4,
-      fileName: '벤치마킹 보고서.docx',
-      fileSize: '12.5MB',
-      updatedAt: '2025-06-28 12:30',
-      fileType: 'document',
-      departmentName: '개발팀'
-    },
-    {
-      fileId: 5,
-      fileName: '회의록.mp3',
-      fileSize: '4.2MB',
-      updatedAt: '2025-06-25 12:30',
-      fileType: 'audio',
-      departmentName: '마케팅팀'
-    },
-    {
-      fileId: 6,
-      fileName: '결산 보고서.docx',
-      fileSize: '12.5MB',
-      updatedAt: '2025-06-28 12:30',
-      fileType: 'document',
-      departmentName: '마케팅팀'
-    },
-    {
-      fileId: 7,
-      fileName: 'UI 디자인.pdf',
-      fileSize: '25.8MB',
-      updatedAt: '2025-05-15 12:30',
-      fileType: 'image',
-      departmentName: '디자인팀'
-    },
-    {
-      fileId: 8,
-      fileName: '프로젝트 회고.pdf',
-      fileSize: '8.9MB',
-      updatedAt: '2025-04-20 12:30',
-      fileType: 'document',
-      departmentName: '개발팀'
-    },
-    {
-      fileId: 9,
-      fileName: '인터뷰 녹음.mp3',
-      fileSize: '18.7MB',
-      updatedAt: '2025-03-28 12:30',
-      fileType: 'audio',
-      departmentName: '마케팅팀'
-    },
-    {
-      fileId: 10,
-      fileName: '브랜드 가이드.pdf',
-      fileSize: '6.4MB',
-      updatedAt: '2025-02-10 12:30',
-      fileType: 'document',
-      departmentName: '디자인팀'
-    },
-  ];
+// API 데이터를 MediaFile 형태로 변환하는 유틸리티 함수
+export const transformCommonFileToMediaFile = (commonFile: any): MediaFile => {
+  return {
+    fileId: commonFile.fileId,
+    fileName: commonFile.fileName,
+    fileSize: commonFile.fileSize,
+    updatedAt: commonFile.updatedAt,
+    departmentName: commonFile.department,
+    department: commonFile.department,
+    // 파일 확장자에 따른 타입 추정
+    fileType: getFileTypeFromName(commonFile.fileName),
+  };
+};
 
-  return files;
+// 파일명에서 파일 타입을 추정하는 함수
+const getFileTypeFromName = (fileName: string): 'document' | 'audio' | 'image' => {
+  const extension = fileName.split('.').pop()?.toLowerCase();
+  
+  const imageExtensions = ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'svg', 'webp'];
+  const audioExtensions = ['mp3', 'wav', 'flac', 'aac', 'ogg', 'm4a'];
+  
+  if (imageExtensions.includes(extension || '')) {
+    return 'image';
+  } else if (audioExtensions.includes(extension || '')) {
+    return 'audio';
+  } else {
+    return 'document';
+  }
 };
 
 export const useDepartmentStats = (): Department[] => {

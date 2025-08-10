@@ -17,41 +17,6 @@ export interface FAQCategory {
   isActive: boolean;
 }
 
-export interface ConfirmModalState {
-  isOpen: boolean;
-  type: 'archive' | 'download' | 'restore' | null;
-  categoryId: string | null;
-  categoryName: string;
-}
-
-export interface FAQTableProps {
-  faqItems?: FAQItem[];
-  isLoading?: boolean;
-  error?: unknown;
-  isSearchMode?: boolean; // 검색 모드 여부
-  searchTerm?: string;
-  selectedCategory?: string;
-  onSearch?: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  onCategoryChange?: (categoryValue: string) => void;
-}
-
-export interface FAQConfirmModalState {
-  isOpen: boolean;
-  type: 'archive' | null;
-  faqId: number | null;
-  faqName: string;
-}
-
-export interface EditModalState {
-  isOpen: boolean;
-  faqData: {
-    question: string;
-    answer: string;
-    category: string;
-  } | undefined;
-  faqId: number | null;
-}
-
 // API 관련 타입들 - 서버 응답과 정확히 일치
 export interface FAQApiItem {
   faqId: number;
@@ -120,4 +85,16 @@ export interface FAQFilterRequest {
   categoryName: string; // 카테고리명
   pageNumber: number; // 0부터 시작
   size?: number; // 페이지 크기 (기본값: 4)
+}
+
+// 컴포넌트 Props 타입
+export interface FAQTableProps {
+  faqItems?: FAQItem[];
+  isLoading?: boolean;
+  error?: unknown;
+  isSearchMode?: boolean; // 검색 모드 여부
+  searchTerm?: string;
+  selectedCategory?: string;
+  onSearch?: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  onCategoryChange?: (categoryValue: string) => void;
 } 

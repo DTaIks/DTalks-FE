@@ -24,6 +24,7 @@ interface CommonTableProps {
   onCategoryChange?: (value: string) => void;
   onArchive: (id: number) => void;
   categoryImage: string;
+  isLoading?: boolean;
   modals: {
     confirmModal: {
       open: (type: 'archive' | 'download', fileName: string) => void;
@@ -43,6 +44,7 @@ const CommonTable: React.FC<CommonTableProps> = ({
   onCategoryChange,
   onArchive,
   categoryImage,
+  isLoading = false,
   modals
 }) => {
   const documentActions = { onArchive };
@@ -77,7 +79,11 @@ const CommonTable: React.FC<CommonTableProps> = ({
         onStatusChange={onStatusChange}
         onCategoryChange={onCategoryChange}
       />
-      {items.length > 0 ? (
+      {isLoading ? (
+        <LoadingContainer>
+          <LoadingText>로딩 중...</LoadingText>
+        </LoadingContainer>
+      ) : items.length > 0 ? (
         <Table>
           <TableHead headers={headers} />
           <TableBody>
@@ -162,4 +168,17 @@ const StatusIcon = styled.img`
   width: ${props => props.alt === "비활성" ? "69px" : "56px"};
   height: 32px;
   object-fit: contain;
+`;
+
+const LoadingContainer = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 200px;
+`;
+
+const LoadingText = styled.div`
+  color: #666;
+  font-size: 16px;
+  font-weight: 500;
 `;

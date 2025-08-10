@@ -53,8 +53,8 @@ const MediaFileContent: React.FC<MediaFileContentProps> = ({
           <FileName>{file.fileName}</FileName>
           <FileMetadata>
             {file.fileSize} · {formatDate(file.updatedAt)}
-            {file.departmentName && (
-              <Department> · {file.departmentName}</Department>
+            {(file.departmentName || file.department) && (
+              <Department> · {file.departmentName || file.department}</Department>
             )}
           </FileMetadata>
         </FileDetails>

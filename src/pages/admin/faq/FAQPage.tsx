@@ -1,122 +1,134 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useCallback } from "react";
 import styled from "styled-components";
 import TitleContainer from "@/layout/TitleContainer";
 import FAQTable from "@/components/admin/faq/table/FAQTable";
 import Button from "@/components/common/Button";
 import Pagination from "@/components/common/Pagination";
 import FAQUploadModal, { type FAQUploadData } from "@/components/admin/faq/FAQUploadModal";
-import { useFAQList, useFAQSearch, useFAQFilter } from "@/hooks/faq/useFAQQueries";
-import { useCreateFAQ } from "@/hooks/faq/useFAQMutations";
+import { useFAQList, useFAQSearch, useFAQFilter } from "@/query/useFAQQueries";
+import { useCreateFAQ } from "@/query/useFAQMutations";
 import { useFAQStore } from "@/store/faqStore";
 import { getCategoryNameFromFilter } from "@/utils/faqUtils";
 
-// FAQ 관리 페이지
 const FAQPage = () => {
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+  const [modalError, setModalError] = useState<string>("");
 
-  // 검색 상태 및 카테고리 상태 확인
   const { searchTerm, setSearchTerm, selectedCategory, setSelectedCategory } = useFAQStore();
-  
-  // FAQ 추가 뮤테이션
   const createFAQMutation = useCreateFAQ();
   
-  // 데이터 조회 모드 결정
-  const isSearchMode = searchTerm.trim().length > 0;
-  const isFilterMode = selectedCategory.trim().length > 0;
-  
-  // 일반 목록 조회
+  const dataMode = useMemo(() => {
+    const hasSearchTerm = searchTerm.trim().length > 0;
+    const hasSelectedCategory = selectedCategory.trim().length > 0;
+    
+    if (hasSelectedCategory && !hasSearchTerm) return 'filter';
+    if (hasSearchTerm && !hasSelectedCategory) return 'search';
+    return 'list';
+  }, [searchTerm, selectedCategory]);
+
   const { data: faqListResponse, isLoading: isListLoading, error: listError } = useFAQList(currentPage);
   
-  // 검색 조회
   const { data: faqSearchResponse, isLoading: isSearchLoading, error: searchError, isDebouncing } = useFAQSearch(
     searchTerm,
     currentPage,
-    isSearchMode && !isFilterMode
+    dataMode === 'search'
   );
   
-  // 카테고리 필터링 조회 (필터 값을 실제 카테고리명으로 변환)
   const { data: faqFilterResponse, isLoading: isFilterLoading, error: filterError } = useFAQFilter(
     getCategoryNameFromFilter(selectedCategory),
     currentPage,
-    isFilterMode && !isSearchMode
+    dataMode === 'filter'
   );
   
-  // 현재 모드에 따른 데이터 선택 (useMemo로 최적화)
-  const currentResponse = useMemo(() => {
-    if (isFilterMode && !isSearchMode) return faqFilterResponse;
-    if (isSearchMode && !isFilterMode) return faqSearchResponse;
-    return faqListResponse;
-  }, [isFilterMode, isSearchMode, faqFilterResponse, faqSearchResponse, faqListResponse]);
+  const { currentResponse, currentLoading, currentError } = useMemo(() => {
+    switch (dataMode) {
+      case 'filter':
+        return {
+          currentResponse: faqFilterResponse,
+          currentLoading: isFilterLoading,
+          currentError: filterError
+        };
+      case 'search':
+        return {
+          currentResponse: faqSearchResponse,
+          currentLoading: isSearchLoading || isDebouncing,
+          currentError: searchError
+        };
+      default:
+        return {
+          currentResponse: faqListResponse,
+          currentLoading: isListLoading,
+          currentError: listError
+        };
+    }
+  }, [dataMode, faqFilterResponse, isFilterLoading, filterError, faqSearchResponse, isSearchLoading, isDebouncing, searchError, faqListResponse, isListLoading, listError]);
   
-  const currentLoading = useMemo(() => {
-    if (isFilterMode && !isSearchMode) return isFilterLoading;
-    if (isSearchMode && !isFilterMode) return isSearchLoading || isDebouncing;
-    return isListLoading;
-  }, [isFilterMode, isSearchMode, isFilterLoading, isSearchLoading, isDebouncing, isListLoading]);
-  
-  const currentError = useMemo(() => {
-    if (isFilterMode && !isSearchMode) return filterError;
-    if (isSearchMode && !isFilterMode) return searchError;
-    return listError;
-  }, [isFilterMode, isSearchMode, filterError, searchError, listError]);
-  
-  // API 응답에서 필요한 데이터 추출 (useMemo로 최적화)
   const { faqItems, totalPages } = useMemo(() => {
     const items = currentResponse?.content || [];
     const pages = currentResponse?.totalPages || 0;
     return { faqItems: items, totalPages: pages };
   }, [currentResponse]);
 
-  // 페이지 유효성 검사 (데이터가 로드된 후에만)
   useEffect(() => {
     if (totalPages > 0 && currentPage > totalPages) {
       setCurrentPage(1);
     }
   }, [totalPages, currentPage]);
 
-  const handlePageChange = (page: number): void => {
+  const handlePageChange = useCallback((page: number): void => {
     setCurrentPage(page);
-  };
+  }, []);
 
-  // 검색어나 카테고리가 변경될 때 페이지를 1로 리셋
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [searchTerm, selectedCategory]);
-
-  const handleModalOpen = (): void => {
+  const handleModalOpen = useCallback((): void => {
     setIsModalOpen(true);
-  };
+    setModalError(""); // 모달 열 때 에러 메시지 초기화
+  }, []);
 
-  const handleModalClose = (): void => {
+  const handleModalClose = useCallback((): void => {
     setIsModalOpen(false);
-  };
+    setModalError(""); // 모달 닫을 때 에러 메시지 초기화
+  }, []);
 
-  const handleFAQSubmit = async (data: FAQUploadData): Promise<void> => {
+  const handleFAQSubmit = useCallback(async (data: FAQUploadData): Promise<void> => {
     try {
+      setModalError(""); // 제출 시 에러 메시지 초기화
       await createFAQMutation.mutateAsync(data);
       handleModalClose();
     } catch (error) {
       console.error('FAQ 생성 실패:', error);
-      // 에러가 발생해도 모달은 열린 상태로 유지하여 사용자가 재시도할 수 있도록 함
+      
+      // 에러 메시지 처리
+      const errorMessage = error instanceof Error ? error.message : 'FAQ 추가에 실패했습니다.';
+      
+      // 중복 에러인지 확인
+      if (errorMessage.includes('중복') || errorMessage.includes('이미 존재')) {
+        setModalError('동일한 질문이 이미 존재합니다. 다른 질문을 입력해주세요.');
+      } else if (errorMessage.includes('카테고리')) {
+        setModalError('카테고리 정보가 올바르지 않습니다. 다시 선택해주세요.');
+      } else {
+        setModalError(errorMessage);
+      }
     }
-  };
+  }, [createFAQMutation, handleModalClose]);
 
-  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleSearch = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(e.target.value);
-    // 검색 시 카테고리 필터 초기화
     if (selectedCategory) {
       setSelectedCategory("");
     }
-  };
+  }, [selectedCategory, setSearchTerm, setSelectedCategory]);
 
-  const handleCategoryChange = (categoryValue: string) => {
+  const handleCategoryChange = useCallback((categoryValue: string) => {
     setSelectedCategory(categoryValue);
-    // 카테고리 선택 시 검색어 초기화
     if (searchTerm) {
       setSearchTerm("");
     }
-  };
+  }, [searchTerm, setSelectedCategory, setSearchTerm]);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm, selectedCategory]);
 
   return (
     <Container>
@@ -135,7 +147,7 @@ const FAQPage = () => {
         faqItems={faqItems}
         isLoading={currentLoading}
         error={currentError}
-        isSearchMode={isSearchMode || isFilterMode}
+        isSearchMode={dataMode !== 'list'}
         searchTerm={searchTerm}
         selectedCategory={selectedCategory}
         onSearch={handleSearch}
@@ -157,6 +169,7 @@ const FAQPage = () => {
         onClose={handleModalClose}
         onSubmit={handleFAQSubmit}
         isSubmitting={createFAQMutation.isPending}
+        errorMessage={modalError}
       />
     </Container>
   );
@@ -206,4 +219,3 @@ const PaginationContainer = styled.div`
   margin-top: 4px;
   margin-bottom: 24px;
 `;
-

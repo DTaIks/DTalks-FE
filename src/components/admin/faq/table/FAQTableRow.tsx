@@ -3,7 +3,7 @@ import styled from "styled-components";
 import ActiveIcon from "@/assets/common/Active.svg";
 import InactiveIcon from "@/assets/common/InActive.svg";
 import { type FAQItem } from "@/types/faq";
-import { useFAQDetail } from "@/hooks/faq/useFAQQueries";
+import { useFAQDetail } from "@/query/useFAQQueries";
 
 interface FAQTableRowProps {
   faq: FAQItem;
@@ -20,49 +20,42 @@ const FAQTableRow: React.FC<FAQTableRowProps> = ({
   onEdit,
   onArchiveClick
 }) => {
-  // 아코디언이 펼쳐졌을 때만 상세 정보 조회
-  const { data: faqDetail, error: detailError } = useFAQDetail(
-    faq.faqId,
-    isExpanded
-  );
+  const { data: faqDetail, error: detailError } = useFAQDetail(faq.faqId, isExpanded);
+
+  const handleEditClick = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    // 비활성화된 FAQ는 수정할 수 없음
+    if (!faq.isActive) {
+      return;
+    }
+    await onEdit(faq);
+  };
+
+  const handleArchiveClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    onArchiveClick(faq);
+  };
 
   const renderActionButtons = () => (
     <ActionContainer>
       <ActionText 
-        onClick={async (e) => {
-          e.stopPropagation();
-          await onEdit(faq);
-        }}
+        onClick={handleEditClick} 
+        $disabled={!faq.isActive}
+        title={!faq.isActive ? "보관된 FAQ는 수정할 수 없습니다." : ""}
       >
         수정
       </ActionText>
       <ActionDivider />
-      <ActionText 
-        onClick={(e) => {
-          e.stopPropagation();
-          onArchiveClick(faq);
-        }}
-      >
-        보관
-      </ActionText>
+      <ActionText onClick={handleArchiveClick}>보관</ActionText>
     </ActionContainer>
   );
 
   const renderExpandedContent = () => {
-    if (detailError) {
-      return (
-        <ExpandedRow>
-          <ExpandedBox>
-            <ExpandedHeader>
-              <ExpandedTitle>답변 내용</ExpandedTitle>
-            </ExpandedHeader>
-            <ExpandedContent>
-              <ErrorText>답변을 불러오는데 실패했습니다.</ErrorText>
-            </ExpandedContent>
-          </ExpandedBox>
-        </ExpandedRow>
-      );
-    }
+    const content = detailError ? (
+      <ErrorText>답변을 불러오는데 실패했습니다.</ErrorText>
+    ) : (
+      <ExpandedAnswer>{faqDetail?.answer || '답변이 없습니다.'}</ExpandedAnswer>
+    );
 
     return (
       <ExpandedRow>
@@ -70,22 +63,18 @@ const FAQTableRow: React.FC<FAQTableRowProps> = ({
           <ExpandedHeader>
             <ExpandedTitle>답변 내용</ExpandedTitle>
           </ExpandedHeader>
-          <ExpandedContent>
-            <ExpandedAnswer>
-              {faqDetail?.answer || '답변이 없습니다.'}
-            </ExpandedAnswer>
-          </ExpandedContent>
+          <ExpandedContent>{content}</ExpandedContent>
         </ExpandedBox>
       </ExpandedRow>
     );
   };
 
+  const statusIcon = faq.isActive ? ActiveIcon : InactiveIcon;
+  const statusAlt = faq.isActive ? "활성" : "비활성";
+
   return (
     <React.Fragment>
-      <TableRow 
-        onClick={() => onRowToggle(faq.faqId)} 
-        $isExpanded={isExpanded}
-      >
+      <TableRow onClick={() => onRowToggle(faq.faqId)} $isExpanded={isExpanded}>
         <TableCell>
           <QuestionText>{faq.question}</QuestionText>
         </TableCell>
@@ -93,10 +82,7 @@ const FAQTableRow: React.FC<FAQTableRowProps> = ({
           <CategoryImage src={faq.categoryImage} alt={faq.category} />
         </TableCell>
         <TableCell>
-          <StatusIcon 
-            src={faq.isActive ? ActiveIcon : InactiveIcon} 
-            alt={faq.isActive ? "활성" : "비활성"} 
-          />
+          <StatusIcon src={statusIcon} alt={statusAlt} />
         </TableCell>
         <TableCell>
           <DateText>{faq.createdAt}</DateText>
@@ -188,15 +174,15 @@ const ActionDivider = styled.div`
   background-color: #E9E0F0;
 `;
 
-const ActionText = styled.span`
-  color: #000;
+const ActionText = styled.span<{ $disabled?: boolean }>`
+  color: ${props => props.$disabled ? '#C8C8C8' : '#000'};
   font-size: 16px;
   font-weight: 500;
-  cursor: pointer;
+  cursor: ${props => props.$disabled ? 'not-allowed' : 'pointer'};
   transition: color 0.2s;
   
   &:hover {
-    color: var(--color-mediumpurple-300);
+    color: ${props => props.$disabled ? '#C8C8C8' : 'var(--color-mediumpurple-300)'};
   }
 `;
 
@@ -277,4 +263,4 @@ const ErrorText = styled.div`
   display: flex;
   align-items: center;
   min-height: 82px;
-`; 
+`;

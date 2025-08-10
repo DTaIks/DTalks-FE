@@ -1,135 +1,144 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useCallback } from "react";
+import { useParams, Navigate } from "react-router-dom";
 import styled from "styled-components";
 import TitleContainer from "@/layout/TitleContainer";
-import DocumentStatCard from "@/components/admin/documentAll/DocumentStatCard";
-import DocumentTable from "@/components/admin/documentAll/DocumentTable";
+import Button from "@/components/common/Button";
 import Pagination from "@/components/common/Pagination";
 import ConfirmModal from "@/components/common/ConfirmModal";
+import DocumentUploadModal from "@/components/common/DocumentUploadModal";
 import { VersionHistoryModal } from "@/components/common/FileVersionManagementModal";
-import { useDocumentStore } from "@/store/documentStore";
+import Document from "@/components/admin/document/Document";
+import { useFileUpload } from "@/hooks/useFileUpload";
+import { useCommonHandlers } from "@/hooks/useCommonHandlers";
+import DocumentCategory1 from "@/assets/document/DocumentCategory1.svg";
+import DocumentCategory2 from "@/assets/document/DocumentCategory2.svg";
+import DocumentCategory3 from "@/assets/document/DocumentCategory3.svg";
 
-// 문서 관리 페이지
+// 통합 문서 관리 페이지
 const DocumentPage = () => {
-  const [currentPage, setCurrentPage] = useState(1);
-  const { getFormattedStats, filteredData } = useDocumentStore();
-  const stats = getFormattedStats();
-  const itemsPerPage = 4;
-  
-  // 페이지 진입 시 전체 상태로 설정
-  useEffect(() => {
-    const { setSelectedStatus, setSelectedCategory } = useDocumentStore.getState();
-    setSelectedStatus("전체 상태");
-    setSelectedCategory("전체 카테고리");
-  }, []);
-  
-  // 확인 모달 상태 관리
-  const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
-  const [modalType, setModalType] = useState<'archive' | 'download'>('download');
-  const [selectedFileName, setSelectedFileName] = useState('');
-  
-  // 버전 모달 상태 관리
-  const [isVersionModalOpen, setIsVersionModalOpen] = useState(false);
-  const [versionFileName, setVersionFileName] = useState('');
-  
-  const totalItems = filteredData.length;
-  const totalPages = totalItems <= itemsPerPage ? 1 : Math.ceil(totalItems / itemsPerPage);
-  
-  useEffect(() => {
-    if (currentPage > totalPages) {
-      setCurrentPage(1);
-    }
-  }, [totalPages, currentPage]);
+  const { category } = useParams<{ category: string }>();
+  const [versionModal, setVersionModal] = useState({ isOpen: false, fileName: '' });
 
-  const handlePageChange = (page: number) => {
-    setCurrentPage(page);
-  };
-
-  // 확인 모달 핸들러들
-  const openConfirmModal = useCallback((type: 'archive' | 'download', fileName: string) => {
-    setModalType(type);
-    setSelectedFileName(fileName);
-    setIsConfirmModalOpen(true);
-  }, []);
-
-  const closeConfirmModal = useCallback(() => {
-    setIsConfirmModalOpen(false);
-    setSelectedFileName('');
-  }, []);
-
-  // 버전 모달 핸들러들 추가
-  const openVersionModal = useCallback((fileName: string) => {
-    setVersionFileName(fileName);
-    setIsVersionModalOpen(true);
-  }, []);
-
-  const closeVersionModal = useCallback(() => {
-    setIsVersionModalOpen(false);
-    setVersionFileName('');
-  }, []);
-
-  const handleConfirmAction = useCallback(() => {
-    if (modalType === 'archive') {
-      // 실제 보관 처리 로직
-      const { archiveDocumentItem } = useDocumentStore.getState();
-      // 파일명으로 문서 ID를 찾아서 보관 처리
-      const documentToArchive = useDocumentStore.getState().documentItems.find(
-        doc => doc.documentName === selectedFileName
-      );
-      if (documentToArchive) {
-        archiveDocumentItem(documentToArchive.documentId);
-      }
-    } else if (modalType === 'download') {
-      console.log(`${selectedFileName} 다운로드 처리`);
-    }
-    closeConfirmModal();
-  }, [modalType, selectedFileName, closeConfirmModal]);
-
-  const modals = {
-    confirmModal: {
-      open: openConfirmModal,
-      close: closeConfirmModal
+  // 카테고리별 설정
+  const categoryConfig = {
+    'policy': {
+      title: "사내 정책",
+      subtitle: "모든 사내 정책 문서를 한 번에 확인하고 정리하세요",
+      image: DocumentCategory1
     },
-    versionModal: {
-      open: openVersionModal,
-      close: closeVersionModal,
-      isOpen: isVersionModalOpen
+    'glossary': {
+      title: "용어사전",
+      subtitle: "모든 용어 사전 문서를 한 번에 확인하고 정리하세요",
+      image: DocumentCategory3
+    },
+    'reportform': {
+      title: "보고서 양식",
+      subtitle: "모든 보고서 양식 문서를 한 번에 확인하고 정리하세요",
+      image: DocumentCategory2
     }
   };
+
+  // 유효하지 않은 카테고리인 경우 리다이렉트
+  if (!category || !categoryConfig[category as keyof typeof categoryConfig]) {
+    return <Navigate to="/admin/documents" replace />;
+  }
+
+  const config = categoryConfig[category as keyof typeof categoryConfig];
+
+  // 공통 핸들러 사용
+  const { handleArchiveByFileName } = useCommonHandlers({
+    modals: {
+      confirmModal: {
+        open: () => {} // 실제로는 사용하지 않음
+      },
+      versionModal: {
+        open: (fileName: string) => setVersionModal({ isOpen: true, fileName }),
+        close: () => setVersionModal({ isOpen: false, fileName: '' }),
+        isOpen: versionModal.isOpen
+      }
+    }
+  });
+
+  // 파일 업로드 hook 사용
+  const {
+    uploadModal,
+    confirmModal,
+    handleFileUploadClick,
+    handleCloseUploadModal,
+    handleSubmit,
+    handleConfirmAction,
+    closeConfirmModal,
+    getButtonText
+  } = useFileUpload({
+    pageType: category as 'policy' | 'glossary' | 'report',
+    onUpload: () => {
+      // 파일 업로드 처리
+    },
+    onEdit: () => {
+      // 파일 수정 처리
+    },
+    onArchive: handleArchiveByFileName,
+    onDownload: () => {
+      // 다운로드 처리
+    }
+  });
+
+  const handleArchive = useCallback((id: number) => {
+    // 보관 처리 로직
+    console.log('보관 처리:', id);
+  }, []);
+
+  const handleVersionHistoryClick = useCallback((fileName: string) => {
+    setVersionModal({ isOpen: true, fileName });
+  }, []);
+
+  const handleConfirmModalOpen = useCallback((type: 'archive' | 'download', fileName: string) => {
+    // confirmModal 열기 로직
+    console.log(`${type} 모달 열기:`, fileName);
+  }, []);
 
   return (
     <Container>
       <HeaderWrapper>
-        <TitleContainer title="전체 문서" subtitle="모든 사내 문서를 한 번에 확인하고 정리하세요" />
-      </HeaderWrapper>
-      <DocumentStatCard stats={stats} />
-      <DocumentTable 
-        currentPage={currentPage} 
-        itemsPerPage={itemsPerPage}
-        modals={modals}
-      />
-      {totalPages >= 1 && (
-        <PaginationContainer>
-          <Pagination
-            key={totalPages}
-            currentPage={currentPage}
-            totalPages={totalPages}
-            onPageChange={handlePageChange}
+        <TitleContainer title={config.title} subtitle={config.subtitle} />
+        <ButtonContainer>
+          <StyledButton 
+            text={getButtonText()} 
+            width="var(--button-width)" 
+            height="var(--button-height)"
+            onClick={handleFileUploadClick}
           />
-        </PaginationContainer>
-      )}
+        </ButtonContainer>
+      </HeaderWrapper>
+      
+      <Document
+        category={category as 'policy' | 'glossary' | 'reportform'}
+        title={config.title}
+        categoryImage={config.image}
+        onArchive={handleArchive}
+        onVersionHistoryClick={handleVersionHistoryClick}
+        onConfirmModalOpen={handleConfirmModalOpen}
+      />
+
+      <DocumentUploadModal
+        isOpen={uploadModal.isOpen}
+        onClose={handleCloseUploadModal}
+        onSubmit={handleSubmit}
+        pageType={category as 'policy' | 'glossary' | 'report'}
+      />
 
       <ConfirmModal
-        isOpen={isConfirmModalOpen}
+        isOpen={confirmModal.isOpen}
         onClose={closeConfirmModal}
         onConfirm={handleConfirmAction}
-        fileName={selectedFileName}
-        type={modalType}
+        fileName={confirmModal.selectedFileName}
+        type={confirmModal.modalType}
       />
 
       <VersionHistoryModal
-        isOpen={isVersionModalOpen}
-        onClose={closeVersionModal}
-        fileName={versionFileName}
+        isOpen={versionModal.isOpen}
+        onClose={() => setVersionModal({ isOpen: false, fileName: '' })}
+        fileName={versionModal.fileName}
       />
     </Container>
   );
@@ -155,10 +164,19 @@ const HeaderWrapper = styled.div`
   margin-bottom: 32px;
 `;
 
-const PaginationContainer = styled.div`
+const ButtonContainer = styled.div`
   display: flex;
-  justify-content: center;
   align-items: center;
-  margin-top: 4px;
-  margin-bottom: 24px;
+  height: 64px;
+`;
+
+const StyledButton = styled(Button)`
+  && {
+    color: var(--color-white);
+    font-family: var(--font-pretendard);
+    font-size: var(--font-size-18);
+    font-style: normal;
+    font-weight: var(--table-header-font-weight);
+    line-height: normal;
+  }
 `;
