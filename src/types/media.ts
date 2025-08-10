@@ -80,6 +80,19 @@ export interface CommonArchivedFileRequest {
   fileType?: string;
 }
 
+export interface DepartmentArchivedFileRequest {
+  option?: string;
+  departmentName: string;
+  pageNumber: number;
+  fileType?: string;
+}
+
+export interface DepartmentArchivedFileResponse {
+  departmentArchivedFileInfoList: CommonArchivedFileInfo[];
+  pagingInfo: PagingInfo;
+  fileType: string;
+}
+
 export interface FileUploadInfo {
   fileName: string;
   description: string;

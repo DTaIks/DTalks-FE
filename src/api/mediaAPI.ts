@@ -1,5 +1,5 @@
 import { apiInstance } from './apiInstance';
-import type { CommonFileResponse, CommonFileRequest, FileUploadInfo, FileUploadResponse, DepartmentFileResponse, DepartmentFileRequest, CommonArchivedFileResponse, CommonArchivedFileRequest } from '@/types/media';
+import type { CommonFileResponse, CommonFileRequest, FileUploadInfo, FileUploadResponse, DepartmentFileResponse, DepartmentFileRequest, CommonArchivedFileResponse, CommonArchivedFileRequest, DepartmentArchivedFileResponse, DepartmentArchivedFileRequest } from '@/types/media';
 
 export const mediaAPI = {
   // 공통 파일 조회
@@ -9,8 +9,6 @@ export const mediaAPI = {
       option: params.option || '전체',
       fileType: params.fileType || '전체'
     })}`);
-    
-
     
     return response.data.data; // data 필드 반환
   },
@@ -71,6 +69,18 @@ export const mediaAPI = {
   getArchivedFiles: async (params: CommonArchivedFileRequest): Promise<CommonArchivedFileResponse> => {
     const response = await apiInstance.get(`/admin/file/common/archive?${new URLSearchParams({
       option: params.option || '전체',
+      pageNumber: params.pageNumber.toString(),
+      fileType: params.fileType || '전체'
+    })}`);
+    
+    return response.data.data; // data 필드 반환
+  },
+
+  // 보관된 부서별 파일 조회
+  getDepartmentArchivedFiles: async (params: DepartmentArchivedFileRequest): Promise<DepartmentArchivedFileResponse> => {
+    const response = await apiInstance.get(`/admin/file/department/archive?${new URLSearchParams({
+      option: params.option || '전체',
+      departmentName: params.departmentName,
       pageNumber: params.pageNumber.toString(),
       fileType: params.fileType || '전체'
     })}`);

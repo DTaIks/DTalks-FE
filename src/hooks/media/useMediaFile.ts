@@ -31,9 +31,10 @@ export const transformArchivedFileToMediaFile = (file: CommonArchivedFileInfo): 
 };
 
 // 버전 히스토리 반환 (실제 API 데이터 사용)
-export const useVersionHistory = (): VersionData[] => {
+export const useVersionHistory = (fileName: string): VersionData[] => {
   // TODO: 실제 API에서 버전 히스토리를 가져오도록 수정
-  // 현재는 빈 배열 반환
+  // fileName 파라미터는 향후 API 호출 시 사용 예정
+  console.log('버전 히스토리 요청:', fileName);
   return [];
 };
 

@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import { useMediaStore } from '@/store/mediaStore';
-import { useMediaFiles, useDepartmentFiles, useArchivedFiles } from '@/query/useMediaQueries';
+import { useMediaFiles, useDepartmentFiles, useArchivedFiles, useDepartmentArchivedFiles } from '@/query/useMediaQueries';
 import { useFileUpload, useFileUpdate, useFileArchive } from '@/query/useMediaMutations';
 import { transformCommonFileToMediaFile, transformArchivedFileToMediaFile } from './useMediaFile';
 
@@ -65,6 +65,14 @@ export const useMediaPage = () => {
     fileType: '전체' // fileType은 기본값으로 설정
   }), [currentPage, selectedFileType]);
 
+  // 보관된 부서별 파일 API 파라미터
+  const departmentArchivedApiParams = useMemo(() => ({
+    pageNumber: currentPage - 1, // API는 0부터 시작
+    departmentName: getDepartmentNameForAPI(selectedDepartment),
+    option: selectedFileType, // 파일 타입을 option 파라미터로 전송
+    fileType: '전체' // fileType은 기본값으로 설정
+  }), [currentPage, selectedDepartment, selectedFileType]);
+
   // 부서가 '전체 파일'이 아닌 경우 부서별 API 사용
   const isDepartmentSpecific = useMemo(() => 
     Boolean(selectedDepartment && selectedDepartment !== '전체 파일'),
@@ -94,54 +102,33 @@ export const useMediaPage = () => {
     isLoading: isArchivedLoading, 
     error: archivedError 
   } = useArchivedFiles(archivedApiParams, {
-    enabled: isArchiveMode
+    enabled: isArchiveMode && selectedDepartment === '전체 파일'
   });
 
-
-
-
+  // 보관된 부서별 파일 쿼리
+  const { 
+    data: departmentArchivedMediaData, 
+    isLoading: isDepartmentArchivedLoading, 
+    error: departmentArchivedError 
+  } = useDepartmentArchivedFiles(departmentArchivedApiParams, {
+    enabled: isArchiveMode && selectedDepartment !== '전체 파일'
+  });
 
   // 현재 사용할 데이터와 로딩 상태 결정
-  const mediaData = isArchiveMode ? archivedMediaData : (isDepartmentSpecific ? departmentMediaData : commonMediaData);
-  const isLoading = isArchiveMode ? isArchivedLoading : (isDepartmentSpecific ? isDepartmentLoading : isCommonLoading);
-  const error = isArchiveMode ? archivedError : (isDepartmentSpecific ? departmentError : commonError);
-
-  // 보관함에서 부서별 필터링을 위한 클라이언트 사이드 필터링 (파일 타입은 API에서 처리)
-  const filterArchivedFilesByDepartment = useMemo(() => {
-    if (!archivedMediaData?.commonArchivedFileInfoList) return [];
-    
-    const files = archivedMediaData.commonArchivedFileInfoList;
-    
-    // 부서별 필터링만 클라이언트에서 처리 (파일 타입은 API에서 이미 필터링됨)
-    if (selectedDepartment === '전체 파일') {
-      return files;
-    }
-    
-    // 특정 부서가 선택된 경우 해당 부서의 파일만 필터링
-    return files.filter(file => file.department === selectedDepartment);
-  }, [archivedMediaData, selectedDepartment]);
-
-  // 일반 파일에서 부서별 필터링을 위한 클라이언트 사이드 필터링 (파일 타입은 API에서 처리)
-  const filterFilesByDepartment = useMemo(() => {
-    if (!mediaData) return [];
-    
-    let fileList;
-    if (isDepartmentSpecific && 'departmentFileInfoList' in mediaData) {
-      fileList = mediaData.departmentFileInfoList;
-    } else if (!isDepartmentSpecific && 'commonFileInfoList' in mediaData) {
-      fileList = mediaData.commonFileInfoList;
-    } else {
-      return [];
-    }
-
-    if (!fileList) return [];
-
-    // 부서별 필터링만 클라이언트에서 처리 (파일 타입은 API에서 이미 필터링됨)
-    return fileList;
-  }, [mediaData, isDepartmentSpecific]);
-
-
+  const mediaData = isArchiveMode 
+    ? (selectedDepartment === '전체 파일' ? archivedMediaData : departmentArchivedMediaData)
+    : (isDepartmentSpecific ? departmentMediaData : commonMediaData);
   
+  const isLoading = isArchiveMode 
+    ? (selectedDepartment === '전체 파일' ? isArchivedLoading : isDepartmentArchivedLoading)
+    : (isDepartmentSpecific ? isDepartmentLoading : isCommonLoading);
+  
+  const error = isArchiveMode 
+    ? (selectedDepartment === '전체 파일' ? archivedError : departmentArchivedError)
+    : (isDepartmentSpecific ? departmentError : commonError);
+
+
+
   const uploadMutation = useFileUpload();
   const updateMutation = useFileUpdate();
   const archiveMutation = useFileArchive();
@@ -152,16 +139,28 @@ export const useMediaPage = () => {
     if (isLoading || !mediaData) return [];
 
     let fileList;
-    if (isArchiveMode && 'commonArchivedFileInfoList' in mediaData) {
-      // 보관함에서는 부서별 필터링된 데이터 사용
-      fileList = filterArchivedFilesByDepartment;
+    if (isArchiveMode) {
+      // 보관함 모드
+      if (selectedDepartment === '전체 파일' && 'commonArchivedFileInfoList' in mediaData) {
+        fileList = mediaData.commonArchivedFileInfoList;
+      } else if (selectedDepartment !== '전체 파일' && 'departmentArchivedFileInfoList' in mediaData) {
+        fileList = mediaData.departmentArchivedFileInfoList;
+      } else {
+        return [];
+      }
       return fileList.map(transformArchivedFileToMediaFile);
     } else {
-      // 일반 파일에서는 부서별 필터링된 데이터 사용 (파일 타입은 API에서 처리)
-      fileList = filterFilesByDepartment;
+      // 일반 파일 모드
+      if (isDepartmentSpecific && 'departmentFileInfoList' in mediaData) {
+        fileList = mediaData.departmentFileInfoList;
+      } else if (!isDepartmentSpecific && 'commonFileInfoList' in mediaData) {
+        fileList = mediaData.commonFileInfoList;
+      } else {
+        return [];
+      }
       return fileList.map(transformCommonFileToMediaFile);
     }
-  }, [mediaData, isArchiveMode, isLoading, filterArchivedFilesByDepartment, filterFilesByDepartment]);
+  }, [mediaData, isArchiveMode, isLoading, selectedDepartment, isDepartmentSpecific]);
 
   // API에서 이미 필터링된 데이터를 사용
   const files = apiFiles;

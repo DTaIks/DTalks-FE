@@ -50,22 +50,9 @@ export const useMediaActions = () => {
     }
   }, [archiveMutation]);
 
-  // 확인 모달 액션 핸들러
-  const handleConfirmAction = useCallback((modalType: 'archive' | 'download', fileName: string) => {
-    if (modalType === 'archive') {
-      // 보관 처리 로직 - 파일명으로 파일 ID를 찾아서 보관 처리
-      // 실제 구현에서는 파일명으로 파일 ID를 찾는 로직이 필요합니다
-      console.log('파일 보관:', fileName);
-    } else if (modalType === 'download') {
-      // 다운로드 처리 로직
-      console.log('파일 다운로드:', fileName);
-    }
-  }, []);
-
   return {
     handleUpload,
     handleEdit,
     handleArchive,
-    handleConfirmAction,
   };
 };

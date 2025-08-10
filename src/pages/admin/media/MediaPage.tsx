@@ -78,28 +78,24 @@ const MediaPage: React.FC = () => {
     }, 
     mediaActions: {
       ...mediaActions,
-      setSelectedFile
+      setSelectedFile,
+      handleConfirmAction: () => {
+        if (confirmModal.type === 'archive') {
+          const fileToArchive = files.find(file => file.fileName === confirmModal.fileName);
+          if (fileToArchive) {
+            mediaActions.handleArchive(fileToArchive.fileId);
+          }
+        } else if (confirmModal.type === 'download') {
+          console.log('파일 다운로드:', confirmModal.fileName);
+        }
+        closeConfirmModal();
+      }
     }
   });
 
   // 페이지 변경 핸들러
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
-  };
-
-  // 확인 모달 액션 핸들러
-  const handleConfirmAction = () => {
-    if (confirmModal.type === 'archive') {
-      // 파일명으로 파일 ID를 찾아서 보관 처리
-      const fileToArchive = files.find(file => file.fileName === confirmModal.fileName);
-      if (fileToArchive) {
-        mediaActions.handleArchive(fileToArchive.fileId);
-      }
-    } else if (confirmModal.type === 'download') {
-      // 다운로드 처리 로직
-      console.log('파일 다운로드:', confirmModal.fileName);
-    }
-    closeConfirmModal();
   };
 
   return (
@@ -233,7 +229,7 @@ const MediaPage: React.FC = () => {
       <ConfirmModal
         isOpen={confirmModal.isOpen}
         onClose={closeConfirmModal}
-        onConfirm={handleConfirmAction}
+        onConfirm={handlers.handleConfirmAction}
         fileName={confirmModal.fileName}
         type={confirmModal.type}
       />
