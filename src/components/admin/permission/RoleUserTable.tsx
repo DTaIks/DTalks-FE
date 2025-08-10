@@ -4,6 +4,7 @@ import { usePermissionStore } from '@/store/permissionStore';
 interface UserTableProps {
   tableHeaders: string[];
   tableData: Array<{
+    userId: number; 
     name: string;
     email: string;
     department: string;
@@ -12,7 +13,7 @@ interface UserTableProps {
 }
 
 const UserTable = ({ tableHeaders, tableData }: UserTableProps) => {
-  const { selectedRows, toggleSelectedRow } = usePermissionStore();
+  const { selectedUserIds, toggleSelectedUserId } = usePermissionStore();
 
   return (
     <UserTableContainer>
@@ -22,11 +23,11 @@ const UserTable = ({ tableHeaders, tableData }: UserTableProps) => {
         ))}
       </TableHeader>
       <TableBody>
-        {tableData.map((row, index) => (
+        {tableData.map((row) => (
           <TableRow 
-            key={index}
-            selected={selectedRows.includes(index)}
-            onClick={() => toggleSelectedRow(index)}
+            key={row.userId}
+            selected={selectedUserIds.includes(row.userId)} 
+            onClick={() => toggleSelectedUserId(row.userId)}
           >
             <TableCell>{row.name}</TableCell>
             <TableCell>{row.email}</TableCell>
@@ -104,4 +105,4 @@ const TableCell = styled.div`
   &:nth-child(3) {
     padding-left: 36px;
   }
-`; 
+`;

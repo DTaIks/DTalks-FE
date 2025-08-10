@@ -1,10 +1,14 @@
 import styled from 'styled-components';
-import React from 'react';
-import Roll1 from '@/assets/permission/PermissionRoll1.svg';
+import React, { useState, useMemo } from 'react';
 import { usePermissionStore } from '@/store/permissionStore';
+import { useAdminUsers, useAdminUserSearch } from '@/query/useAdminUser';
+import { useRoleManagement } from '@/query/usePermission';
 import type { PermissionUser } from '@/types/permission';
-import ModalHeader from '@/components/admin/permission/RoleManagementModalHeader';
-import UserTable from '@/components/admin/permission/RoleManagementUserTable';
+import type { User } from '@/types/user';
+import ModalHeader from '@/components/admin/permission/RoleModalHeader';
+import { RoleInfoSection } from './RoleInfoSection';
+import { UserSearchSection } from './RoleUserSearchSection';
+import { ActionSection } from './RoleSaveButtonSection';
 
 interface RoleManagementProps {
   open: boolean;
@@ -13,23 +17,128 @@ interface RoleManagementProps {
 }
 
 const RoleManagement = ({ open, onClose, selectedUser }: RoleManagementProps) => {
-  const { clearSelectedRows } = usePermissionStore();
+  const { clearSelectedUserIds, selectedUserIds, setSelectedUserIds } = usePermissionStore(); 
+  
+  // 상태 관리
+  const [searchTerm, setSearchTerm] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [isSearchMode, setIsSearchMode] = useState(false);
 
-  // 모달이 열릴 때 선택 상태 초기화
+  // 권한 관리 훅
+  const { handleRoleChange, isLoading: isSaving } = useRoleManagement();
+
+  // 모달이 열릴 때 상태 초기화
   React.useEffect(() => {
     if (open) {
-      clearSelectedRows();
+      clearSelectedUserIds();
+      setSearchTerm('');
+      setCurrentPage(1);
+      setIsSearchMode(false);
     }
-  }, [open, clearSelectedRows]);
+  }, [open, clearSelectedUserIds]);
 
-  // 테이블 데이터
-  const tableHeaders = ['이름', '이메일', '부서', '역할'];
-  const tableData = [
-    { name: '이주원', email: 'lee@gachon.ac.kr', department: '디자인팀', role: '사용자' },
-    { name: '정지민', email: 'jmjung@gachon.ac.kr', department: '개발팀', role: '사용자' },
-    { name: '김동섭', email: 'dongsub@gachon.ac.kr', department: '인프라팀', role: '사용자' },
-    { name: '김유경', email: 'msaws@gachon.ac.kr', department: 'aws팀', role: 'aws' },
-  ];
+  // 검색어 변경 감지
+  React.useEffect(() => {
+    if (searchTerm.trim()) {
+      setIsSearchMode(true);
+      setCurrentPage(1);
+    } else {
+      setIsSearchMode(false);
+      setCurrentPage(1);
+    }
+  }, [searchTerm]);
+
+  // 사용자 목록 조회
+  const {
+    data: userListData,
+    isLoading: isUserListLoading,
+    error: userListError
+  } = useAdminUsers({
+    pageNumber: currentPage,
+    pageSize: 4
+  });
+
+  // 사용자 검색
+  const {
+    data: searchData,
+    isLoading: isSearchLoading,
+    error: searchError
+  } = useAdminUserSearch(
+    {
+      name: searchTerm.trim(),
+      pageNumber: currentPage,
+      pageSize: 4
+    },
+    isSearchMode && searchTerm.trim().length > 0
+  );
+
+  // 현재 표시할 데이터 결정
+  const currentData = useMemo(() => {
+    if (isSearchMode) {
+      return searchData?.data;
+    }
+    return userListData?.data;
+  }, [isSearchMode, searchData, userListData]);
+
+  // 로딩 상태
+  const isLoading = isSearchMode ? isSearchLoading : isUserListLoading;
+  
+  // 에러 상태
+  const error = isSearchMode ? searchError : userListError;
+
+  // 해당 권한을 가진 사용자들을 자동 선택 (데이터가 로딩될 때마다)
+  React.useEffect(() => {
+    if (currentData?.adminInfoList && selectedUser?.roleName && open) {
+      const usersWithSelectedRole = currentData.adminInfoList
+        .filter((user: User) => user.role === selectedUser.roleName)
+        .map((user: User) => user.userId);
+      
+      if (usersWithSelectedRole.length > 0) {
+        // 기존 선택된 사용자들과 합치기 (중복 제거)
+        setSelectedUserIds(prev => Array.from(new Set([...prev, ...usersWithSelectedRole])));
+      }
+    }
+  }, [currentData, selectedUser?.roleName, open, setSelectedUserIds]);
+
+  // 테이블 데이터 변환
+  const tableData = useMemo(() => {
+    if (!currentData?.adminInfoList) return [];
+    
+    return currentData.adminInfoList.map((user: User) => ({
+      userId: user.userId,
+      name: user.userName,
+      email: user.email,
+      department: user.department,
+      role: user.role
+    }));
+  }, [currentData]);
+
+  // 이벤트 핸들러들
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchTerm(e.target.value);
+  };
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+  };
+
+  const handleSave = () => {
+    if (!selectedUser?.roleId || !selectedUser?.roleName) {
+      return;
+    }
+
+    const userIds = selectedUserIds.filter((id): id is number => Boolean(id));
+
+    handleRoleChange(
+      userIds,
+      selectedUser.roleId,
+      () => {
+        // 성공 콜백
+        clearSelectedUserIds();
+        onClose();
+      },
+    );
+  };
 
   if (!open) return null;
 
@@ -41,27 +150,25 @@ const RoleManagement = ({ open, onClose, selectedUser }: RoleManagementProps) =>
           onClose={onClose}
         />
         
-        <ModalSection>
-          <ModalContent>
-            <RoleIcon src={selectedUser?.image || Roll1} alt="role" />
-            <RoleInfo>
-              <RoleName>{selectedUser?.roleName || "관리자"}</RoleName>
-              <RoleEngName>{selectedUser?.roleNameEn || "Administrator"}</RoleEngName>
-            </RoleInfo>
-          </ModalContent>
-          <UserCountText>현재 {selectedUser?.roleUserCount || 1}명의 사용자가 이 권한을 가지고 있습니다.</UserCountText>
-        </ModalSection>
+        <RoleInfoSection selectedUser={selectedUser} />
         
-        <ModalSection2>
-          <ModalSection2Header>
-            <HeaderTitle>사용자 검색</HeaderTitle>
-            <SearchInput placeholder="사용자를 검색하세요" />
-          </ModalSection2Header>
-          
-          <UserTable tableHeaders={tableHeaders} tableData={tableData} />
-        </ModalSection2>
+        <UserSearchSection
+          searchTerm={searchTerm}
+          onSearchChange={handleSearchChange}
+          isLoading={isLoading}
+          error={error}
+          tableData={tableData}
+          currentPage={currentPage}
+          totalPages={currentData?.pagingInfo?.totalPageCount || 1}
+          onPageChange={handlePageChange}
+          isSearchMode={isSearchMode}
+        />
         
-        <ActionButton>저장</ActionButton>
+        <ActionSection
+          selectedCount={selectedUserIds.length}
+          onSave={handleSave}
+          isSaving={isSaving}
+        />
       </ModalContainer>
     </ModalOverlay>
   );
@@ -69,7 +176,6 @@ const RoleManagement = ({ open, onClose, selectedUser }: RoleManagementProps) =>
 
 export default RoleManagement;
 
-// 모달 오버레이
 const ModalOverlay = styled.div`
   position: fixed;
   top: 0;
@@ -84,147 +190,11 @@ const ModalOverlay = styled.div`
   z-index: 1000;
 `;
 
-// 모달 컨테이너
 const ModalContainer = styled.div`
   width: 868px;
-  height: 678px;
+  height: 720px;
   flex-shrink: 0;
   border-radius: 19.5px;
   background: #FFF;
   position: relative;
-`;
-
-// 첫 번째 섹션
-const ModalSection = styled.div`
-  width: 796.5px;
-  height: 97.5px;
-  flex-shrink: 0;
-  border-radius: 18.75px;
-  background: #F5F5F5;
-  margin-top: 36px;
-  margin-left: 36px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-`;
-
-// 모달 내용
-const ModalContent = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding-left: 36px;
-`;
-
-// 역할 아이콘
-const RoleIcon = styled.img`
-  width: 33.6px;
-  height: 33.6px;
-  border-radius: 8.4px;
-  object-fit: cover;
-`;
-
-// 역할 정보
-const RoleInfo = styled.div`
-  display: flex;
-  flex-direction: column;
-`;
-
-// 역할 이름
-const RoleName = styled.span`
-  font-size: 16.8px;
-  font-weight: 700;
-  color: var(--color-black);
-  width: 100%;
-  text-align: left;
-`;
-
-// 역할 영문 이름
-const RoleEngName = styled.span`
-  font-size: 14px;
-  color: #888;
-  width: 100%;
-  text-align: left;
-`;
-
-// 사용자 수 텍스트
-const UserCountText = styled.span`
-  color: var(--color-black);
-  font-family: var(--font-pretendard);
-  font-size: var(--font-size-14);
-  font-weight: 500;
-  margin-right: 36px;
-`;
-
-// 두 번째 섹션
-const ModalSection2 = styled.div`
-  width: 796.5px;
-  height: 328.5px;
-  flex-shrink: 0;
-  border-radius: 18.75px;
-  border: 1.5px solid #E9E9E9;
-  margin-top: 24px;
-  margin-left: 36px;
-`;
-
-// 섹션 헤더
-const ModalSection2Header = styled.div`
-  width: 796.5px;
-  height: 60px;
-  flex-shrink: 0;
-  border-radius: 18.75px 18.75px 0 0;
-  border-bottom: 1.5px solid #E9E9E9;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding-left: 36px;
-  padding-right: 36px;
-  box-sizing: border-box;
-`;
-
-// 헤더 제목
-const HeaderTitle = styled.span`
-  color: #000;
-  font-size: 16.5px;
-  font-weight: 500;
-`;
-
-// 검색 입력창
-const SearchInput = styled.input`
-  width: 200px;
-  height: 32px;
-  flex-shrink: 0;
-  border-radius: 3.75px;
-  border: 0.75px solid #666;
-  padding: 0 12px;
-  font-family: var(--font-pretendard);
-  font-size: 14px;
-  outline: none;
-
-  &::placeholder {
-    color: #999;
-  }
-`;
-
-// 액션 버튼
-const ActionButton = styled.button`
-  width: 132px;
-  height: 44px;
-  flex-shrink: 0;
-  border-radius: 6px;
-  background: #8061B0;
-  border: none;
-  color: white;
-  font-family: var(--font-pretendard);
-  font-size: 16px;
-  font-weight: 500;
-  cursor: pointer;
-  position: absolute;
-  bottom: 36px;
-  right: 36px;
-  transition: background-color 0.2s ease;
-
-  &:hover {
-    background: #6b4f8f;
-  }
 `;
