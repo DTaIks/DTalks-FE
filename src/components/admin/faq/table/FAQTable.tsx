@@ -22,10 +22,6 @@ const FAQTable: React.FC<FAQTableProps> = ({
   onSearch = () => {},
   onCategoryChange = () => {}
 }) => {
-  // props로 받은 API 데이터 사용
-  const currentFAQItems = faqItems;
-
-  // Zustand 스토어에서 UI 상태 가져오기
   const {
     expandedRows,
     confirmModal,
@@ -37,41 +33,36 @@ const FAQTable: React.FC<FAQTableProps> = ({
     closeEditModal
   } = useFAQStore();
 
-  // React Query mutations
   const updateFAQMutation = useUpdateFAQ();
   const archiveFAQMutation = useArchiveFAQ();
 
-  // 핸들러 함수들
   const handleRowToggle = useCallback((faqId: number) => {
     toggleExpandedRow(faqId);
   }, [toggleExpandedRow]);
 
   const handleEdit = useCallback(async (faq: FAQItem) => {
+    // 비활성화된 FAQ는 수정할 수 없음
+    if (!faq.isActive) {
+      console.warn('보관된 FAQ는 수정할 수 없습니다.');
+      return;
+    }
+
+    const createModalData = (question: string, answer: string, category: string) => ({
+      isOpen: true,
+      faqData: { question, answer, category },
+      faqId: faq.faqId
+    });
+
     try {
-      // FAQ 상세 정보를 API로 조회
       const faqDetail = await faqAPI.getFAQDetail(faq.faqId);
-      
-      setEditModal({
-        isOpen: true,
-        faqData: {
-          question: faqDetail.question,
-          answer: faqDetail.answer || '',
-          category: faqDetail.categoryName || faq.category
-        },
-        faqId: faq.faqId
-      });
+      setEditModal(createModalData(
+        faqDetail.question,
+        faqDetail.answer || '',
+        faqDetail.categoryName || faq.category
+      ));
     } catch (error) {
       console.error('FAQ 상세 정보 조회 실패:', error);
-      // 에러 발생 시 기본 정보로 모달 열기
-      setEditModal({
-        isOpen: true,
-        faqData: {
-          question: faq.question,
-          answer: '',
-          category: faq.category
-        },
-        faqId: faq.faqId
-      });
+      setEditModal(createModalData(faq.question, '', faq.category));
     }
   }, [setEditModal]);
 
@@ -87,35 +78,31 @@ const FAQTable: React.FC<FAQTableProps> = ({
   }, [setConfirmModal]);
 
   const handleConfirmAction = useCallback(async () => {
-    if (confirmModal.type === 'archive' && confirmModal.faqId) {
-      try {
-        await archiveFAQMutation.mutateAsync(confirmModal.faqId);
-      } catch (error) {
-        console.error('FAQ 보관 실패:', error);
-      }
+    if (confirmModal.type !== 'archive' || !confirmModal.faqId) return;
+    
+    try {
+      await archiveFAQMutation.mutateAsync(confirmModal.faqId);
+    } catch (error) {
+      console.error('FAQ 보관 실패:', error);
+    } finally {
+      closeConfirmModal();
     }
-    closeConfirmModal();
   }, [confirmModal, archiveFAQMutation, closeConfirmModal]);
 
   const handleSubmitEdit = useCallback(async (data: { question: string; answer: string; category: string }) => {
-    if (editModal.faqId) {
-      try {
-        await updateFAQMutation.mutateAsync({
-          faqId: editModal.faqId,
-          faqData: {
-            question: data.question,
-            answer: data.answer,
-            category: data.category
-          }
-        });
-        closeEditModal();
-      } catch (error) {
-        console.error('FAQ 수정 실패:', error);
-      }
+    if (!editModal.faqId) return;
+    
+    try {
+      await updateFAQMutation.mutateAsync({
+        faqId: editModal.faqId,
+        faqData: data
+      });
+      closeEditModal();
+    } catch (error) {
+      console.error('FAQ 수정 실패:', error);
     }
   }, [editModal.faqId, updateFAQMutation, closeEditModal]);
 
-  // 카테고리 옵션 설정
   const categoryOptions = useMemo(() => [
     { value: "", label: "전체 카테고리" },
     { value: "it", label: "IT / 시스템" },
@@ -125,7 +112,6 @@ const FAQTable: React.FC<FAQTableProps> = ({
     { value: "welfare", label: "복지 / 휴가" }
   ], []);
 
-  // 테이블 행 렌더링
   const renderTableRow = useCallback((faq: FAQItem) => {
     const isExpanded = expandedRows.has(faq.faqId);
     
@@ -141,9 +127,6 @@ const FAQTable: React.FC<FAQTableProps> = ({
     );
   }, [expandedRows, handleRowToggle, handleEdit, handleArchiveClick]);
 
-
-
-  // 모달 렌더링
   const renderModals = useCallback(() => (
     <>
       {confirmModal.isOpen && confirmModal.type && (
@@ -170,41 +153,36 @@ const FAQTable: React.FC<FAQTableProps> = ({
     </>
   ), [confirmModal, editModal, closeConfirmModal, handleConfirmAction, closeEditModal, handleSubmitEdit, archiveFAQMutation.isPending, updateFAQMutation.isPending]);
 
-  // 로딩 상태 처리
-  if (isLoading) {
-    const loadingMessage = isSearchMode ? "검색 중입니다..." : "FAQ 목록을 불러오고 있습니다...";
-    
-    return (
-      <TableContainer>
-        <FAQTableHeader
-          searchTerm={searchTerm}
-          selectedCategory={selectedCategory}
-          onSearch={onSearch}
-          onCategoryChange={onCategoryChange}
-          categoryOptions={categoryOptions}
-        />
-        <EmptyState 
-          message={loadingMessage}
-          subMessage="잠시만 기다려주세요."
-        />
-      </TableContainer>
-    );
-  }
+  const renderHeader = () => (
+    <FAQTableHeader
+      searchTerm={searchTerm}
+      selectedCategory={selectedCategory}
+      onSearch={onSearch}
+      onCategoryChange={onCategoryChange}
+      categoryOptions={categoryOptions}
+    />
+  );
 
-  // 에러 상태 처리 (네트워크 오류, 서버 오류 등)
-  if (error) {
+  const renderEmptyState = () => {
+    if (isLoading) {
+      const loadingMessage = isSearchMode ? "검색 중입니다..." : "FAQ 목록을 불러오고 있습니다...";
+      return <EmptyState message={loadingMessage} subMessage="잠시만 기다려주세요." />;
+    }
+    if (error) {
+      return <EmptyState message="FAQ 목록을 불러오는데 실패했습니다." />;
+    }
+    if (faqItems.length === 0) {
+      return <EmptyState message={isSearchMode ? "검색 결과가 없습니다." : "등록된 FAQ가 없습니다."} />;
+    }
+    return null;
+  };
+
+  const emptyState = renderEmptyState();
+  if (emptyState) {
     return (
       <TableContainer>
-        <FAQTableHeader
-          searchTerm={searchTerm}
-          selectedCategory={selectedCategory}
-          onSearch={onSearch}
-          onCategoryChange={onCategoryChange}
-          categoryOptions={categoryOptions}
-        />
-        <EmptyState 
-          message="FAQ 목록을 불러오는데 실패했습니다." 
-        />
+        {renderHeader()}
+        {emptyState}
       </TableContainer>
     );
   }
@@ -212,25 +190,11 @@ const FAQTable: React.FC<FAQTableProps> = ({
   return (
     <>
       <TableContainer>
-        <FAQTableHeader
-          searchTerm={searchTerm}
-          selectedCategory={selectedCategory}
-          onSearch={onSearch}
-          onCategoryChange={onCategoryChange}
-          categoryOptions={categoryOptions}
-        />
-        {currentFAQItems.length > 0 ? (
-          <>
-            <FAQTableHead />
-            <TableBody>
-              {currentFAQItems.map(renderTableRow)}
-            </TableBody>
-          </>
-        ) : (
-          <EmptyState 
-            message={isSearchMode ? "검색 결과가 없습니다." : "등록된 FAQ가 없습니다."} 
-          />
-        )}
+        {renderHeader()}
+        <FAQTableHead />
+        <TableBody>
+          {faqItems.map(renderTableRow)}
+        </TableBody>
       </TableContainer>
       {renderModals()}
     </>
@@ -251,6 +215,3 @@ const TableBody = styled.div`
   display: flex;
   flex-direction: column;
 `;
-
-
-

@@ -11,14 +11,10 @@ import { useArchiveFAQCategory, useRestoreFAQCategory } from "@/query/useFAQMuta
 import { useFAQStore } from "@/store/faqStore";
 
 const FAQCategoryTable: React.FC = () => {
-  // API에서 카테고리 데이터 조회 (React Query)
   const { data: categoryData = [], isLoading, error } = useFAQCategories();
-  
-  // 카테고리 아카이브/복원 mutations
   const archiveCategoryMutation = useArchiveFAQCategory();
   const restoreCategoryMutation = useRestoreFAQCategory();
   
-  // Zustand 스토어에서 UI 상태 가져오기
   const {
     selectedCategoryItem,
     categoryConfirmModal,
@@ -27,7 +23,6 @@ const FAQCategoryTable: React.FC = () => {
     closeCategoryConfirmModal
   } = useFAQStore();
 
-  // 핸들러 함수들
   const handleRowClick = useCallback((category: FAQCategory) => {
     setSelectedCategoryItem(category);
   }, [setSelectedCategoryItem]);
@@ -43,18 +38,19 @@ const FAQCategoryTable: React.FC = () => {
   }, [setCategoryConfirmModal]);
 
   const handleConfirmAction = useCallback(async () => {
-    if (categoryConfirmModal.categoryName) {
-      try {
-        if (categoryConfirmModal.type === 'archive') {
-          await archiveCategoryMutation.mutateAsync(categoryConfirmModal.categoryName);
-        } else if (categoryConfirmModal.type === 'restore') {
-          await restoreCategoryMutation.mutateAsync(categoryConfirmModal.categoryName);
-        }
-      } catch (error) {
-        console.error('카테고리 보관/복원 실패:', error);
-      }
+    if (!categoryConfirmModal.categoryName) return;
+    
+    try {
+      const mutation = categoryConfirmModal.type === 'archive' 
+        ? archiveCategoryMutation 
+        : restoreCategoryMutation;
+      
+      await mutation.mutateAsync(categoryConfirmModal.categoryName);
+    } catch (error) {
+      console.error('카테고리 보관/복원 실패:', error);
+    } finally {
+      closeCategoryConfirmModal();
     }
-    closeCategoryConfirmModal();
   }, [categoryConfirmModal, archiveCategoryMutation, restoreCategoryMutation, closeCategoryConfirmModal]);
 
   const renderTableRow = useCallback((category: FAQCategory) => (
@@ -67,41 +63,25 @@ const FAQCategoryTable: React.FC = () => {
     />
   ), [selectedCategoryItem, handleRowClick, handleArchiveClick]);
 
-  // 로딩 상태 처리
-  if (isLoading) {
-    return (
-      <TableContainer>
-        <FAQCategoryTableHeader />
-        <EmptyState 
-          message="카테고리 목록을 불러오고 있습니다..."
-          subMessage="잠시만 기다려주세요."
-        />
-      </TableContainer>
-    );
-  }
+  const renderEmptyState = () => {
+    if (isLoading) {
+      return <EmptyState message="카테고리 목록을 불러오고 있습니다..." subMessage="잠시만 기다려주세요." />;
+    }
+    if (error) {
+      return <EmptyState message="카테고리 목록을 불러오는데 실패했습니다." subMessage="잠시 후 다시 시도해주세요." />;
+    }
+    if (categoryData.length === 0) {
+      return <EmptyState message="등록된 카테고리가 없습니다." subMessage="새로운 카테고리를 추가해보세요." />;
+    }
+    return null;
+  };
 
-  // 에러 상태 처리
-  if (error) {
+  const emptyState = renderEmptyState();
+  if (emptyState) {
     return (
       <TableContainer>
         <FAQCategoryTableHeader />
-        <EmptyState 
-          message="카테고리 목록을 불러오는데 실패했습니다."
-          subMessage="잠시 후 다시 시도해주세요."
-        />
-      </TableContainer>
-    );
-  }
-
-  // 빈 상태 처리
-  if (categoryData.length === 0) {
-    return (
-      <TableContainer>
-        <FAQCategoryTableHeader />
-        <EmptyState 
-          message="등록된 카테고리가 없습니다."
-          subMessage="새로운 카테고리를 추가해보세요."
-        />
+        {emptyState}
       </TableContainer>
     );
   }

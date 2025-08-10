@@ -11,7 +11,8 @@ interface BaseModalProps {
   children: React.ReactNode;
   onSubmit?: () => void;
   submitText?: string;
-  submitDisabled?: boolean; 
+  submitDisabled?: boolean;
+  isSubmitting?: boolean;
 }
 
 export const UploadBaseModal: React.FC<BaseModalProps> = ({
@@ -21,7 +22,8 @@ export const UploadBaseModal: React.FC<BaseModalProps> = ({
   children,
   onSubmit,
   submitText = '저장',
-  submitDisabled = false, 
+  submitDisabled = false,
+  isSubmitting = false,
 }) => {
   useEffect(() => {
     const handleEscape = (event: KeyboardEvent) => {
@@ -78,9 +80,9 @@ export const UploadBaseModal: React.FC<BaseModalProps> = ({
             <ModalFooter>
               <Button
                 variant="primary"
-                text={`${submitText}`}
+                text={isSubmitting ? '업로드 중...' : submitText}
                 onClick={handleSubmit}
-                disabled={submitDisabled}
+                disabled={submitDisabled || isSubmitting}
                 width="132px"
                 height="44px"
                 fontSize="16px"

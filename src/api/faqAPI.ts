@@ -15,8 +15,34 @@ const JSON_HEADERS = {
 
 // 공통 에러 처리 함수
 const handleApiError = (error: unknown, defaultMessage: string): never => {
-  const axiosError = error as { response?: { data?: { message?: string; error?: string } }; message?: string };
+  const axiosError = error as { 
+    response?: { 
+      data?: { 
+        message?: string; 
+        error?: string; 
+        code?: string;
+      }; 
+      status?: number;
+    }; 
+    message?: string 
+  };
+  
   const serverMsg = axiosError?.response?.data?.message || axiosError?.response?.data?.error || axiosError?.message;
+  const errorCode = axiosError?.response?.data?.code;
+  const statusCode = axiosError?.response?.status;
+  
+  // 중복 에러 처리
+  if (statusCode === 409 || errorCode === 'DUPLICATE' || 
+      serverMsg?.includes('중복') || serverMsg?.includes('이미 존재') ||
+      serverMsg?.includes('duplicate') || serverMsg?.includes('already exists')) {
+    throw new Error('동일한 질문이 이미 존재합니다. 다른 질문을 입력해주세요.');
+  }
+  
+  // 기타 클라이언트 에러
+  if (statusCode === 400) {
+    throw new Error(serverMsg || '잘못된 요청입니다. 입력 정보를 확인해주세요.');
+  }
+  
   throw new Error(serverMsg || defaultMessage);
 };
 

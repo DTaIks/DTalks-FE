@@ -1,7 +1,7 @@
 import React from "react";
 import styled from 'styled-components';
 import DropDownButton from "@/components/common/DropDownButton";
-import type { MediaFile } from "@/hooks/media/useMediaFile";
+import type { MediaFile } from "@/types/media";
 
 interface MediaFileContentProps {
   file: MediaFile;
@@ -11,7 +11,7 @@ interface MediaFileContentProps {
     handleArchiveClick: (fileName: string) => void;
     handleVersionManagementClick: (fileName: string) => void;
     handleEditClick: (file: MediaFile) => void;
-    handleUploadSubmit: (data: { fileName: string; description: string; fileVersion: string; isPublic: boolean }) => void;
+    handleUploadSubmit: (data: { uploadFile?: File; fileName: string; description: string; fileVersion: string; isPublic: boolean }) => void;
     handleConfirmAction: () => void;
     handleDocumentArchive: (documentId: number) => void;
   };
@@ -53,8 +53,8 @@ const MediaFileContent: React.FC<MediaFileContentProps> = ({
           <FileName>{file.fileName}</FileName>
           <FileMetadata>
             {file.fileSize} · {formatDate(file.updatedAt)}
-            {file.departmentName && (
-              <Department> · {file.departmentName}</Department>
+            {(file.departmentName || file.department) && (
+              <Department> · {file.departmentName || file.department}</Department>
             )}
           </FileMetadata>
         </FileDetails>

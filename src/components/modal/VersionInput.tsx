@@ -1,36 +1,44 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
-import { validateSemver, semverInput } from '@/utils/validation';
+import { validateSemver } from '@/utils/validation';
 
 interface VersionInputProps {
  version: string;
  onVersionChange: (value: string) => void;
  onBlur?: () => void;
  placeholder?: string;
- isValid?: boolean;
  showError?: boolean;
+ isEditMode?: boolean;
 }
 
-export const VersionInput: React.FC<VersionInputProps> = ({
- version,
- onVersionChange,
- onBlur,
- placeholder = "1.0.0",
- showError = false,
+export const VersionInput: React.FC<VersionInputProps> = ({ 
+  version, 
+  onVersionChange, 
+  onBlur, 
+  placeholder = "1.0.0", 
+  showError = false
 }) => {
- const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-   const validInput = semverInput(e.target.value);
-   onVersionChange(validInput);
- };
+  const [semverInput, setSemverInput] = useState(version);
 
- const handleBlur = () => {
+  // version prop이 변경될 때 semverInput 상태 업데이트
+  useEffect(() => {
+    setSemverInput(version);
+  }, [version]);
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setSemverInput(value);
+    onVersionChange(value);
+  };
+
+  const handleBlur = () => {
    if (onBlur) {
      onBlur();
    }
  };
 
- const isCurrentValueValid = validateSemver(version);
- const isEmpty = version.trim() === '';
+ const isCurrentValueValid = validateSemver(semverInput);
+ const isEmpty = semverInput.trim() === '';
 
  return (
    <VersionContainer>
@@ -39,7 +47,7 @@ export const VersionInput: React.FC<VersionInputProps> = ({
        <VersionPrefix>v</VersionPrefix>
        <Input
          type="text"
-         value={version}
+         value={semverInput}
          onChange={handleChange}
          onBlur={handleBlur}
          placeholder={placeholder}

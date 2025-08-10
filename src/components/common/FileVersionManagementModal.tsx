@@ -1,6 +1,6 @@
 import React, { useCallback } from 'react';
 import styled from 'styled-components';
-import { useVersionHistory, useFiles } from '@/hooks/media/useMediaFile';
+import { useVersionHistory } from '@/hooks/media/useMediaFile';
 
 interface VersionHistoryModalProps {
   isOpen: boolean;
@@ -15,17 +15,10 @@ export const VersionHistoryModal: React.FC<VersionHistoryModalProps> = ({
 }) => {
   const versions = useVersionHistory(fileName);
   
-  const getDisplayFileName = (fileName: string, departmentName?: string) => {
-    if (departmentName) {
-      return `[${departmentName}] ${fileName}`;
-    }
-    return fileName;
-  };
 
-  // 파일의 부서명을 찾기
-  const files = useFiles();
-  const currentFile = files.find(file => file.fileName === fileName);
-  const displayFileName = getDisplayFileName(fileName, currentFile?.departmentName);
+
+  // 파일명만 표시 (부서명은 API에서 가져올 예정)
+  const displayFileName = fileName;
   
   const handleOverlayClick = useCallback(
     (event: React.MouseEvent<HTMLDivElement>) => {

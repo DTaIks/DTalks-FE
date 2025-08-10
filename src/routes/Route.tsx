@@ -9,10 +9,8 @@ import FAQPage from '@/pages/admin/faq/FAQPage';
 import FAQCategoryPage from '@/pages/admin/faq/FAQCategoryPage';
 import ChartPage from '@/pages/admin/chart/ChartPage';
 import MediaPage from '@/pages/admin/media/MediaPage';
+import DocumentAllPage from '@/pages/admin/documentAll/DocumentAllPage';
 import DocumentPage from '@/pages/admin/document/DocumentPage';
-import GlossaryPage from '@/pages/admin/glossary/GlossaryPage';
-import PolicyPage from '@/pages/admin/policy/PolicyPage';
-import ReportFormPage from '@/pages/admin/report/ReportFormPage';
 import Layout from '@/layout/Layout';
 
 // 인증이 필요한 라우트
@@ -65,10 +63,8 @@ export default function AppRoutes() {
           <Route index element={<ChartPage />} />
           <Route path="users" element={<UserListPage />} />
           <Route path="permission" element={<PermissionPage />} />
-          <Route path="documents" element={<DocumentPage />} />
-          <Route path="glossary" element={<GlossaryPage />} />
-          <Route path="policy" element={<PolicyPage />} />
-          <Route path="report-form" element={<ReportFormPage />} />
+          <Route path="documents" element={<DocumentAllPage />} />
+          <Route path="documents/:category" element={<DocumentPage />} />
           <Route path="faq" element={<FAQPage />} />
           <Route path="faqcategory" element={<FAQCategoryPage />} />
           <Route path="media" element={<MediaPage />} />

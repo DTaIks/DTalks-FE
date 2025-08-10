@@ -135,9 +135,9 @@ const NAVIGATION_MAP: Record<string, string> = {
   [MENU_ITEMS.USER_LIST]: "/admin/users",
   [MENU_ITEMS.PERMISSION]: "/admin/permission",
   [MENU_ITEMS.ALL_DOCUMENTS]: "/admin/documents",
-  [MENU_ITEMS.TERMS]: "/admin/glossary",
-  [MENU_ITEMS.REGULATIONS]: "/admin/policy",
-  [MENU_ITEMS.REPORT_FORM]: "/admin/report-form",
+  [MENU_ITEMS.TERMS]: "/admin/documents/glossary",
+  [MENU_ITEMS.REGULATIONS]: "/admin/documents/policy",
+  [MENU_ITEMS.REPORT_FORM]: "/admin/documents/reportform",
   [MENU_ITEMS.MEDIA]: "/admin/media",
   [MENU_ITEMS.SCHEDULE_LIST]: "/admin/faq",
   [MENU_ITEMS.SCHEDULE_REGISTER]: "/admin/faqcategory"

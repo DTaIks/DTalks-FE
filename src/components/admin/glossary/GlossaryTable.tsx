@@ -1,11 +1,11 @@
-import React, { useCallback } from "react";
-import { useDocumentStore } from "@/store/documentStore";
+import React, { useCallback, useState } from "react";
 import CommonTable from "@/components/common/table/CommonTable";
 import DocumentCategory3 from "@/assets/document/DocumentCategory3.svg";
+import type { DocumentResponse } from "@/types/document";
 
 interface GlossaryTableProps {
-  currentPage: number;
-  itemsPerPage: number;
+  glossaryData?: DocumentResponse;
+  isLoading: boolean;
   modals: {
     confirmModal: {
       open: (type: 'archive' | 'download', fileName: string) => void;
@@ -15,37 +15,33 @@ interface GlossaryTableProps {
 }
 
 const GlossaryTable: React.FC<GlossaryTableProps> = ({ 
-  currentPage, 
-  itemsPerPage,
+  glossaryData,
+  isLoading,
   modals
 }) => {
-  const {
-    searchTerm,
-    selectedStatus,
-    setSelectedStatus,
-    setSearchTerm,
-    archiveDocumentItem,
-    getFilteredData
-  } = useDocumentStore();
+  const [searchTerm, setSearchTerm] = useState("");
+  const [selectedStatus, setSelectedStatus] = useState("전체 상태");
 
-  const { paginatedData } = getFilteredData(currentPage, itemsPerPage);
+  // API 데이터에서 문서 목록 추출
+  const documentList = glossaryData?.documentInfoResponseList || [];
 
   const handleSearch = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(e.target.value);
-  }, [setSearchTerm]);
+  }, []);
 
   const handleStatusChange = useCallback((value: string) => {
     setSelectedStatus(value);
-  }, [setSelectedStatus]);
+  }, []);
 
   const handleArchive = useCallback((id: number) => {
-    archiveDocumentItem(id);
-  }, [archiveDocumentItem]);
+    // 보관 처리 로직 (API 호출 필요)
+    console.log('보관 처리:', id);
+  }, []);
 
   return (
     <CommonTable
       title="용어사전 목록"
-      items={paginatedData}
+      items={documentList}
       searchTerm={searchTerm}
       selectedStatus={selectedStatus}
       onSearchChange={handleSearch}
@@ -53,6 +49,7 @@ const GlossaryTable: React.FC<GlossaryTableProps> = ({
       onArchive={handleArchive}
       categoryImage={DocumentCategory3}
       modals={modals}
+      isLoading={isLoading}
     />
   );
 };

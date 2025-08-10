@@ -1,5 +1,5 @@
 import { useCallback } from 'react';
-import type { MediaFile } from '@/hooks/media/useMediaFile';
+import type { MediaFile } from '@/types/media';
 import { useDocumentStore } from '@/store/documentStore';
 
 interface UseCommonHandlersProps {
@@ -22,6 +22,7 @@ interface UseCommonHandlersProps {
     handleConfirmAction: (modalType: 'archive' | 'download', fileName: string) => void;
     handleEdit: (data: { fileName: string; description: string; fileVersion: string; isPublic: boolean }) => void;
     handleUpload: (data: { fileName: string; description: string; fileVersion: string; isPublic: boolean }) => void;
+    setSelectedFile?: (file: { fileId: number; fileName: string } | null) => void;
   };
   documentActions?: {
     onArchive: (id: number) => void;
@@ -48,16 +49,25 @@ export const useCommonHandlers = ({ modals, mediaActions, documentActions }: Use
   // 수정 버튼 클릭 핸들러 (Media 전용)
   const handleEditClick = useCallback((file: MediaFile) => {
     if (!modals.uploadModal || !mediaActions) {
-      console.log("수정 기능은 Media 페이지에서만 사용 가능합니다.");
       return;
     }
 
+    // 선택된 파일 정보 저장
+    if (mediaActions.setSelectedFile) {
+      mediaActions.setSelectedFile({
+        fileId: file.fileId,
+        fileName: file.fileName
+      });
+    }
+
     const initialData = {
+      uploadFile: undefined, // 수정 모드에서는 기존 파일 유지 (새 파일 선택 시에만 변경)
       fileName: file.fileName,
       description: file.description || '',
-      fileVersion: file.fileVersion || '1.0.0',
-      isPublic: file.isPublic || false
+      fileVersion: file.fileVersion || '1.0.0', // 기존 버전 그대로 사용
+      isPublic: file.isPublic ?? true // 기본값을 true로 설정
     };
+    
     modals.uploadModal.openEdit(initialData);
   }, [modals.uploadModal, mediaActions]);
 
@@ -70,7 +80,6 @@ export const useCommonHandlers = ({ modals, mediaActions, documentActions }: Use
   // 업로드 모달 핸들러 (Media 전용)
   const handleUploadSubmit = useCallback((data: { fileName: string; description: string; fileVersion: string; isPublic: boolean }) => {
     if (!modals.uploadModal || !mediaActions) {
-      console.log("업로드 기능은 Media 페이지에서만 사용 가능합니다.");
       return;
     }
 
@@ -85,7 +94,6 @@ export const useCommonHandlers = ({ modals, mediaActions, documentActions }: Use
   // Document 보관 핸들러 (Document 전용)
   const handleDocumentArchive = useCallback((documentId: number) => {
     if (!documentActions) {
-      console.log("보관 기능은 Document 페이지에서만 사용 가능합니다.");
       return;
     }
     documentActions.onArchive(documentId);

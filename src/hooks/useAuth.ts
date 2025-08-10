@@ -51,8 +51,13 @@ export const useLogin = () => {
       setError(null);
     },
     onSuccess: (data) => {
+      // 쿠키 기반 인증이므로 토큰은 백업용으로만 저장
       if (data?.accessToken) setAccessToken(data.accessToken);
       if (data?.refreshToken) setRefreshToken(data.refreshToken);
+      
+      // 쿠키가 제대로 설정되었는지 확인
+      console.log('로그인 성공 - 쿠키 확인 필요');
+      
       setAuthenticated(true);
       setLoading(false);
       setError(null);

@@ -14,6 +14,7 @@ interface FAQUploadModalProps {
   isSubmitting?: boolean;
   initialData?: FAQUploadData;
   isEdit?: boolean;
+  errorMessage?: string;
 }
 
 export interface FAQUploadData {
@@ -43,6 +44,7 @@ const FAQUploadModal: React.FC<FAQUploadModalProps> = ({
   isSubmitting,
   initialData,
   isEdit = false,
+  errorMessage,
 }) => {
   const [formData, setFormData] = useState<FAQUploadData>({
     question: '',
@@ -144,6 +146,12 @@ const FAQUploadModal: React.FC<FAQUploadModalProps> = ({
         />
       </InputRow>
 
+      {errorMessage && (
+        <ErrorMessage>
+          {errorMessage}
+        </ErrorMessage>
+      )}
+
       <UploadInfoCard
         title={isEdit ? "FAQ 수정" : "FAQ 추가"}
         texts={FAQ_UPLOAD_INFO}
@@ -158,4 +166,17 @@ const InputRow = styled.div`
   display: flex;
   gap: var(--gap-16);
   margin-bottom: 40px;
+`;
+
+const ErrorMessage = styled.div`
+  color: var(--color-error);
+  font-size: var(--font-size-14);
+  font-weight: var(--font-weight-500);
+  margin-bottom: 20px;
+  margin-top: -24px;
+  padding: 12px 16px;
+  padding-left: 25px;
+  background-color: rgba(255, 59, 48, 0.1);
+  border-radius: 8px;
+  border: 1px solid rgba(255, 59, 48, 0.2);
 `;

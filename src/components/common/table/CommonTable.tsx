@@ -1,4 +1,4 @@
-import React, { useCallback } from "react";
+import React from "react";
 import styled from "styled-components";
 import DropDownButton from "@/components/common/DropDownButton";
 import { useCommonHandlers } from "@/hooks/useCommonHandlers";
@@ -24,6 +24,7 @@ interface CommonTableProps {
   onCategoryChange?: (value: string) => void;
   onArchive: (id: number) => void;
   categoryImage: string;
+  isLoading?: boolean;
   modals: {
     confirmModal: {
       open: (type: 'archive' | 'download', fileName: string) => void;
@@ -43,28 +44,79 @@ const CommonTable: React.FC<CommonTableProps> = ({
   onCategoryChange,
   onArchive,
   categoryImage,
+  isLoading = false,
   modals
 }) => {
-  const documentActions = { onArchive };
-  const handlers = useCommonHandlers({ modals, documentActions });
+  const handlers = useCommonHandlers({ modals, documentActions: { onArchive } });
 
-  const handleDownload = useCallback((documentName: string) => {
-    handlers.handleDownloadClick(documentName);
-  }, [handlers]);
-
-  const handleVersionManagement = useCallback((documentName: string) => {
-    if (modals.handleVersionHistoryClick) {
-      modals.handleVersionHistoryClick(documentName);
-    } else {
-      handlers.handleVersionManagementClick(documentName);
+  const handleAction = (action: string, documentName: string) => {
+    switch (action) {
+      case 'download':
+        handlers.handleDownloadClick(documentName);
+        break;
+      case 'version':
+        if (modals.handleVersionHistoryClick) {
+          modals.handleVersionHistoryClick(documentName);
+        } else {
+          handlers.handleVersionManagementClick(documentName);
+        }
+        break;
+      case 'archive':
+        handlers.handleArchiveClick(documentName);
+        break;
     }
-  }, [handlers, modals]);
+  };
 
-  const handleArchive = useCallback((documentName: string) => {
-    handlers.handleArchiveClick(documentName);
-  }, [handlers]);
+  const renderTableContent = () => {
+    if (isLoading) {
+      return (
+        <LoadingContainer>
+          <LoadingText>로딩 중...</LoadingText>
+        </LoadingContainer>
+      );
+    }
 
-  const headers = ["문서명", "카테고리", "버전", "작성자", "최종 수정일", "상태", "작업"];
+    if (items.length === 0) {
+      return (
+        <EmptyState 
+          message={searchTerm ? "검색 결과가 없습니다." : "표시할 문서가 없습니다"}
+          subMessage={searchTerm ? "다른 검색어를 입력해보세요." : "업로드된 문서가 없거나 필터 조건에 맞는 문서가 없습니다."}
+        />
+      );
+    }
+
+    return (
+      <Table>
+        <TableHead headers={["문서명", "카테고리", "버전", "작성자", "최종 수정일", "상태", "작업"]} />
+        <TableBody>
+          {items.map((item) => (
+            <TableRow key={item.documentId}>
+              <TableCell><Text>{item.documentName}</Text></TableCell>
+              <TableCell><CategoryImage src={categoryImage} alt={item.category} /></TableCell>
+              <TableCell><Text>{item.latestVersion}</Text></TableCell>
+              <TableCell><Text>{item.uploaderName}</Text></TableCell>
+              <TableCell><Text>{item.lastUpdatedAt}</Text></TableCell>
+              <TableCell>
+                <StatusIcon 
+                  src={item.isActive ? ActiveIcon : InActiveIcon} 
+                  alt={item.isActive ? "활성" : "비활성"} 
+                />
+              </TableCell>
+              <TableCell>
+                <DropDownButton 
+                  items={[
+                    { label: "다운로드", onClick: () => handleAction('download', item.documentName) },
+                    { label: "버전관리", onClick: () => handleAction('version', item.documentName) },
+                    { label: "보관", onClick: () => handleAction('archive', item.documentName) },
+                  ]}
+                />
+              </TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+    );
+  };
 
   return (
     <TableContainer>
@@ -77,46 +129,7 @@ const CommonTable: React.FC<CommonTableProps> = ({
         onStatusChange={onStatusChange}
         onCategoryChange={onCategoryChange}
       />
-      {items.length > 0 ? (
-        <Table>
-          <TableHead headers={headers} />
-          <TableBody>
-            {items.map((item) => (
-              <TableRow key={item.documentId}>
-                <TableCell>
-                  <DocumentName>{item.documentName}</DocumentName>
-                </TableCell>
-                <TableCell>
-                  <CategoryImage src={categoryImage} alt={item.category} />
-                </TableCell>
-                <TableCell>
-                  <VersionText>{item.latestVersion}</VersionText>
-                </TableCell>
-                <TableCell>
-                  <AuthorText>{item.uploaderName}</AuthorText>
-                </TableCell>
-                <TableCell>
-                  <DateText>{item.lastUpdatedAt}</DateText>
-                </TableCell>
-                <TableCell>
-                  <StatusIcon src={item.isActive ? ActiveIcon : InActiveIcon} alt={item.isActive ? "활성" : "비활성"} />
-                </TableCell>
-                <TableCell>
-                  <DropDownButton 
-                    items={[
-                      { label: "다운로드", onClick: () => handleDownload(item.documentName) },
-                      { label: "버전관리", onClick: () => handleVersionManagement(item.documentName) },
-                      { label: "보관", onClick: () => handleArchive(item.documentName) },
-                    ]}
-                  />
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      ) : (
-        <EmptyState />
-      )}
+      {renderTableContent()}
     </TableContainer>
   );
 };
@@ -127,11 +140,10 @@ const Table = styled.div`
   width: 100%;
 `;
 
-const DocumentName = styled.span`
+const Text = styled.span`
   color: #000;
   font-size: 16px;
   font-weight: 500;
-  white-space: nowrap;
 `;
 
 const CategoryImage = styled.img`
@@ -140,26 +152,21 @@ const CategoryImage = styled.img`
   object-fit: contain;
 `;
 
-const VersionText = styled.span`
-  color: #000;
-  font-size: 16px;
-  font-weight: 500;
-`;
-
-const AuthorText = styled.span`
-  color: #000;
-  font-size: 16px;
-  font-weight: 500;
-`;
-
-const DateText = styled.span`
-  color: #000;
-  font-size: 16px;
-  font-weight: 500;
-`;
-
 const StatusIcon = styled.img`
   width: ${props => props.alt === "비활성" ? "69px" : "56px"};
   height: 32px;
   object-fit: contain;
+`;
+
+const LoadingContainer = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 200px;
+`;
+
+const LoadingText = styled.div`
+  color: #666;
+  font-size: 16px;
+  font-weight: 500;
 `;
