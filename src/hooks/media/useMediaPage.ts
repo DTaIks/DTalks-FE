@@ -1,8 +1,8 @@
 import { useMemo } from 'react';
 import { useMediaStore } from '@/store/mediaStore';
-import { useMediaFiles, useDepartmentFiles } from '@/query/useMediaQueries';
-import { useFileUpload, useFileUpdate } from '@/query/useMediaMutations';
-import { transformCommonFileToMediaFile } from './useMediaFile';
+import { useMediaFiles, useDepartmentFiles, useArchivedFiles } from '@/query/useMediaQueries';
+import { useFileUpload, useFileUpdate, useFileArchive } from '@/query/useMediaMutations';
+import { transformCommonFileToMediaFile, transformArchivedFileToMediaFile } from './useMediaFile';
 
 // 부서명 매핑 상수
 const DEPARTMENT_MAPPING: Record<string, string> = {
@@ -44,19 +44,26 @@ export const useMediaPage = () => {
     return DEPARTMENT_MAPPING[uiDepartmentName] || '전체';
   };
 
-  // API 파라미터
+  // API 파라미터 - API에서 직접 필터링
   const commonApiParams = useMemo(() => ({
     pageNumber: currentPage - 1, // API는 0부터 시작
-    option: '전체', // 최고 관리자는 모든 파일 조회
-    fileType: selectedFileType
+    option: selectedFileType, // 파일 타입을 option 파라미터로 전송
+    fileType: '전체' // fileType은 기본값으로 설정
   }), [currentPage, selectedFileType]);
 
   const departmentApiParams = useMemo(() => ({
     pageNumber: currentPage - 1, // API는 0부터 시작
     departmentName: getDepartmentNameForAPI(selectedDepartment),
-    option: '전체',
-    fileType: selectedFileType
+    option: selectedFileType, // 파일 타입을 option 파라미터로 전송
+    fileType: '전체' // fileType은 기본값으로 설정
   }), [currentPage, selectedDepartment, selectedFileType]);
+
+  // 보관된 파일 API 파라미터
+  const archivedApiParams = useMemo(() => ({
+    pageNumber: currentPage - 1, // API는 0부터 시작
+    option: selectedFileType, // 파일 타입을 option 파라미터로 전송
+    fileType: '전체' // fileType은 기본값으로 설정
+  }), [currentPage, selectedFileType]);
 
   // 부서가 '전체 파일'이 아닌 경우 부서별 API 사용
   const isDepartmentSpecific = useMemo(() => 
@@ -81,19 +88,43 @@ export const useMediaPage = () => {
     enabled: isDepartmentSpecific
   });
 
+  // 보관된 파일 쿼리
+  const { 
+    data: archivedMediaData, 
+    isLoading: isArchivedLoading, 
+    error: archivedError 
+  } = useArchivedFiles(archivedApiParams, {
+    enabled: isArchiveMode
+  });
+
+
+
+
+
   // 현재 사용할 데이터와 로딩 상태 결정
-  const mediaData = isDepartmentSpecific ? departmentMediaData : commonMediaData;
-  const isLoading = isDepartmentSpecific ? isDepartmentLoading : isCommonLoading;
-  const error = isDepartmentSpecific ? departmentError : commonError;
-  
-  const uploadMutation = useFileUpload();
-  const updateMutation = useFileUpdate();
+  const mediaData = isArchiveMode ? archivedMediaData : (isDepartmentSpecific ? departmentMediaData : commonMediaData);
+  const isLoading = isArchiveMode ? isArchivedLoading : (isDepartmentSpecific ? isDepartmentLoading : isCommonLoading);
+  const error = isArchiveMode ? archivedError : (isDepartmentSpecific ? departmentError : commonError);
 
-  // API 파일 데이터
-  const apiFiles = useMemo(() => {
-    // 로딩 중이거나 데이터가 없으면 빈 배열 반환
-    if (isLoading || !mediaData) return [];
+  // 보관함에서 부서별 필터링을 위한 클라이언트 사이드 필터링 (파일 타입은 API에서 처리)
+  const filterArchivedFilesByDepartment = useMemo(() => {
+    if (!archivedMediaData?.commonArchivedFileInfoList) return [];
+    
+    const files = archivedMediaData.commonArchivedFileInfoList;
+    
+    // 부서별 필터링만 클라이언트에서 처리 (파일 타입은 API에서 이미 필터링됨)
+    if (selectedDepartment === '전체 파일') {
+      return files;
+    }
+    
+    // 특정 부서가 선택된 경우 해당 부서의 파일만 필터링
+    return files.filter(file => file.department === selectedDepartment);
+  }, [archivedMediaData, selectedDepartment]);
 
+  // 일반 파일에서 부서별 필터링을 위한 클라이언트 사이드 필터링 (파일 타입은 API에서 처리)
+  const filterFilesByDepartment = useMemo(() => {
+    if (!mediaData) return [];
+    
     let fileList;
     if (isDepartmentSpecific && 'departmentFileInfoList' in mediaData) {
       fileList = mediaData.departmentFileInfoList;
@@ -105,8 +136,32 @@ export const useMediaPage = () => {
 
     if (!fileList) return [];
 
-    return fileList.map(transformCommonFileToMediaFile);
-  }, [mediaData, isDepartmentSpecific, isLoading]);
+    // 부서별 필터링만 클라이언트에서 처리 (파일 타입은 API에서 이미 필터링됨)
+    return fileList;
+  }, [mediaData, isDepartmentSpecific]);
+
+
+  
+  const uploadMutation = useFileUpload();
+  const updateMutation = useFileUpdate();
+  const archiveMutation = useFileArchive();
+
+  // API 파일 데이터
+  const apiFiles = useMemo(() => {
+    // 로딩 중이거나 데이터가 없으면 빈 배열 반환
+    if (isLoading || !mediaData) return [];
+
+    let fileList;
+    if (isArchiveMode && 'commonArchivedFileInfoList' in mediaData) {
+      // 보관함에서는 부서별 필터링된 데이터 사용
+      fileList = filterArchivedFilesByDepartment;
+      return fileList.map(transformArchivedFileToMediaFile);
+    } else {
+      // 일반 파일에서는 부서별 필터링된 데이터 사용 (파일 타입은 API에서 처리)
+      fileList = filterFilesByDepartment;
+      return fileList.map(transformCommonFileToMediaFile);
+    }
+  }, [mediaData, isArchiveMode, isLoading, filterArchivedFilesByDepartment, filterFilesByDepartment]);
 
   // API에서 이미 필터링된 데이터를 사용
   const files = apiFiles;
@@ -122,27 +177,32 @@ export const useMediaPage = () => {
     // 부서 선택 (전체 파일 포함)
     selectDepartment: (departmentName: string) => {
       setSelectedDepartment(departmentName);
+      setCurrentPage(1); // 부서 변경 시 첫 페이지로 이동
     },
     
     // 파일 타입 선택
     selectFileType: (fileType: string) => {
       setSelectedFileType(fileType as '전체' | '문서' | '이미지' | '음성');
+      setCurrentPage(1); // 파일 타입 변경 시 첫 페이지로 이동
     },
     
     // 보관함 관련
     toggleArchive: (isArchive: boolean) => {
       setArchiveMode(isArchive);
+      setCurrentPage(1); // 보관함 모드 변경 시 첫 페이지로 이동
     },
     
     // 보관함에서 부서 선택
     selectArchiveDepartment: (departmentName: string) => {
       setSelectedDepartment(departmentName);
+      setCurrentPage(1); // 보관함에서 부서 변경 시 첫 페이지로 이동
     }
       }), [setCurrentPage, setSelectedDepartment, setSelectedFileType, setArchiveMode]);
 
   return {
     // 상태
     selectedDepartment,
+    selectedFileType,
     isArchiveMode,
     isArchiveClosing,
     currentPage,
@@ -155,6 +215,7 @@ export const useMediaPage = () => {
     error,
     isUploading: uploadMutation.isPending,
     isUpdating: updateMutation.isPending,
+    isArchiving: archiveMutation.isPending,
     
     // 액션
     ...handlers,
@@ -168,5 +229,6 @@ export const useMediaPage = () => {
     setSelectedFile,
     uploadMutation,
     updateMutation,
+    archiveMutation,
   };
 };

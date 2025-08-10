@@ -49,3 +49,22 @@ export const useFileUpdate = () => {
     },
   });
 };
+
+// 파일 보관 뮤테이션
+export const useFileArchive = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (fileId: number) => mediaAPI.archiveFile(fileId),
+    onSuccess: () => {
+      // 모든 mediaFiles와 departmentFiles 쿼리를 무효화
+      queryClient.invalidateQueries({
+        predicate: (query) =>
+          query.queryKey[0] === 'mediaFiles' || query.queryKey[0] === 'departmentFiles'
+      });
+    },
+    onError: (error: Error) => {
+      console.error('파일 보관 실패:', error);
+    },
+  });
+};

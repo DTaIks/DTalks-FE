@@ -56,6 +56,30 @@ export interface DepartmentFileRequest {
   fileType?: string;
 }
 
+export interface CommonArchivedFileInfo {
+  fileId: number;
+  fileName: string;
+  fileSize: string;
+  updatedAt: string;
+  department: string;
+  description: string;
+  fileUrl: string;
+  latestFileVersionNumber: string;
+  fileType: string;
+}
+
+export interface CommonArchivedFileResponse {
+  commonArchivedFileInfoList: CommonArchivedFileInfo[];
+  pagingInfo: PagingInfo;
+  fileType: string;
+}
+
+export interface CommonArchivedFileRequest {
+  option?: string;
+  pageNumber: number;
+  fileType?: string;
+}
+
 export interface FileUploadInfo {
   fileName: string;
   description: string;
@@ -74,7 +98,7 @@ export interface MediaFile {
   fileName: string;
   fileSize: string;
   updatedAt: string;
-  fileType?: 'document' | 'audio' | 'image';
+  fileType?: '문서' | '이미지' | '음성';
   departmentName?: string;
   department?: string;
   description?: string;

@@ -30,6 +30,7 @@ const MediaPage: React.FC = () => {
   ];
   const {
     selectedDepartment,
+    selectedFileType,
     isArchiveMode,
     isArchiveClosing,
     currentPage,
@@ -58,8 +59,6 @@ const MediaPage: React.FC = () => {
   } = useMediaPage();
 
   const mediaActions = useMediaActions();
-  
-
   
   const handlers = useCommonHandlers({ 
     modals: {
@@ -90,7 +89,16 @@ const MediaPage: React.FC = () => {
 
   // 확인 모달 액션 핸들러
   const handleConfirmAction = () => {
-    mediaActions.handleConfirmAction(confirmModal.type, confirmModal.fileName);
+    if (confirmModal.type === 'archive') {
+      // 파일명으로 파일 ID를 찾아서 보관 처리
+      const fileToArchive = files.find(file => file.fileName === confirmModal.fileName);
+      if (fileToArchive) {
+        mediaActions.handleArchive(fileToArchive.fileId);
+      }
+    } else if (confirmModal.type === 'download') {
+      // 다운로드 처리 로직
+      console.log('파일 다운로드:', confirmModal.fileName);
+    }
     closeConfirmModal();
   };
 
@@ -168,6 +176,7 @@ const MediaPage: React.FC = () => {
               <DropdownWrapper>
                 <DropdownFilter 
                   options={['전체', '문서', '이미지', '음성'] as const}
+                  defaultValue={selectedFileType}
                   onSelect={selectFileType}
                   placeholder="파일 유형"
                 />

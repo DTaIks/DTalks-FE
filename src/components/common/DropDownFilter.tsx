@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import styled from 'styled-components';
 
 interface DropdownFilterProps<T extends readonly string[]> {
@@ -21,6 +21,11 @@ function DropdownFilter<T extends readonly string[]>({
   const [selectedValue, setSelectedValue] = useState<T[number] | undefined>(
     defaultValue
   );
+
+  // defaultValue가 변경되면 내부 상태도 업데이트
+  React.useEffect(() => {
+    setSelectedValue(defaultValue);
+  }, [defaultValue]);
 
   const toggleExpanded = (): void => {
     if (!disabled) {
