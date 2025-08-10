@@ -1,11 +1,12 @@
 import { useCallback } from 'react';
-import { useFileUpload, useFileUpdate } from '@/query/useMediaMutations';
+import { useFileUpload, useFileUpdate, useFileArchive } from '@/query/useMediaMutations';
 import { useMediaStore } from '@/store/mediaStore';
 import type { MediaUploadData } from '@/components/admin/media/MediaFileUploadModal';
 
 export const useMediaActions = () => {
   const uploadMutation = useFileUpload();
   const updateMutation = useFileUpdate();
+  const archiveMutation = useFileArchive();
   const { selectedFile } = useMediaStore();
 
   // 파일 업로드 핸들러
@@ -40,20 +41,18 @@ export const useMediaActions = () => {
     }
   }, [updateMutation, selectedFile]);
 
-  // 확인 모달 액션 핸들러
-  const handleConfirmAction = useCallback((modalType: 'archive' | 'download', fileName: string) => {
-    if (modalType === 'archive') {
-      // 보관 처리 로직
-      console.log('파일 보관:', fileName);
-    } else if (modalType === 'download') {
-      // 다운로드 처리 로직
-      console.log('파일 다운로드:', fileName);
+  // 파일 보관 핸들러
+  const handleArchive = useCallback(async (fileId: number) => {
+    try {
+      await archiveMutation.mutateAsync(fileId);
+    } catch (error) {
+      console.error('파일 보관 실패:', error);
     }
-  }, []);
+  }, [archiveMutation]);
 
   return {
     handleUpload,
     handleEdit,
-    handleConfirmAction,
+    handleArchive,
   };
 };
