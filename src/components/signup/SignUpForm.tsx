@@ -1,13 +1,12 @@
 import styled from 'styled-components';
 import InputField from '@/components/common/InputField';
 import Button from '@/components/common/Button';
-import { useSignUp } from '@/hooks/useSignUp';
+import { useSignUpForm } from '@/hooks/useSignUp';
 
 export default function SignUpForm(): JSX.Element {
   const {
     register,
     handleSubmit,
-    watch,
     errors,
     authState,
     handleEmailCheck,
@@ -15,8 +14,11 @@ export default function SignUpForm(): JSX.Element {
     getAuthButtonClick,
     isAuthButtonDisabled,
     isSubmitEnabled,
-    formatTimer
-  } = useSignUp();
+    formatTimer,
+    getEmailCheckButtonText,
+    isEmailCheckButtonDisabled,
+    getSubmitButtonText
+  } = useSignUpForm();
 
   return (
     <FormWrapper>
@@ -31,11 +33,11 @@ export default function SignUpForm(): JSX.Element {
             ...register('email'),
             disabled: authState.isEmailVerified
           }}
-          infoText={errors.email?.message || ''}
-          infoTextColor={errors.email ? '#F0191D' : ''}
-          buttonText="중복 확인"
+          infoText={errors.email?.message || (authState.isEmailVerified ? '사용 가능한 이메일입니다.' : '')}
+          infoTextColor={errors.email ? '#F0191D' : authState.isEmailVerified ? '#27ae60' : ''}
+          buttonText={getEmailCheckButtonText()}
           onButtonClick={handleEmailCheck}
-          buttonDisabled={!watch('email') || authState.isEmailVerified}
+          buttonDisabled={isEmailCheckButtonDisabled()}
         />
 
         <AuthCodeFieldWrapper>
@@ -60,7 +62,7 @@ export default function SignUpForm(): JSX.Element {
           )}
 
           {authState.isAuthCodeSent && authState.authTimer === 0 && !authState.isAuthCodeVerified && (
-            <TimerText>인증시간이 만료되었습니다. 재전송 버튼을 눌러주세요.</TimerText>
+            <TimerText>인증시간이 만료되었습니다.</TimerText>
           )}
         </AuthCodeFieldWrapper>
 
@@ -100,7 +102,7 @@ export default function SignUpForm(): JSX.Element {
         />
 
         <Button
-          text="회원가입"
+          text={getSubmitButtonText()}
           type="submit"
           variant="submit"
           width="380px"
@@ -134,7 +136,7 @@ const Title = styled.h2`
 `;
 
 const TimerText = styled.div`
-  font-size: 9px;
+  font-size: 12px;
   color: #F0191D;
   text-align: center;
   margin-top: 3px;

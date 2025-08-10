@@ -14,9 +14,6 @@ export const adminUserAPI = {
       pageSize: (params.pageSize || 7).toString(),
     });
 
-    console.log('사용자 목록 조회 요청:', `/admin/user?${queryParams.toString()}`);
-    console.log('전달받은 params (이미 0-based):', params);
-
     try {
       const response = await apiInstance.get<AdminUserListResponse>(
         `/admin/user?${queryParams.toString()}`,

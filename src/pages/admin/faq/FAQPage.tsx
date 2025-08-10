@@ -5,8 +5,8 @@ import FAQTable from "@/components/admin/faq/table/FAQTable";
 import Button from "@/components/common/Button";
 import Pagination from "@/components/common/Pagination";
 import FAQUploadModal, { type FAQUploadData } from "@/components/admin/faq/FAQUploadModal";
-import { useFAQList, useFAQSearch, useFAQFilter } from "@/hooks/faq/useFAQQueries";
-import { useCreateFAQ } from "@/hooks/faq/useFAQMutations";
+import { useFAQList, useFAQSearch, useFAQFilter } from "@/query/useFAQQueries";
+import { useCreateFAQ } from "@/query/useFAQMutations";
 import { useFAQStore } from "@/store/faqStore";
 import { getCategoryNameFromFilter } from "@/utils/faqUtils";
 
@@ -206,4 +206,3 @@ const PaginationContainer = styled.div`
   margin-top: 4px;
   margin-bottom: 24px;
 `;
-

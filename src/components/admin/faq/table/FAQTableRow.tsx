@@ -3,7 +3,7 @@ import styled from "styled-components";
 import ActiveIcon from "@/assets/common/Active.svg";
 import InactiveIcon from "@/assets/common/InActive.svg";
 import { type FAQItem } from "@/types/faq";
-import { useFAQDetail } from "@/hooks/faq/useFAQQueries";
+import { useFAQDetail } from "@/query/useFAQQueries";
 
 interface FAQTableRowProps {
   faq: FAQItem;

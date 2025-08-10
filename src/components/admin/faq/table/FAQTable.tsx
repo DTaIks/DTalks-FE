@@ -9,7 +9,7 @@ import FAQTableHeader from "@/components/admin/faq/table/FAQTableHeader";
 import FAQTableHead from "@/components/admin/faq/table/FAQTableHead";
 import FAQTableRow from "@/components/admin/faq/table/FAQTableRow";
 import { useFAQStore } from "@/store/faqStore";
-import { useUpdateFAQ, useArchiveFAQ } from "@/hooks/faq/useFAQMutations";
+import { useUpdateFAQ, useArchiveFAQ } from "@/query/useFAQMutations";
 import { faqAPI } from "@/api/faqAPI";
 
 const FAQTable: React.FC<FAQTableProps> = ({ 
