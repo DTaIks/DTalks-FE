@@ -1,5 +1,5 @@
 import styled from "styled-components";
-import RoleManagement from "@/components/admin/permission/RoleManagement";
+import RoleManagement from "./RoleManagement";
 import { usePermissionStore } from "@/store/permissionStore";
 import TableHeader from "@/components/admin/permission/PermissionTableHeader";
 import TableRow from "@/components/admin/permission/PermissionTableRow";

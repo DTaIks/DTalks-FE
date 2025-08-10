@@ -11,17 +11,17 @@ interface PermissionUser {
 }
 
 interface PermissionState {
-  // 선택된 행들 (여러 개 선택 가능)
-  selectedRows: number[];
+  // 선택된 사용자 ID들 (userId 기반)
+  selectedUserIds: number[];
   selectedUser: PermissionUser | null;
   isModalOpen: boolean;
   
   // 액션들
-  setSelectedRows: (rows: number[]) => void;
-  addSelectedRow: (rowIndex: number) => void;
-  removeSelectedRow: (rowIndex: number) => void;
-  toggleSelectedRow: (rowIndex: number) => void;
-  clearSelectedRows: () => void;
+  setSelectedUserIds: (userIds: number[] | ((prev: number[]) => number[])) => void;
+  addSelectedUserId: (userId: number) => void;
+  removeSelectedUserId: (userId: number) => void;
+  toggleSelectedUserId: (userId: number) => void;
+  clearSelectedUserIds: () => void;
   setSelectedUser: (user: PermissionUser | null) => void;
   setModalOpen: (open: boolean) => void;
   resetPermissionState: () => void;
@@ -30,35 +30,41 @@ interface PermissionState {
 export const usePermissionStore = create<PermissionState>()(
   (set, get) => ({
     // 초기 상태
-    selectedRows: [],
+    selectedUserIds: [],
     selectedUser: null,
     isModalOpen: false,
     
     // 액션들
-    setSelectedRows: (rows) => set({ selectedRows: rows }),
-    
-    addSelectedRow: (rowIndex) => {
-      const { selectedRows } = get();
-      if (!selectedRows.includes(rowIndex)) {
-        set({ selectedRows: [...selectedRows, rowIndex] });
-      }
-    },
-    
-    removeSelectedRow: (rowIndex) => {
-      const { selectedRows } = get();
-      set({ selectedRows: selectedRows.filter(row => row !== rowIndex) });
-    },
-    
-    toggleSelectedRow: (rowIndex) => {
-      const { selectedRows } = get();
-      if (selectedRows.includes(rowIndex)) {
-        set({ selectedRows: selectedRows.filter(row => row !== rowIndex) });
+    setSelectedUserIds: (userIds) => {
+      if (typeof userIds === 'function') {
+        set((state) => ({ selectedUserIds: userIds(state.selectedUserIds) }));
       } else {
-        set({ selectedRows: [...selectedRows, rowIndex] });
+        set({ selectedUserIds: userIds });
       }
     },
     
-    clearSelectedRows: () => set({ selectedRows: [] }),
+    addSelectedUserId: (userId) => {
+      const { selectedUserIds } = get();
+      if (!selectedUserIds.includes(userId)) {
+        set({ selectedUserIds: [...selectedUserIds, userId] });
+      }
+    },
+    
+    removeSelectedUserId: (userId) => {
+      const { selectedUserIds } = get();
+      set({ selectedUserIds: selectedUserIds.filter(id => id !== userId) });
+    },
+    
+    toggleSelectedUserId: (userId) => {
+      const { selectedUserIds } = get();
+      if (selectedUserIds.includes(userId)) {
+        set({ selectedUserIds: selectedUserIds.filter(id => id !== userId) });
+      } else {
+        set({ selectedUserIds: [...selectedUserIds, userId] });
+      }
+    },
+    
+    clearSelectedUserIds: () => set({ selectedUserIds: [] }),
     
     setSelectedUser: (user) => set({ selectedUser: user }),
     
@@ -66,10 +72,10 @@ export const usePermissionStore = create<PermissionState>()(
     
     resetPermissionState: () => {
       set({
-        selectedRows: [],
+        selectedUserIds: [],
         selectedUser: null,
         isModalOpen: false,
       });
     },
   })
-); 
+);
