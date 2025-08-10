@@ -10,6 +10,16 @@ interface LoginResponse {
   refreshToken: string;
 }
 
+interface SignUpRequest {
+  email: string;
+  employeeNumber: string;
+  password: string;
+}
+
+interface SignUpResponse {
+  message: string;
+}
+
 export const authAPI = {
   login: async (data: LoginRequest): Promise<LoginResponse> => {
     const sanitized: LoginRequest = {
@@ -31,10 +41,12 @@ export const authAPI = {
       return response.data;
     } catch (error: unknown) {
       const axiosError = error as { response?: { status?: number; data?: { message?: string; error?: string }; headers?: Record<string, unknown> }; message?: string };
-      const serverMsg = axiosError?.response?.data?.message || axiosError?.response?.data?.error || axiosError?.message;
       
-      const errorToThrow = new Error(serverMsg || '로그인에 실패했습니다.');
-      throw errorToThrow;
+      throw new Error(
+        axiosError?.response?.data?.message || 
+        axiosError?.response?.data?.error || 
+        axiosError?.message
+      );
     }
   },
 
@@ -42,8 +54,97 @@ export const authAPI = {
     await apiInstance.post('/admin/auth/logout');
   },
 
-  checkEmailDuplicate: async (email: string): Promise<{ isDuplicate: boolean }> => {
-     const response = await apiInstance.get<{ isDuplicate: boolean }>(`/admin/auth/check-email?email=${encodeURIComponent(email)}`);
-     return response.data;
+  // 회원가입 API 추가
+  signUp: async (data: SignUpRequest): Promise<SignUpResponse> => {
+    const sanitized: SignUpRequest = {
+      email: data.email?.trim(),
+      employeeNumber: data.employeeNumber?.trim(),
+      password: data.password?.trim(),
+    } as SignUpRequest;
+
+    if (!sanitized.email || !sanitized.employeeNumber || !sanitized.password) {
+      throw new Error('모든 필드를 입력해주세요.');
+    }
+
+    try {
+      const response = await apiInstance.post<SignUpResponse>(
+        '/admin/auth/join',
+        sanitized,
+        { headers: { 'Content-Type': 'application/json', Accept: 'application/json' } }
+      );
+
+      return response.data;
+    } catch (error: unknown) {
+      const axiosError = error as { 
+        response?: { 
+          status?: number; 
+          data?: { message?: string; error?: string }; 
+          headers?: Record<string, unknown> 
+        }; 
+        message?: string 
+      };
+      
+      throw new Error(
+        axiosError?.response?.data?.message || 
+        axiosError?.response?.data?.error || 
+        axiosError?.message || '회원가입 중 오류가 발생했습니다.'
+      );
+    }
   },
-}; 
+
+  // 이메일 중복 확인 API
+  validateEmail: async (email: string): Promise<{ isDuplicate: boolean }> => {
+    try {
+      const response = await apiInstance.post<{
+        data: { isDuplicate: boolean };
+      }>('/admin/email/validation', { email });
+      
+      const { data: responseData } = response.data;
+      return responseData;
+    } catch (error: unknown) {
+      const axiosError = error as { response?: { status?: number; data?: { message?: string; error?: string }; headers?: Record<string, unknown> }; message?: string };
+      
+      throw new Error(
+        axiosError?.response?.data?.message || 
+        axiosError?.response?.data?.error || 
+        axiosError?.message
+      );
+    }
+  },
+
+  // 이메일 인증번호 전송 API
+  sendAuthCode: async (email: string, isDuplicateEmail: boolean): Promise<void> => {
+    try {
+      await apiInstance.post('/admin/email/send', { 
+        email, 
+        isDuplicateEmail 
+      });
+    } catch (error: unknown) {
+      const axiosError = error as { response?: { status?: number; data?: { message?: string; error?: string }; headers?: Record<string, unknown> }; message?: string };
+      
+      throw new Error(
+        axiosError?.response?.data?.message || 
+        axiosError?.response?.data?.error || 
+        axiosError?.message
+      );
+    }
+  },
+
+  // 이메일 인증번호 확인 API
+  verifyAuthCode: async (email: string, verificationNumber: string): Promise<void> => {
+    try {
+      await apiInstance.post('/admin/email/verification', {
+        email,
+        verificationNumber
+      });
+    } catch (error: unknown) {
+      const axiosError = error as { response?: { status?: number; data?: { message?: string; error?: string }; headers?: Record<string, unknown> }; message?: string };
+      
+      throw new Error(
+        axiosError?.response?.data?.message || 
+        axiosError?.response?.data?.error || 
+        axiosError?.message
+      );
+    }
+  },
+};
