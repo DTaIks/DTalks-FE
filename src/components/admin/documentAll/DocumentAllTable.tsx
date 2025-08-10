@@ -37,7 +37,7 @@ const DocumentAllTable: React.FC<DocumentAllTableProps> = ({
     fileUrl: doc.fileUrl,
   }));
 
-  const handleArchive = useCallback((id: number) => {
+  const handleArchive = useCallback(() => {
     // 보관 처리 로직 (API 연동 필요)
   }, []);
 

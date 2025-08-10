@@ -4,8 +4,6 @@ import DocumentCategory3 from "@/assets/document/DocumentCategory3.svg";
 import type { DocumentResponse } from "@/types/document";
 
 interface GlossaryTableProps {
-  currentPage: number;
-  itemsPerPage: number;
   glossaryData?: DocumentResponse;
   isLoading: boolean;
   modals: {
@@ -17,8 +15,6 @@ interface GlossaryTableProps {
 }
 
 const GlossaryTable: React.FC<GlossaryTableProps> = ({ 
-  currentPage, 
-  itemsPerPage,
   glossaryData,
   isLoading,
   modals

@@ -23,13 +23,9 @@ export const documentAPI = {
     
     const url = `/admin/documents?${queryParams.toString()}`;
     
-    try {
-      const response = await apiInstance.get(url);
-      
-      // 서버 응답이 {code, status, message, data} 형태인 경우 data 필드를 반환
-      return response.data.data || response.data;
-    } catch (error: any) {
-      throw error;
-    }
+    const response = await apiInstance.get(url);
+    
+    // 서버 응답이 {code, status, message, data} 형태인 경우 data 필드를 반환
+    return response.data.data || response.data;
   }
 };

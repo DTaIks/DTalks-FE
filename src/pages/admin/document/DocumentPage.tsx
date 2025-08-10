@@ -3,7 +3,7 @@ import { useParams, Navigate } from "react-router-dom";
 import styled from "styled-components";
 import TitleContainer from "@/layout/TitleContainer";
 import Button from "@/components/common/Button";
-import Pagination from "@/components/common/Pagination";
+
 import ConfirmModal from "@/components/common/ConfirmModal";
 import DocumentUploadModal from "@/components/common/DocumentUploadModal";
 import { VersionHistoryModal } from "@/components/common/FileVersionManagementModal";
@@ -37,13 +37,6 @@ const DocumentPage = () => {
       image: DocumentCategory2
     }
   };
-
-  // 유효하지 않은 카테고리인 경우 리다이렉트
-  if (!category || !categoryConfig[category as keyof typeof categoryConfig]) {
-    return <Navigate to="/admin/documents" replace />;
-  }
-
-  const config = categoryConfig[category as keyof typeof categoryConfig];
 
   // 공통 핸들러 사용
   const { handleArchiveByFileName } = useCommonHandlers({
@@ -96,6 +89,13 @@ const DocumentPage = () => {
     // confirmModal 열기 로직
     console.log(`${type} 모달 열기:`, fileName);
   }, []);
+
+  // 유효하지 않은 카테고리인 경우 리다이렉트
+  if (!category || !categoryConfig[category as keyof typeof categoryConfig]) {
+    return <Navigate to="/admin/documents" replace />;
+  }
+
+  const config = categoryConfig[category as keyof typeof categoryConfig];
 
   return (
     <Container>

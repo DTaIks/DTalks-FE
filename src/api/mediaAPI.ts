@@ -1,37 +1,28 @@
 import { apiInstance } from './apiInstance';
-import type { CommonFileResponse, CommonFileRequest, FileUploadInfo, FileUploadResponse } from '@/types/media';
+import type { CommonFileResponse, CommonFileRequest, FileUploadInfo, FileUploadResponse, DepartmentFileResponse, DepartmentFileRequest } from '@/types/media';
 
 export const mediaAPI = {
-  // 공통 파일 목록 조회
+  // 공통 파일 조회
   getCommonFiles: async (params: CommonFileRequest): Promise<CommonFileResponse> => {
-    const { option, pageNumber, fileType } = params;
-    const queryParams = new URLSearchParams();
+    const response = await apiInstance.get(`/admin/file/common?${new URLSearchParams({
+      pageNumber: params.pageNumber.toString(),
+      option: params.option || '전체',
+      fileType: params.fileType || '전체'
+    })}`);
     
-    // option은 필수 파라미터이므로 기본값 설정 (전체로 설정)
-    const finalOption = option || '전체'; // 전체 파일로 설정
-    queryParams.append('option', finalOption);
-    queryParams.append('pageNumber', pageNumber.toString());
-    queryParams.append('pageSize', '5'); // 페이지 크기 5로 설정
+    return response.data.data; // data 필드 반환
+  },
+
+  // 부서별 파일 조회
+  getDepartmentFiles: async (params: DepartmentFileRequest): Promise<DepartmentFileResponse> => {
+    const response = await apiInstance.get(`/admin/file/department?${new URLSearchParams({
+      pageNumber: params.pageNumber.toString(),
+      departmentName: params.departmentName,
+      option: params.option || '공통',
+      fileType: params.fileType || '전체'
+    })}`);
     
-    // 파일 타입 필터 추가 (API에서 지원하는 경우)
-    if (fileType) {
-      queryParams.append('fileType', fileType);
-    }
-    
-    const url = `/admin/file/common?${queryParams.toString()}`;
-    
-    console.log('🌐 API 요청 URL:', url);
-    console.log('🌐 API 요청 파라미터:', JSON.stringify({ option: finalOption, pageNumber, pageSize: '5' }));
-    
-    const response = await apiInstance.get(url);
-    
-    console.log('🌐 API 응답 데이터:', JSON.stringify(response.data, null, 2));
-    console.log('🌐 API 응답 data 필드:', JSON.stringify(response.data?.data, null, 2));
-    console.log('🌐 파일 목록 개수:', response.data?.data?.commonFileInfoList?.length || 0);
-    console.log('🌐 파일 목록:', JSON.stringify(response.data?.data?.commonFileInfoList, null, 2));
-    
-    // 서버 응답이 {code, status, message, data} 형태인 경우 data 필드를 반환
-    return response.data.data || response.data;
+    return response.data.data; // data 필드 반환
   },
 
   // 파일 업로드
@@ -46,6 +37,28 @@ export const mediaAPI = {
     
     // 일반 API 인스턴스 사용 (쿠키 기반 인증)
     const response = await apiInstance.post('/admin/file/upload', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+    
+    return response.data;
+  },
+
+  // 파일 수정
+  updateFile: async (fileId: number, file: File | null, fileInfo: FileUploadInfo): Promise<FileUploadResponse> => {
+    const formData = new FormData();
+    
+    // 파일이 있는 경우에만 추가 (수정 시 파일을 변경하지 않을 수도 있음)
+    if (file) {
+      formData.append('file', file);
+    }
+    
+    // fileInfo를 JSON 문자열로 변환하여 하나의 객체로 전송
+    formData.append('fileInfo', JSON.stringify(fileInfo));
+    
+    // 일반 API 인스턴스 사용 (쿠키 기반 인증)
+    const response = await apiInstance.post(`/admin/file/${fileId}/update`, formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
       },

@@ -8,7 +8,7 @@ import ConfirmModal from "@/components/common/ConfirmModal";
 import { VersionHistoryModal } from "@/components/common/FileVersionManagementModal";
 import { useDocumentStore } from "@/store/documentStore";
 import { useDocumentAllList } from "@/query/useDocumentAllQueries";
-import EmptyState from "@/components/common/EmptyState";
+
 
 // 전체 문서 관리 페이지
 const DocumentAllPage = () => {
@@ -32,17 +32,17 @@ const DocumentAllPage = () => {
   const documents = documentData?.documentInfoResponseList || [];
   const totalPages = documentData?.pagingInfo?.totalPageCount || 1;
   
-  const handlePageChange = (page: number) => {
+  const handlePageChange = useCallback((page: number) => {
     setCurrentPage(page);
-  };
+  }, []);
   
   const openConfirmModal = (type: 'archive' | 'download', fileName: string) => {
     setConfirmModal({ isOpen: true, type, fileName });
   };
   
-  const closeConfirmModal = () => {
+  const closeConfirmModal = useCallback(() => {
     setConfirmModal({ isOpen: false, type: 'archive', fileName: '' });
-  };
+  }, []);
   
   const openVersionModal = (fileName: string) => {
     setVersionModal({ isOpen: true, fileName });
@@ -155,20 +155,4 @@ const PaginationContainer = styled.div`
   margin-bottom: 24px;
 `;
 
-const LoadingText = styled.div`
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 200px;
-  color: var(--color-gray);
-  font-size: var(--font-size-14);
-`;
 
-const ErrorText = styled.div`
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 200px;
-  color: #dc3545;
-  font-size: var(--font-size-14);
-`;

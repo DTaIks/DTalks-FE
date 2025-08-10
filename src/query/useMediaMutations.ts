@@ -10,20 +10,42 @@ export const useFileUpload = () => {
     mutationFn: ({ file, fileInfo }: { file: File; fileInfo: FileUploadInfo }) =>
       mediaAPI.uploadFile(file, fileInfo),
     onSuccess: () => {
-      console.log('✅ 파일 업로드 성공! 쿼리 무효화 실행');
-      // 파일 업로드 성공 시 파일 목록을 다시 불러옴
-      queryClient.invalidateQueries({ queryKey: ['mediaFiles'] });
+      // 모든 mediaFiles와 departmentFiles 쿼리를 무효화
+      queryClient.invalidateQueries({ 
+        predicate: (query) => 
+          query.queryKey[0] === 'mediaFiles' || query.queryKey[0] === 'departmentFiles'
+      });
     },
-    onError: (error: any) => {
+    onError: (error: Error) => {
       console.error('파일 업로드 실패:', error);
       console.error('에러 상세 정보:', {
         message: error.message,
-        code: error.code,
-        status: error.response?.status,
-        statusText: error.response?.statusText,
-        data: error.response?.data,
-        config: error.config
+        code: (error as { code?: string }).code,
+        status: (error as { response?: { status?: number } }).response?.status,
+        statusText: (error as { response?: { statusText?: string } }).response?.statusText,
+        data: (error as { response?: { data?: unknown } }).response?.data,
+        config: (error as { config?: unknown }).config
       });
+    },
+  });
+};
+
+// 파일 수정 뮤테이션
+export const useFileUpdate = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ fileId, file, fileInfo }: { fileId: number; file: File | null; fileInfo: FileUploadInfo }) =>
+      mediaAPI.updateFile(fileId, file, fileInfo),
+    onSuccess: () => {
+      // 모든 mediaFiles와 departmentFiles 쿼리를 무효화
+      queryClient.invalidateQueries({
+        predicate: (query) =>
+          query.queryKey[0] === 'mediaFiles' || query.queryKey[0] === 'departmentFiles'
+      });
+    },
+    onError: (error: Error) => {
+      console.error('파일 수정 실패:', error);
     },
   });
 };

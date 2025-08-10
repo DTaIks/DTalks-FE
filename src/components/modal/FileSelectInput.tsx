@@ -10,6 +10,7 @@ interface FileSelectInputProps {
   maxSizeInMB?: number;
   onFileError?: (error: string) => void;
   fileError?: string;
+  disabled?: boolean;
 }
 
 export const FileSelectInput: React.FC<FileSelectInputProps> = ({
@@ -20,7 +21,8 @@ export const FileSelectInput: React.FC<FileSelectInputProps> = ({
   placeholder = "선택된 파일 없음",
   maxSizeInMB = 10,
   onFileError,
-  fileError
+  fileError,
+  disabled = false
 }) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -50,7 +52,9 @@ export const FileSelectInput: React.FC<FileSelectInputProps> = ({
   };
 
   const handleButtonClick = () => {
-    fileInputRef.current?.click();
+    if (!disabled) {
+      fileInputRef.current?.click();
+    }
   };
 
   return (
@@ -62,9 +66,10 @@ export const FileSelectInput: React.FC<FileSelectInputProps> = ({
           value={fileDisplayName}
           placeholder={placeholder}
           readOnly
+          disabled={disabled}
         />
-        <SelectButton type="button" onClick={handleButtonClick}>
-          파일 선택
+        <SelectButton type="button" onClick={handleButtonClick} disabled={disabled}>
+          {disabled ? '기존 파일' : '파일 선택'}
         </SelectButton>
         <HiddenFileInput
           ref={fileInputRef}
@@ -124,9 +129,9 @@ const SelectButton = styled.button`
   height: 24px;
   transform: translateY(-50%);
   padding: 6px 12px;
-  background: rgba(0, 0, 0, 0.10);
-  color: #374151;
-  border: 0.375px solid #000;
+  background: ${props => props.disabled ? '#f3f4f6' : 'rgba(0, 0, 0, 0.10)'};
+  color: ${props => props.disabled ? '#6b7280' : '#374151'};
+  border: 0.375px solid ${props => props.disabled ? '#d1d5db' : '#000'};
   border-radius: 1.5px;
   font-size: var(--font-size-14);
   font-weight: var(--font-weight-400);
@@ -135,14 +140,15 @@ const SelectButton = styled.button`
   display: flex;
   align-items: center;
   justify-content: center;
+  cursor: ${props => props.disabled ? 'default' : 'pointer'};
 
   &:hover {
-    background: #d1d5db;
-    border-color: #4b5563;
+    background: ${props => props.disabled ? '#f3f4f6' : '#d1d5db'};
+    border-color: ${props => props.disabled ? '#d1d5db' : '#4b5563'};
   }
 
   &:active {
-    background: #e5e7eb;
+    background: ${props => props.disabled ? '#f3f4f6' : '#e5e7eb'};
   }
 
   &:focus-visible {

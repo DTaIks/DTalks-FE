@@ -57,22 +57,17 @@ const MediaFileUploadModal: React.FC<MediaUploadModalProps> = ({
     fileVersion: false
   });
 
-  useEffect(() => {
-    if (!isOpen) {
-      setTouched({
-        fileName: false,
-        description: false,
-        fileVersion: false
-      });
-      setFileError('');
-    }
-  }, [isOpen]);
-
   // 초기 데이터 설정
   useEffect(() => {
     if (isOpen && initialData && isEditMode) {
-      setFormData(initialData);
-      setFileDisplayName(initialData.fileName);
+      setFormData({
+        uploadFile: undefined,
+        fileName: initialData.fileName || '',
+        description: initialData.description || '',
+        fileVersion: initialData.fileVersion || '1.0.0',
+        isPublic: initialData.isPublic ?? true
+      });
+      setFileDisplayName('');
     } else if (isOpen && !isEditMode) {
       // 새 파일 업로드 모드일 때 초기화
       setFormData({
@@ -85,6 +80,17 @@ const MediaFileUploadModal: React.FC<MediaUploadModalProps> = ({
       setFileDisplayName('');
     }
   }, [isOpen, initialData, isEditMode]);
+
+  useEffect(() => {
+    if (!isOpen) {
+      setTouched({
+        fileName: false,
+        description: false,
+        fileVersion: false
+      });
+      setFileError('');
+    }
+  }, [isOpen]);
 
   const handleSubmit = () => {
     if (isFormValid()) {
@@ -122,7 +128,10 @@ const MediaFileUploadModal: React.FC<MediaUploadModalProps> = ({
 
   const isValidSemver = (version: string): boolean => /^\d+\.\d+\.\d+$/.test(version);
   
-  const hasValidFile = () => formData.uploadFile !== undefined && !fileError;
+  const hasValidFile = () => {
+    // 모든 모드에서 파일이 필수
+    return formData.uploadFile !== undefined && !fileError;
+  };
   const hasValidFileName = () => formData.fileName.trim() !== '';
   const hasValidDescription = () => formData.description.trim() !== '';
   const hasValidVersion = () => isValidSemver(formData.fileVersion);
@@ -172,14 +181,16 @@ const MediaFileUploadModal: React.FC<MediaUploadModalProps> = ({
         maxSizeInMB={10}
         onFileError={setFileError}
         fileError={fileError}
+        placeholder="선택된 파일 없음"
+        disabled={false} // 수정 모드에서도 파일 변경 가능
       />
 
-      <FileNameInput
-        value={formData.fileName}
-        onChange={(value) => handleInputChange('fileName', value)}
-        onBlur={() => handleBlur('fileName')}
-        showError={touched.fileName && !hasValidFileName()}
-      />
+             <FileNameInput
+         value={formData.fileName}
+         onChange={(value) => handleInputChange('fileName', value)}
+         onBlur={() => handleBlur('fileName')}
+         showError={touched.fileName && !hasValidFileName()}
+       />
 
       <FileDescriptionInput
         value={formData.description}
@@ -189,12 +200,13 @@ const MediaFileUploadModal: React.FC<MediaUploadModalProps> = ({
       />
 
       <InputRow>
-        <VersionInput
-          version={formData.fileVersion}
-          onVersionChange={(value) => handleInputChange('fileVersion', value)}
-          onBlur={() => handleBlur('fileVersion')}
-          showError={touched.fileVersion && !hasValidVersion()}
-        />
+                 <VersionInput
+           version={formData.fileVersion}
+           onVersionChange={(value) => handleInputChange('fileVersion', value)}
+           onBlur={() => handleBlur('fileVersion')}
+           showError={touched.fileVersion && !hasValidVersion()}
+           isEditMode={isEditMode}
+         />
         <PublicSetting
           isPublic={formData.isPublic}
           onPublicChange={(value) => handleInputChange('isPublic', value)}

@@ -14,16 +14,20 @@ import ConfirmModal from '@/components/common/ConfirmModal';
 import { VersionHistoryModal } from '@/components/common/FileVersionManagementModal';
 import EmptyState from '@/components/common/EmptyState';
 
-import { useDepartmentStats } from '@/hooks/media/useMediaFile';
 import { useMediaPage } from '@/hooks/media/useMediaPage';
 import { useMediaActions } from '@/hooks/media/useMediaActions';
 import { useCommonHandlers } from '@/hooks/useCommonHandlers';
+import type { MediaFile } from '@/types/media';
 
 const MediaPage: React.FC = () => {
-  console.log('🎬 MediaPage 컴포넌트 렌더링 시작');
   
-  // 데이터 및 상태 관리
-  const departments = useDepartmentStats();
+  // 부서 목록 정의
+  const departments = [
+    { id: 'all', name: '전체 파일' },
+    { id: 'media', name: '마케팅팀' },
+    { id: 'develop', name: '개발팀' },
+    { id: 'art', name: '디자인팀' }
+  ];
   const {
     selectedDepartment,
     isArchiveMode,
@@ -32,11 +36,12 @@ const MediaPage: React.FC = () => {
     uploadModal,
     confirmModal,
     versionModal,
-    filteredFiles,
+    files,
     totalPages,
     isLoading,
     error,
     isUploading,
+    isUpdating,
     setCurrentPage,
     openUploadModal,
     closeUploadModal,
@@ -45,19 +50,16 @@ const MediaPage: React.FC = () => {
     closeConfirmModal,
     openVersionModal,
     closeVersionModal,
-    handleArchiveSelect,
-    handleArchiveClose,
-    handleArchiveDepartmentSelect,
-    handleFileTypeSelect,
-    handleAllSelect,
-    handleDepartmentSelect,
-    uploadMutation,
+    selectDepartment,
+    selectFileType,
+    toggleArchive,
+    selectArchiveDepartment,
+    setSelectedFile,
   } = useMediaPage();
 
   const mediaActions = useMediaActions();
   
-  console.log('🎬 MediaPage 컴포넌트 렌더링 완료');
-  console.log('🎬 페이지네이션 정보:', { currentPage, totalPages, filteredFilesLength: filteredFiles.length });
+
   
   const handlers = useCommonHandlers({ 
     modals: {
@@ -75,7 +77,10 @@ const MediaPage: React.FC = () => {
         isOpen: versionModal.isOpen,
       }
     }, 
-    mediaActions 
+    mediaActions: {
+      ...mediaActions,
+      setSelectedFile
+    }
   });
 
   // 페이지 변경 핸들러
@@ -122,18 +127,18 @@ const MediaPage: React.FC = () => {
                   title={dept.name}
                   icon={<FolderIcon>📁</FolderIcon>}
                   isSelected={selectedDepartment === dept.name && !isArchiveMode}
-                  onClick={() => dept.name === '전체 파일' ? handleAllSelect() : handleDepartmentSelect(dept.name)}
+                  onClick={() => selectDepartment(dept.name)}
                 />
               ))}
             </DepartmentListContainer>
-            <Footer onClick={handleArchiveSelect} isSelected={isArchiveMode}>
+            <Footer onClick={() => toggleArchive(true)} isSelected={isArchiveMode}>
               <ArchiveText>보관함</ArchiveText>
             </Footer>
             
             <ArchiveModal className={isArchiveMode ? (isArchiveClosing ? 'close' : 'show') : ''}>
               <ArchiveHeader>
                 <ArchiveTitle>보관함</ArchiveTitle>
-                <CloseButton onClick={handleArchiveClose}>
+                <CloseButton onClick={() => toggleArchive(false)}>
                   ✕
                 </CloseButton>
               </ArchiveHeader>
@@ -147,7 +152,7 @@ const MediaPage: React.FC = () => {
                       title={dept.name}
                       icon={<FolderIcon>📁</FolderIcon>}
                       isSelected={selectedDepartment === dept.name && isArchiveMode}
-                      onClick={() => handleArchiveDepartmentSelect(dept.name)}
+                      onClick={() => selectArchiveDepartment(dept.name)}
                     />
                   ))}
                 </DepartmentListContainer>
@@ -163,7 +168,7 @@ const MediaPage: React.FC = () => {
               <DropdownWrapper>
                 <DropdownFilter 
                   options={['전체', '문서', '이미지', '음성'] as const}
-                  onSelect={handleFileTypeSelect}
+                  onSelect={selectFileType}
                   placeholder="파일 유형"
                 />
               </DropdownWrapper>
@@ -175,13 +180,13 @@ const MediaPage: React.FC = () => {
                   <LoadingText>파일 목록을 불러오는 중...</LoadingText>
                 ) : error ? (
                   <ErrorText>파일 목록을 불러오는데 실패했습니다.</ErrorText>
-                ) : filteredFiles.length === 0 ? (
+                ) : files.length === 0 ? (
                   <EmptyState 
                     message="표시할 파일이 없습니다"
                     subMessage="업로드된 파일이 없거나 필터 조건에 맞는 파일이 없습니다."
                   />
                 ) : (
-                  filteredFiles.map((file: any) => (
+                  files.map((file: MediaFile) => (
                     <MediaFileContent 
                       key={file.fileId} 
                       file={file}
@@ -192,13 +197,13 @@ const MediaPage: React.FC = () => {
                 )}
               </FileContentWrapper>
               
-              {(filteredFiles.length > 0 || totalPages > 0) && (
+              {(files.length > 0 || totalPages > 0) && (
                 <PaginationContainer>
                   <Pagination
                     key={totalPages}
-                    currentPage={currentPage + 1}
+                    currentPage={currentPage}
                     totalPages={Math.max(totalPages, 1)}
-                    onPageChange={(page) => handlePageChange(page - 1)}
+                    onPageChange={handlePageChange}
                   />
                 </PaginationContainer>
               )}
@@ -213,7 +218,7 @@ const MediaPage: React.FC = () => {
         onSubmit={handlers.handleUploadSubmit}
         initialData={uploadModal.initialData}
         isEditMode={uploadModal.isEditMode}
-        isSubmitting={isUploading}
+        isSubmitting={uploadModal.isEditMode ? isUpdating : isUploading}
       />
 
       <ConfirmModal
@@ -508,5 +513,3 @@ const ErrorText = styled.div`
   color: #dc3545;
   font-size: var(--font-size-14);
 `;
-
-

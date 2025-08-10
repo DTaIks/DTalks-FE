@@ -15,12 +15,7 @@ export const VersionHistoryModal: React.FC<VersionHistoryModalProps> = ({
 }) => {
   const versions = useVersionHistory(fileName);
   
-  const getDisplayFileName = (fileName: string, departmentName?: string) => {
-    if (departmentName) {
-      return `[${departmentName}] ${fileName}`;
-    }
-    return fileName;
-  };
+
 
   // 파일명만 표시 (부서명은 API에서 가져올 예정)
   const displayFileName = fileName;

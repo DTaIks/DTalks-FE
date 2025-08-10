@@ -53,7 +53,7 @@ const initialState: DocumentPageUIState = {
   },
 };
 
-export const useDocumentPageStore = create<DocumentPageUIState & DocumentPageUIActions>((set, get) => ({
+export const useDocumentPageStore = create<DocumentPageUIState & DocumentPageUIActions>((set) => ({
   ...initialState,
   
   // 페이지네이션 액션

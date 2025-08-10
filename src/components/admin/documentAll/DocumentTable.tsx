@@ -4,7 +4,7 @@ import CompareCard from "@/components/common/document/DocumentCompareCard";
 import CommonTable from "@/components/common/table/CommonTable";
 import { useDocumentList } from "@/query/useDocumentQueries";
 import { useVersionCompare } from "@/hooks/useVersionCompare";
-import type { DocumentResponse } from "@/types/document";
+
 
 interface DocumentTableProps {
   category: 'policy' | 'glossary' | 'reportform';
@@ -59,9 +59,7 @@ const DocumentTable: React.FC<DocumentTableProps> = ({
     }
   }, [totalPages, currentPage]);
 
-  const handlePageChange = (page: number) => {
-    setCurrentPage(page);
-  };
+
 
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(e.target.value);
