@@ -1,19 +1,26 @@
 import React, { useCallback } from 'react';
 import styled from 'styled-components';
-import { useVersionHistory } from '@/hooks/media/useMediaFile';
+import { useFileVersionHistory } from '@/query/useMediaQueries';
+import { transformFileVersionHistoryToVersionData } from '@/hooks/media/useMediaFile';
 
 interface VersionHistoryModalProps {
   isOpen: boolean;
   onClose: () => void;
   fileName: string;
+  fileId?: number;
 }
 
 export const VersionHistoryModal: React.FC<VersionHistoryModalProps> = ({
   isOpen,
   onClose,
-  fileName
+  fileName,
+  fileId
 }) => {
-  const versions = useVersionHistory(fileName);
+  const { data: versionHistory, isLoading, error } = useFileVersionHistory(fileId || null, {
+    enabled: isOpen && fileId !== undefined
+  });
+
+  const versions = versionHistory ? transformFileVersionHistoryToVersionData(versionHistory) : [];
   
 
 
@@ -46,15 +53,23 @@ export const VersionHistoryModal: React.FC<VersionHistoryModalProps> = ({
         </ModalHeader>
                 
         <VersionList>
-          {versions.map((version) => (
-            <VersionItem key={version.id}>
-              <VersionNumber>{version.version}</VersionNumber>
-              <VersionInfo>{version.updatedAt} · {version.fileSize} · {version.uploaderName}</VersionInfo>
-              {version.description && (
-                <VersionDescription>{version.description}</VersionDescription>
-              )}
-            </VersionItem>
-          ))}
+          {isLoading ? (
+            <LoadingText>버전 히스토리를 불러오는 중...</LoadingText>
+          ) : error ? (
+            <ErrorText>버전 히스토리를 불러오는데 실패했습니다.</ErrorText>
+          ) : versions.length === 0 ? (
+            <EmptyText>버전 히스토리가 없습니다.</EmptyText>
+          ) : (
+            versions.map((version) => (
+              <VersionItem key={version.id}>
+                <VersionNumber>{version.version}</VersionNumber>
+                <VersionInfo>{version.updatedAt} · {version.uploaderName}</VersionInfo>
+                {version.description && (
+                  <VersionDescription>{version.description}</VersionDescription>
+                )}
+              </VersionItem>
+            ))
+          )}
         </VersionList>
       </ModalContainer>
     </ModalOverlay>
@@ -167,4 +182,31 @@ const VersionDescription = styled.p`
   font-size: var(--font-size-14);
   color: var(--color-gray);
   margin: 0;
+`;
+
+const LoadingText = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 200px;
+  color: var(--color-gray);
+  font-size: var(--font-size-14);
+`;
+
+const ErrorText = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 200px;
+  color: #dc3545;
+  font-size: var(--font-size-14);
+`;
+
+const EmptyText = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 200px;
+  color: var(--color-gray);
+  font-size: var(--font-size-14);
 `;

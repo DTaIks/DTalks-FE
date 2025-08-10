@@ -1,5 +1,5 @@
 import { apiInstance } from './apiInstance';
-import type { CommonFileResponse, CommonFileRequest, FileUploadInfo, FileUploadResponse, DepartmentFileResponse, DepartmentFileRequest, CommonArchivedFileResponse, CommonArchivedFileRequest, DepartmentArchivedFileResponse, DepartmentArchivedFileRequest } from '@/types/media';
+import type { CommonFileResponse, CommonFileRequest, FileUploadInfo, FileUploadResponse, DepartmentFileResponse, DepartmentFileRequest, CommonArchivedFileResponse, CommonArchivedFileRequest, DepartmentArchivedFileResponse, DepartmentArchivedFileRequest, FileVersionHistory } from '@/types/media';
 
 export const mediaAPI = {
   // 공통 파일 조회
@@ -10,7 +10,8 @@ export const mediaAPI = {
       fileType: params.fileType || '전체'
     })}`);
     
-    return response.data.data; // data 필드 반환
+    // 서버 응답 구조에 따라 data 필드 또는 전체 응답 반환
+    return response.data.data || response.data;
   },
 
   // 부서별 파일 조회
@@ -22,7 +23,8 @@ export const mediaAPI = {
       fileType: params.fileType || '전체'
     })}`);
     
-    return response.data.data; // data 필드 반환
+    // 서버 응답 구조에 따라 data 필드 또는 전체 응답 반환
+    return response.data.data || response.data;
   },
 
   // 파일 업로드
@@ -73,7 +75,8 @@ export const mediaAPI = {
       fileType: params.fileType || '전체'
     })}`);
     
-    return response.data.data; // data 필드 반환
+    // 서버 응답 구조에 따라 data 필드 또는 전체 응답 반환
+    return response.data.data || response.data;
   },
 
   // 보관된 부서별 파일 조회
@@ -85,6 +88,14 @@ export const mediaAPI = {
       fileType: params.fileType || '전체'
     })}`);
     
-    return response.data.data; // data 필드 반환
+    // 서버 응답 구조에 따라 data 필드 또는 전체 응답 반환
+    return response.data.data || response.data;
+  },
+
+  // 파일 버전 히스토리 조회
+  getFileVersionHistory: async (fileId: number): Promise<FileVersionHistory[]> => {
+    const response = await apiInstance.get(`/admin/file/${fileId}/history`);
+    // 서버 응답 구조에 따라 data 필드 또는 전체 응답 반환
+    return response.data.data || response.data;
   }
 };

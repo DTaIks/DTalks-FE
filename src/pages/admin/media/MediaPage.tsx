@@ -86,7 +86,27 @@ const MediaPage: React.FC = () => {
             mediaActions.handleArchive(fileToArchive.fileId);
           }
         } else if (confirmModal.type === 'download') {
-          console.log('파일 다운로드:', confirmModal.fileName);
+          // 확인 모달에서 다운로드 처리
+          const fileToDownload = files.find(file => file.fileName === confirmModal.fileName);
+          if (fileToDownload && fileToDownload.fileUrl) {
+            // 파일 유효성 검사 후 다운로드
+            fetch(fileToDownload.fileUrl, { method: 'HEAD' })
+              .then(response => {
+                if (response.ok) {
+                  const link = document.createElement('a');
+                  link.href = fileToDownload.fileUrl!;
+                  link.download = fileToDownload.fileName;
+                  document.body.appendChild(link);
+                  link.click();
+                  document.body.removeChild(link);
+                } else {
+                  alert('파일을 찾을 수 없습니다. 관리자에게 문의해주세요.');
+                }
+              })
+                             .catch(error => {
+                 alert('파일 다운로드 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.');
+               });
+          }
         }
         closeConfirmModal();
       }
@@ -184,7 +204,10 @@ const MediaPage: React.FC = () => {
                 {isLoading ? (
                   <LoadingText>파일 목록을 불러오는 중...</LoadingText>
                 ) : error ? (
-                  <ErrorText>파일 목록을 불러오는데 실패했습니다.</ErrorText>
+                  <EmptyState 
+                    message="파일 목록을 불러오는데 실패했습니다"
+                    subMessage="잠시 후 다시 시도해주세요."
+                  />
                 ) : files.length === 0 ? (
                   <EmptyState 
                     message="표시할 파일이 없습니다"
@@ -238,6 +261,7 @@ const MediaPage: React.FC = () => {
         isOpen={versionModal.isOpen}
         onClose={closeVersionModal}
         fileName={versionModal.fileName}
+        fileId={versionModal.fileId}
       />
     </PageContainer>
   );
@@ -507,14 +531,5 @@ const LoadingText = styled.div`
   align-items: center;
   height: 200px;
   color: var(--color-gray);
-  font-size: var(--font-size-14);
-`;
-
-const ErrorText = styled.div`
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 200px;
-  color: #dc3545;
   font-size: var(--font-size-14);
 `;

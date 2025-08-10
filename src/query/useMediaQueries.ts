@@ -69,3 +69,20 @@ export const useDepartmentArchivedFiles = (params: DepartmentArchivedFileRequest
     enabled: options?.enabled !== false, // 기본값은 true
   });
 };
+
+// 파일 버전 히스토리 조회 쿼리
+export const useFileVersionHistory = (fileId: number | null, options?: { enabled?: boolean }) => {
+  return useQuery({
+    queryKey: ['fileVersionHistory', fileId],
+    queryFn: async () => {
+      if (!fileId) throw new Error('File ID is required');
+      const result = await mediaAPI.getFileVersionHistory(fileId);
+      return result;
+    },
+    staleTime: 30 * 1000, // 30초 동안 fresh 상태 유지
+    gcTime: 5 * 60 * 1000, // 5분
+    refetchOnMount: false, // 마운트 시 자동 리페치 비활성화
+    refetchOnWindowFocus: false, // 윈도우 포커스 시 자동 리페치 비활성화
+    enabled: options?.enabled !== false && fileId !== null, // fileId가 있을 때만 활성화
+  });
+};

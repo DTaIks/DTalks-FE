@@ -36,6 +36,7 @@ interface MediaUIState {
   versionModal: {
     isOpen: boolean;
     fileName: string;
+    fileId?: number;
   };
 }
 
@@ -63,7 +64,7 @@ interface MediaUIActions {
   openConfirmModal: (type: 'archive' | 'download', fileName: string) => void;
   closeConfirmModal: () => void;
   
-  openVersionModal: (fileName: string) => void;
+  openVersionModal: (fileName: string, fileId?: number) => void;
   closeVersionModal: () => void;
   
   // 전체 리셋
@@ -90,6 +91,7 @@ const initialState: MediaUIState = {
   versionModal: {
     isOpen: false,
     fileName: '',
+    fileId: undefined,
   },
 };
 
@@ -181,11 +183,12 @@ export const useMediaStore = create<MediaUIState & MediaUIActions>()(
         });
       },
       
-      openVersionModal: (fileName) => {
+      openVersionModal: (fileName, fileId) => {
         set({
           versionModal: {
             isOpen: true,
             fileName,
+            fileId,
           },
         });
       },
@@ -195,6 +198,7 @@ export const useMediaStore = create<MediaUIState & MediaUIActions>()(
           versionModal: {
             isOpen: false,
             fileName: '',
+            fileId: undefined,
           },
         });
       },
