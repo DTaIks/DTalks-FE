@@ -7,7 +7,7 @@ import Pagination from "@/components/common/Pagination";
 import ConfirmModal from "@/components/common/ConfirmModal";
 import DocumentUploadModal from "@/components/common/DocumentUploadModal";
 import { VersionHistoryModal } from "@/components/common/FileVersionManagementModal";
-import Document from "@/components/admin/document/Document";
+import DocumentTable from "@/components/admin/documentAll/DocumentTable";
 import { useFileUpload } from "@/hooks/useFileUpload";
 import { useCommonHandlers } from "@/hooks/useCommonHandlers";
 import DocumentCategory1 from "@/assets/document/DocumentCategory1.svg";
@@ -111,7 +111,7 @@ const DocumentPage = () => {
         </ButtonContainer>
       </HeaderWrapper>
       
-      <Document
+      <DocumentTable
         category={category as 'policy' | 'glossary' | 'reportform'}
         title={config.title}
         categoryImage={config.image}

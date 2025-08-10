@@ -1,8 +1,8 @@
 import { useEffect, useCallback, useState } from "react";
 import styled from "styled-components";
 import TitleContainer from "@/layout/TitleContainer";
-import DocumentStatCard from "@/components/admin/documentAll/DocumentStatCard";
-import DocumentTable from "@/components/admin/documentAll/DocumentTable";
+import DocumentAllStatCard from "@/components/admin/documentAll/DocumentAllStatCard";
+import DocumentAllTable from "@/components/admin/documentAll/DocumentAllTable";
 import Pagination from "@/components/common/Pagination";
 import ConfirmModal from "@/components/common/ConfirmModal";
 import { VersionHistoryModal } from "@/components/common/FileVersionManagementModal";
@@ -92,8 +92,8 @@ const DocumentAllPage = () => {
       <HeaderWrapper>
         <TitleContainer title="전체 문서" subtitle="모든 사내 문서를 한 번에 확인하고 정리하세요" />
       </HeaderWrapper>
-      <DocumentStatCard stats={stats} />
-      <DocumentTable 
+      <DocumentAllStatCard stats={stats} />
+      <DocumentAllTable 
         documents={documents}
         modals={modals}
         isLoading={isLoading}

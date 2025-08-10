@@ -6,11 +6,11 @@ interface StatData {
   additionalInfo?: string;
 }
 
-interface DocumentStatCardProps {
+interface DocumentAllStatCardProps {
   stats: StatData[];
 }
 
-const DocumentStatCard: React.FC<DocumentStatCardProps> = ({ stats }) => {
+const DocumentAllStatCard: React.FC<DocumentAllStatCardProps> = ({ stats }) => {
   return (
     <StatContainer>
       {stats.map((stat, index) => (
@@ -30,7 +30,7 @@ const DocumentStatCard: React.FC<DocumentStatCardProps> = ({ stats }) => {
   );
 };
 
-export default DocumentStatCard;
+export default DocumentAllStatCard;
 
 const StatContainer = styled.div`
   display: flex;
@@ -80,4 +80,4 @@ const StatValue = styled.div`
   color: var(--color-black);
   font-size: var(--font-size-28);
   font-weight: 600;
-`; 
+`;
