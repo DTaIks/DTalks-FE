@@ -6,8 +6,8 @@ import type { FAQCategory } from "@/types/faq";
 import FAQCategoryTableHeader from "@/components/admin/faq/category/FAQCategoryTableHeader";
 import FAQCategoryTableHead from "@/components/admin/faq/category/FAQCategoryTableHead";
 import FAQCategoryTableRow from "@/components/admin/faq/category/FAQCategoryTableRow";
-import { useFAQCategories } from "@/hooks/faq/useFAQQueries";
-import { useArchiveFAQCategory, useRestoreFAQCategory } from "@/hooks/faq/useFAQMutations";
+import { useFAQCategories } from "@/query/useFAQQueries";
+import { useArchiveFAQCategory, useRestoreFAQCategory } from "@/query/useFAQMutations";
 import { useFAQStore } from "@/store/faqStore";
 
 const FAQCategoryTable: React.FC = () => {

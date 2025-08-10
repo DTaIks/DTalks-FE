@@ -18,7 +18,7 @@ interface InputFieldProps {
   className?: string;
   inputWidth?: string;
   inputAlignSelf?: string;
-  autocomplete?: string;
+  autocomplete?: string;  
 }
 
 // 입력 필드 컴포넌트
@@ -47,11 +47,11 @@ const InputField: React.FC<InputFieldProps> = ({
     return (
       <SignupInputRow>
         <SignupLabel>{label}</SignupLabel>
-        <SignupInputWrapper hasButton={hasButton}>
+        <SignupInputWrapper $hasButton={hasButton}>
           <SignupInput 
             {...inputProps}
             placeholder={placeholder}
-            hasButton={hasButton}
+            $hasButton={hasButton}
             autoComplete={autocomplete}
             value={inputProps?.value || value}
             onChange={inputProps?.onChange || onChange}
@@ -67,13 +67,13 @@ const InputField: React.FC<InputFieldProps> = ({
             </SignupButton>
           )}
         </SignupInputWrapper>
-        {infoText && <SignupInfoText color={infoTextColor}>{infoText}</SignupInfoText>}
+        {infoText && <SignupInfoText $color={infoTextColor}>{infoText}</SignupInfoText>}
       </SignupInputRow>
     );
   }
 
   return (
-    <LoginInputRoot inputWidth={inputWidth} inputAlignSelf={inputAlignSelf} className={className}>
+    <LoginInputRoot $inputWidth={inputWidth} $inputAlignSelf={inputAlignSelf} className={className}>
       <LoginTitle>{title}</LoginTitle>
       <LoginTextfield>
         <LoginText 
@@ -91,9 +91,7 @@ const InputField: React.FC<InputFieldProps> = ({
 export default InputField;
 
 // 로그인용 스타일
-const LoginInputRoot = styled.div.withConfig({
-  shouldForwardProp: (prop) => prop !== 'inputWidth' && prop !== 'inputAlignSelf'
-})<{ inputWidth?: string; inputAlignSelf?: string }>`
+const LoginInputRoot = styled.div<{ $inputWidth?: string; $inputAlignSelf?: string }>`
   width: 382.5px;
   overflow: hidden;
   display: flex;
@@ -105,8 +103,8 @@ const LoginInputRoot = styled.div.withConfig({
   font-size: var(--font-size-22);
   color: var(--color-black);
   font-family: var(--font-pretendard);
-  width: ${(p) => p.inputWidth || '382.5px'};
-  align-self: ${(p) => p.inputAlignSelf};
+  width: ${(p) => p.$inputWidth || '382.5px'};
+  align-self: ${(p) => p.$inputAlignSelf};
 `;
 
 const LoginTitle = styled.div`
@@ -158,12 +156,12 @@ const SignupInputRow = styled.div`
   position: relative;
 `;
 
-const SignupInputWrapper = styled.div<{ hasButton: boolean }>`
-  display: ${props => props.hasButton ? 'flex' : 'flex'};
-  padding: ${props => props.hasButton ? '0' : '6px 9px'};
+const SignupInputWrapper = styled.div<{ $hasButton: boolean }>`
+  display: ${props => props.$hasButton ? 'flex' : 'flex'};
+  padding: ${props => props.$hasButton ? '0' : '6px 9px'};
   align-items: center;
   justify-content: center;
-  gap: ${props => props.hasButton ? '6px' : '0'};
+  gap: ${props => props.$hasButton ? '6px' : '0'};
   width: 100%;
   box-sizing: border-box;
 `;
@@ -184,9 +182,9 @@ const SignupLabel = styled.label`
   padding-left: calc((100% - 381px) / 2);
 `;
 
-const SignupInput = styled.input<{ hasButton: boolean }>`
+const SignupInput = styled.input<{ $hasButton: boolean }>`
   display: flex;
-  width: ${props => props.hasButton ? '250.5px' : '381px'};
+  width: ${props => props.$hasButton ? '250.5px' : '381px'};
   height: 34.5px;
   padding: 6px 9px;
   align-items: center;
@@ -224,9 +222,9 @@ const SignupButton = styled.button`
   }
 `;
 
-const SignupInfoText = styled.div<{ color?: string }>`
+const SignupInfoText = styled.div<{ $color?: string }>`
   font-size: 12px;
-  color: ${props => props.color || '#8c8c8c'};
+  color: ${props => props.$color || '#8c8c8c'};
   margin-top: 3px;
   line-height: 1.2;
   text-align: left;
@@ -236,4 +234,4 @@ const SignupInfoText = styled.div<{ color?: string }>`
   margin-top: 3.75px;
   margin-right: auto;
   padding-left: calc((100% - 381px) / 2 + 9px);
-`; 
+`;
