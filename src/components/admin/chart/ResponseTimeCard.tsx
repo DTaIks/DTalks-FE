@@ -1,8 +1,9 @@
 import React from 'react';
 import styled from 'styled-components';
 import Chart from 'react-apexcharts';
+import { useResponseTime } from '@/query/useChartQueries';
+import { LoadingState, ErrorState, NoDataState } from '@/components/admin/chart/ChartDataState';
 import '@/styles/Global.css';
-
 
 export interface ResponseTime {
   avg: number;
@@ -64,7 +65,8 @@ function groupZones(zones: number[], total: number): Zone[] {
   });
 }
 
-export const ResponseTimeChart: React.FC<ResponseTimeChartProps> = ({ responseTime }) => {
+// 차트 내용 컴포넌트
+const ResponseTimeChartContent: React.FC<ResponseTimeChartProps> = ({ responseTime }) => {
   const { avg, zones } = responseTime;
   const total = zones.reduce((sum, v) => sum + v, 0);
 
@@ -90,7 +92,6 @@ export const ResponseTimeChart: React.FC<ResponseTimeChartProps> = ({ responseTi
     labels: groupedZones.map((d) => d.range),
     legend: { show: false },
     dataLabels: { enabled: false },
-
     states: {
       hover: {
         filter: {
@@ -98,7 +99,6 @@ export const ResponseTimeChart: React.FC<ResponseTimeChartProps> = ({ responseTi
         }
       }
     },
-
     tooltip: {
       enabled: true,
       y: {
@@ -118,11 +118,10 @@ export const ResponseTimeChart: React.FC<ResponseTimeChartProps> = ({ responseTi
   const donutChartSeries = groupedZones.map((d) => d.percentage);
 
   return (
-    <ResponseTimeCard>
+    <>
       <CardHeader>
         <CardTitle>응답 시간 분석</CardTitle>
       </CardHeader>
-
       <CardContent>
         <ChartWrapper>
           <Chart options={donutChartOptions} series={donutChartSeries} type="donut" width={240} height={240} />
@@ -131,7 +130,6 @@ export const ResponseTimeChart: React.FC<ResponseTimeChartProps> = ({ responseTi
             <AverageLabel>평균 응답 시간</AverageLabel>
           </CenterContent>
         </ChartWrapper>
-
         <LegendContainer>
           {legend.map(({ range, color, count, percentage }) => (
             <LegendItem key={range}>
@@ -145,20 +143,56 @@ export const ResponseTimeChart: React.FC<ResponseTimeChartProps> = ({ responseTi
           ))}
         </LegendContainer>
       </CardContent>
+    </>
+  );
+};
+
+export const ResponseTimeChart: React.FC = () => {
+  const { data, isLoading, error } = useResponseTime();
+
+  if (isLoading) {
+    return (
+      <ResponseTimeCard>
+        <LoadingState message="응답 시간 데이터를 불러오는 중" />
+      </ResponseTimeCard>
+    );
+  }
+
+  if (error) {
+    return (
+      <ResponseTimeCard>
+        <ErrorState 
+          title="응답 시간 데이터를 불러올 수 없습니다" 
+          message={error.message} 
+        />
+      </ResponseTimeCard>
+    );
+  }
+
+  if (!data) {
+    return (
+      <ResponseTimeCard>
+        <NoDataState message="응답 시간 데이터가 없습니다" />
+      </ResponseTimeCard>
+    );
+  }
+
+  return (
+    <ResponseTimeCard>
+      <ResponseTimeChartContent responseTime={data} />
     </ResponseTimeCard>
   );
 };
 
-const BaseCard = styled.div`
+const ResponseTimeCard = styled.div`
+  width: 1062px;
+  height: 463px;
   flex-shrink: 0;
   border-radius: var(--br-18);
   background: var(--color-white);
   box-shadow: 0 8px 24px rgba(125, 93, 246, 0.1);
-`;
-
-const ResponseTimeCard = styled(BaseCard)`
-  width: 1062.75px;
-  height: 463px;
+  display: flex;
+  flex-direction: column;
 `;
 
 const CardHeader = styled.div`

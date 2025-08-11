@@ -1,6 +1,8 @@
 import React from 'react';
 import { BarChart, Bar, XAxis, YAxis, Cell } from 'recharts';
 import styled from 'styled-components';
+import { useWeeklyResponse } from '@/query/useChartQueries';
+import { LoadingState, ErrorState, NoDataState } from '@/components/admin/chart/ChartDataState';
 import '@/styles/Global.css';
 
 export type WeeklyResponse = {
@@ -11,7 +13,7 @@ interface WeeklyResponseStatCardProps {
   data: WeeklyResponse;
 }
 
-const WeeklyResponseCard: React.FC<WeeklyResponseStatCardProps> = ({ data }) => {
+const WeeklyResponseCardContent: React.FC<WeeklyResponseStatCardProps> = ({ data }) => {
   const chartData = data.values;
   const total = chartData.reduce((sum, item) => sum + item.count, 0);
   const dailyAverage = Math.round(total / chartData.length);
@@ -32,7 +34,7 @@ const WeeklyResponseCard: React.FC<WeeklyResponseStatCardProps> = ({ data }) => 
   };
  
   return (
-    <Container>
+    <>
       <CardHeader>
         <CardTitle>일주일간 응답 횟수 통계</CardTitle>
       </CardHeader>
@@ -81,6 +83,43 @@ const WeeklyResponseCard: React.FC<WeeklyResponseStatCardProps> = ({ data }) => 
           </CountInline>
         </Count>
       </BarChartWrapper>
+    </>
+  );
+};
+
+const WeeklyResponseCard: React.FC = () => {
+  const { data, isLoading, error } = useWeeklyResponse();
+
+  if (isLoading) {
+    return (
+      <Container>
+        <LoadingState message="주간 응답 데이터를 불러오는 중" />
+      </Container>
+    );
+  }
+
+  if (error) {
+    return (
+      <Container>
+        <ErrorState 
+          title="주간 응답 데이터를 불러올 수 없습니다" 
+          message={error.message} 
+        />
+      </Container>
+    );
+  }
+
+  if (!data) {
+    return (
+      <Container>
+        <NoDataState message="주간 응답 데이터가 없습니다" />
+      </Container>
+    );
+  }
+
+  return (
+    <Container>
+      <WeeklyResponseCardContent data={data} />
     </Container>
   );
 };
@@ -88,7 +127,7 @@ const WeeklyResponseCard: React.FC<WeeklyResponseStatCardProps> = ({ data }) => 
 export default WeeklyResponseCard;
 
 const Container = styled.div`
-  width: 1062.75px;
+  width: 1062px;
   border-radius: 18.75px;
   background: var(--color-white);
   box-shadow: 0px 6px 18px 0px rgba(125, 93, 246, 0.1);
