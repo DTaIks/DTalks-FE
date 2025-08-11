@@ -1,4 +1,4 @@
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { authAPI } from '@/api/authAPI';
 
 // 이메일 중복 확인
@@ -40,6 +40,33 @@ export const useSignUpMutation = () => {
       authAPI.signUp(data),
     onError: (error) => {
       console.error('회원가입 실패:', error);
+    }
+  });
+};
+
+// 비밀번호 재설정
+export const usePasswordResetMutation = () => {
+  return useMutation({
+    mutationFn: (data: { email: string; newPassword: string; verificationCode: string }) => 
+      authAPI.resetPassword(data),
+    onError: (error) => {
+      console.error('비밀번호 재설정 실패:', error);
+    }
+  });
+};
+
+// 로그아웃
+export const useLogoutMutation = () => {
+  const queryClient = useQueryClient();
+  
+  return useMutation({
+    mutationFn: () => authAPI.logout(),
+    onSuccess: () => {
+      // 로그아웃 성공 시 모든 React Query 캐시 초기화
+      queryClient.clear();
+    },
+    onError: (error) => {
+      console.error('로그아웃 실패:', error);
     }
   });
 };
