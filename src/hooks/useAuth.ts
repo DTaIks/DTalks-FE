@@ -1,47 +1,29 @@
+import { useEffect, useRef } from 'react';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { useAuthStore } from '@/store/authStore';
 import { authAPI } from '@/api/authAPI';
+import { useLocation } from 'react-router-dom';
 
-//이메일 중복 확인
+// 이메일 중복 확인
 export const useCheckEmailDuplicate = (email: string) => {
   return useQuery({
     queryKey: ['email-duplicate', email],
-    queryFn: () => authAPI.checkEmailDuplicate(email),
+    queryFn: () => authAPI.validateEmail(email),
     enabled: !!email && email.includes('@'),
     staleTime: 1000 * 60 * 5, // 5분
   });
 };
 
-// 인증번호 발송
-// export const useSendAuthCode = () => {
-//   return useMutation({
-//     mutationFn: (email: string) => authAPI.sendAuthCode(email),
-//     onSuccess: () => {
-//       console.log('인증번호가 발송되었습니다.');
-//     },
-//     onError: (error) => {
-//       console.error('인증번호 발송 실패:', error);
-//     },
-//   });
-// };
-
-// 인증번호 확인
-// export const useVerifyAuthCode = () => {
-//   return useMutation({
-//     mutationFn: ({ email, code }: { email: string; code: string }) =>
-//       authAPI.verifyAuthCode(email, code),
-//     onSuccess: () => {
-//       console.log('인증번호가 확인되었습니다.');
-//     },
-//     onError: (error) => {
-//       console.error('인증번호 확인 실패:', error);
-//     },
-//   });
-// };
-
 // 로그인
 export const useLogin = () => {
-  const { setAuthenticated, setLoading, setError, setAccessToken, setRefreshToken } = useAuthStore();
+  const { 
+    setAuthenticated, 
+    setLoading, 
+    setError, 
+    setAccessToken, 
+    setRefreshToken, 
+    setAuthChecking 
+  } = useAuthStore();
   
   return useMutation({
     mutationFn: ({ email, password }: { email: string; password: string }) =>
@@ -55,69 +37,61 @@ export const useLogin = () => {
       if (data?.accessToken) setAccessToken(data.accessToken);
       if (data?.refreshToken) setRefreshToken(data.refreshToken);
       
-      // 쿠키가 제대로 설정되었는지 확인
-      console.log('로그인 성공 - 쿠키 확인 필요');
-      
       setAuthenticated(true);
+      setAuthChecking(false);
       setLoading(false);
       setError(null);
     },
     onError: (error: unknown) => {
       const errorMessage = error instanceof Error ? error.message : '로그인에 실패했습니다.';
       setLoading(false);
+      setAuthChecking(false);
       setError(errorMessage);
-      console.error('로그인 실패:', error);
     },
   });
 };
 
-// 회원가입
-// export const useSignup = () => {
-//   const { setUser, setAuthenticated, setLoading, setError } = useAuthStore();
-  
-//   return useMutation({
-//     mutationFn: (userData: {
-//       email: string;
-//       password: string;
-//       employeeNumber: string;
-//       authCode: string;
-//     }) => authAPI.signup(userData),
-//     onMutate: () => {
-//       setLoading(true);
-//       setError(null);
-//     },
-//     onSuccess: (data) => {
-//       // 성공 시 Zustand store 업데이트
-//       setUser(data.user);
-//       setAuthenticated(true);
-//       setLoading(false);
-//       setError(null);
-//     },
-//     onError: (error: any) => {
-//       setLoading(false);
-//       setError(error.message || '회원가입에 실패했습니다.');
-//       console.error('회원가입 실패:', error);
-//     },
-//   });
-// };
-
-// 로그아웃 (쿠키 기반)
+// 로그아웃
 export const useLogout = () => {
   const { logout, setError } = useAuthStore();
 
   return useMutation({
-    mutationFn: async () => {
-      await authAPI.logout();
-    },
+    mutationFn: authAPI.logout,
     onSuccess: () => {
       logout();
     },
     onError: (error: unknown) => {
       const errorMessage = error instanceof Error ? error.message : '로그아웃에 실패했습니다.';
-      console.error('로그아웃 실패:', error);
-      // 실패해도 로컬은 초기화하여 세션 끊김 상태 유지 권장 시 아래 주석 해제
-      // logout();
       setError(errorMessage);
     },
   });
+};
+
+// 백그라운드 인증 확인
+export const useAuth = () => {
+  const { reissueToken, setAuthenticated, setAuthChecking } = useAuthStore();
+  const location = useLocation();
+  const hasCheckedAuth = useRef(false);
+
+  useEffect(() => {
+    // 이미 인증 확인을 완료했거나 로그인 페이지이면 실행하지 않음
+    if (hasCheckedAuth.current || location.pathname === '/login') {
+      setAuthChecking(false);
+      return;
+    }
+
+    const checkAuthInBackground = async () => {
+      try {
+        await reissueToken();
+        setAuthenticated(true);
+      } catch {
+        setAuthenticated(false);
+      } finally {
+        setAuthChecking(false);
+        hasCheckedAuth.current = true;
+      }
+    };
+
+    checkAuthInBackground();
+  }, [reissueToken, setAuthenticated, setAuthChecking, location.pathname]);
 };
