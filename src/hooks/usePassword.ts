@@ -1,8 +1,15 @@
 import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
+import { useNavigate } from 'react-router-dom';
 import { passwordResetSchema } from '@/utils/passwordResetSchema';
 import type { PasswordResetFormData } from '@/utils/passwordResetSchema';
+import {
+  useEmailValidationMutation,
+  useSendAuthCodeMutation,
+  useVerifyAuthCodeMutation,
+  usePasswordResetMutation
+} from '@/query/useAuthQueries';
 
 // 추후에 백엔드 측에서 설정한 시간으로 변경
 const AUTH_TIMEOUT = 300;
@@ -17,6 +24,7 @@ interface AuthState {
 }
 
 export const usePassword = () => {
+  const navigate = useNavigate();
   const [authState, setAuthState] = useState<AuthState>({
     isEmailVerified: false,
     isAuthCodeSent: false,
@@ -30,11 +38,18 @@ export const usePassword = () => {
     register,
     handleSubmit,
     watch,
-    formState: { errors, isValid }
+    formState: { errors, isValid },
+    setError,
+    clearErrors
   } = useForm<PasswordResetFormData>({
     resolver: yupResolver(passwordResetSchema),
     mode: 'onChange'
   });
+
+  const emailValidationMutation = useEmailValidationMutation();
+  const sendAuthCodeMutation = useSendAuthCodeMutation();
+  const verifyAuthCodeMutation = useVerifyAuthCodeMutation();
+  const passwordResetMutation = usePasswordResetMutation();
 
   // 타이머 관리
   useEffect(() => {
@@ -55,8 +70,8 @@ export const usePassword = () => {
     };
   }, [authState.authTimer]);
 
-  // 이메일 인증 확인
-  const handleEmailCheck = () => {
+  // 이메일 인증 확인 (가입된 이메일인지 확인)
+  const handleEmailCheck = async () => {
     const email = watch('email');
     if (!email) return;
 
@@ -67,59 +82,174 @@ export const usePassword = () => {
       return; // 에러가 있으면 인증 확인을 진행하지 않음
     }
 
-    // 실제로는 API 호출하여 가입된 이메일인지 확인
-    // 여기서는 모의 데이터로 확인
-    const mockRegisteredEmails = ['test@example.com', 'user@company.com'];
-    const isRegistered = mockRegisteredEmails.includes(email);
-    
-    if (isRegistered) {
-      setAuthState(prev => ({ ...prev, isEmailVerified: true, emailError: '' }));
-    } else {
-      // 가입되지 않은 이메일인 경우 에러 메시지 표시
-      setAuthState(prev => ({ 
-        ...prev, 
-        isEmailVerified: false, 
-        emailError: '가입되지 않은 이메일입니다.' 
-      }));
-    }
+    // 이메일 중복 확인 API 호출하여 가입된 이메일인지 확인
+    emailValidationMutation.mutate(email, {
+      onSuccess: (result) => {
+        if (result.isDuplicate) {
+          // 가입된 이메일인 경우 (중복 = true)
+          setAuthState(prev => ({ 
+            ...prev, 
+            isEmailVerified: true, 
+            emailError: '' 
+          }));
+          clearErrors('email');
+        } else {
+          // 가입되지 않은 이메일인 경우 (중복 = false)
+          setAuthState(prev => ({ 
+            ...prev, 
+            isEmailVerified: false, 
+            emailError: '가입되지 않은 이메일입니다.' 
+          }));
+          setError('email', { 
+            type: 'manual', 
+            message: '가입되지 않은 이메일입니다.' 
+          });
+        }
+      },
+      onError: (error) => {
+        setAuthState(prev => ({ 
+          ...prev, 
+          isEmailVerified: false,
+          emailError: '이메일 확인 중 오류가 발생했습니다.'
+        }));
+        setError('email', { 
+          type: 'manual', 
+          message: '이메일 확인 중 오류가 발생했습니다.' 
+        });
+      }
+    });
   };
 
   // 인증번호 전송
-  const handleAuthCodeSend = () => {
-    setAuthState(prev => ({
-      ...prev,
-      isAuthCodeSent: true,
-      authTimer: AUTH_TIMEOUT,
-      canResend: false
-    }));
+  const handleAuthCodeSend = async () => {
+    const email = watch('email');
+    if (!email || !authState.isEmailVerified) return;
+
+    // 가입된 이메일이므로 isDuplicateEmail을 true로 설정
+    sendAuthCodeMutation.mutate(
+      { email, isDuplicateEmail: true },
+      {
+        onSuccess: () => {
+          setAuthState(prev => ({
+            ...prev,
+            isAuthCodeSent: true,
+            authTimer: AUTH_TIMEOUT,
+            canResend: false
+          }));
+        },
+        onError: (error) => {
+          setError('authCode', {
+            type: 'manual',
+            message: error instanceof Error ? error.message : '인증번호 전송에 실패했습니다.'
+          });
+        }
+      }
+    );
   };
 
   // 인증번호 확인
-  const handleAuthCodeVerify = () => {
+  const handleAuthCodeVerify = async () => {
+    const email = watch('email');
     const authCode = watch('authCode');
-    if (!authCode || authCode.length !== 6) return;
+    
+    if (!authCode || authCode.length !== 6) {
+      setError('authCode', {
+        type: 'manual',
+        message: '인증번호 6자리를 입력해 주세요.'
+      });
+      return;
+    }
 
-    // 실제로는 API 호출
-    setAuthState(prev => ({
-      ...prev,
-      isAuthCodeVerified: true,
-      authTimer: 0
-    }));
+    if (!email) return;
+
+    verifyAuthCodeMutation.mutate(
+      { email, verificationNumber: authCode },
+      {
+        onSuccess: () => {
+          setAuthState(prev => ({
+            ...prev,
+            isAuthCodeVerified: true,
+            authTimer: 0
+          }));
+          clearErrors('authCode');
+        },
+        onError: (error) => {
+          setError('authCode', {
+            type: 'manual',
+            message: error instanceof Error ? error.message : '인증번호가 올바르지 않습니다.'
+          });
+        }
+      }
+    );
   };
 
   // 인증번호 재전송
-  const handleAuthCodeResend = () => {
-    setAuthState(prev => ({
-      ...prev,
-      authTimer: AUTH_TIMEOUT,
-      canResend: false
-    }));
+  const handleAuthCodeResend = async () => {
+    const email = watch('email');
+    if (!email || !authState.isEmailVerified) return;
+
+    // 가입된 이메일이므로 isDuplicateEmail을 true로 설정
+    sendAuthCodeMutation.mutate(
+      { email, isDuplicateEmail: true },
+      {
+        onSuccess: () => {
+          setAuthState(prev => ({
+            ...prev,
+            authTimer: AUTH_TIMEOUT,
+            canResend: false
+          }));
+        },
+        onError: (error) => {
+          setError('authCode', {
+            type: 'manual',
+            message: error instanceof Error ? error.message : '인증번호 재전송에 실패했습니다.'
+          });
+        }
+      }
+    );
   };
 
   // 폼 제출
-  const onSubmit = (data: PasswordResetFormData) => {
-    console.log('비밀번호 재설정 데이터:', data);
-    // 실제 비밀번호 재설정 API 호출
+  const onSubmit = async (data: PasswordResetFormData) => {
+    if (!authState.isEmailVerified || !authState.isAuthCodeVerified) {
+      return;
+    }
+
+    const resetData = {
+      email: data.email,
+      newPassword: data.password,
+      verificationCode: data.authCode
+    };
+
+    passwordResetMutation.mutate(resetData, {
+      onSuccess: () => {
+        console.log('비밀번호 재설정 성공');
+        // 비밀번호 재설정 성공 시 로그인 페이지로 리다이렉트
+        navigate('/login');
+      },
+      onError: (error) => {
+        const errorMessage = error instanceof Error ? error.message : '비밀번호 재설정 중 오류가 발생했습니다.';
+        console.error('비밀번호 재설정 실패:', errorMessage);
+        
+        // 에러 메시지를 적절한 필드에 표시
+        if (errorMessage.includes('인증번호') || errorMessage.includes('verification')) {
+          setError('authCode', {
+            type: 'manual',
+            message: '인증번호가 올바르지 않습니다.'
+          });
+        } else if (errorMessage.includes('이메일')) {
+          setError('email', {
+            type: 'manual',
+            message: '이메일 정보가 올바르지 않습니다.'
+          });
+        } else {
+          setError('password', {
+            type: 'manual',
+            message: errorMessage
+          });
+        }
+      }
+    });
   };
 
   // 유틸리티 함수들
@@ -146,11 +276,28 @@ export const usePassword = () => {
     if (!authState.isEmailVerified) return true;
     if (authState.isAuthCodeVerified) return true;
     if (authState.isAuthCodeSent && authState.authTimer > 0 && !watch('authCode') && !authState.isAuthCodeVerified) return true;
-    return false;
+    return sendAuthCodeMutation.isPending || verifyAuthCodeMutation.isPending;
   };
 
   const isSubmitEnabled = (): boolean => {
     return isValid && authState.isEmailVerified && authState.isAuthCodeVerified;
+  };
+
+  const getEmailCheckButtonText = (): string => {
+    if (emailValidationMutation.isPending) return '확인 중';
+    if (authState.isEmailVerified) return '확인 완료';
+    return '이메일 확인';
+  };
+
+  const isEmailCheckButtonDisabled = (): boolean => {
+    const email = watch('email');
+    return !email || emailValidationMutation.isPending || authState.isEmailVerified;
+  };
+
+  const getSubmitButtonText = (): string => {
+    if (passwordResetMutation.isPending) return '비밀번호 재설정 중';
+    if (passwordResetMutation.isSuccess) return '재설정 완료';
+    return '비밀번호 재설정';
   };
 
   return {
@@ -164,6 +311,9 @@ export const usePassword = () => {
     getAuthButtonClick,
     isAuthButtonDisabled,
     isSubmitEnabled,
-    formatTimer
+    formatTimer,
+    getEmailCheckButtonText,
+    isEmailCheckButtonDisabled,
+    getSubmitButtonText
   };
 };

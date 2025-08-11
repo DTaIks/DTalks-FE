@@ -15,7 +15,10 @@ export default function PasswordForm(): JSX.Element {
     getAuthButtonClick,
     isAuthButtonDisabled,
     isSubmitEnabled,
-    formatTimer
+    formatTimer,
+    getEmailCheckButtonText,
+    isEmailCheckButtonDisabled,
+    getSubmitButtonText
   } = usePassword();
 
   return (
@@ -31,11 +34,11 @@ export default function PasswordForm(): JSX.Element {
             ...register('email'),
             disabled: authState.isEmailVerified
           }}
-          infoText={errors.email?.message || authState.emailError || ''}
-          infoTextColor={errors.email || authState.emailError ? '#F0191D' : ''}
-          buttonText="이메일 확인"
+          infoText={errors.email?.message || authState.emailError || (authState.isEmailVerified ? '가입된 이메일입니다.' : '')}
+          infoTextColor={errors.email || authState.emailError ? '#F0191D' : authState.isEmailVerified ? '#27ae60' : ''}
+          buttonText={getEmailCheckButtonText()}
           onButtonClick={handleEmailCheck}
-          buttonDisabled={!watch('email') || authState.isEmailVerified}
+          buttonDisabled={isEmailCheckButtonDisabled()}
         />
 
         <AuthCodeFieldWrapper>
@@ -60,7 +63,7 @@ export default function PasswordForm(): JSX.Element {
           )}
 
           {authState.isAuthCodeSent && authState.authTimer === 0 && !authState.isAuthCodeVerified && (
-            <TimerText>인증시간이 만료되었습니다. 재전송 버튼을 눌러주세요.</TimerText>
+            <TimerText>인증시간이 만료되었습니다.</TimerText>
           )}
         </AuthCodeFieldWrapper>
 
@@ -100,7 +103,7 @@ export default function PasswordForm(): JSX.Element {
         />
 
         <Button
-          text="비밀번호 재설정"
+          text={getSubmitButtonText()}
           type="submit"
           variant="submit"
           width="380px"
