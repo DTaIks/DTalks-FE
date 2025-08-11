@@ -1,40 +1,11 @@
 import { aiApiInstance } from "./apiInstance";
-
-export interface DailyConversationData {
-  count: number; 
-  increase: number; 
-}
-
-export interface SuccessRateData {
-  percent: number;
-  increase: number; 
-}  
-
-export interface SatisfactionData {
-  percent: number;
-  increase: number; 
-}
-
-export interface ResponseTimeData {
-  avg: number;
-  zones: number[]; 
-}
-
-export interface TemplateUsageData {
-  templates: string[];
-  counts: number[];
-  percentages: number[];
-}
-
-export interface KeywordAnalysisData {
-  count: number;
-  keywords: string[];
-  values: number[];
-}
-
-export interface WeeklyResponseData {
-  values: number[]; 
-}
+import type { 
+    DailyConversationData, 
+    SuccessRateData, 
+    SatisfactionData, 
+    ResponseTimeData,
+    TemplateUsageData,
+    WeeklyResponseData  } from "@/types/chart";
 
 export class ChartAPI {
   // 일일 대화 수 조회
@@ -88,17 +59,6 @@ export class ChartAPI {
       return response.data;
     } catch (error) {
       console.error('프롬프트 템플릿 사용 통계 조회 실패:', error);
-      throw error;
-    }
-  }
-
-  // 질문 키워드 분석 조회
-  static async getKeywordAnalysis() {
-    try {
-      const response = await aiApiInstance.get<KeywordAnalysisData>('/api/chatbot/keyword');
-      return response.data;
-    } catch (error) {
-      console.error('질문 키워드 분석 조회 실패:', error);
       throw error;
     }
   }

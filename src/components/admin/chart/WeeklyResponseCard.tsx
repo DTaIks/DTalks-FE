@@ -127,7 +127,7 @@ const WeeklyResponseCard: React.FC = () => {
 export default WeeklyResponseCard;
 
 const Container = styled.div`
-  width: 1062.75px;
+  width: 1062px;
   border-radius: 18.75px;
   background: var(--color-white);
   box-shadow: 0px 6px 18px 0px rgba(125, 93, 246, 0.1);

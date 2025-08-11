@@ -185,7 +185,7 @@ export const ResponseTimeChart: React.FC = () => {
 };
 
 const ResponseTimeCard = styled.div`
-  width: 1062.75px;
+  width: 1062px;
   height: 463px;
   flex-shrink: 0;
   border-radius: var(--br-18);

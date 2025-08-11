@@ -3,12 +3,8 @@ import styled from 'styled-components';
 import { usePromptTemplate } from '@/query/useChartQueries';
 import { LoadingState, ErrorState, NoDataState } from '@/components/admin/chart/ChartDataState';
 import { DonutChart } from '@/components/admin/chart/DonutChartCard';
+import type { DonutChartData } from '@/types/chart';
 import '@/styles/Global.css';
-
-export interface DonutChartData {
-  value: number;
-  count: number;
-}
 
 export interface PromptTemplate {
   smallTalk: DonutChartData;
@@ -93,7 +89,7 @@ export const PromptTemplateCard: React.FC = () => {
 
 const Container = styled.div`
   flex-shrink: 0;
-  width: 1062.75px;
+  width: 1062px;
   height: 336px;
   border-radius: 18.75px;
   background: var(--color-white);
