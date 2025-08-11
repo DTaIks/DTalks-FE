@@ -4,7 +4,7 @@ import { useAuthStore } from '@/store/authStore';
 
 // API 인스턴스 설정
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://dtalks.kro.kr/';
-const AI_API_BASE_URL = import.meta.env.VITE_AI_API_URL || 'http://61.109.238.56:8000';
+const AI_API_BASE_URL = import.meta.env.VITE_AI_API_URL || 'http://61.109.238.56:8001';
 
 // axios 인스턴스 생성
 const createAxiosInstance = (): AxiosInstance => {
