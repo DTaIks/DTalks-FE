@@ -21,6 +21,7 @@ interface AuthState {
   authTimer: number;
   canResend: boolean;
   emailError: string;
+  verificationCode: string; // 인증번호 확인 성공 시 받은 verificationCode 저장
 }
 
 export const usePassword = () => {
@@ -31,7 +32,8 @@ export const usePassword = () => {
     isAuthCodeVerified: false,
     authTimer: 0,
     canResend: false,
-    emailError: ''
+    emailError: '',
+    verificationCode: '' // 초기값 추가
   });
 
   const {
@@ -106,7 +108,7 @@ export const usePassword = () => {
           });
         }
       },
-      onError: (error) => {
+      onError: () => {
         setAuthState(prev => ({ 
           ...prev, 
           isEmailVerified: false,
@@ -137,12 +139,12 @@ export const usePassword = () => {
             canResend: false
           }));
         },
-        onError: (error) => {
-          setError('authCode', {
-            type: 'manual',
-            message: error instanceof Error ? error.message : '인증번호 전송에 실패했습니다.'
-          });
-        }
+               onError: () => {
+         setError('authCode', {
+           type: 'manual',
+           message: '인증번호 전송에 실패했습니다.'
+         });
+       }
       }
     );
   };
@@ -165,11 +167,15 @@ export const usePassword = () => {
     verifyAuthCodeMutation.mutate(
       { email, verificationNumber: authCode },
       {
-        onSuccess: () => {
+        onSuccess: (response) => {
+          // 인증번호 확인 성공 시 받은 verificationCode 저장
+          const verificationCode = response?.data?.verificationCode || authCode;
+          
           setAuthState(prev => ({
             ...prev,
             isAuthCodeVerified: true,
-            authTimer: 0
+            authTimer: 0,
+            verificationCode: verificationCode
           }));
           clearErrors('authCode');
         },
@@ -218,12 +224,11 @@ export const usePassword = () => {
     const resetData = {
       email: data.email,
       newPassword: data.password,
-      verificationCode: data.authCode
+      verificationCode: authState.verificationCode // 인증번호 확인 성공 시 받은 verificationCode 사용
     };
 
     passwordResetMutation.mutate(resetData, {
       onSuccess: () => {
-        console.log('비밀번호 재설정 성공');
         // 비밀번호 재설정 성공 시 로그인 페이지로 리다이렉트
         navigate('/login');
       },

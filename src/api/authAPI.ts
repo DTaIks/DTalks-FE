@@ -161,12 +161,13 @@ export const authAPI = {
   },
 
   // 이메일 인증번호 확인 API (공개 API - 토큰 불필요)
-  verifyAuthCode: async (email: string, verificationNumber: string): Promise<void> => {
+  verifyAuthCode: async (email: string, verificationNumber: string): Promise<{ data: { verificationCode: string } }> => {
     try {
-      await apiInstance.post('/admin/email/verification', {
+      const response = await apiInstance.post<{ data: { verificationCode: string } }>('/admin/email/verification', {
         email,
         verificationNumber
       });
+      return response.data;
     } catch (error: unknown) {
       const axiosError = error as { response?: { status?: number; data?: { message?: string; error?: string }; headers?: Record<string, unknown> }; message?: string };
 
