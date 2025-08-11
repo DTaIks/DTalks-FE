@@ -1,37 +1,12 @@
 import React from 'react';
 import styled from 'styled-components';
 import TitleContainer from '@/layout/TitleContainer';
-import StatCard from '@/components/admin/chart/StatCard';
+import { DailyChatCard, SuccessRateCard, SatisfactionCard } from '@/components/admin/chart/StatCard';
 import { ResponseTimeChart } from '@/components/admin/chart/ResponseTimeCard';
-import { KeywordAnalysisCard } from '@/components/admin/chart/KeywordAnalysisCard';
 import { PromptTemplateCard } from '@/components/admin/chart/PromptTemplateCard';
 import WeeklyResponseCard from '@/components/admin/chart/WeeklyResponseCard';
 
-import {
-  useDailyChat,
-  useSuccessRate,
-  useSatisfaction,
-  useResponseTime,
-  usePromptTemplate,
-  useKeyword,
-  useWeeklyResponse,
-} from '@/hooks/useChart';
-
 const ChartPage: React.FC = () => {
-  const dailyChat = useDailyChat();
-  const successRate = useSuccessRate();
-  const satisfaction = useSatisfaction();
-  const responseTime = useResponseTime();
-  const promptTemplate = usePromptTemplate();
-  const keyword = useKeyword();
-  const weeklyResponse = useWeeklyResponse();
-
-  const statCards = [
-    { data: dailyChat },
-    { data: successRate },
-    { data: satisfaction }
-  ];
-
   return (
     <Container>
       <HeaderWrapper>
@@ -39,22 +14,16 @@ const ChartPage: React.FC = () => {
       </HeaderWrapper>
       <ContentArea>
         <StatCardsContainer>
-          {statCards.map((card, index) => (
-            <StatCard 
-              key={index}
-              data={card.data}
-            />
-          ))}
+          <DailyChatCard />
+          <SuccessRateCard />
+          <SatisfactionCard />
         </StatCardsContainer>
 
-        <ResponseTimeChart responseTime={responseTime} />
+        <PromptTemplateCard />
 
-        <ChartsRow>
-          <PromptTemplateCard data={promptTemplate} />
-          <KeywordAnalysisCard keyword={keyword} />
-        </ChartsRow>
+        <ResponseTimeChart />
 
-        <WeeklyResponseCard data={weeklyResponse} />
+        <WeeklyResponseCard />
       </ContentArea>
     </Container>
   );
@@ -92,10 +61,4 @@ const StatCardsContainer = styled.div`
   flex-wrap: wrap;
   gap: var(--gap-36);
   padding-bottom: 46.6px;
-`;
-
-const ChartsRow = styled.div`
-  display: flex;
-  gap: var(--gap-20);
-  margin-top: 60px;
 `;

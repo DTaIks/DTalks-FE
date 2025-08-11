@@ -4,6 +4,7 @@ import { useAuthStore } from '@/store/authStore';
 
 // API 인스턴스 설정
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://dtalks.kro.kr/';
+const AI_API_BASE_URL = import.meta.env.VITE_AI_API_URL || 'http://61.109.238.56:8000';
 
 // axios 인스턴스 생성
 const createAxiosInstance = (): AxiosInstance => {
@@ -46,5 +47,27 @@ const createAxiosInstance = (): AxiosInstance => {
   return instance;
 };
 
-// API 인스턴스 생성
+// AI API 전용 axios 인스턴스 생성
+const createAIAxiosInstance = (): AxiosInstance => {
+  const instance = axios.create({
+    baseURL: AI_API_BASE_URL,
+    timeout: 10000,
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  });
+
+  // AI API용 응답 인터셉터
+  instance.interceptors.response.use(
+    (response: AxiosResponse) => response,
+    (error: AxiosError) => {
+      console.error('AI API 오류:', error);
+      return Promise.reject(error);
+    }
+  );
+
+  return instance;
+};
+
 export const apiInstance = createAxiosInstance();
+export const aiApiInstance = createAIAxiosInstance();

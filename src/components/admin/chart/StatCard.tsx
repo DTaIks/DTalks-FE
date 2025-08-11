@@ -1,5 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
+import { useDailyChat, useSuccessRate, useSatisfaction } from '@/query/useChartQueries';
+import { LoadingState, ErrorState, NoDataState } from '@/components/admin/chart/ChartDataState';
 
 export interface StatCard {
   title: string;
@@ -10,7 +12,9 @@ export interface StatCard {
 }
 
 interface StatCardProps {
-  data: StatCard;
+  data?: StatCard;
+  isLoading?: boolean;
+  error?: Error | null;
 }
 
 // 증감에 따른 텍스트와 색상 변환
@@ -27,9 +31,41 @@ function formatStatValue(value: number, unit: string = ''): string {
   return `${value.toLocaleString()}${unit}`;
 }
 
-const StatCard: React.FC<StatCardProps> = ({ data }) => {
-  const { title, value, increase, unit = '', compareWith = '이전 대비' } = data;
+const StatCard: React.FC<StatCardProps> = ({ data, isLoading, error }) => {
+  if (isLoading) {
+    return (
+      <Card>
+        <Content>
+          <LoadingState message="데이터를 불러오는 중" />
+        </Content>
+      </Card>
+    );
+  }
 
+  if (error) {
+    return (
+      <Card>
+        <Content>
+          <ErrorState 
+            title="데이터를 불러올 수 없습니다" 
+            message={error.message} 
+          />
+        </Content>
+      </Card>
+    );
+  }
+
+  if (!data) {
+    return (
+      <Card>
+        <Content>
+          <NoDataState message="데이터가 없습니다" />
+        </Content>
+      </Card>
+    );
+  }
+
+  const { title, value, increase, unit = '', compareWith = '이전 대비' } = data;
   const formatValue = formatStatValue(value, unit);
   const change = getChange(increase, compareWith);
 
@@ -44,6 +80,22 @@ const StatCard: React.FC<StatCardProps> = ({ data }) => {
       </Content>
     </Card>
   );
+};
+
+// StatCard 컴포넌트들
+export const DailyChatCard: React.FC = () => {
+  const { data, isLoading, error } = useDailyChat();
+  return <StatCard data={data} isLoading={isLoading} error={error} />;
+};
+
+export const SuccessRateCard: React.FC = () => {
+  const { data, isLoading, error } = useSuccessRate();
+  return <StatCard data={data} isLoading={isLoading} error={error} />;
+};
+
+export const SatisfactionCard: React.FC = () => {
+  const { data, isLoading, error } = useSatisfaction();
+  return <StatCard data={data} isLoading={isLoading} error={error} />;
 };
 
 export default StatCard;
