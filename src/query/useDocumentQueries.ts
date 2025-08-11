@@ -24,3 +24,40 @@ export const useDocumentList = (currentPage: number, category: 'policy' | 'gloss
     refetchOnWindowFocus: false,
   });
 };
+
+// 카테고리별 문서 수 조회
+export const useDocumentCountByCategory = (categoryName: string) => {
+  return useQuery({
+    queryKey: ['documentCount', categoryName],
+    queryFn: () => documentAPI.getDocumentCountByCategory(categoryName),
+    enabled: !!categoryName,
+    staleTime: 1000 * 60 * 10, // 10분간 캐시 유지
+    gcTime: 1000 * 60 * 30, // 30분간 캐시 보관
+    refetchOnWindowFocus: false, // 윈도우 포커스 시 재요청 안함
+    refetchOnMount: false, // 컴포넌트 마운트 시 재요청 안함
+  });
+};
+
+export const useRecentUpdateCountByCategory = (categoryName: string) => {
+  return useQuery({
+    queryKey: ['recentUpdateCount', categoryName],
+    queryFn: () => documentAPI.getRecentUpdateCountByCategory(categoryName),
+    enabled: !!categoryName,
+    staleTime: 1000 * 60 * 10, // 10분간 캐시 유지
+    gcTime: 1000 * 60 * 30, // 30분간 캐시 보관
+    refetchOnWindowFocus: false, // 윈도우 포커스 시 재요청 안함
+    refetchOnMount: false, // 컴포넌트 마운트 시 재요청 안함
+  });
+};
+
+export const useActiveDocumentCountByCategory = (categoryName: string) => {
+  return useQuery({
+    queryKey: ['activeDocumentCount', categoryName],
+    queryFn: () => documentAPI.getActiveDocumentCountByCategory(categoryName),
+    enabled: !!categoryName,
+    staleTime: 1000 * 60 * 10, // 10분간 캐시 유지
+    gcTime: 1000 * 60 * 30, // 30분간 캐시 보관
+    refetchOnWindowFocus: false, // 윈도우 포커스 시 재요청 안함
+    refetchOnMount: false, // 컴포넌트 마운트 시 재요청 안함
+  });
+};

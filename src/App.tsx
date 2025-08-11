@@ -1,8 +1,11 @@
 import AppRoutes from '@/routes/Route';
 import '@/styles/Global.css';
-// 초기 세션 확인은 호출하지 않음 (쿠키 자동 첨부 + 로컬 복원)
+import { useAuth } from '@/hooks/useAuth';
 
 function App() {
+  // 새로고침 시 토큰 재발급 시도
+  useAuth();
+
   return (
     <>
       <AppRoutes />

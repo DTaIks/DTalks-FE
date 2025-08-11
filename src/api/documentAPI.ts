@@ -27,5 +27,23 @@ export const documentAPI = {
     
     // 서버 응답이 {code, status, message, data} 형태인 경우 data 필드를 반환
     return response.data.data || response.data;
-  }
+  },
+
+  // 카테고리별 문서 수 조회
+  getDocumentCountByCategory: async (categoryName: string): Promise<{ documentCount: number }> => {
+    const response = await apiInstance.get(`/admin/documents/count?category=${encodeURIComponent(categoryName)}`);
+    return response.data.data || response.data;
+  },
+
+  // 최근 업데이트 문서 수 조회
+  getRecentUpdateCountByCategory: async (categoryName: string): Promise<{ documentCount: number }> => {
+    const response = await apiInstance.get(`/admin/documents/recent-update-count?category=${encodeURIComponent(categoryName)}`);
+    return response.data.data || response.data;
+  },
+
+  // 활성 문서 수 조회
+  getActiveDocumentCountByCategory: async (categoryName: string): Promise<{ documentCount: number }> => {
+    const response = await apiInstance.get(`/admin/documents/count/active?category=${encodeURIComponent(categoryName)}`);
+    return response.data.data || response.data;
+  },
 };

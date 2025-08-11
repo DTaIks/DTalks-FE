@@ -21,12 +21,7 @@ export const VersionHistoryModal: React.FC<VersionHistoryModalProps> = ({
   });
 
   const versions = versionHistory ? transformFileVersionHistoryToVersionData(versionHistory) : [];
-  
 
-
-  // 파일명만 표시 (부서명은 API에서 가져올 예정)
-  const displayFileName = fileName;
-  
   const handleOverlayClick = useCallback(
     (event: React.MouseEvent<HTMLDivElement>) => {
       if (event.target === event.currentTarget) {
@@ -36,46 +31,52 @@ export const VersionHistoryModal: React.FC<VersionHistoryModalProps> = ({
     [onClose]
   );
 
+  const renderVersionList = () => {
+    if (isLoading) {
+      return <LoadingText>버전 히스토리를 불러오는 중...</LoadingText>;
+    }
+
+    if (error) {
+      return <ErrorText>버전 히스토리를 불러오는데 실패했습니다.</ErrorText>;
+    }
+
+    if (versions.length === 0) {
+      return <EmptyText>버전 히스토리가 없습니다.</EmptyText>;
+    }
+
+    return versions.map((version) => (
+      <VersionItem key={version.id}>
+        <VersionNumber>v{version.version}</VersionNumber>
+        <VersionInfo>{version.updatedAt} · {version.uploaderName}</VersionInfo>
+        {version.description && (
+          <VersionDescription>{version.description}</VersionDescription>
+        )}
+      </VersionItem>
+    ));
+  };
+
   return (
     <ModalOverlay isOpen={isOpen} onClick={handleOverlayClick}>
       <ModalContainer isOpen={isOpen}>
         <ModalHeader>
           <HeaderContent>
             <ModalTitle>문서 버전 히스토리</ModalTitle>
-            <FileName>{displayFileName}</FileName>
+            <FileName>{fileName}</FileName>
           </HeaderContent>
-          <CloseButton
-            onClick={onClose}
-            type="button"
-          >
+          <CloseButton onClick={onClose} type="button">
             ✕
           </CloseButton>
         </ModalHeader>
-                
+        
         <VersionList>
-          {isLoading ? (
-            <LoadingText>버전 히스토리를 불러오는 중...</LoadingText>
-          ) : error ? (
-            <ErrorText>버전 히스토리를 불러오는데 실패했습니다.</ErrorText>
-          ) : versions.length === 0 ? (
-            <EmptyText>버전 히스토리가 없습니다.</EmptyText>
-          ) : (
-            versions.map((version) => (
-              <VersionItem key={version.id}>
-                <VersionNumber>{version.version}</VersionNumber>
-                <VersionInfo>{version.updatedAt} · {version.uploaderName}</VersionInfo>
-                {version.description && (
-                  <VersionDescription>{version.description}</VersionDescription>
-                )}
-              </VersionItem>
-            ))
-          )}
+          {renderVersionList()}
         </VersionList>
       </ModalContainer>
     </ModalOverlay>
   );
 };
 
+// Styled Components
 const ModalOverlay = styled.div<{ isOpen: boolean }>`
   position: fixed;
   top: 0;
