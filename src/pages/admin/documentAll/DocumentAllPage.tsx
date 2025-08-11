@@ -8,12 +8,39 @@ import ConfirmModal from "@/components/common/ConfirmModal";
 import { VersionHistoryModal } from "@/components/common/FileVersionManagementModal";
 import { useDocumentStore } from "@/store/documentStore";
 import { useDocumentAllList } from "@/query/useDocumentAllQueries";
+import { useDocumentCountByCategory, useRecentUpdateCountByCategory, useActiveDocumentCountByCategory } from "@/query/useDocumentQueries";
 
 
 // 전체 문서 관리 페이지
 const DocumentAllPage = () => {
-  const { getFormattedStats } = useDocumentStore();
-  const stats = getFormattedStats();
+  
+  // 전체 문서 수 조회
+  const { data: totalCount } = useDocumentCountByCategory('all');
+  
+  // 최근 업데이트 문서 수 조회
+  const { data: recentUpdateCount } = useRecentUpdateCountByCategory('all');
+  
+  // 활성 문서 수 조회
+  const { data: activeCount } = useActiveDocumentCountByCategory('all');
+  
+  // API 데이터로 통계 생성
+  const stats = [
+    {
+      title: "전체 문서",
+      value: totalCount?.documentCount?.toString() || "0",
+      additionalInfo: "총 문서수"
+    },
+    {
+      title: "최근 업데이트 문서 수",
+      value: `${recentUpdateCount?.documentCount || 0}개`,
+      additionalInfo: "+1개 이번 주"
+    },
+    {
+      title: "활성 문서 수",
+      value: `${activeCount?.documentCount || 0}개`,
+      additionalInfo: "+1개 이번 달"
+    }
+  ];
   
   // 페이지 진입 시 전체 상태로 설정
   useEffect(() => {

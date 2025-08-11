@@ -1,25 +1,27 @@
 import React, { useCallback } from 'react';
 import styled from 'styled-components';
-import { useVersionHistory } from '@/hooks/media/useMediaFile';
+import { useFileVersionHistory } from '@/query/useMediaQueries';
+import { transformFileVersionHistoryToVersionData } from '@/hooks/media/useMediaFile';
 
 interface VersionHistoryModalProps {
   isOpen: boolean;
   onClose: () => void;
   fileName: string;
+  fileId?: number;
 }
 
 export const VersionHistoryModal: React.FC<VersionHistoryModalProps> = ({
   isOpen,
   onClose,
-  fileName
+  fileName,
+  fileId
 }) => {
-  const versions = useVersionHistory(fileName);
-  
+  const { data: versionHistory, isLoading, error } = useFileVersionHistory(fileId || null, {
+    enabled: isOpen && fileId !== undefined
+  });
 
+  const versions = versionHistory ? transformFileVersionHistoryToVersionData(versionHistory) : [];
 
-  // 파일명만 표시 (부서명은 API에서 가져올 예정)
-  const displayFileName = fileName;
-  
   const handleOverlayClick = useCallback(
     (event: React.MouseEvent<HTMLDivElement>) => {
       if (event.target === event.currentTarget) {
@@ -29,38 +31,52 @@ export const VersionHistoryModal: React.FC<VersionHistoryModalProps> = ({
     [onClose]
   );
 
+  const renderVersionList = () => {
+    if (isLoading) {
+      return <LoadingText>버전 히스토리를 불러오는 중...</LoadingText>;
+    }
+
+    if (error) {
+      return <ErrorText>버전 히스토리를 불러오는데 실패했습니다.</ErrorText>;
+    }
+
+    if (versions.length === 0) {
+      return <EmptyText>버전 히스토리가 없습니다.</EmptyText>;
+    }
+
+    return versions.map((version) => (
+      <VersionItem key={version.id}>
+        <VersionNumber>v{version.version}</VersionNumber>
+        <VersionInfo>{version.updatedAt} · {version.uploaderName}</VersionInfo>
+        {version.description && (
+          <VersionDescription>{version.description}</VersionDescription>
+        )}
+      </VersionItem>
+    ));
+  };
+
   return (
     <ModalOverlay isOpen={isOpen} onClick={handleOverlayClick}>
       <ModalContainer isOpen={isOpen}>
         <ModalHeader>
           <HeaderContent>
             <ModalTitle>문서 버전 히스토리</ModalTitle>
-            <FileName>{displayFileName}</FileName>
+            <FileName>{fileName}</FileName>
           </HeaderContent>
-          <CloseButton
-            onClick={onClose}
-            type="button"
-          >
+          <CloseButton onClick={onClose} type="button">
             ✕
           </CloseButton>
         </ModalHeader>
-                
+        
         <VersionList>
-          {versions.map((version) => (
-            <VersionItem key={version.id}>
-              <VersionNumber>{version.version}</VersionNumber>
-              <VersionInfo>{version.updatedAt} · {version.fileSize} · {version.uploaderName}</VersionInfo>
-              {version.description && (
-                <VersionDescription>{version.description}</VersionDescription>
-              )}
-            </VersionItem>
-          ))}
+          {renderVersionList()}
         </VersionList>
       </ModalContainer>
     </ModalOverlay>
   );
 };
 
+// Styled Components
 const ModalOverlay = styled.div<{ isOpen: boolean }>`
   position: fixed;
   top: 0;
@@ -167,4 +183,31 @@ const VersionDescription = styled.p`
   font-size: var(--font-size-14);
   color: var(--color-gray);
   margin: 0;
+`;
+
+const LoadingText = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 200px;
+  color: var(--color-gray);
+  font-size: var(--font-size-14);
+`;
+
+const ErrorText = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 200px;
+  color: #dc3545;
+  font-size: var(--font-size-14);
+`;
+
+const EmptyText = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 200px;
+  color: var(--color-gray);
+  font-size: var(--font-size-14);
 `;

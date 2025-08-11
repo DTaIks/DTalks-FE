@@ -7,9 +7,9 @@ interface MediaFileContentProps {
   file: MediaFile;
   isArchiveMode?: boolean;
   handlers: { 
-    handleDownloadClick: (fileName: string) => void;
+    handleDownloadClick: (fileName: string, fileUrl?: string) => void;
     handleArchiveClick: (fileName: string) => void;
-    handleVersionManagementClick: (fileName: string) => void;
+    handleVersionManagementClick: (fileName: string, fileId?: number) => void;
     handleEditClick: (file: MediaFile) => void;
     handleUploadSubmit: (data: { uploadFile?: File; fileName: string; description: string; fileVersion: string; isPublic: boolean }) => void;
     handleConfirmAction: () => void;
@@ -30,7 +30,7 @@ const MediaFileContent: React.FC<MediaFileContentProps> = ({
   const dropdownItems = [
     {
       label: "다운로드",
-      onClick: () => handlers.handleDownloadClick(file.fileName)
+      onClick: () => handlers.handleDownloadClick(file.fileName, file.fileUrl)
     },
     {
       label: "수정",
@@ -42,7 +42,7 @@ const MediaFileContent: React.FC<MediaFileContentProps> = ({
     },
     {
       label: "버전 관리",
-      onClick: () => handlers.handleVersionManagementClick(file.fileName)
+      onClick: () => handlers.handleVersionManagementClick(file.fileName, file.fileId)
     }
   ];
 

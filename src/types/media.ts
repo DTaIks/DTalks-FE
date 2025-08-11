@@ -117,6 +117,7 @@ export interface MediaFile {
   description?: string;
   fileVersion: string;
   isPublic?: boolean;
+  fileUrl?: string;
 }
 
 export interface Department {
@@ -132,4 +133,12 @@ export interface VersionData {
   fileSize: string;
   description?: string;
   updatedAt: string;
+}
+
+export interface FileVersionHistory {
+  versionId: number;
+  versionNumber: string;
+  createdAt: string;
+  description: string;
+  uploaderName: string;
 }

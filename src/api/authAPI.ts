@@ -1,24 +1,12 @@
 import { apiInstance } from './apiInstance';
-
-interface LoginRequest {
-  email: string;
-  password: string;
-}
-
-interface LoginResponse {
-  accessToken: string;
-  refreshToken: string;
-}
-
-interface SignUpRequest {
-  email: string;
-  employeeNumber: string;
-  password: string;
-}
-
-interface SignUpResponse {
-  message: string;
-}
+import type { 
+  LoginRequest, 
+  LoginResponse, 
+  SignUpRequest, 
+  SignUpResponse, 
+  TokenReissueResponse, 
+  EmailValidationResponse 
+} from '@/types/auth';
 
 export const authAPI = {
   login: async (data: LoginRequest): Promise<LoginResponse> => {
@@ -41,17 +29,59 @@ export const authAPI = {
       return response.data;
     } catch (error: unknown) {
       const axiosError = error as { response?: { status?: number; data?: { message?: string; error?: string }; headers?: Record<string, unknown> }; message?: string };
-      
+
       throw new Error(
-        axiosError?.response?.data?.message || 
-        axiosError?.response?.data?.error || 
+        axiosError?.response?.data?.message ||
+        axiosError?.response?.data?.error ||
         axiosError?.message
       );
     }
   },
 
+  // 토큰 재발급
+  reissueToken: async (accessToken: string): Promise<TokenReissueResponse> => {
+    try {
+      const response = await apiInstance.post('/admin/auth/reissue', {}, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`
+        }
+      });
+      return response.data.data || response.data;
+    } catch (error: unknown) {
+      const axiosError = error as { response?: { status?: number; data?: { message?: string; error?: string }; headers?: Record<string, unknown> }; message?: string };
+      
+      throw new Error(
+        axiosError?.response?.data?.message || 
+        axiosError?.response?.data?.error || 
+        axiosError?.message || '토큰 재발급 중 오류가 발생했습니다.'
+      );
+    }
+  },
+
+  // 로그아웃
   logout: async (): Promise<void> => {
-    await apiInstance.post('/admin/auth/logout');
+    try {
+      await apiInstance.get('/admin/auth/logout');
+      // 성공 시 HTTP 204 No Content이므로 응답 데이터 없음
+    } catch (error: unknown) {
+      const axiosError = error as { 
+        response?: { 
+          status?: number; 
+          statusText?: string;
+          data?: { message?: string; error?: string }; 
+          headers?: Record<string, unknown>;
+          config?: { url?: string; method?: string };
+        }; 
+        message?: string;
+        config?: { url?: string; method?: string };
+      };
+      
+      throw new Error(
+        axiosError?.response?.data?.message || 
+        axiosError?.response?.data?.error || 
+        axiosError?.message || '로그아웃 중 오류가 발생했습니다.'
+      );
+    }
   },
 
   // 회원가입 API 추가
@@ -75,38 +105,38 @@ export const authAPI = {
 
       return response.data;
     } catch (error: unknown) {
-      const axiosError = error as { 
-        response?: { 
-          status?: number; 
-          data?: { message?: string; error?: string }; 
-          headers?: Record<string, unknown> 
-        }; 
-        message?: string 
+      const axiosError = error as {
+        response?: {
+          status?: number;
+          data?: { message?: string; error?: string };
+          headers?: Record<string, unknown>
+        };
+        message?: string
       };
-      
+
       throw new Error(
-        axiosError?.response?.data?.message || 
-        axiosError?.response?.data?.error || 
+        axiosError?.response?.data?.message ||
+        axiosError?.response?.data?.error ||
         axiosError?.message || '회원가입 중 오류가 발생했습니다.'
       );
     }
   },
 
   // 이메일 중복 확인 API
-  validateEmail: async (email: string): Promise<{ isDuplicate: boolean }> => {
+  validateEmail: async (email: string): Promise<EmailValidationResponse> => {
     try {
       const response = await apiInstance.post<{
-        data: { isDuplicate: boolean };
+        data: EmailValidationResponse;
       }>('/admin/email/validation', { email });
-      
+
       const { data: responseData } = response.data;
       return responseData;
     } catch (error: unknown) {
       const axiosError = error as { response?: { status?: number; data?: { message?: string; error?: string }; headers?: Record<string, unknown> }; message?: string };
-      
+
       throw new Error(
-        axiosError?.response?.data?.message || 
-        axiosError?.response?.data?.error || 
+        axiosError?.response?.data?.message ||
+        axiosError?.response?.data?.error ||
         axiosError?.message
       );
     }
@@ -115,16 +145,16 @@ export const authAPI = {
   // 이메일 인증번호 전송 API
   sendAuthCode: async (email: string, isDuplicateEmail: boolean): Promise<void> => {
     try {
-      await apiInstance.post('/admin/email/send', { 
-        email, 
-        isDuplicateEmail 
+      await apiInstance.post('/admin/email/send', {
+        email,
+        isDuplicateEmail
       });
     } catch (error: unknown) {
       const axiosError = error as { response?: { status?: number; data?: { message?: string; error?: string }; headers?: Record<string, unknown> }; message?: string };
-      
+
       throw new Error(
-        axiosError?.response?.data?.message || 
-        axiosError?.response?.data?.error || 
+        axiosError?.response?.data?.message ||
+        axiosError?.response?.data?.error ||
         axiosError?.message
       );
     }
@@ -139,10 +169,10 @@ export const authAPI = {
       });
     } catch (error: unknown) {
       const axiosError = error as { response?: { status?: number; data?: { message?: string; error?: string }; headers?: Record<string, unknown> }; message?: string };
-      
+
       throw new Error(
-        axiosError?.response?.data?.message || 
-        axiosError?.response?.data?.error || 
+        axiosError?.response?.data?.message ||
+        axiosError?.response?.data?.error ||
         axiosError?.message
       );
     }

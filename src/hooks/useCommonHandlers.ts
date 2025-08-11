@@ -13,7 +13,7 @@ interface UseCommonHandlersProps {
       close: () => void;
     };
     versionModal?: {  
-      open: (fileName: string) => void;
+      open: (fileName: string, fileId?: number) => void;
       close: () => void;
       isOpen: boolean;
     }
@@ -32,8 +32,32 @@ interface UseCommonHandlersProps {
 export const useCommonHandlers = ({ modals, mediaActions, documentActions }: UseCommonHandlersProps) => {
   const { archiveDocumentItem } = useDocumentStore();
   // 다운로드 버튼 클릭 핸들러 (공통)
-  const handleDownloadClick = useCallback((fileName: string) => {
-    modals.confirmModal.open('download', fileName);
+  const handleDownloadClick = useCallback((fileName: string, fileUrl?: string) => {
+    if (fileUrl) {
+      // fileUrl이 있으면 유효성 검사 후 다운로드
+      fetch(fileUrl, { method: 'HEAD' })
+        .then(response => {
+          if (response.ok) {
+            // 파일이 존재하면 다운로드
+            const link = document.createElement('a');
+            link.href = fileUrl;
+            link.download = fileName;
+            link.style.display = 'none';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+          } else {
+            // 파일이 존재하지 않으면 에러 메시지 표시
+            alert('파일을 찾을 수 없습니다. 관리자에게 문의해주세요.');
+          }
+        })
+        .catch(() => {
+          alert('파일 다운로드 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.');
+        });
+    } else {
+      // fileUrl이 없으면 확인 모달 표시
+      modals.confirmModal.open('download', fileName);
+    }
   }, [modals.confirmModal]);
 
   // 보관 버튼 클릭 핸들러 (공통)
@@ -42,8 +66,8 @@ export const useCommonHandlers = ({ modals, mediaActions, documentActions }: Use
   }, [modals.confirmModal]);
 
   // 버전관리 버튼 클릭 핸들러 (공통)
-  const handleVersionManagementClick = useCallback((fileName: string) => {
-    modals.versionModal?.open(fileName);  
+  const handleVersionManagementClick = useCallback((fileName: string, fileId?: number) => {
+    modals.versionModal?.open(fileName, fileId);  
   }, [modals.versionModal]); 
 
   // 수정 버튼 클릭 핸들러 (Media 전용)

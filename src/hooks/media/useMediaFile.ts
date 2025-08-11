@@ -1,4 +1,4 @@
-import type { MediaFile, CommonFileInfo, DepartmentFileInfo, CommonArchivedFileInfo, VersionData } from '@/types/media';
+import type { MediaFile, CommonFileInfo, DepartmentFileInfo, CommonArchivedFileInfo, VersionData, FileVersionHistory } from '@/types/media';
 
 // API 데이터를 MediaFile 형태로 변환하는 유틸리티 함수
 export const transformCommonFileToMediaFile = (file: CommonFileInfo | DepartmentFileInfo): MediaFile => {
@@ -11,7 +11,8 @@ export const transformCommonFileToMediaFile = (file: CommonFileInfo | Department
     description: file.description || '',
     fileVersion: file.latestFileVersionNumber || '1.0.0',
     fileType: file.fileType as '문서' | '이미지' | '음성', // API의 fileType 필드 사용
-    isPublic: true // API에서 isPublic 정보를 제공하지 않으므로 기본값으로 설정
+    isPublic: true, // API에서 isPublic 정보를 제공하지 않으므로 기본값으로 설정
+    fileUrl: file.fileUrl // fileUrl 추가
   };
 };
 
@@ -26,15 +27,21 @@ export const transformArchivedFileToMediaFile = (file: CommonArchivedFileInfo): 
     description: file.description || '',
     fileVersion: file.latestFileVersionNumber || '1.0.0',
     fileType: file.fileType as '문서' | '이미지' | '음성', // API의 fileType 필드 사용
-    isPublic: true
+    isPublic: true,
+    fileUrl: file.fileUrl // fileUrl 추가
   };
 };
 
-// 버전 히스토리 반환 (실제 API 데이터 사용)
-export const useVersionHistory = (fileName: string): VersionData[] => {
-  // TODO: 실제 API에서 버전 히스토리를 가져오도록 수정
-  // fileName 파라미터는 향후 API 호출 시 사용 예정
-  console.log('버전 히스토리 요청:', fileName);
-  return [];
+// API 버전 히스토리를 UI용 VersionData로 변환하는 함수
+export const transformFileVersionHistoryToVersionData = (history: FileVersionHistory[]): VersionData[] => {
+  return history.map(item => ({
+    id: item.versionId.toString(),
+    version: item.versionNumber,
+    date: item.createdAt,
+    uploaderName: item.uploaderName,
+    fileSize: '', // API에서 제공하지 않으므로 빈 문자열
+    description: item.description,
+    updatedAt: item.createdAt
+  }));
 };
 

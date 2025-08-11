@@ -127,7 +127,7 @@ const DropdownMenu = styled.div`
   top: -125%;
   left: -250%;
   width: 100px;
-  min-height: 15vh;
+  min-height: 162px;
   flex-shrink: 0;
   border-radius: var(--br-10);
   border: 1px solid rgba(153, 102, 204, 0.20);
