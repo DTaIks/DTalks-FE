@@ -33,12 +33,12 @@ const DocumentAllPage = () => {
     {
       title: "최근 업데이트 문서 수",
       value: `${recentUpdateCount?.documentCount || 0}개`,
-      additionalInfo: "+1개 이번 주"
+      additionalInfo: "이번 주"
     },
     {
-      title: "활성 문서 수",
+      title: "활성 버전",
       value: `${activeCount?.documentCount || 0}개`,
-      additionalInfo: "+1개 이번 달"
+      additionalInfo: "활성 문서 수"
     }
   ];
   

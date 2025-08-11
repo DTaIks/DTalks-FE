@@ -9,10 +9,6 @@ export const passwordResetSchema = yup.object({
     .string()
     .required('인증번호를 입력해 주세요.')
     .length(6, '인증번호 6자리를 입력하세요.'),
-  employeeNumber: yup
-    .string()
-    .required('사원번호를 입력해 주세요.')
-    .min(4, '유효하지 않은 사원번호입니다.'),
   password: yup
     .string()
     .required('새 비밀번호를 입력해 주세요.')

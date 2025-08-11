@@ -74,8 +74,11 @@ export const useAuth = () => {
   const hasCheckedAuth = useRef(false);
 
   useEffect(() => {
-    // 이미 인증 확인을 완료했거나 로그인 페이지이면 실행하지 않음
-    if (hasCheckedAuth.current || location.pathname === '/login') {
+    // 공개 페이지 목록 (토큰 재발급 불필요)
+    const publicPages = ['/login', '/signup', '/password'];
+    
+    // 이미 인증 확인을 완료했거나 공개 페이지이면 실행하지 않음
+    if (hasCheckedAuth.current || publicPages.includes(location.pathname)) {
       setAuthChecking(false);
       return;
     }
@@ -84,14 +87,18 @@ export const useAuth = () => {
       try {
         await reissueToken();
         setAuthenticated(true);
+        // 인증 성공 시에도 isAuthChecking을 true로 유지하여 현재 페이지 보호
+        // setAuthChecking(false) 호출하지 않음
       } catch {
         setAuthenticated(false);
-      } finally {
+        // 인증 실패 시에만 setAuthChecking(false) 호출
         setAuthChecking(false);
+      } finally {
         hasCheckedAuth.current = true;
       }
     };
 
     checkAuthInBackground();
-  }, [reissueToken, setAuthenticated, setAuthChecking, location.pathname]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // location.pathname 의존성 제거하여 페이지 이동 시 재실행 방지
 };

@@ -18,7 +18,6 @@ interface InputFieldProps {
   className?: string;
   inputWidth?: string;
   inputAlignSelf?: string;
-  autocomplete?: string;  
 }
 
 // 입력 필드 컴포넌트
@@ -39,7 +38,6 @@ const InputField: React.FC<InputFieldProps> = ({
   className = '',
   inputWidth,
   inputAlignSelf,
-  autocomplete,
 }) => {
   const hasButton = !!buttonText;
   
@@ -52,10 +50,14 @@ const InputField: React.FC<InputFieldProps> = ({
             {...inputProps}
             placeholder={placeholder}
             $hasButton={hasButton}
-            autoComplete={autocomplete}
             value={inputProps?.value || value}
             onChange={inputProps?.onChange || onChange}
             type={inputProps?.type || type}
+            autoComplete={
+              (inputProps?.type || type) === 'password' ? 'new-password' :
+              (inputProps?.type || type) === 'email' ? 'username' :
+              (inputProps?.type || type) === 'text' ? 'off' : undefined
+            }
           />
           {hasButton && (
             <SignupButton
@@ -77,11 +79,16 @@ const InputField: React.FC<InputFieldProps> = ({
       <LoginTitle>{title}</LoginTitle>
       <LoginTextfield>
         <LoginText 
-          type={inputProps?.type || type}
+          {...inputProps}
           placeholder={placeholder}
           value={inputProps?.value || value}
           onChange={inputProps?.onChange || onChange}
-          autoComplete={autocomplete}
+          type={inputProps?.type || type}
+          autoComplete={
+            (inputProps?.type || type) === 'password' ? 'new-password' :
+            (inputProps?.type || type) === 'email' ? 'username' :
+            (inputProps?.type || type) === 'text' ? 'off' : undefined
+          }
         />
       </LoginTextfield>
     </LoginInputRoot>

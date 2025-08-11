@@ -7,7 +7,6 @@ export default function PasswordForm(): JSX.Element {
   const {
     register,
     handleSubmit,
-    watch,
     errors,
     authState,
     handleEmailCheck,
@@ -15,7 +14,10 @@ export default function PasswordForm(): JSX.Element {
     getAuthButtonClick,
     isAuthButtonDisabled,
     isSubmitEnabled,
-    formatTimer
+    formatTimer,
+    getEmailCheckButtonText,
+    isEmailCheckButtonDisabled,
+    getSubmitButtonText
   } = usePassword();
 
   return (
@@ -31,11 +33,11 @@ export default function PasswordForm(): JSX.Element {
             ...register('email'),
             disabled: authState.isEmailVerified
           }}
-          infoText={errors.email?.message || authState.emailError || ''}
-          infoTextColor={errors.email || authState.emailError ? '#F0191D' : ''}
-          buttonText="이메일 확인"
+          infoText={errors.email?.message || authState.emailError || (authState.isEmailVerified ? '가입된 이메일입니다.' : '')}
+          infoTextColor={errors.email || authState.emailError ? '#F0191D' : authState.isEmailVerified ? '#27ae60' : ''}
+          buttonText={getEmailCheckButtonText()}
           onButtonClick={handleEmailCheck}
-          buttonDisabled={!watch('email') || authState.isEmailVerified}
+          buttonDisabled={isEmailCheckButtonDisabled()}
         />
 
         <AuthCodeFieldWrapper>
@@ -60,27 +62,16 @@ export default function PasswordForm(): JSX.Element {
           )}
 
           {authState.isAuthCodeSent && authState.authTimer === 0 && !authState.isAuthCodeVerified && (
-            <TimerText>인증시간이 만료되었습니다. 재전송 버튼을 눌러주세요.</TimerText>
+            <TimerText>인증시간이 만료되었습니다.</TimerText>
           )}
         </AuthCodeFieldWrapper>
-
-        <InputField
-          variant="signup"
-          label="사원번호"
-          placeholder="사원번호를 입력해 주세요."
-          inputProps={{
-            ...register('employeeNumber')
-          }}
-          infoText={errors.employeeNumber?.message || ''}
-          infoTextColor={errors.employeeNumber ? '#F0191D' : ''}
-        />
 
         <InputField
           variant="signup"
           label="새 비밀번호"
           placeholder="문자, 숫자, 특수문자 포함 8자~20자"
           inputProps={{
-            type: 'password',
+            type: "password",
             ...register('password')
           }}
           infoText={errors.password?.message || ''}
@@ -92,7 +83,7 @@ export default function PasswordForm(): JSX.Element {
           label="새 비밀번호 확인"
           placeholder="새 비밀번호를 다시 입력해 주세요."
           inputProps={{
-            type: 'password',
+            type: "password",
             ...register('passwordCheck')
           }}
           infoText={errors.passwordCheck?.message || ''}
@@ -100,7 +91,7 @@ export default function PasswordForm(): JSX.Element {
         />
 
         <Button
-          text="비밀번호 재설정"
+          text={getSubmitButtonText()}
           type="submit"
           variant="submit"
           width="380px"
@@ -134,7 +125,7 @@ const Title = styled.h2`
 `;
 
 const TimerText = styled.div`
-  font-size: 9px;
+  font-size: 12px;
   color: #F0191D;
   text-align: center;
   margin-top: 3px;
