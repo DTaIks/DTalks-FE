@@ -2,6 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 import { faqAPI } from '@/api/faqAPI';
 import { transformFAQApiItems, transformFAQCategoryApiItems } from '@/utils/faqUtils';
 import { useDebouncedSearch } from '@/hooks/useDebouncedSearch';
+import type { FAQListApiResponse } from '@/types/faq';
 
 // FAQ 목록 조회 쿼리 (페이지는 0부터 시작)
 export const useFAQList = (currentPage: number) => {
@@ -18,8 +19,12 @@ export const useFAQList = (currentPage: number) => {
         totalElements: response.totalElements || 0,
       };
     },
-    staleTime: 1000 * 60 * 5,
+    staleTime: 1000 * 60 * 10, // 10분
+    gcTime: 1000 * 60 * 30, // 30분
+    refetchOnMount: false,
     refetchOnWindowFocus: false,
+    refetchOnReconnect: false,
+    placeholderData: (previousData: FAQListApiResponse | undefined) => previousData,
   });
 };
 

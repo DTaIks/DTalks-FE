@@ -1,33 +1,11 @@
 import React from 'react';
 import styled from 'styled-components';
-import type { MediaFile } from '@/types/media';
+import type { MediaFile, MediaContentProps } from '@/types/media';
 import MediaFileContent from './MediaFileContentList';
 import Header from './MediaHeader';
 import DropdownFilter from '@/components/common/DropDownFilter';
 import Pagination from '@/components/common/Pagination';
 import EmptyState from '@/components/common/EmptyState';
-
-interface MediaContentProps {
-  selectedDepartment: string;
-  selectedFileType: '전체' | '문서' | '이미지' | '음성';
-  isArchiveMode: boolean;
-  files: MediaFile[];
-  totalPages: number;
-  currentPage: number;
-  isLoading: boolean;
-  error: string | null;
-  handlers: {
-    handleDownloadClick: (fileName: string, fileUrl?: string) => void;
-    handleArchiveClick: (fileName: string) => void;
-    handleVersionManagementClick: (fileName: string, fileId?: number) => void;
-    handleEditClick: (file: MediaFile) => void;
-    handleUploadSubmit: (data: { uploadFile?: File; fileName: string; description: string; fileVersion: string; isPublic: boolean }) => void;
-    handleConfirmAction: () => void;
-    handleDocumentArchive: (documentId: number) => void;
-  };
-  onSelectFileType: (fileType: '전체' | '문서' | '이미지' | '음성') => void;
-  onPageChange: (page: number) => void;
-}
 
 const MediaContent: React.FC<MediaContentProps> = ({
   selectedDepartment,

@@ -1,26 +1,55 @@
 import React, { useCallback } from 'react';
 import styled from 'styled-components';
 import { useFileVersionHistory } from '@/query/useMediaQueries';
+import { useDocumentVersionHistory } from '@/query/useDocumentQueries';
 import { transformFileVersionHistoryToVersionData } from '@/hooks/media/useMediaFile';
-
-interface VersionHistoryModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  fileName: string;
-  fileId?: number;
-}
+import type { DocumentVersionHistory } from '@/api/documentAPI';
+import type { VersionHistoryModalProps } from '@/types/media';
 
 export const VersionHistoryModal: React.FC<VersionHistoryModalProps> = ({
   isOpen,
   onClose,
   fileName,
-  fileId
+  fileId,
+  pageType = 'media'
 }) => {
-  const { data: versionHistory, isLoading, error } = useFileVersionHistory(fileId || null, {
-    enabled: isOpen && fileId !== undefined
+  // 미디어 파일용 쿼리
+  const { 
+    data: mediaVersionHistory, 
+    isLoading: mediaIsLoading, 
+    error: mediaError 
+  } = useFileVersionHistory(fileId || null, {
+    enabled: isOpen && fileId !== undefined && pageType === 'media'
   });
 
-  const versions = versionHistory ? transformFileVersionHistoryToVersionData(versionHistory) : [];
+  // 문서용 쿼리
+  const { 
+    data: documentVersionHistory, 
+    isLoading: documentIsLoading, 
+    error: documentError 
+  } = useDocumentVersionHistory(pageType === 'document' ? fileId || null : null);
+
+  // 현재 페이지 타입에 따라 데이터 선택
+  const versionHistory = pageType === 'document' ? documentVersionHistory : mediaVersionHistory;
+  const isLoading = pageType === 'document' ? documentIsLoading : mediaIsLoading;
+  const error = pageType === 'document' ? documentError : mediaError;
+
+  // 문서용 데이터 변환 함수
+  const transformDocumentVersionHistoryToVersionData = (history: DocumentVersionHistory[]) => {
+    return history.map((version) => ({
+      id: version.versionId,
+      version: version.versionNumber,
+      updatedAt: version.createdAt,
+      uploaderName: version.uploaderName,
+      description: version.description
+    }));
+  };
+
+  const versions = versionHistory 
+    ? pageType === 'document' 
+      ? transformDocumentVersionHistoryToVersionData(versionHistory as DocumentVersionHistory[])
+      : transformFileVersionHistoryToVersionData(versionHistory)
+    : [];
 
   const handleOverlayClick = useCallback(
     (event: React.MouseEvent<HTMLDivElement>) => {

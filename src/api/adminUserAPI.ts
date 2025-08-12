@@ -25,7 +25,6 @@ export const adminUserAPI = {
         }
       );
 
-      console.log('사용자 목록 조회 성공:', response.data);
       return response.data;
     } catch (error: unknown) {
       const axiosError = error as {
@@ -74,7 +73,6 @@ export const adminUserAPI = {
         }
       );
 
-      console.log('사용자 검색 성공:', response.data);
       return response.data;
     } catch (error: unknown) {
       const axiosError = error as {

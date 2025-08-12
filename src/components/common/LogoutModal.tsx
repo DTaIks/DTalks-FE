@@ -24,8 +24,10 @@ const LogoutModal: React.FC<LogoutModalProps> = ({ isOpen, onClose }) => {
     try {
       await logoutMutation.mutateAsync();
     } catch {
-      resetLocal();
+      // 401 에러는 이미 로그아웃된 상태이므로 정상 처리
     } finally {
+      // 로그아웃 성공/실패와 관계없이 로컬 상태 초기화
+      resetLocal();
       onClose();
       navigate('/login');
     }

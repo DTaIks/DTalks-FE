@@ -6,20 +6,29 @@ import type { FAQCategory } from "@/types/faq";
 import FAQCategoryTableHeader from "@/components/admin/faq/category/FAQCategoryTableHeader";
 import FAQCategoryTableHead from "@/components/admin/faq/category/FAQCategoryTableHead";
 import FAQCategoryTableRow from "@/components/admin/faq/category/FAQCategoryTableRow";
-import { useFAQCategories } from "@/query/useFAQQueries";
-import { useArchiveFAQCategory, useRestoreFAQCategory } from "@/query/useFAQMutations";
 import { useFAQStore } from "@/store/faqStore";
 
-const FAQCategoryTable: React.FC = () => {
-  const { data: categoryData = [], isLoading, error } = useFAQCategories();
-  const archiveCategoryMutation = useArchiveFAQCategory();
-  const restoreCategoryMutation = useRestoreFAQCategory();
-  
+interface FAQCategoryTableProps {
+  categoryData: FAQCategory[];
+  isLoading: boolean;
+  error: Error | null;
+  onArchiveClick: (category: FAQCategory, e: React.MouseEvent) => void;
+  onConfirmAction: () => Promise<void>;
+  isMutationPending: boolean;
+}
+
+const FAQCategoryTable: React.FC<FAQCategoryTableProps> = ({
+  categoryData,
+  isLoading,
+  error,
+  onArchiveClick,
+  onConfirmAction,
+  isMutationPending
+}) => {
   const {
     selectedCategoryItem,
     categoryConfirmModal,
     setSelectedCategoryItem,
-    setCategoryConfirmModal,
     closeCategoryConfirmModal
   } = useFAQStore();
 
@@ -27,41 +36,15 @@ const FAQCategoryTable: React.FC = () => {
     setSelectedCategoryItem(category);
   }, [setSelectedCategoryItem]);
 
-  const handleArchiveClick = useCallback((category: FAQCategory, e: React.MouseEvent) => {
-    e.stopPropagation();
-    setCategoryConfirmModal({
-      isOpen: true,
-      type: category.isActive ? 'archive' : 'restore',
-      categoryId: category.categoryId,
-      categoryName: category.categoryName
-    });
-  }, [setCategoryConfirmModal]);
-
-  const handleConfirmAction = useCallback(async () => {
-    if (!categoryConfirmModal.categoryName) return;
-    
-    try {
-      const mutation = categoryConfirmModal.type === 'archive' 
-        ? archiveCategoryMutation 
-        : restoreCategoryMutation;
-      
-      await mutation.mutateAsync(categoryConfirmModal.categoryName);
-    } catch (error) {
-      console.error('카테고리 보관/복원 실패:', error);
-    } finally {
-      closeCategoryConfirmModal();
-    }
-  }, [categoryConfirmModal, archiveCategoryMutation, restoreCategoryMutation, closeCategoryConfirmModal]);
-
   const renderTableRow = useCallback((category: FAQCategory) => (
     <FAQCategoryTableRow
       key={category.categoryId}
       category={category}
       isSelected={selectedCategoryItem?.categoryId === category.categoryId}
       onRowClick={handleRowClick}
-      onArchiveClick={handleArchiveClick}
+      onArchiveClick={onArchiveClick}
     />
-  ), [selectedCategoryItem, handleRowClick, handleArchiveClick]);
+  ), [selectedCategoryItem, handleRowClick, onArchiveClick]);
 
   const renderEmptyState = () => {
     if (isLoading) {
@@ -102,10 +85,10 @@ const FAQCategoryTable: React.FC = () => {
         <ConfirmModal
           isOpen={categoryConfirmModal.isOpen}
           onClose={closeCategoryConfirmModal}
-          onConfirm={handleConfirmAction}
+          onConfirm={onConfirmAction}
           fileName={categoryConfirmModal.categoryName}
           type={categoryConfirmModal.type as 'archive' | 'download' | 'restore'}
-          isLoading={archiveCategoryMutation.isPending || restoreCategoryMutation.isPending}
+          isLoading={isMutationPending}
         />
       )}
     </>

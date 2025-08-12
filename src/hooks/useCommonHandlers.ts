@@ -26,11 +26,12 @@ interface UseCommonHandlersProps {
   };
   documentActions?: {
     onArchive: (id: number) => void;
+    onUpdate?: (documentName: string) => void;
   };
 }
 
 export const useCommonHandlers = ({ modals, mediaActions, documentActions }: UseCommonHandlersProps) => {
-  const { archiveDocumentItem } = useDocumentStore();
+  // const { archiveDocumentItem } = useDocumentStore();
   // 다운로드 버튼 클릭 핸들러 (공통)
   const handleDownloadClick = useCallback((fileName: string, fileUrl?: string) => {
     if (fileUrl) {
@@ -95,6 +96,13 @@ export const useCommonHandlers = ({ modals, mediaActions, documentActions }: Use
     modals.uploadModal.openEdit(initialData);
   }, [modals.uploadModal, mediaActions]);
 
+  // 문서 수정 버튼 클릭 핸들러 (Document 전용)
+  const handleDocumentUpdateClick = useCallback((documentName: string) => {
+    if (documentActions?.onUpdate) {
+      documentActions.onUpdate(documentName);
+    }
+  }, [documentActions]);
+
   // 확인 모달 액션 핸들러 (공통)
   const handleConfirmAction = useCallback(() => {
     // 이 함수는 각 페이지에서 직접 구현되어야 함
@@ -131,9 +139,10 @@ export const useCommonHandlers = ({ modals, mediaActions, documentActions }: Use
     );
     
     if (documentToArchive) {
-      archiveDocumentItem(documentToArchive.documentId);
+      // 실제 API 호출을 위해 confirmModal을 통해 처리
+      modals.confirmModal.open('archive', fileName);
     }
-  }, [archiveDocumentItem]);
+  }, [modals.confirmModal]);
 
   // 버전 히스토리 모달 핸들러 (공통)
   const handleVersionHistoryClick = useCallback((fileName: string) => {
@@ -155,6 +164,7 @@ export const useCommonHandlers = ({ modals, mediaActions, documentActions }: Use
     
     // Document 전용 핸들러
     handleDocumentArchive,
+    handleDocumentUpdateClick,
     handleArchiveByFileName,
     handleVersionHistoryClick
   };

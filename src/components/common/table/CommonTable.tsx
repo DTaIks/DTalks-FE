@@ -22,7 +22,8 @@ interface CommonTableProps {
   onSearchChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onStatusChange: (value: string) => void;
   onCategoryChange?: (value: string) => void;
-  onArchive: (id: number) => void;
+  onArchive: (id: number, isArchived?: boolean) => void;
+  onUpdate?: (documentName: string) => void;
   categoryImage: string;
   isLoading?: boolean;
   modals: {
@@ -43,16 +44,20 @@ const CommonTable: React.FC<CommonTableProps> = ({
   onStatusChange,
   onCategoryChange,
   onArchive,
+  onUpdate,
   categoryImage,
   isLoading = false,
   modals
 }) => {
-  const handlers = useCommonHandlers({ modals, documentActions: { onArchive } });
+  const handlers = useCommonHandlers({ modals, documentActions: { onArchive, onUpdate } });
 
-  const handleAction = (action: string, documentName: string) => {
+  const handleAction = (action: string, documentName: string, fileUrl?: string) => {
     switch (action) {
       case 'download':
-        handlers.handleDownloadClick(documentName);
+        handlers.handleDownloadClick(documentName, fileUrl);
+        break;
+      case 'update':
+        handlers.handleDocumentUpdateClick(documentName);
         break;
       case 'version':
         if (modals.handleVersionHistoryClick) {
@@ -61,9 +66,14 @@ const CommonTable: React.FC<CommonTableProps> = ({
           handlers.handleVersionManagementClick(documentName);
         }
         break;
-      case 'archive':
-        handlers.handleArchiveClick(documentName);
+      case 'archive': {
+        // 파일명으로 문서를 찾아서 isActive 상태 확인
+        const document = items.find(item => item.documentName === documentName);
+        if (document) {
+          onArchive(document.documentId, !document.isActive);
+        }
         break;
+      }
     }
   };
 
@@ -105,9 +115,10 @@ const CommonTable: React.FC<CommonTableProps> = ({
               <TableCell>
                 <DropDownButton 
                   items={[
-                    { label: "다운로드", onClick: () => handleAction('download', item.documentName) },
+                    { label: "다운로드", onClick: () => handleAction('download', item.documentName, item.fileUrl) },
+                    { label: "수정", onClick: () => handleAction('update', item.documentName) },
                     { label: "버전관리", onClick: () => handleAction('version', item.documentName) },
-                    { label: "보관", onClick: () => handleAction('archive', item.documentName) },
+                                         { label: item.isActive ? "보관" : "복원", onClick: () => handleAction('archive', item.documentName) },
                   ]}
                 />
               </TableCell>

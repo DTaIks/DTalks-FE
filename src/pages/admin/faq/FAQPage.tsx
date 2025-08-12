@@ -6,7 +6,7 @@ import Button from "@/components/common/Button";
 import Pagination from "@/components/common/Pagination";
 import FAQUploadModal, { type FAQUploadData } from "@/components/admin/faq/FAQUploadModal";
 import { useFAQList, useFAQSearch, useFAQFilter } from "@/query/useFAQQueries";
-import { useCreateFAQ } from "@/query/useFAQMutations";
+import { useCreateFAQ, useUpdateFAQ, useArchiveFAQ } from "@/query/useFAQMutations";
 import { useFAQStore } from "@/store/faqStore";
 import { getCategoryNameFromFilter } from "@/utils/faqUtils";
 
@@ -15,8 +15,11 @@ const FAQPage = () => {
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [modalError, setModalError] = useState<string>("");
 
+
   const { searchTerm, setSearchTerm, selectedCategory, setSelectedCategory } = useFAQStore();
   const createFAQMutation = useCreateFAQ();
+  const updateFAQMutation = useUpdateFAQ();
+  const archiveFAQMutation = useArchiveFAQ();
   
   const dataMode = useMemo(() => {
     const hasSearchTerm = searchTerm.trim().length > 0;
@@ -126,6 +129,33 @@ const FAQPage = () => {
     }
   }, [searchTerm, setSelectedCategory, setSearchTerm]);
 
+  // FAQ 상세 정보 조회 핸들러
+  const handleFAQDetail = useCallback(async (faqId: number) => {
+    // TODO: FAQ 상세 정보 조회 로직 구현
+    console.log('FAQ 상세 정보 조회:', faqId);
+  }, []);
+
+  // FAQ 수정 핸들러
+  const handleFAQUpdate = useCallback(async (faqId: number, faqData: { question: string; answer: string; category: string }) => {
+    try {
+      await updateFAQMutation.mutateAsync({
+        faqId,
+        faqData
+      });
+    } catch (error) {
+      console.error('FAQ 수정 실패:', error);
+    }
+  }, [updateFAQMutation]);
+
+  // FAQ 보관 핸들러
+  const handleFAQArchive = useCallback(async (faqId: number) => {
+    try {
+      await archiveFAQMutation.mutateAsync(faqId);
+    } catch (error) {
+      console.error('FAQ 보관 실패:', error);
+    }
+  }, [archiveFAQMutation]);
+
   useEffect(() => {
     setCurrentPage(1);
   }, [searchTerm, selectedCategory]);
@@ -152,6 +182,9 @@ const FAQPage = () => {
         selectedCategory={selectedCategory}
         onSearch={handleSearch}
         onCategoryChange={handleCategoryChange}
+        onFAQDetail={handleFAQDetail}
+        onFAQUpdate={handleFAQUpdate}
+        onFAQArchive={handleFAQArchive}
       />
       {(faqItems.length > 0 || totalPages > 0) && (
         <PaginationContainer>

@@ -62,7 +62,7 @@ export const permissionAPI = {
         }
       );
 
-      console.log('권한 변경 성공:', response.data);
+
       return response.data;
     } catch (error: unknown) {
       const axiosError = error as {

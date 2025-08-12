@@ -1,19 +1,10 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import styled from "styled-components";
 import CompareCard from "@/components/common/document/DocumentCompareCard";
 import CommonTable from "@/components/common/table/CommonTable";
 import { useDocumentList } from "@/query/useDocumentQueries";
 import { useVersionCompare } from "@/hooks/useVersionCompare";
-
-
-interface DocumentTableProps {
-  category: 'policy' | 'glossary' | 'reportform';
-  title: string;
-  categoryImage: string;
-  onArchive?: (id: number) => void;
-  onVersionHistoryClick?: (fileName: string) => void;
-  onConfirmModalOpen?: (type: 'archive' | 'download', fileName: string) => void;
-}
+import type { DocumentTableProps } from "@/types/table";
 
 const DocumentTable: React.FC<DocumentTableProps> = ({ 
   category, 
@@ -21,7 +12,9 @@ const DocumentTable: React.FC<DocumentTableProps> = ({
   categoryImage,
   onArchive,
   onVersionHistoryClick,
-  onConfirmModalOpen
+  onConfirmModalOpen,
+  onUpdate,
+  onDocumentsLoaded
 }) => {
   const [currentPage, setCurrentPage] = useState(1);
   
@@ -50,8 +43,15 @@ const DocumentTable: React.FC<DocumentTableProps> = ({
   const [selectedStatus, setSelectedStatus] = useState("전체 상태");
 
   // API 데이터에서 문서 목록 추출
-  const documentList = documentData?.documentInfoResponseList || [];
+  const documentList = useMemo(() => documentData?.documentInfoResponseList || [], [documentData?.documentInfoResponseList]);
   const totalPages = documentData?.pagingInfo?.totalPageCount || 1;
+  
+  // 문서 목록이 로드되면 부모 컴포넌트에 전달
+  useEffect(() => {
+    if (onDocumentsLoaded && documentList.length > 0) {
+      onDocumentsLoaded(documentList);
+    }
+  }, [documentList, onDocumentsLoaded]);
   
   useEffect(() => {
     if (currentPage > totalPages) {
@@ -69,9 +69,9 @@ const DocumentTable: React.FC<DocumentTableProps> = ({
     setSelectedStatus(value);
   };
 
-  const handleArchive = (id: number) => {
+  const handleArchive = (id: number, isArchived?: boolean) => {
     if (onArchive) {
-      onArchive(id);
+      onArchive(id, isArchived);
     }
   };
 
@@ -123,6 +123,7 @@ const DocumentTable: React.FC<DocumentTableProps> = ({
         onSearchChange={handleSearch}
         onStatusChange={handleStatusChange}
         onArchive={handleArchive}
+        onUpdate={onUpdate}
         categoryImage={categoryImage}
         modals={{
           confirmModal: {

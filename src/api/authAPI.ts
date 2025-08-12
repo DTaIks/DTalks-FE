@@ -26,6 +26,11 @@ export const authAPI = {
         { headers: { 'Content-Type': 'application/json', Accept: 'application/json' } }
       );
 
+      // 디버깅: 응답 구조 확인
+      console.log('로그인 응답 전체:', response);
+      console.log('로그인 응답 데이터:', response.data);
+      console.log('로그인 응답 데이터 타입:', typeof response.data);
+
       return response.data;
     } catch (error: unknown) {
       const axiosError = error as { response?: { status?: number; data?: { message?: string; error?: string }; headers?: Record<string, unknown> }; message?: string };
@@ -39,13 +44,10 @@ export const authAPI = {
   },
 
   // 토큰 재발급
-  reissueToken: async (accessToken: string): Promise<TokenReissueResponse> => {
+  reissueToken: async (): Promise<TokenReissueResponse> => {
     try {
-      const response = await apiInstance.post('/admin/auth/reissue', {}, {
-        headers: {
-          Authorization: `Bearer ${accessToken}`
-        }
-      });
+      // HttpOnly 쿠키 기반이므로 별도 헤더 없이 쿠키만 전송
+      const response = await apiInstance.post('/admin/auth/reissue');
       return response.data.data || response.data;
     } catch (error: unknown) {
       const axiosError = error as { response?: { status?: number; data?: { message?: string; error?: string }; headers?: Record<string, unknown> }; message?: string };
@@ -76,11 +78,14 @@ export const authAPI = {
         config?: { url?: string; method?: string };
       };
       
-      throw new Error(
-        axiosError?.response?.data?.message || 
-        axiosError?.response?.data?.error || 
-        axiosError?.message || '로그아웃 중 오류가 발생했습니다.'
-      );
+      // 401 에러가 아닌 경우에만 에러를 던짐 (401은 이미 로그아웃된 상태)
+      if (axiosError?.response?.status !== 401) {
+        throw new Error(
+          axiosError?.response?.data?.message || 
+          axiosError?.response?.data?.error || 
+          axiosError?.message || '로그아웃 중 오류가 발생했습니다.'
+        );
+      }
     }
   },
 

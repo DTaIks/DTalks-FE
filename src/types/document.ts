@@ -7,6 +7,7 @@ export interface DocumentInfo {
   fileUrl: string;
   lastUpdatedAt: string;
   isActive: boolean;
+  isArchived?: boolean;
 }
 
 export interface DocumentPagingInfo {

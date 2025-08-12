@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { useAuthStore } from '@/store/authStore';
+import { useLoginStore } from '@/store/loginStore';
 import { authAPI } from '@/api/authAPI';
 import { useLocation } from 'react-router-dom';
 
@@ -25,6 +26,8 @@ export const useLogin = () => {
     setAuthChecking 
   } = useAuthStore();
   
+  const { setError: setLoginError } = useLoginStore();
+  
   return useMutation({
     mutationFn: ({ email, password }: { email: string; password: string }) =>
       authAPI.login({ email, password }),
@@ -33,6 +36,11 @@ export const useLogin = () => {
       setError(null);
     },
     onSuccess: (data) => {
+      // 디버깅: 로그인 성공 시 데이터 확인
+      console.log('로그인 성공 데이터:', data);
+      console.log('accessToken 존재 여부:', !!data?.accessToken);
+      console.log('refreshToken 존재 여부:', !!data?.refreshToken);
+      
       // 쿠키 기반 인증이므로 토큰은 백업용으로만 저장
       if (data?.accessToken) setAccessToken(data.accessToken);
       if (data?.refreshToken) setRefreshToken(data.refreshToken);
@@ -41,12 +49,14 @@ export const useLogin = () => {
       setAuthChecking(false);
       setLoading(false);
       setError(null);
+      setLoginError(null); // 로그인 성공 시 에러 초기화
     },
     onError: (error: unknown) => {
       const errorMessage = error instanceof Error ? error.message : '로그인에 실패했습니다.';
       setLoading(false);
       setAuthChecking(false);
       setError(errorMessage);
+      setLoginError(errorMessage); // 로그인 에러도 설정
     },
   });
 };
@@ -61,8 +71,13 @@ export const useLogout = () => {
       logout();
     },
     onError: (error: unknown) => {
+      // 401 에러는 이미 로그아웃된 상태이므로 에러로 처리하지 않음
       const errorMessage = error instanceof Error ? error.message : '로그아웃에 실패했습니다.';
-      setError(errorMessage);
+      if (!errorMessage.includes('401')) {
+        setError(errorMessage);
+      }
+      // 401 에러가 아닌 경우에도 로컬 상태는 초기화
+      logout();
     },
   });
 };
@@ -71,34 +86,42 @@ export const useLogout = () => {
 export const useAuth = () => {
   const { reissueToken, setAuthenticated, setAuthChecking } = useAuthStore();
   const location = useLocation();
-  const hasCheckedAuth = useRef(false);
+  const isCheckingRef = useRef(false);
+  const hasCheckedRef = useRef(false);
 
   useEffect(() => {
     // 공개 페이지 목록 (토큰 재발급 불필요)
     const publicPages = ['/login', '/signup', '/password'];
     
-    // 이미 인증 확인을 완료했거나 공개 페이지이면 실행하지 않음
-    if (hasCheckedAuth.current || publicPages.includes(location.pathname)) {
-      setAuthChecking(false);
+    // 이미 인증 확인 중이거나 공개 페이지이면 실행하지 않음
+    if (isCheckingRef.current || publicPages.includes(location.pathname)) {
+      return;
+    }
+
+    // 이미 한 번 확인했다면 다시 확인하지 않음 (개발 환경에서 중복 방지)
+    if (hasCheckedRef.current && process.env.NODE_ENV === 'development') {
       return;
     }
 
     const checkAuthInBackground = async () => {
+      isCheckingRef.current = true;
+      
       try {
         await reissueToken();
         setAuthenticated(true);
+        hasCheckedRef.current = true;
         // 인증 성공 시에도 isAuthChecking을 true로 유지하여 현재 페이지 보호
         // setAuthChecking(false) 호출하지 않음
       } catch {
         setAuthenticated(false);
+        hasCheckedRef.current = true;
         // 인증 실패 시에만 setAuthChecking(false) 호출
         setAuthChecking(false);
       } finally {
-        hasCheckedAuth.current = true;
+        isCheckingRef.current = false;
       }
     };
 
     checkAuthInBackground();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []); // location.pathname 의존성 제거하여 페이지 이동 시 재실행 방지
+  }, [location.pathname, reissueToken, setAuthenticated, setAuthChecking]); // location.pathname 의존성 추가하여 페이지 변경 시 재확인
 };

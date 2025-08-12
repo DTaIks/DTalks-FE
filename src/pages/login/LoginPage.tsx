@@ -5,6 +5,7 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import LoginForm from "@/components/login/LoginForm";
 import Logo from "@/assets/common/Logo.png";
 import { useAuthStore } from '@/store/authStore';
+import { useLoginStore } from '@/store/loginStore';
 import { useLogin } from '@/hooks/useAuth';
 import { loginSchema, type LoginFormData } from '@/utils/authSchema';
 import styled from "styled-components";
@@ -12,7 +13,21 @@ import styled from "styled-components";
 export default function LoginPage(): JSX.Element {
   const navigate = useNavigate();
   
-  // React Hook Form 설정
+  // Zustand store에서 상태 가져오기
+  const { isAuthenticated } = useAuthStore();
+  const { 
+    email: savedEmail, 
+    password: savedPassword, 
+    error, 
+    isLoading,
+    setEmail, 
+    setPassword, 
+    setError, 
+    setLoading,
+    resetForm 
+  } = useLoginStore();
+
+  // React Hook Form 설정 - 저장된 값으로 초기화
   const {
     handleSubmit,
     formState: { errors },
@@ -21,11 +36,12 @@ export default function LoginPage(): JSX.Element {
     setError: setFormError
   } = useForm<LoginFormData>({
     resolver: yupResolver(loginSchema),
-    mode: 'onChange' // 실시간 유효성 검사
+    mode: 'onChange', // 실시간 유효성 검사
+    defaultValues: {
+      email: savedEmail,
+      password: savedPassword
+    }
   });
-
-  // Zustand store에서 상태 가져오기
-  const { isAuthenticated, error, setError } = useAuthStore();
 
   // 로그인 뮤테이션 훅 사용
   const loginMutation = useLogin();
@@ -41,6 +57,7 @@ export default function LoginPage(): JSX.Element {
   const handleLogin = async (data: LoginFormData): Promise<void> => {
     try {
       setError(null);
+      setLoading(true);
       setFormError('email', { message: '' });
       setFormError('password', { message: '' });
       
@@ -50,11 +67,14 @@ export default function LoginPage(): JSX.Element {
         password: data.password
       });
       
-      // 성공 시 어드민 페이지로 이동
+      // 성공 시 폼 초기화하고 어드민 페이지로 이동
+      resetForm();
       navigate('/admin');
     } catch (error: unknown) {
       console.error('로그인 실패:', error);
       // 에러는 useLogin 훅에서 이미 처리됨
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -74,15 +94,19 @@ export default function LoginPage(): JSX.Element {
           email={email}
           password={password}
           onEmailChange={(e) => {
-            setValue('email', e.target.value);
+            const value = e.target.value;
+            setValue('email', value);
+            setEmail(value);
             setError(null);
           }}
           onPasswordChange={(e) => {
-            setValue('password', e.target.value);
+            const value = e.target.value;
+            setValue('password', value);
+            setPassword(value);
             setError(null);
           }}
           onLogin={handleSubmit(handleLogin)}
-          isLoading={loginMutation.isPending}
+          isLoading={isLoading || loginMutation.isPending}
           error={error || errors.email?.message || errors.password?.message}
         />
         <SignUpContainer>
