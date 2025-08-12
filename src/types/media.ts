@@ -1,3 +1,6 @@
+// 모달 관련 타입들을 modal.ts에서 import
+export type { MediaUploadModalProps, MediaUploadData, VersionHistoryModalProps, MediaArchiveModalProps } from './modal';
+
 export interface CommonFileInfo {
   fileId: number;
   fileName: string;
@@ -194,44 +197,7 @@ export interface MediaSidebarProps {
   onSelectArchiveDepartment: (department: string) => void;
 }
 
-// MediaUploadModal 컴포넌트
-export interface MediaUploadModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  onSubmit: (data: MediaUploadData) => void;
-  isSubmitting?: boolean;
-  initialData?: MediaUploadData | null;
-  isEditMode?: boolean;
-}
-
-export interface MediaUploadData {
-  uploadFile?: File;
-  fileName: string;
-  description: string;
-  fileVersion: string;
-  isPublic: boolean;
-}
-
-// VersionHistoryModal 컴포넌트
-export interface VersionHistoryModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  fileName: string;
-  fileId?: number;
-  pageType?: 'media' | 'document';
-}
-
 // MediaHeader 컴포넌트
 export interface MediaFileContentHeaderProps {
   selectedTeam: string;
-}
-
-// ArchiveModal 컴포넌트
-export interface ArchiveModalProps {
-  isOpen: boolean;
-  isClosing: boolean;
-  departments: Array<{ id: string; name: string }>;
-  selectedDepartment: string;
-  onClose: () => void;
-  onSelectDepartment: (department: string) => void;
 }

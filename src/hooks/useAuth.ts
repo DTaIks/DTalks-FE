@@ -36,6 +36,11 @@ export const useLogin = () => {
       setError(null);
     },
     onSuccess: (data) => {
+      // 디버깅: 로그인 성공 시 데이터 확인
+      console.log('로그인 성공 데이터:', data);
+      console.log('accessToken 존재 여부:', !!data?.accessToken);
+      console.log('refreshToken 존재 여부:', !!data?.refreshToken);
+      
       // 쿠키 기반 인증이므로 토큰은 백업용으로만 저장
       if (data?.accessToken) setAccessToken(data.accessToken);
       if (data?.refreshToken) setRefreshToken(data.refreshToken);

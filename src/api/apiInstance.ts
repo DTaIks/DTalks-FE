@@ -9,8 +9,13 @@ let isLoggingOut = false;
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://dtalks.kro.kr/';
 const AI_API_BASE_URL = import.meta.env.VITE_AI_API_URL || 'http://61.109.238.56:8001';
 
-// 공개 API 목록 (인증 불필요)
-const PUBLIC_APIS = [
+// 공개 API 목록 (인증 불필요, but 쿠키는 받아야 하는 API들)
+const PUBLIC_APIS_WITH_COOKIES = [
+  '/admin/auth/login',  // 로그인은 쿠키를 받아야 함
+];
+
+// 공개 API 목록 (인증 불필요, 쿠키도 받지 않는 API들)
+const PUBLIC_APIS_WITHOUT_COOKIES = [
   '/admin/auth/join',
   '/admin/email/validation',
   '/admin/email/send',
@@ -32,12 +37,11 @@ const createAxiosInstance = (): AxiosInstance => {
   // 요청 인터셉터
   instance.interceptors.request.use(
     (config) => {
-      // 공개 API인 경우 withCredentials를 false로 설정하여 쿠키 제외
-      if (PUBLIC_APIS.some(api => config.url?.includes(api))) {
+      // 쿠키를 받지 않는 공개 API인 경우 withCredentials를 false로 설정
+      if (PUBLIC_APIS_WITHOUT_COOKIES.some(api => config.url?.includes(api))) {
         config.withCredentials = false;
       }
-      // 쿠키 기반 인증이므로 별도 헤더 설정 불필요
-      // withCredentials: true로 쿠키가 자동으로 포함됨 (공개 API 제외)
+      // 나머지는 withCredentials: true로 설정 (쿠키 포함)
       return config;
     },
     (error) => Promise.reject(error)
@@ -51,10 +55,10 @@ const createAxiosInstance = (): AxiosInstance => {
       const url = error.config?.url;
       
       // 401 에러이고 토큰 재발급 API가 아닌 경우에만 토큰 재발급 시도
-      if (status === 401 && url && !isLoggingOut && !PUBLIC_APIS.some(api => url.includes(api)) && !url.includes('/admin/auth/reissue')) {
+      if (status === 401 && url && !isLoggingOut && !PUBLIC_APIS_WITH_COOKIES.some(api => url.includes(api)) && !PUBLIC_APIS_WITHOUT_COOKIES.some(api => url.includes(api)) && !url.includes('/admin/auth/reissue')) {
         try {
           isLoggingOut = true;
-          const { reissueToken, logout } = useAuthStore.getState();
+          const { reissueToken } = useAuthStore.getState();
           
           // 토큰 재발급 시도
           await reissueToken();
@@ -71,7 +75,7 @@ const createAxiosInstance = (): AxiosInstance => {
         } finally {
           isLoggingOut = false;
         }
-      } else if ((status === 410) && url && !isLoggingOut && !PUBLIC_APIS.some(api => url.includes(api))) {
+      } else if ((status === 410) && url && !isLoggingOut && !PUBLIC_APIS_WITH_COOKIES.some(api => url.includes(api)) && !PUBLIC_APIS_WITHOUT_COOKIES.some(api => url.includes(api))) {
         // 410 에러는 바로 로그아웃 (세션 만료)
         try {
           isLoggingOut = true;

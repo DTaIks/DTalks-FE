@@ -1,5 +1,3 @@
-// 모달 관련 컴포넌트 Props 타입들
-
 // UploadBaseModal 컴포넌트
 export interface BaseModalProps {
   isOpen: boolean;
@@ -29,7 +27,7 @@ export interface DocumentUploadModalProps {
     fileUrl?: string;
   };
 }
-
+// DocumentUploadData 타입
 export interface DocumentUploadData {
   fileId?: number;
   uploadFile?: File;
@@ -55,7 +53,7 @@ export interface MediaUploadModalProps {
     fileUrl?: string;
   };
 }
-
+// MediaUploadData 타입
 export interface MediaUploadData {
   fileId?: number;
   uploadFile?: File;
@@ -79,7 +77,7 @@ export interface FAQUploadModalProps {
     category: string;
   };
 }
-
+// FAQUploadData 타입
 export interface FAQUploadData {
   faqId?: number;
   question: string;
@@ -94,6 +92,16 @@ export interface ArchiveModalProps {
   onConfirm: () => void;
   fileName: string;
   isLoading?: boolean;
+}
+
+// 미디어 전용 ArchiveModal Props (부서 선택 기능 포함)
+export interface MediaArchiveModalProps {
+  isOpen: boolean;
+  isClosing: boolean;
+  departments: Array<{ id: string; name: string }>;
+  selectedDepartment: string;
+  onClose: () => void;
+  onSelectDepartment: (department: string) => void;
 }
 
 // VersionHistoryModal 컴포넌트

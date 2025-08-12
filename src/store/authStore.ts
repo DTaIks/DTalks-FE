@@ -1,5 +1,4 @@
 import { create } from 'zustand';
-import { apiInstance } from '@/api/apiInstance';
 import { authAPI } from '@/api/authAPI';
 import type { AuthStore } from '@/types/auth';
 

@@ -26,6 +26,11 @@ export const authAPI = {
         { headers: { 'Content-Type': 'application/json', Accept: 'application/json' } }
       );
 
+      // 디버깅: 응답 구조 확인
+      console.log('로그인 응답 전체:', response);
+      console.log('로그인 응답 데이터:', response.data);
+      console.log('로그인 응답 데이터 타입:', typeof response.data);
+
       return response.data;
     } catch (error: unknown) {
       const axiosError = error as { response?: { status?: number; data?: { message?: string; error?: string }; headers?: Record<string, unknown> }; message?: string };
