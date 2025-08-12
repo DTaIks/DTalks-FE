@@ -39,13 +39,10 @@ export const authAPI = {
   },
 
   // 토큰 재발급
-  reissueToken: async (accessToken: string): Promise<TokenReissueResponse> => {
+  reissueToken: async (): Promise<TokenReissueResponse> => {
     try {
-      const response = await apiInstance.post('/admin/auth/reissue', {}, {
-        headers: {
-          Authorization: `Bearer ${accessToken}`
-        }
-      });
+      // HttpOnly 쿠키 기반이므로 별도 헤더 없이 쿠키만 전송
+      const response = await apiInstance.post('/admin/auth/reissue');
       return response.data.data || response.data;
     } catch (error: unknown) {
       const axiosError = error as { response?: { status?: number; data?: { message?: string; error?: string }; headers?: Record<string, unknown> }; message?: string };

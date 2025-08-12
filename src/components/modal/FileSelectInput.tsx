@@ -1,18 +1,6 @@
 import React, { useRef } from 'react';
 import styled from 'styled-components';
-
-interface FileSelectInputProps {
-  fileDisplayName: string;
-  onFileDisplayNameChange: (name: string) => void;
-  onFileChange: (file: File | null) => void;
-  accept?: string;
-  placeholder?: string;
-  maxSizeInMB?: number;
-  onFileError?: (error: string) => void;
-  fileError?: string;
-  disabled?: boolean;
-  optional?: boolean;
-}
+import type { FileSelectInputProps } from '@/types/modal';
 
 export const FileSelectInput: React.FC<FileSelectInputProps> = ({
   fileDisplayName,

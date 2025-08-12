@@ -7,32 +7,7 @@ import { FileDescriptionInput } from '@/components/modal/FileDescriptionInput';
 import { VersionInput } from '@/components/modal/VersionInput';
 import { FileCategory } from '@/components/modal/FileCategoryDropdownMenu';
 import { UploadInfoCard } from '@/components/modal/UploadInfoCard';
-
-interface DocumentUploadModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  onSubmit: (data: DocumentUploadData) => void;
-  isSubmitting?: boolean;
-  pageType?: 'policy' | 'report' | 'glossary' | 'document';
-  mode?: 'upload' | 'update';
-  initialData?: {
-    fileId?: number;
-    fileName: string;
-    description: string;
-    fileVersion: string;
-    category: string;
-    fileUrl?: string;
-  };
-}
-
-export interface DocumentUploadData {
-  fileId?: number;
-  uploadFile?: File;
-  fileName: string;
-  description: string;
-  fileVersion: string;
-  category: string; 
-}
+import type { DocumentUploadModalProps, DocumentUploadData } from '@/types/modal';
 
 const CATEGORY = [
   '용어 사전',

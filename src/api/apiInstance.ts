@@ -43,21 +43,42 @@ const createAxiosInstance = (): AxiosInstance => {
     (error) => Promise.reject(error)
   );
 
-  // 응답 인터셉터: 401 시 전역 로그아웃으로 상태 동기화 (공개 API 제외)
+  // 응답 인터셉터: 401 시 토큰 재발급 시도 후 실패 시 로그아웃
   instance.interceptors.response.use(
     (response: AxiosResponse) => response,
     async (error: AxiosError) => {
       const status = error.response?.status;
       const url = error.config?.url;
       
-      // 로그아웃 처리 중이거나 공개 API가 아닌 경우에만 401/410 에러 시 로그아웃 처리
-      if ((status === 401 || status === 410) && url && !isLoggingOut && !PUBLIC_APIS.some(api => url.includes(api))) {
+      // 401 에러이고 토큰 재발급 API가 아닌 경우에만 토큰 재발급 시도
+      if (status === 401 && url && !isLoggingOut && !PUBLIC_APIS.some(api => url.includes(api)) && !url.includes('/admin/auth/reissue')) {
+        try {
+          isLoggingOut = true;
+          const { reissueToken, logout } = useAuthStore.getState();
+          
+          // 토큰 재발급 시도
+          await reissueToken();
+          
+          // 토큰 재발급 성공 시 원래 요청 재시도
+          if (error.config) {
+            return apiInstance.request(error.config);
+          }
+        } catch (reissueError) {
+          // 토큰 재발급 실패 시 로그아웃
+          console.error('토큰 재발급 실패:', reissueError);
+          const { logout } = useAuthStore.getState();
+          logout();
+        } finally {
+          isLoggingOut = false;
+        }
+      } else if ((status === 410) && url && !isLoggingOut && !PUBLIC_APIS.some(api => url.includes(api))) {
+        // 410 에러는 바로 로그아웃 (세션 만료)
         try {
           isLoggingOut = true;
           const { logout } = useAuthStore.getState();
           logout();
-        } catch (error) {
-          console.error('로그아웃 처리 중 오류:', error);
+        } catch (logoutError) {
+          console.error('로그아웃 처리 중 오류:', logoutError);
         } finally {
           isLoggingOut = false;
         }

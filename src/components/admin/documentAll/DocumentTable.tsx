@@ -4,25 +4,7 @@ import CompareCard from "@/components/common/document/DocumentCompareCard";
 import CommonTable from "@/components/common/table/CommonTable";
 import { useDocumentList } from "@/query/useDocumentQueries";
 import { useVersionCompare } from "@/hooks/useVersionCompare";
-
-
-interface DocumentTableProps {
-  category: 'policy' | 'glossary' | 'reportform';
-  title: string;
-  categoryImage: string;
-  onArchive?: (id: number, isArchived?: boolean) => void;
-  onVersionHistoryClick?: (fileName: string) => void;
-  onConfirmModalOpen?: (type: 'archive' | 'download', fileName: string) => void;
-  onUpdate?: (documentName: string) => void;
-  onDocumentsLoaded?: (documents: Array<{
-    documentId: number;
-    documentName: string;
-    latestVersion: string;
-    category: string;
-    fileUrl: string;
-    isActive: boolean;
-  }>) => void;
-}
+import type { DocumentTableProps } from "@/types/table";
 
 const DocumentTable: React.FC<DocumentTableProps> = ({ 
   category, 

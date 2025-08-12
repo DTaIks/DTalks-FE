@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { apiInstance } from '@/api/apiInstance';
+import { authAPI } from '@/api/authAPI';
 import type { AuthStore } from '@/types/auth';
 
 const initialAuthState = {
@@ -56,11 +57,11 @@ export const useAuthStore = create<AuthStore>()(
       try {
         set({ isLoading: true, error: null });
         
-        // 쿠키만 전송하여 토큰 재발급 요청
-        const response = await apiInstance.post('/admin/auth/reissue');
+        // HttpOnly 쿠키 기반이므로 별도 토큰 없이 쿠키만 전송
+        const response = await authAPI.reissueToken();
         
-        // 응답에서 새 토큰 추출
-        const { accessToken, refreshToken } = response.data.data || response.data;
+        // 응답에서 새 토큰 추출 (백업용으로만 저장)
+        const { accessToken, refreshToken } = response;
         
         set({ 
           accessToken, 

@@ -1,9 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-
-interface MediaFileContentHeaderProps {
-  selectedTeam: string;
-}
+import type { MediaFileContentHeaderProps } from '@/types/media';
 
 const Header: React.FC<MediaFileContentHeaderProps> = ({ selectedTeam }) => {
   return (

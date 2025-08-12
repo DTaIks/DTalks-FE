@@ -4,14 +4,7 @@ import { useFileVersionHistory } from '@/query/useMediaQueries';
 import { useDocumentVersionHistory } from '@/query/useDocumentQueries';
 import { transformFileVersionHistoryToVersionData } from '@/hooks/media/useMediaFile';
 import type { DocumentVersionHistory } from '@/api/documentAPI';
-
-interface VersionHistoryModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  fileName: string;
-  fileId?: number;
-  pageType?: 'media' | 'document';
-}
+import type { VersionHistoryModalProps } from '@/types/media';
 
 export const VersionHistoryModal: React.FC<VersionHistoryModalProps> = ({
   isOpen,

@@ -8,23 +8,7 @@ import { FileDescriptionInput } from '@/components/modal/FileDescriptionInput';
 import { VersionInput } from '@/components/modal/VersionInput';
 import { PublicSetting } from '@/components/modal/FilePublicSetting';
 import { UploadInfoCard } from '@/components/modal/UploadInfoCard';
-
-interface MediaUploadModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  onSubmit: (data: MediaUploadData) => void;
-  isSubmitting?: boolean;
-  initialData?: MediaUploadData | null;
-  isEditMode?: boolean;
-}
-
-export interface MediaUploadData {
-  uploadFile?: File;
-  fileName: string;
-  description: string;
-  fileVersion: string;
-  isPublic: boolean;
-}
+import type { MediaUploadModalProps, MediaUploadData } from '@/types/media';
 
 const MEDIA_UPLOAD_INFO = [
   "지원 형식: 이미지(JPG, PNG), 음성(MP3), \n문서(pdf, docx, xlsx, csv)",

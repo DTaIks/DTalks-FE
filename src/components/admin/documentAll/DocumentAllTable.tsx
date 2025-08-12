@@ -1,24 +1,7 @@
 import React, { useCallback } from "react";
 import DocumentCommonTable from "@/components/common/table/DocumentCommonTable";
 import type { DocumentInfo } from "@/types/document";
-
-interface DocumentAllTableProps {
-  documents: DocumentInfo[];
-  modals: {
-    confirmModal: {
-      open: (type: 'archive' | 'download', fileName: string) => void;
-      close: () => void;
-    };
-    versionModal: {
-      open: (fileName: string) => void;
-      close: () => void;
-      isOpen: boolean;
-    };
-  };
-  isLoading?: boolean;
-  error?: Error | null;
-  onUpdate?: (documentName: string) => void;
-}
+import type { DocumentAllTableProps } from "@/types/table";
 
 const DocumentAllTable: React.FC<DocumentAllTableProps> = ({ 
   documents,
