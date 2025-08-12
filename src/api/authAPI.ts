@@ -61,7 +61,7 @@ export const authAPI = {
   // 로그아웃
   logout: async (): Promise<void> => {
     try {
-      await apiInstance.get('/admin/auth/logout');
+      await apiInstance.post('/admin/auth/logout');
       // 성공 시 HTTP 204 No Content이므로 응답 데이터 없음
     } catch (error: unknown) {
       const axiosError = error as { 

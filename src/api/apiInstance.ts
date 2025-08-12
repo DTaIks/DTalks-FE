@@ -36,8 +36,8 @@ const createAxiosInstance = (): AxiosInstance => {
         try {
           const { logout } = useAuthStore.getState();
           logout();
-        } catch (error) {
-          console.error('로그아웃 처리 중 오류:', error);
+        } catch {
+          // 로그아웃 처리 중 에러는 무시
         }
       }
       return Promise.reject(error);
@@ -61,7 +61,6 @@ const createAIAxiosInstance = (): AxiosInstance => {
   instance.interceptors.response.use(
     (response: AxiosResponse) => response,
     (error: AxiosError) => {
-      console.error('AI API 오류:', error);
       return Promise.reject(error);
     }
   );
