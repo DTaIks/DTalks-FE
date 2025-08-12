@@ -1,12 +1,12 @@
-import { apiInstance } from './apiInstance';
-import type { 
-  LoginRequest, 
-  LoginResponse, 
-  SignUpRequest, 
-  SignUpResponse, 
-  TokenReissueResponse, 
-  EmailValidationResponse 
+import type {
+  EmailValidationResponse,
+  LoginRequest,
+  LoginResponse,
+  SignUpRequest,
+  SignUpResponse,
+  TokenReissueResponse
 } from '@/types/auth';
+import { apiInstance } from './apiInstance';
 
 export const authAPI = {
   login: async (data: LoginRequest): Promise<LoginResponse> => {
@@ -203,6 +203,48 @@ export const authAPI = {
         axiosError?.response?.data?.message ||
         axiosError?.response?.data?.error ||
         axiosError?.message || '비밀번호 재설정 중 오류가 발생했습니다.'
+      );
+    }
+  },
+
+  // 프로필 조회 API
+  getProfile: async (): Promise<{ name: string }> => {
+    console.log('getProfile API 호출 시작');
+    try {
+      const response = await apiInstance.get('/admin/profile');
+      console.log('getProfile API 전체 응답:', response);
+      console.log('getProfile API 응답 데이터:', response.data);
+      
+      // 다양한 응답 구조 처리
+      let profileData;
+      if (response.data && typeof response.data === 'object') {
+        // response.data가 객체인 경우
+        if (response.data.name) {
+          profileData = { name: response.data.name };
+        } else if (response.data.data && response.data.data.name) {
+          // data.data.name 구조
+          profileData = { name: response.data.data.name };
+        } else {
+          // 다른 구조일 경우 첫 번째 문자열 값을 name으로 사용
+          const values = Object.values(response.data);
+          const nameValue = values.find(val => typeof val === 'string');
+          profileData = { name: nameValue || 'admin' };
+        }
+      } else {
+        // response.data가 문자열인 경우
+        profileData = { name: response.data || 'admin' };
+      }
+      
+      console.log('처리된 프로필 데이터:', profileData);
+      return profileData;
+    } catch (error: unknown) {
+      console.error('getProfile API 에러:', error);
+      const axiosError = error as { response?: { status?: number; data?: { message?: string; error?: string }; headers?: Record<string, unknown> }; message?: string };
+
+      throw new Error(
+        axiosError?.response?.data?.message ||
+        axiosError?.response?.data?.error ||
+        axiosError?.message || '프로필 조회 중 오류가 발생했습니다.'
       );
     }
   },

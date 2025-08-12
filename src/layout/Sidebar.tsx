@@ -1,9 +1,10 @@
-import styled from "styled-components";
-import React, { useState, useEffect } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
-import LogoImage from "@/assets/common/Small_Logo.png";
+import { authAPI } from "@/api/authAPI";
 import ProfileImageSrc from "@/assets/common/Profile.png";
+import LogoImage from "@/assets/common/Small_Logo.png";
 import LogoutModal from "@/components/common/LogoutModal";
+import React, { useEffect, useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
+import styled from "styled-components";
 
 type SidebarProps = {
   className?: string;
@@ -236,6 +237,32 @@ const Sidebar: React.FC<SidebarProps> = ({ className = "" }) => {
   const [hoveredMenu, setHoveredMenu] = useState<string>("");
   const [isProfileDropdownOpen, setProfileDropdownOpen] = useState(false);
   const [isLogoutModalOpen, setLogoutModalOpen] = useState(false);
+  const [profileName, setProfileName] = useState<string>("admin");
+
+  // 프로필 정보 가져오기
+  useEffect(() => {
+    const fetchProfile = async () => {
+      console.log('프로필 정보 가져오기 시작');
+      try {
+        const profileData = await authAPI.getProfile();
+        console.log('프로필 데이터 받음:', profileData);
+        console.log('설정할 이름:', profileData.name);
+        setProfileName(profileData.name);
+        console.log('프로필 이름 설정됨:', profileData.name);
+      } catch (error) {
+        console.error('프로필 조회 실패:', error);
+        // 에러 발생 시 기본값 유지
+        setProfileName('admin');
+      }
+    };
+
+    fetchProfile();
+  }, []);
+
+  // profileName 변경 감지
+  useEffect(() => {
+    console.log('profileName이 변경됨:', profileName);
+  }, [profileName]);
 
   const clearHoveredMenu = () => {
     setHoveredMenu("");
@@ -355,6 +382,9 @@ const Sidebar: React.FC<SidebarProps> = ({ className = "" }) => {
   const selectedMenu = getSelectedMenuKey();
   const currentOpenMenus = getOpenMenus();
 
+  // 디버깅: profileName 값 확인
+  console.log('현재 profileName 값:', profileName);
+
   return (
     <SidebarRoot className={`sidebar ${className}`}>
       <LogoRow>
@@ -387,7 +417,10 @@ const Sidebar: React.FC<SidebarProps> = ({ className = "" }) => {
       <ProfileDivider />
       <ProfileSection onClick={handleProfileClick}>
         <Profile alt="" src={ProfileImageSrc} />
-        <AdminText>admin</AdminText>
+        <AdminText>
+          {profileName || 'admin'}
+          {/* 디버깅용 주석: {profileName ? `(${profileName})` : '(기본값)'} */}
+        </AdminText>
         <ProfileDropdown 
           isOpen={isProfileDropdownOpen} 
           onMenuClick={handleProfileMenuClick} 
