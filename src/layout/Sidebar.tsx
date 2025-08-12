@@ -625,7 +625,8 @@ const AdminText = styled.div`
   font-family: var(--font-pretendard);
   position: absolute;
   left: 50%;
-  transform: translateX(-70%);
+  transform: translateX(-50%);
+  text-align: center;
 `;
 
 const ProfileDropdownContainer = styled.div`
