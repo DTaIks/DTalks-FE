@@ -2,6 +2,7 @@ import styled from "styled-components";
 import { CircularProgressbar, buildStyles } from "react-circular-progressbar";
 import "react-circular-progressbar/dist/styles.css";
 import '@/styles/Global.css';
+import type { DonutChartProps } from '@/types/chart';
 
 // 프롬프트 템플릿 종류
 const TEMPLATE_TYPES = {
@@ -10,15 +11,6 @@ const TEMPLATE_TYPES = {
   formatSearch: 'Format Search',
   organization: 'Organization',
 } as const;
-
-export interface DonutChartProps {
-  type: keyof typeof TEMPLATE_TYPES;
-  size?: string;
-  value?: number;
-  count?: number;
-  pathColor?: string;
-  trailColor?: string;
-}
 
 export const DonutChart = ({
   type,

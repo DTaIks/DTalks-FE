@@ -1,29 +1,14 @@
 import React, { useCallback } from "react";
 import DocumentCommonTable from "@/components/common/table/DocumentCommonTable";
 import type { DocumentInfo } from "@/types/document";
-
-interface DocumentAllTableProps {
-  documents: DocumentInfo[];
-  modals: {
-    confirmModal: {
-      open: (type: 'archive' | 'download', fileName: string) => void;
-      close: () => void;
-    };
-    versionModal: {
-      open: (fileName: string) => void;
-      close: () => void;
-      isOpen: boolean;
-    };
-  };
-  isLoading?: boolean;
-  error?: Error | null;
-}
+import type { DocumentAllTableProps } from "@/types/table";
 
 const DocumentAllTable: React.FC<DocumentAllTableProps> = ({ 
   documents,
   modals,
   isLoading = false,
-  error = null
+  error = null,
+  onUpdate
 }) => {
   // API 데이터를 DocumentItem 형태로 변환
   const transformedDocuments = documents.map(doc => ({
@@ -37,9 +22,13 @@ const DocumentAllTable: React.FC<DocumentAllTableProps> = ({
     fileUrl: doc.fileUrl,
   }));
 
-  const handleArchive = useCallback(() => {
-    // 보관 처리 로직 (API 연동 필요)
-  }, []);
+  const handleArchive = useCallback((id: number) => {
+    // 파일명으로 문서를 찾아서 confirmModal 열기
+    const document = documents.find(doc => doc.documentId === id);
+    if (document) {
+      modals.confirmModal.open('archive', document.documentName);
+    }
+  }, [documents, modals.confirmModal]);
 
   // 로딩 상태일 때는 빈 배열 전달 (EmptyState가 표시됨)
   const displayDocuments = isLoading ? [] : transformedDocuments;
@@ -55,6 +44,7 @@ const DocumentAllTable: React.FC<DocumentAllTableProps> = ({
       onCategoryChange={() => {}}
       onStatusChange={() => {}}
       onArchive={handleArchive}
+      onUpdate={onUpdate}
       modals={modals}
       error={error}
     />

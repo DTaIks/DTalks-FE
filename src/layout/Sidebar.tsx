@@ -5,23 +5,11 @@ import LogoutModal from "@/components/common/LogoutModal";
 import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import styled from "styled-components";
+import type { DropdownIconProps, MenuItemProps, SubMenuItemProps } from '@/types/layout';
 
 type SidebarProps = {
   className?: string;
 };
-
-interface DropdownIconProps {
-  isOpen: boolean;
-}
-
-interface MenuItemProps {
-  isSelected?: boolean;
-  isToggle?: boolean;
-}
-
-interface SubMenuItemProps {
-  isSelected?: boolean;
-}
 
 interface ProfileMenuAction {
   key: string;

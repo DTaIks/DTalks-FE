@@ -1,17 +1,6 @@
 import React, { useRef } from 'react';
 import styled from 'styled-components';
-
-interface FileSelectInputProps {
-  fileDisplayName: string;
-  onFileDisplayNameChange: (name: string) => void;
-  onFileChange: (file: File | null) => void;
-  accept?: string;
-  placeholder?: string;
-  maxSizeInMB?: number;
-  onFileError?: (error: string) => void;
-  fileError?: string;
-  disabled?: boolean;
-}
+import type { FileSelectInputProps } from '@/types/modal';
 
 export const FileSelectInput: React.FC<FileSelectInputProps> = ({
   fileDisplayName,
@@ -22,7 +11,8 @@ export const FileSelectInput: React.FC<FileSelectInputProps> = ({
   maxSizeInMB = 10,
   onFileError,
   fileError,
-  disabled = false
+  disabled = false,
+  optional = false
 }) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -69,7 +59,7 @@ export const FileSelectInput: React.FC<FileSelectInputProps> = ({
           disabled={disabled}
         />
         <SelectButton type="button" onClick={handleButtonClick} disabled={disabled}>
-          {disabled ? '기존 파일' : '파일 선택'}
+          {disabled ? '기존 파일' : optional ? '파일 선택' : '파일 선택'}
         </SelectButton>
         <HiddenFileInput
           ref={fileInputRef}

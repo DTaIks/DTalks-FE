@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+
 import type { MediaUploadData } from '@/components/admin/media/MediaFileUploadModal';
 
 type FileType = '전체' | '문서' | '이미지' | '음성';
@@ -96,7 +97,7 @@ const initialState: MediaUIState = {
 
 export const useMediaStore = create<MediaUIState & MediaUIActions>()(
   (set, get) => ({
-    ...initialState,
+      ...initialState,
     
     // 필터 액션
     setSelectedDepartment: (department) => {
@@ -205,5 +206,4 @@ export const useMediaStore = create<MediaUIState & MediaUIActions>()(
     resetAll: () => {
       set(initialState);
     },
-  })
-);
+  }));

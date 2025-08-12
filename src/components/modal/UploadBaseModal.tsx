@@ -3,17 +3,7 @@ import styled from 'styled-components';
 // @ts-expect-error - verbatimModuleSyntax
 import FocusTrap from 'focus-trap-react';
 import Button from '@/components/common/Button';
-
-interface BaseModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  title: string;
-  children: React.ReactNode;
-  onSubmit?: () => void;
-  submitText?: string;
-  submitDisabled?: boolean;
-  isSubmitting?: boolean;
-}
+import type { BaseModalProps } from '@/types/modal';
 
 export const UploadBaseModal: React.FC<BaseModalProps> = ({
   isOpen,

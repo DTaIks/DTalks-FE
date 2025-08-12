@@ -1,15 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import DepartmentBox from '@/components/admin/media/DepartmentList';
-
-interface ArchiveModalProps {
-  isOpen: boolean;
-  isClosing: boolean;
-  departments: Array<{ id: string; name: string }>;
-  selectedDepartment: string;
-  onClose: () => void;
-  onSelectDepartment: (department: string) => void;
-}
+import type { ArchiveModalProps } from '@/types/media';
 
 const ArchiveModal: React.FC<ArchiveModalProps> = ({
   isOpen,

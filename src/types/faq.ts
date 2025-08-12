@@ -97,4 +97,7 @@ export interface FAQTableProps {
   selectedCategory?: string;
   onSearch?: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onCategoryChange?: (categoryValue: string) => void;
+  onFAQDetail?: (faqId: number) => void;
+  onFAQUpdate?: (faqId: number, faqData: { question: string; answer: string; category: string }) => void;
+  onFAQArchive?: (faqId: number) => void;
 } 

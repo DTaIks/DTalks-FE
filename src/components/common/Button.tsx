@@ -1,21 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-
-// 버튼 props 인터페이스
-interface ButtonProps {
-  text: string;
-  onClick?: () => void;
-  variant?: 'primary' | 'secondary' | 'submit' | 'login';
-  type?: 'button' | 'submit' | 'reset';
-  width?: string;
-  height?: string;
-  fontSize?: string;
-  disabled?: boolean;
-  isLoading?: boolean;
-  isCompleted?: boolean;
-  style?: React.CSSProperties;
-  className?: string;
-}
+import type { ButtonProps } from '@/types/component';
 
 // 버튼 상태 인터페이스
 interface ButtonState {
