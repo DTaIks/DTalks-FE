@@ -89,10 +89,7 @@ export const usePromptTemplate = () => {
         smallTalk: data.templates.findIndex(template => template === '일상 대화'),
         organization: data.templates.findIndex(template => template === '조직도 조회'),
         formatSearch: data.templates.findIndex(template => template === '양식 요청'),
-        qna: {
-          docs: data.templates.findIndex(template => template === '내부 문서'),
-          faq: data.templates.findIndex(template => template === 'FAQ')
-        }
+        qna: data.templates.findIndex(template => template === 'QnA')
       };
       
       const smallTalkCount = templateIndexMap.smallTalk !== -1 ? data.counts[templateIndexMap.smallTalk] : 0;
@@ -103,14 +100,9 @@ export const usePromptTemplate = () => {
       
       const formatSearchCount = templateIndexMap.formatSearch !== -1 ? data.counts[templateIndexMap.formatSearch] : 0;
       const formatSearchPercent = templateIndexMap.formatSearch !== -1 ? data.percentages[templateIndexMap.formatSearch] : 0;
-      
-      const docsCount = templateIndexMap.qna.docs !== -1 ? data.counts[templateIndexMap.qna.docs] : 0;
-      const docsPercent = templateIndexMap.qna.docs !== -1 ? data.percentages[templateIndexMap.qna.docs] : 0;
-      const faqCount = templateIndexMap.qna.faq !== -1 ? data.counts[templateIndexMap.qna.faq] : 0;
-      const faqPercent = templateIndexMap.qna.faq !== -1 ? data.percentages[templateIndexMap.qna.faq] : 0;
-      
-      const qnaCount = docsCount + faqCount;
-      const qnaPercent = docsPercent + faqPercent;
+
+      const qnaCount = templateIndexMap.qna !== -1 ? data.counts[templateIndexMap.qna] : 0;
+      const qnaPercent = templateIndexMap.qna !== -1 ? data.percentages[templateIndexMap.qna] : 0;
       
       return {
         smallTalk: { 

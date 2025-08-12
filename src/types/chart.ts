@@ -24,12 +24,6 @@ export interface TemplateUsageData {
   percentages: number[];
 }
 
-export interface KeywordAnalysisData {
-  count: number;
-  keywords: string[];
-  values: number[];
-}
-
 export interface WeeklyResponseData {
   values: number[]; 
 }

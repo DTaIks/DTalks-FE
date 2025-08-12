@@ -107,8 +107,7 @@ export const usePermissionStore = create<PermissionState>()(
       return excludedUserIds.includes(userId);
     },
     
-    setSelectedUser: (user) => set({ selectedUser: user }),
-    
+    setSelectedUser: (user) => set({ selectedUser: user }),    
     setModalOpen: (open) => set({ isModalOpen: open }),
     
     resetPermissionState: () => {
