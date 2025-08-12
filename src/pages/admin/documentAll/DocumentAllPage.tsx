@@ -1,4 +1,4 @@
-import { useEffect, useCallback, useState } from "react";
+import { useEffect, useCallback, useState, useMemo } from "react";
 import styled from "styled-components";
 import TitleContainer from "@/layout/TitleContainer";
 import DocumentAllStatCard from "@/components/admin/documentAll/DocumentAllStatCard";
@@ -6,9 +6,11 @@ import DocumentAllTable from "@/components/admin/documentAll/DocumentAllTable";
 import Pagination from "@/components/common/Pagination";
 import ConfirmModal from "@/components/common/ConfirmModal";
 import { VersionHistoryModal } from "@/components/common/FileVersionManagementModal";
+import DocumentUploadModal from "@/components/common/DocumentUploadModal";
 import { useDocumentStore } from "@/store/documentStore";
 import { useDocumentAllList } from "@/query/useDocumentAllQueries";
 import { useDocumentCountByCategory, useRecentUpdateCountByCategory, useActiveDocumentCountByCategory } from "@/query/useDocumentQueries";
+import { useDocumentUpdate, useDocumentArchive, useDocumentRestore } from "@/query/useDocumentMutations";
 
 
 // 전체 문서 관리 페이지
@@ -27,7 +29,7 @@ const DocumentAllPage = () => {
   const stats = [
     {
       title: "전체 문서",
-      value: totalCount?.documentCount?.toString() || "0",
+      value: `${totalCount?.documentCount || 0}개`,
       additionalInfo: "총 문서수"
     },
     {
@@ -51,12 +53,29 @@ const DocumentAllPage = () => {
   
   const [currentPage, setCurrentPage] = useState(1);
   const [confirmModal, setConfirmModal] = useState({ isOpen: false, type: 'archive' as 'archive' | 'download', fileName: '' });
-  const [versionModal, setVersionModal] = useState({ isOpen: false, fileName: '' });
+  const [versionModal, setVersionModal] = useState({ isOpen: false, fileName: '', fileId: null as number | null });
+  const [updateModal, setUpdateModal] = useState({ 
+    isOpen: false, 
+    documentName: '', 
+    initialData: undefined as {
+      fileId?: number;
+      fileName: string;
+      description: string;
+      fileVersion: string;
+      category: string;
+      fileUrl?: string;
+    } | undefined
+  });
   
   // 전체 문서 쿼리 사용
   const { data: documentData, isLoading, error } = useDocumentAllList(currentPage);
   
-  const documents = documentData?.documentInfoResponseList || [];
+  // 문서 수정 뮤테이션
+  const documentUpdateMutation = useDocumentUpdate();
+  const documentArchiveMutation = useDocumentArchive();
+  const documentRestoreMutation = useDocumentRestore();
+  
+  const documents = useMemo(() => documentData?.documentInfoResponseList || [], [documentData?.documentInfoResponseList]);
   const totalPages = documentData?.pagingInfo?.totalPageCount || 1;
   
   const handlePageChange = useCallback((page: number) => {
@@ -72,12 +91,39 @@ const DocumentAllPage = () => {
   }, []);
   
   const openVersionModal = (fileName: string) => {
-    setVersionModal({ isOpen: true, fileName });
+    // 파일명으로 문서 ID를 찾아서 버전 히스토리 모달 열기
+    const document = documents.find(doc => doc.documentName === fileName);
+    if (document) {
+      setVersionModal({ isOpen: true, fileName, fileId: document.documentId });
+    }
   };
   
   const closeVersionModal = () => {
-    setVersionModal({ isOpen: false, fileName: '' });
+    setVersionModal({ isOpen: false, fileName: '', fileId: null });
   };
+  
+  const openUpdateModal = (documentName: string) => {
+    // 문서명으로 해당 문서 정보 찾기
+    const documentToUpdate = documents.find(doc => doc.documentName === documentName);
+    if (documentToUpdate) {
+      setUpdateModal({
+        isOpen: true,
+        documentName,
+        initialData: {
+          fileId: documentToUpdate.documentId,
+          fileName: documentToUpdate.documentName,
+          description: '',
+          fileVersion: documentToUpdate.latestVersion || '1.0.0',
+          category: documentToUpdate.category,
+          fileUrl: documentToUpdate.fileUrl
+        }
+      });
+    }
+  };
+  
+  const closeUpdateModal = useCallback(() => {
+    setUpdateModal({ isOpen: false, documentName: '', initialData: undefined });
+  }, []);
   
   useEffect(() => {
     if (currentPage > totalPages) {
@@ -85,22 +131,52 @@ const DocumentAllPage = () => {
     }
   }, [totalPages, currentPage, handlePageChange]);
 
-  const handleConfirmAction = useCallback(() => {
+  const handleConfirmAction = useCallback(async () => {
     if (confirmModal.type === 'archive') {
-      // 실제 보관 처리 로직
-      const { archiveDocumentItem } = useDocumentStore.getState();
-      // 파일명으로 문서 ID를 찾아서 보관 처리
-      const documentToArchive = useDocumentStore.getState().documentItems.find(
+      // 파일명으로 문서 ID를 찾아서 보관/복원 처리
+      const documentToArchive = documents.find(
         doc => doc.documentName === confirmModal.fileName
       );
       if (documentToArchive) {
-        archiveDocumentItem(documentToArchive.documentId);
+        try {
+          if (!documentToArchive.isActive) {
+            // isActive가 false면 현재 보관된 상태이므로 복원
+            await documentRestoreMutation.mutateAsync(documentToArchive.documentId);
+          } else {
+            // isActive가 true면 현재 활성 상태이므로 보관
+            await documentArchiveMutation.mutateAsync(documentToArchive.documentId);
+          }
+        } catch (error) {
+          console.error('문서 보관/복원 실패:', error);
+        }
       }
     } else if (confirmModal.type === 'download') {
-      console.log(`${confirmModal.fileName} 다운로드 처리`);
+      // 다운로드 처리 로직
     }
     closeConfirmModal();
-  }, [confirmModal.type, confirmModal.fileName, closeConfirmModal]);
+  }, [confirmModal.type, confirmModal.fileName, closeConfirmModal, documents, documentArchiveMutation, documentRestoreMutation]);
+
+  const handleDocumentUpdate = useCallback((data: {
+    uploadFile?: File;
+    fileName: string;
+    description: string;
+    fileVersion: string;
+    category: string;
+  }) => {
+    if (updateModal.initialData?.fileId) {
+      documentUpdateMutation.mutate({
+        fileId: updateModal.initialData.fileId,
+        file: data.uploadFile || null,
+        fileInfo: {
+          fileName: data.fileName,
+          description: data.description,
+          fileVersion: data.fileVersion,
+          category: data.category
+        }
+      });
+      closeUpdateModal();
+    }
+  }, [updateModal.initialData, documentUpdateMutation, closeUpdateModal]);
 
   const modals = {
     confirmModal: {
@@ -125,6 +201,7 @@ const DocumentAllPage = () => {
         modals={modals}
         isLoading={isLoading}
         error={error}
+        onUpdate={openUpdateModal}
       />
       {totalPages >= 1 && (
         <PaginationContainer>
@@ -145,10 +222,21 @@ const DocumentAllPage = () => {
         type={confirmModal.type}
       />
 
-      <VersionHistoryModal
-        isOpen={versionModal.isOpen}
-        onClose={closeVersionModal}
-        fileName={versionModal.fileName}
+             <VersionHistoryModal
+         isOpen={versionModal.isOpen}
+         onClose={closeVersionModal}
+         fileName={versionModal.fileName}
+         fileId={versionModal.fileId || undefined}
+         pageType="document"
+       />
+
+      <DocumentUploadModal
+        isOpen={updateModal.isOpen}
+        onClose={closeUpdateModal}
+        onSubmit={handleDocumentUpdate}
+        isSubmitting={documentUpdateMutation.isPending}
+        mode="update"
+        initialData={updateModal.initialData}
       />
     </Container>
   );

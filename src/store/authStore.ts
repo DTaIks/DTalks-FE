@@ -67,9 +67,21 @@ export const useAuthStore = create<AuthStore>()(
           refreshToken,
           isLoading: false 
         });
-      } catch (error) {
+      } catch (error: unknown) {
+        const axiosError = error as { response?: { status?: number } };
+        const status = axiosError?.response?.status;
+        
+        let errorMessage = '토큰 재발급 실패';
+        if (status === 410) {
+          errorMessage = '세션이 만료되었습니다. 다시 로그인해주세요.';
+        } else if (status === 401) {
+          errorMessage = '인증이 필요합니다. 다시 로그인해주세요.';
+        } else if (error instanceof Error) {
+          errorMessage = error.message;
+        }
+        
         set({ 
-          error: error instanceof Error ? error.message : '토큰 재발급 실패',
+          error: errorMessage,
           isLoading: false 
         });
         throw error;
@@ -87,6 +99,6 @@ export const useAuthStore = create<AuthStore>()(
         isLoading: false,
         isAuthChecking: false,
       });
-    },
+        },
   })
 ); 

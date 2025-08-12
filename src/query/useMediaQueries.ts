@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { mediaAPI } from '@/api/mediaAPI';
-import type { CommonFileRequest, DepartmentFileRequest, CommonArchivedFileRequest, DepartmentArchivedFileRequest } from '@/types/media';
+import type { CommonFileRequest, DepartmentFileRequest, CommonArchivedFileRequest, DepartmentArchivedFileRequest, CommonFileResponse, CommonArchivedFileResponse } from '@/types/media';
 
 // 공통 파일 목록 조회 쿼리
 export const useMediaFiles = (params: CommonFileRequest, options?: { enabled?: boolean }) => {
@@ -10,11 +10,12 @@ export const useMediaFiles = (params: CommonFileRequest, options?: { enabled?: b
       const result = await mediaAPI.getCommonFiles(params);
       return result;
     },
-    staleTime: 30 * 1000, // 30초 동안 fresh 상태 유지
-    gcTime: 5 * 60 * 1000, // 5분
+    staleTime: 1000 * 60 * 5, // 5분 동안 fresh 상태 유지
+    gcTime: 1000 * 60 * 15, // 15분
     refetchOnMount: false, // 마운트 시 자동 리페치 비활성화
     refetchOnWindowFocus: false, // 윈도우 포커스 시 자동 리페치 비활성화
-    placeholderData: (previousData) => previousData, // 이전 데이터를 placeholder로 사용
+    refetchOnReconnect: false, // 재연결 시 자동 리페치 비활성화
+    placeholderData: (previousData: CommonFileResponse | undefined) => previousData, // 이전 데이터를 placeholder로 사용
     enabled: options?.enabled !== false, // 기본값은 true
   });
 };
@@ -44,11 +45,12 @@ export const useArchivedFiles = (params: CommonArchivedFileRequest, options?: { 
       const result = await mediaAPI.getArchivedFiles(params);
       return result;
     },
-    staleTime: 30 * 1000, // 30초 동안 fresh 상태 유지
-    gcTime: 5 * 60 * 1000, // 5분
+    staleTime: 1000 * 60 * 5, // 5분 동안 fresh 상태 유지
+    gcTime: 1000 * 60 * 15, // 15분
     refetchOnMount: false, // 마운트 시 자동 리페치 비활성화
     refetchOnWindowFocus: false, // 윈도우 포커스 시 자동 리페치 비활성화
-    placeholderData: (previousData) => previousData, // 이전 데이터를 placeholder로 사용
+    refetchOnReconnect: false, // 재연결 시 자동 리페치 비활성화
+    placeholderData: (previousData: CommonArchivedFileResponse | undefined) => previousData, // 이전 데이터를 placeholder로 사용
     enabled: options?.enabled !== false, // 기본값은 true
   });
 };

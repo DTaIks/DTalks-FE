@@ -10,6 +10,11 @@ const queryClient = new QueryClient({
     queries: {
       retry: 1,
       refetchOnWindowFocus: false,
+      refetchOnMount: true, // 마운트 시 자동 리페치 활성화 (뮤테이션 후 무효화를 위해)
+      refetchOnReconnect: false, // 재연결 시 자동 리페치 비활성화
+      staleTime: 1000 * 60 * 10, // 10분 (더 길게 설정)
+      gcTime: 1000 * 60 * 30, // 30분 (더 길게 설정)
+      placeholderData: (previousData: unknown) => previousData, // 이전 데이터를 placeholder로 사용
     },
     mutations: {
       retry: 1,

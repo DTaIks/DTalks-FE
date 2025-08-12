@@ -25,7 +25,8 @@ interface DocumentTableProps {
   onSearchChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onStatusChange: (value: string) => void;
   onCategoryChange: (value: string) => void;
-  onArchive: (id: number) => void;
+  onArchive: (id: number, isArchived?: boolean) => void;
+  onUpdate?: (documentName: string) => void;
   modals: {
     confirmModal: {
       open: (type: 'archive' | 'download', fileName: string) => void;
@@ -44,30 +45,49 @@ const DocumentTable: React.FC<DocumentTableProps> = ({
   onStatusChange,
   onCategoryChange,
   onArchive,
+  onUpdate,
   modals,
   error = null
 }) => {
-  const handlers = useCommonHandlers({ modals, documentActions: { onArchive } });
+  const handlers = useCommonHandlers({ modals, documentActions: { onArchive, onUpdate } });
 
-  const handleAction = (action: string, documentName: string) => {
+  const handleAction = (action: string, documentName: string, fileUrl?: string) => {
     switch (action) {
       case 'download':
-        handlers.handleDownloadClick(documentName);
+        handlers.handleDownloadClick(documentName, fileUrl);
+        break;
+      case 'update':
+        handlers.handleDocumentUpdateClick(documentName);
         break;
       case 'version':
         handlers.handleVersionManagementClick(documentName);
         break;
-      case 'archive':
-        handlers.handleArchiveClick(documentName);
+      case 'archive': {
+        // 파일명으로 문서를 찾아서 isActive 상태 확인
+        const document = documents.find(doc => doc.documentName === documentName);
+        if (document) {
+          onArchive(document.documentId, !document.isActive);
+        }
         break;
+      }
     }
   };
 
   const getCategoryImage = (category: string) => {
     switch (category) {
-      case "사내 정책": return DocumentCategory2;
-      case "용어 사전": return DocumentCategory3;
-      default: return DocumentCategory1;
+      case "POLICY":
+      case "policy":
+        return DocumentCategory2; // 사내정책
+      case "TERMINOLOGY":
+      case "terminology":
+      case "glossary":
+        return DocumentCategory3; // 용어사전
+      case "REPORT_FORM":
+      case "report_form":
+      case "reportform":
+        return DocumentCategory1; // 보고서양식
+      default:
+        return DocumentCategory1; // Default to 보고서양식
     }
   };
 
@@ -103,9 +123,10 @@ const DocumentTable: React.FC<DocumentTableProps> = ({
               <TableCell>
                 <DropDownButton 
                   items={[
-                    { label: "다운로드", onClick: () => handleAction('download', document.documentName) },
+                    { label: "다운로드", onClick: () => handleAction('download', document.documentName, document.fileUrl) },
+                    { label: "수정", onClick: () => handleAction('update', document.documentName) },
                     { label: "버전관리", onClick: () => handleAction('version', document.documentName) },
-                    { label: "보관", onClick: () => handleAction('archive', document.documentName) },
+                                         { label: document.isActive ? "보관" : "복원", onClick: () => handleAction('archive', document.documentName) },
                   ]}
                 />
               </TableCell>

@@ -10,8 +10,12 @@ export function usePermissions() {
   return useQuery<Pick<PermissionUser, 'roleId' | 'roleUserCount' | 'isActive'>[], Error>({
     queryKey: PERMISSION_QUERY_KEY,
     queryFn: () => permissionAPI.getPermissions(),
-    staleTime: 1000 * 60 * 5,
+    staleTime: 1000 * 60 * 15, // 15분
+    gcTime: 1000 * 60 * 45, // 45분
+    refetchOnMount: false,
     refetchOnWindowFocus: false,
+    refetchOnReconnect: false,
+    placeholderData: (previousData: Pick<PermissionUser, 'roleId' | 'roleUserCount' | 'isActive'>[] | undefined) => previousData,
   });
 }
 

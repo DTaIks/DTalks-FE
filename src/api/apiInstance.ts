@@ -2,6 +2,9 @@ import axios from 'axios';
 import type { AxiosInstance, AxiosResponse, AxiosError } from 'axios';
 import { useAuthStore } from '@/store/authStore';
 
+// 로그아웃 처리 중인지 확인하는 플래그
+let isLoggingOut = false;
+
 // API 인스턴스 설정
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://dtalks.kro.kr/';
 const AI_API_BASE_URL = import.meta.env.VITE_AI_API_URL || 'http://61.109.238.56:8001';
@@ -47,13 +50,16 @@ const createAxiosInstance = (): AxiosInstance => {
       const status = error.response?.status;
       const url = error.config?.url;
       
-      // 공개 API가 아닌 경우에만 401 에러 시 로그아웃 처리
-      if (status === 401 && url && !PUBLIC_APIS.some(api => url.includes(api))) {
+      // 로그아웃 처리 중이거나 공개 API가 아닌 경우에만 401/410 에러 시 로그아웃 처리
+      if ((status === 401 || status === 410) && url && !isLoggingOut && !PUBLIC_APIS.some(api => url.includes(api))) {
         try {
+          isLoggingOut = true;
           const { logout } = useAuthStore.getState();
           logout();
         } catch (error) {
           console.error('로그아웃 처리 중 오류:', error);
+        } finally {
+          isLoggingOut = false;
         }
       }
       return Promise.reject(error);

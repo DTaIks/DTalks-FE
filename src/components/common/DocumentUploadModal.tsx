@@ -14,9 +14,19 @@ interface DocumentUploadModalProps {
   onSubmit: (data: DocumentUploadData) => void;
   isSubmitting?: boolean;
   pageType?: 'policy' | 'report' | 'glossary' | 'document';
+  mode?: 'upload' | 'update';
+  initialData?: {
+    fileId?: number;
+    fileName: string;
+    description: string;
+    fileVersion: string;
+    category: string;
+    fileUrl?: string;
+  };
 }
 
 export interface DocumentUploadData {
+  fileId?: number;
   uploadFile?: File;
   fileName: string;
   description: string;
@@ -30,6 +40,20 @@ const CATEGORY = [
   '보고서 양식',
 ];
 
+// 카테고리 매핑 (한글 -> 영문)
+const CATEGORY_MAPPING: Record<string, string> = {
+  '용어 사전': 'glossary',
+  '사내 정책': 'policy',
+  '보고서 양식': 'reportform'
+};
+
+// 영문 -> 한글 매핑 (초기값 설정용)
+const REVERSE_CATEGORY_MAPPING: Record<string, string> = {
+  'glossary': '용어 사전',
+  'policy': '사내 정책',
+  'reportform': '보고서 양식'
+};
+
 const DOCUMENT_UPLOAD_INFO = [
   "지원 형식: 문서(pdf, docx, xlsx, csv)",
   "중복 파일 업로드 시 자동으로 버전 관리됩니다",
@@ -40,9 +64,13 @@ const DocumentUploadModal: React.FC<DocumentUploadModalProps> = ({
   isOpen,
   onClose,
   onSubmit,
-  pageType = 'document'
+  isSubmitting = false,
+  pageType = 'document',
+  mode = 'upload',
+  initialData
 }) => {
   const [formData, setFormData] = useState<DocumentUploadData>({
+    fileId: undefined,
     uploadFile: undefined,
     fileName: '',
     description: '',
@@ -60,6 +88,20 @@ const DocumentUploadModal: React.FC<DocumentUploadModalProps> = ({
 
   const [fileError, setFileError] = useState<string>('');
 
+  // 초기 데이터가 있으면 폼에 설정 (수정 모드)
+  useEffect(() => {
+    if (initialData && mode === 'update') {
+      setFormData({
+        fileId: initialData.fileId,
+        uploadFile: undefined,
+        fileName: initialData.fileName,
+        description: '', // 수정 모드에서는 설명을 빈 값으로 설정
+        fileVersion: initialData.fileVersion,
+        category: REVERSE_CATEGORY_MAPPING[initialData.category] || initialData.category,
+      });
+    }
+  }, [initialData, mode]);
+
   useEffect(() => {
     if (!isOpen) {
       setTouched({
@@ -71,8 +113,15 @@ const DocumentUploadModal: React.FC<DocumentUploadModalProps> = ({
   }, [isOpen]);
 
   const handleSubmit = () => {
+    
     if (isFormValid()) {
-      onSubmit(formData);
+      // 카테고리를 영문으로 변환
+      const convertedData = {
+        ...formData,
+        category: CATEGORY_MAPPING[formData.category] || formData.category
+      };
+
+              onSubmit(convertedData);
       handleReset();
     }
   };
@@ -109,22 +158,23 @@ const DocumentUploadModal: React.FC<DocumentUploadModalProps> = ({
 
   const isValidSemver = (version: string): boolean => /^\d+\.\d+\.\d+$/.test(version);
   
-  const hasValidFile = () => formData.uploadFile !== undefined;
+  const hasValidFile = () => mode === 'upload' ? formData.uploadFile !== undefined : true;
   const hasValidFileName = () => formData.fileName.trim() !== '';
   const hasValidDescription = () => formData.description.trim() !== '';
   const hasValidVersion = () => isValidSemver(formData.fileVersion);
   const hasValidCategory = () => formData.category.trim() !== '';
 
   const isFormValid = () => (
-    hasValidFile() &&
     hasValidFileName() &&
     hasValidDescription() &&
     hasValidVersion() &&
-    hasValidCategory()
+    hasValidCategory() &&
+    (mode === 'upload' ? hasValidFile() : true)
   );
 
   const handleReset = () => {
     setFormData({
+      fileId: undefined,
       uploadFile: undefined,
       fileName: '',
       description: '',
@@ -145,15 +195,16 @@ const DocumentUploadModal: React.FC<DocumentUploadModalProps> = ({
   };
 
   const getModalTitle = () => {
+    const action = mode === 'update' ? '수정' : '업로드';
     switch (pageType) {
       case 'policy':
-        return '사내 정책 업로드';
+        return `사내 정책 ${action}`;
       case 'report':
-        return '보고서 양식 업로드';
+        return `보고서 양식 ${action}`;
       case 'glossary':
-        return '용어 사전 업로드';
+        return `용어 사전 ${action}`;
       default:
-        return '문서 업로드';
+        return `문서 ${action}`;
     }
   };
 
@@ -163,7 +214,9 @@ const DocumentUploadModal: React.FC<DocumentUploadModalProps> = ({
       onClose={handleClose}
       title={getModalTitle()}
       onSubmit={handleSubmit}
-      submitDisabled={!isFormValid()} 
+      submitDisabled={!isFormValid()}
+      isSubmitting={isSubmitting}
+      submitText={mode === 'update' ? '수정' : '업로드'}
     >
         <FileSelectInput
          fileDisplayName={fileDisplayName}
@@ -173,6 +226,8 @@ const DocumentUploadModal: React.FC<DocumentUploadModalProps> = ({
          fileError={fileError}
          accept=".pdf,.docx,.xlsx,.csv"
          maxSizeInMB={10}
+         optional={mode === 'update'}
+         placeholder={mode === 'update' ? "선택된 파일 없음" : "파일을 선택하세요"}
        />
 
       <FileNameInput
@@ -187,6 +242,7 @@ const DocumentUploadModal: React.FC<DocumentUploadModalProps> = ({
         value={formData.description}
         onChange={(value) => handleInputChange('description', value)}
         onBlur={() => handleBlur('description')}
+        placeholder={mode === 'update' ? "수정사항을 작성하시오" : "파일 설명을 입력하세요"}
         showError={touched.description && !hasValidDescription()}
       />
 

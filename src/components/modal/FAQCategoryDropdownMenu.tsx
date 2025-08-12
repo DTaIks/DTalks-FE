@@ -156,7 +156,6 @@ const DropdownList = styled.ul`
   padding: 0;
   list-style: none;
   box-sizing: border-box;
-  margin-top: -30px;
 `;
 
 const DropdownItem = styled.li<{ isSelected?: boolean }>`

@@ -41,11 +41,7 @@ const UserListTable = () => {
   const response = isSearchMode ? searchResponse : listResponse;
 
   // 서버 응답 로그
-  useEffect(() => {
-    if (response?.data?.pagingInfo) {
-      console.log('서버 응답 pagingInfo:', response.data.pagingInfo);
-    }
-  }, [response]);
+  
 
   const handlePageChange = (page: number) => {
     console.log('handlePageChange 호출:', {

@@ -63,7 +63,7 @@ const MediaFileUploadModal: React.FC<MediaUploadModalProps> = ({
       setFormData({
         uploadFile: undefined,
         fileName: initialData.fileName || '',
-        description: initialData.description || '',
+        description: '', // 수정 모드에서는 설명을 빈 값으로 설정
         fileVersion: initialData.fileVersion || '1.0.0',
         isPublic: initialData.isPublic ?? true
       });
@@ -196,6 +196,7 @@ const MediaFileUploadModal: React.FC<MediaUploadModalProps> = ({
         value={formData.description}
         onChange={(value) => handleInputChange('description', value)}
         onBlur={() => handleBlur('description')}
+        placeholder={isEditMode ? "수정사항을 작성하시오" : "파일 설명을 입력하세요"}
         showError={touched.description && !hasValidDescription()}
       />
 

@@ -76,11 +76,14 @@ export const authAPI = {
         config?: { url?: string; method?: string };
       };
       
-      throw new Error(
-        axiosError?.response?.data?.message || 
-        axiosError?.response?.data?.error || 
-        axiosError?.message || '로그아웃 중 오류가 발생했습니다.'
-      );
+      // 401 에러가 아닌 경우에만 에러를 던짐 (401은 이미 로그아웃된 상태)
+      if (axiosError?.response?.status !== 401) {
+        throw new Error(
+          axiosError?.response?.data?.message || 
+          axiosError?.response?.data?.error || 
+          axiosError?.message || '로그아웃 중 오류가 발생했습니다.'
+        );
+      }
     }
   },
 

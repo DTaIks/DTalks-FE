@@ -10,6 +10,7 @@ import { VersionHistoryModal } from "@/components/common/FileVersionManagementMo
 import DocumentTable from "@/components/admin/documentAll/DocumentTable";
 import { useFileUpload } from "@/hooks/useFileUpload";
 import { useCommonHandlers } from "@/hooks/useCommonHandlers";
+import { useDocumentUpload, useDocumentUpdate, useDocumentArchive, useDocumentRestore } from "@/query/useDocumentMutations";
 import DocumentCategory1 from "@/assets/document/DocumentCategory1.svg";
 import DocumentCategory2 from "@/assets/document/DocumentCategory2.svg";
 import DocumentCategory3 from "@/assets/document/DocumentCategory3.svg";
@@ -17,7 +18,33 @@ import DocumentCategory3 from "@/assets/document/DocumentCategory3.svg";
 // 통합 문서 관리 페이지
 const DocumentPage = () => {
   const { category } = useParams<{ category: string }>();
-  const [versionModal, setVersionModal] = useState({ isOpen: false, fileName: '' });
+  const [versionModal, setVersionModal] = useState({ isOpen: false, fileName: '', fileId: null as number | null });
+  const [updateModal, setUpdateModal] = useState({ 
+    isOpen: false, 
+    documentName: '', 
+    initialData: undefined as {
+      fileId?: number;
+      fileName: string;
+      description: string;
+      fileVersion: string;
+      category: string;
+      fileUrl?: string;
+    } | undefined
+  });
+  const [documents, setDocuments] = useState<Array<{
+    documentId: number;
+    documentName: string;
+    latestVersion: string;
+    category: string;
+    fileUrl: string;
+    isActive: boolean;
+  }>>([]);
+  
+  // 문서 업로드 뮤테이션
+  const documentUploadMutation = useDocumentUpload();
+  const documentUpdateMutation = useDocumentUpdate();
+  const documentArchiveMutation = useDocumentArchive();
+  const documentRestoreMutation = useDocumentRestore();
 
   // 카테고리별 설정
   const categoryConfig = {
@@ -38,17 +65,92 @@ const DocumentPage = () => {
     }
   };
 
+  // 문서 업로드 핸들러
+  const handleDocumentUpload = useCallback(async (data: {
+    uploadFile?: File;
+    fileName: string;
+    description: string;
+    fileVersion: string;
+    category: string;
+  }) => {
+    if (!data.uploadFile) {
+      console.error('업로드할 파일이 없습니다.');
+      return;
+    }
+
+    const fileInfo = {
+      fileName: data.fileName,
+      description: data.description,
+      fileVersion: data.fileVersion,
+      category: data.category // 모달에서 선택된 카테고리 값을 그대로 사용
+    };
+
+    
+
+    try {
+      await documentUploadMutation.mutateAsync({ file: data.uploadFile, fileInfo });
+    } catch (error) {
+      console.error('문서 업로드 실패:', error);
+    }
+  }, [documentUploadMutation]);
+
+  // 문서 수정 핸들러
+  const closeUpdateModal = useCallback(() => {
+    setUpdateModal({ isOpen: false, documentName: '', initialData: undefined });
+  }, []);
+
+  const handleDocumentUpdate = useCallback((data: {
+    uploadFile?: File;
+    fileName: string;
+    description: string;
+    fileVersion: string;
+    category: string;
+  }) => {
+    if (updateModal.initialData?.fileId) {
+      documentUpdateMutation.mutate({
+        fileId: updateModal.initialData.fileId,
+        file: data.uploadFile || null,
+        fileInfo: {
+          fileName: data.fileName,
+          description: data.description,
+          fileVersion: data.fileVersion,
+          category: data.category
+        }
+      });
+      closeUpdateModal();
+    }
+  }, [updateModal.initialData, documentUpdateMutation, closeUpdateModal]);
+
+  const openUpdateModal = useCallback((documentName: string) => {
+    // 문서명으로 해당 문서 정보 찾기
+    const documentToUpdate = documents.find(doc => doc.documentName === documentName);
+    if (documentToUpdate) {
+      setUpdateModal({
+        isOpen: true,
+        documentName,
+        initialData: {
+          fileId: documentToUpdate.documentId,
+          fileName: documentToUpdate.documentName,
+          description: '',
+          fileVersion: documentToUpdate.latestVersion || '1.0.0',
+          category: documentToUpdate.category,
+          fileUrl: documentToUpdate.fileUrl
+        }
+      });
+    }
+  }, [documents]);
+
   // 공통 핸들러 사용
   const { handleArchiveByFileName } = useCommonHandlers({
     modals: {
       confirmModal: {
         open: () => {} // 실제로는 사용하지 않음
       },
-      versionModal: {
-        open: (fileName: string) => setVersionModal({ isOpen: true, fileName }),
-        close: () => setVersionModal({ isOpen: false, fileName: '' }),
-        isOpen: versionModal.isOpen
-      }
+             versionModal: {
+         open: (fileName: string) => setVersionModal({ isOpen: true, fileName, fileId: null }),
+         close: () => setVersionModal({ isOpen: false, fileName: '', fileId: null }),
+         isOpen: versionModal.isOpen
+       }
     }
   });
 
@@ -64,30 +166,64 @@ const DocumentPage = () => {
     getButtonText
   } = useFileUpload({
     pageType: category as 'policy' | 'glossary' | 'report',
-    onUpload: () => {
-      // 파일 업로드 처리
-    },
+    onUpload: handleDocumentUpload,
     onEdit: () => {
       // 파일 수정 처리
     },
     onArchive: handleArchiveByFileName,
-    onDownload: () => {
-      // 다운로드 처리
+    onDownload: (fileName: string, fileUrl?: string) => {
+      // 다운로드 처리 - useCommonHandlers의 handleDownloadClick과 동일한 로직
+      if (fileUrl) {
+        // fileUrl이 있으면 유효성 검사 후 다운로드
+        fetch(fileUrl, { method: 'HEAD' })
+          .then(response => {
+            if (response.ok) {
+              // 파일이 존재하면 다운로드
+              const link = document.createElement('a');
+              link.href = fileUrl;
+              link.download = fileName;
+              link.style.display = 'none';
+              document.body.appendChild(link);
+              link.click();
+              document.body.removeChild(link);
+            } else {
+              // 파일이 존재하지 않으면 에러 메시지 표시
+              alert('파일을 찾을 수 없습니다. 관리자에게 문의해주세요.');
+            }
+          })
+          .catch(() => {
+            alert('파일 다운로드 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.');
+          });
+             } else {
+         // fileUrl이 없으면 확인 모달 표시
+       }
     }
   });
 
-  const handleArchive = useCallback((id: number) => {
-    // 보관 처리 로직
-    console.log('보관 처리:', id);
-  }, []);
+  const handleArchive = useCallback(async (id: number, isArchived?: boolean) => {
+    try {
+      if (isArchived) {
+        // isArchived가 true면 현재 보관된 상태이므로 복원
+        await documentRestoreMutation.mutateAsync(id);
+      } else {
+        // isArchived가 false면 현재 활성 상태이므로 보관
+        await documentArchiveMutation.mutateAsync(id);
+      }
+    } catch (error) {
+      console.error('문서 보관/복원 실패:', error);
+    }
+  }, [documentArchiveMutation, documentRestoreMutation]);
 
   const handleVersionHistoryClick = useCallback((fileName: string) => {
-    setVersionModal({ isOpen: true, fileName });
-  }, []);
+    // 파일명으로 문서 ID를 찾아서 버전 히스토리 모달 열기
+    const document = documents.find(doc => doc.documentName === fileName);
+    if (document) {
+      setVersionModal({ isOpen: true, fileName, fileId: document.documentId });
+    }
+  }, [documents]);
 
-  const handleConfirmModalOpen = useCallback((type: 'archive' | 'download', fileName: string) => {
+  const handleConfirmModalOpen = useCallback(() => {
     // confirmModal 열기 로직
-    console.log(`${type} 모달 열기:`, fileName);
   }, []);
 
   // 유효하지 않은 카테고리인 경우 리다이렉트
@@ -118,6 +254,8 @@ const DocumentPage = () => {
         onArchive={handleArchive}
         onVersionHistoryClick={handleVersionHistoryClick}
         onConfirmModalOpen={handleConfirmModalOpen}
+        onUpdate={openUpdateModal}
+        onDocumentsLoaded={setDocuments}
       />
 
       <DocumentUploadModal
@@ -125,6 +263,7 @@ const DocumentPage = () => {
         onClose={handleCloseUploadModal}
         onSubmit={handleSubmit}
         pageType={category as 'policy' | 'glossary' | 'report'}
+        isSubmitting={documentUploadMutation.isPending}
       />
 
       <ConfirmModal
@@ -135,10 +274,21 @@ const DocumentPage = () => {
         type={confirmModal.modalType}
       />
 
-      <VersionHistoryModal
-        isOpen={versionModal.isOpen}
-        onClose={() => setVersionModal({ isOpen: false, fileName: '' })}
-        fileName={versionModal.fileName}
+             <VersionHistoryModal
+         isOpen={versionModal.isOpen}
+         onClose={() => setVersionModal({ isOpen: false, fileName: '', fileId: null })}
+         fileName={versionModal.fileName}
+         fileId={versionModal.fileId || undefined}
+         pageType="document"
+       />
+
+      <DocumentUploadModal
+        isOpen={updateModal.isOpen}
+        onClose={closeUpdateModal}
+        onSubmit={handleDocumentUpdate}
+        isSubmitting={documentUpdateMutation.isPending}
+        mode="update"
+        initialData={updateModal.initialData}
       />
     </Container>
   );

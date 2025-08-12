@@ -5,6 +5,7 @@ import TableHeader from "@/components/admin/permission/PermissionTableHeader";
 import TableRow from "@/components/admin/permission/PermissionTableRow";
 import { usePermissions } from "@/query/usePermission";
 import type { PermissionUser } from "@/types/permission";
+import EmptyState from "@/components/common/EmptyState";
 
 import Roll1 from '@/assets/permission/PermissionRoll1.svg';
 import Roll2 from '@/assets/permission/PermissionRoll2.svg';
@@ -48,8 +49,18 @@ const PermissionTable = () => {
     setSelectedUser(null);
   };
 
-  if (isLoading) return <div>로딩 중...</div>;
-  if (isError) return <div>데이터를 불러오는 데 실패했습니다.</div>;
+  const renderEmptyState = () => {
+    if (isLoading) {
+      return <EmptyState message="권한 목록을 불러오고 있습니다..." subMessage="잠시만 기다려주세요." />;
+    }
+    if (isError) {
+      return <EmptyState message="권한 목록을 불러오는데 실패했습니다." subMessage="잠시 후 다시 시도해주세요." />;
+    }
+    if (!permissionData || permissionData.length === 0) {
+      return <EmptyState message="등록된 권한이 없습니다." subMessage="새로운 권한을 추가해보세요." />;
+    }
+    return null;
+  };
 
   const mergedData: PermissionUser[] = (permissionData ?? []).map(item => {
     const fixed = roleInfo.find(r => r.roleId === item.roleId);
@@ -63,6 +74,28 @@ const PermissionTable = () => {
       image: fixed?.image ?? "",
     };
   });
+
+  const emptyState = renderEmptyState();
+  if (emptyState) {
+    return (
+      <>
+        <TableWrapper>
+          <TableBox>
+            <Table>
+              <TableHeader />
+              {emptyState}
+            </Table>
+          </TableBox>
+        </TableWrapper>
+
+        <RoleManagement
+          open={isModalOpen}
+          onClose={handleEditModalClose}
+          selectedUser={selectedUser}
+        />
+      </>
+    );
+  }
 
   return (
     <>

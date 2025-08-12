@@ -7,6 +7,7 @@ export interface DocumentItem {
   fileUrl: string;
   lastUpdatedAt: string;
   isActive: boolean;
+  isArchived?: boolean;
 }
 
 export interface TableProps {

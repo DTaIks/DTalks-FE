@@ -208,11 +208,10 @@ export const useSignUpForm = () => {
       password: data.password
     };
 
-    signUpMutation.mutate(signUpData, {
-      onSuccess: (response) => {
-        console.log('회원가입 성공:', response);
-        reset();
-        // 회원가입 성공 시 로그인 페이지로 리다이렉트
+          signUpMutation.mutate(signUpData, {
+        onSuccess: () => {
+          reset();
+          // 회원가입 성공 시 로그인 페이지로 리다이렉트
         navigate('/login');
       },
       onError: (error) => {

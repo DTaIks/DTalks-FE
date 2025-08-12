@@ -1,5 +1,6 @@
 import { apiInstance } from './apiInstance';
 import type { CommonFileResponse, CommonFileRequest, FileUploadInfo, FileUploadResponse, DepartmentFileResponse, DepartmentFileRequest, CommonArchivedFileResponse, CommonArchivedFileRequest, DepartmentArchivedFileResponse, DepartmentArchivedFileRequest, FileVersionHistory } from '@/types/media';
+import type { MediaUploadData } from '@/components/admin/media/MediaFileUploadModal';
 
 export const mediaAPI = {
   // 공통 파일 조회
@@ -28,12 +29,16 @@ export const mediaAPI = {
   },
 
   // 파일 업로드
-  uploadFile: async (file: File, fileInfo: FileUploadInfo): Promise<FileUploadResponse> => {
+  uploadFile: async (file: File, fileInfo: FileUploadInfo | MediaUploadData): Promise<FileUploadResponse> => {
     const formData = new FormData();
     // 파일 추가
     formData.append('file', file);
-    // fileInfo를 JSON 문자열로 변환하여 하나의 객체로 전송
-    formData.append('fileInfo', JSON.stringify(fileInfo));
+    
+    // fileInfo에서 uploadFile 필드가 있다면 제거 (MediaUploadData인 경우)
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { uploadFile, ...cleanFileInfo } = fileInfo as FileUploadInfo & { uploadFile?: File };
+    formData.append('fileInfo', JSON.stringify(cleanFileInfo));
+    
     // 일반 API 인스턴스 사용 (쿠키 기반 인증)
     const response = await apiInstance.post('/admin/file/upload', formData, {
       headers: {
@@ -45,14 +50,18 @@ export const mediaAPI = {
   },
 
   // 파일 수정
-  updateFile: async (fileId: number, file: File | null, fileInfo: FileUploadInfo): Promise<FileUploadResponse> => {
+  updateFile: async (fileId: number, file: File | null, fileInfo: FileUploadInfo | MediaUploadData): Promise<FileUploadResponse> => {
     const formData = new FormData();
     // 파일이 있는 경우에만 추가 (수정 시 파일을 변경하지 않을 수도 있음)
     if (file) {
       formData.append('file', file);
     }
-    // fileInfo를 JSON 문자열로 변환하여 하나의 객체로 전송
-    formData.append('fileInfo', JSON.stringify(fileInfo));
+    
+    // fileInfo에서 uploadFile 필드가 있다면 제거 (MediaUploadData인 경우)
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { uploadFile, ...cleanFileInfo } = fileInfo as FileUploadInfo & { uploadFile?: File };
+    formData.append('fileInfo', JSON.stringify(cleanFileInfo));
+    
     // 일반 API 인스턴스 사용 (쿠키 기반 인증)
     const response = await apiInstance.post(`/admin/file/${fileId}/update`, formData, {
       headers: {
