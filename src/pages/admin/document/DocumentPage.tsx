@@ -15,39 +15,70 @@ import DocumentCategory1 from "@/assets/document/DocumentCategory1.svg";
 import DocumentCategory2 from "@/assets/document/DocumentCategory2.svg";
 import DocumentCategory3 from "@/assets/document/DocumentCategory3.svg";
 
+// 타입 정의들
+interface CategoryConfig {
+  title: string;
+  subtitle: string;
+  image: string;
+}
+
+type CategoryKey = 'policy' | 'glossary' | 'reportform';
+
+interface VersionModalState {
+  isOpen: boolean;
+  fileName: string;
+  fileId: number | null;
+}
+
+interface UpdateModalState {
+  isOpen: boolean;
+  documentName: string;
+  initialData?: {
+    fileId?: number;
+    fileName: string;
+    description: string;
+    fileVersion: string;
+    category: string;
+    fileUrl?: string;
+  };
+}
+
+interface DocumentData {
+  documentId: number;
+  documentName: string;
+  latestVersion: string;
+  category: string;
+  fileUrl: string;
+  isActive: boolean;
+}
+
 // 통합 문서 관리 페이지
 const DocumentPage = () => {
   const { category } = useParams<{ category: string }>();
-  const [versionModal, setVersionModal] = useState({ isOpen: false, fileName: '', fileId: null as number | null });
-  const [updateModal, setUpdateModal] = useState({ 
+  
+  // State 관리
+  const [versionModal, setVersionModal] = useState<VersionModalState>({ 
+    isOpen: false, 
+    fileName: '', 
+    fileId: null 
+  });
+  
+  const [updateModal, setUpdateModal] = useState<UpdateModalState>({ 
     isOpen: false, 
     documentName: '', 
-    initialData: undefined as {
-      fileId?: number;
-      fileName: string;
-      description: string;
-      fileVersion: string;
-      category: string;
-      fileUrl?: string;
-    } | undefined
+    initialData: undefined
   });
-  const [documents, setDocuments] = useState<Array<{
-    documentId: number;
-    documentName: string;
-    latestVersion: string;
-    category: string;
-    fileUrl: string;
-    isActive: boolean;
-  }>>([]);
   
-  // 문서 업로드 뮤테이션
+  const [documents, setDocuments] = useState<DocumentData[]>([]);
+  
+  // 문서 관련 뮤테이션
   const documentUploadMutation = useDocumentUpload();
   const documentUpdateMutation = useDocumentUpdate();
   const documentArchiveMutation = useDocumentArchive();
   const documentRestoreMutation = useDocumentRestore();
 
   // 카테고리별 설정
-  const categoryConfig = {
+  const categoryConfig: Record<CategoryKey, CategoryConfig> = {
     'policy': {
       title: "사내 정책",
       subtitle: "모든 사내 정책 문서를 한 번에 확인하고 정리하세요",
@@ -82,10 +113,8 @@ const DocumentPage = () => {
       fileName: data.fileName,
       description: data.description,
       fileVersion: data.fileVersion,
-      category: data.category // 모달에서 선택된 카테고리 값을 그대로 사용
+      category: data.category
     };
-
-    
 
     try {
       await documentUploadMutation.mutateAsync({ file: data.uploadFile, fileInfo });
@@ -94,7 +123,7 @@ const DocumentPage = () => {
     }
   }, [documentUploadMutation]);
 
-  // 문서 수정 핸들러
+  // 문서 수정 관련 핸들러
   const closeUpdateModal = useCallback(() => {
     setUpdateModal({ isOpen: false, documentName: '', initialData: undefined });
   }, []);
@@ -122,7 +151,6 @@ const DocumentPage = () => {
   }, [updateModal.initialData, documentUpdateMutation, closeUpdateModal]);
 
   const openUpdateModal = useCallback((documentName: string) => {
-    // 문서명으로 해당 문서 정보 찾기
     const documentToUpdate = documents.find(doc => doc.documentName === documentName);
     if (documentToUpdate) {
       setUpdateModal({
@@ -140,21 +168,53 @@ const DocumentPage = () => {
     }
   }, [documents]);
 
+  // 다운로드 핸들러
+  const handleDownload = useCallback((fileName: string, fileUrl?: string) => {
+    if (fileUrl) {
+      fetch(fileUrl, { method: 'HEAD' })
+        .then(response => {
+          if (response.ok) {
+            const link = document.createElement('a');
+            link.href = fileUrl;
+            link.download = fileName;
+            link.style.display = 'none';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+          } else {
+            alert('파일을 찾을 수 없습니다. 관리자에게 문의해주세요.');
+          }
+        })
+        .catch(() => {
+          alert('파일 다운로드 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.');
+        });
+    } else {
+      alert('다운로드할 파일 URL이 없습니다.');
+    }
+  }, []);
+
   // 공통 핸들러 사용
   const { handleArchiveByFileName } = useCommonHandlers({
     modals: {
       confirmModal: {
-        open: () => {} // 실제로는 사용하지 않음
+        open: () => {} 
       },
-             versionModal: {
-         open: (fileName: string) => setVersionModal({ isOpen: true, fileName, fileId: null }),
-         close: () => setVersionModal({ isOpen: false, fileName: '', fileId: null }),
-         isOpen: versionModal.isOpen
-       }
+      versionModal: {
+        open: (fileName: string) => {
+          const document = documents.find(doc => doc.documentName === fileName);
+          setVersionModal({ 
+            isOpen: true, 
+            fileName, 
+            fileId: document?.documentId || null 
+          });
+        },
+        close: () => setVersionModal({ isOpen: false, fileName: '', fileId: null }),
+        isOpen: versionModal.isOpen
+      }
     }
   });
 
-  // 파일 업로드 hook 사용
+  // 파일 업로드 훅
   const {
     uploadModal,
     confirmModal,
@@ -168,45 +228,18 @@ const DocumentPage = () => {
     pageType: category as 'policy' | 'glossary' | 'report',
     onUpload: handleDocumentUpload,
     onEdit: () => {
-      // 파일 수정 처리
+      // 편집 기능이 필요한 경우 구현
     },
     onArchive: handleArchiveByFileName,
-    onDownload: (fileName: string, fileUrl?: string) => {
-      // 다운로드 처리 - useCommonHandlers의 handleDownloadClick과 동일한 로직
-      if (fileUrl) {
-        // fileUrl이 있으면 유효성 검사 후 다운로드
-        fetch(fileUrl, { method: 'HEAD' })
-          .then(response => {
-            if (response.ok) {
-              // 파일이 존재하면 다운로드
-              const link = document.createElement('a');
-              link.href = fileUrl;
-              link.download = fileName;
-              link.style.display = 'none';
-              document.body.appendChild(link);
-              link.click();
-              document.body.removeChild(link);
-            } else {
-              // 파일이 존재하지 않으면 에러 메시지 표시
-              alert('파일을 찾을 수 없습니다. 관리자에게 문의해주세요.');
-            }
-          })
-          .catch(() => {
-            alert('파일 다운로드 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.');
-          });
-             } else {
-         // fileUrl이 없으면 확인 모달 표시
-       }
-    }
+    onDownload: handleDownload
   });
 
+  // 보관/복원 핸들러
   const handleArchive = useCallback(async (id: number, isArchived?: boolean) => {
     try {
       if (isArchived) {
-        // isArchived가 true면 현재 보관된 상태이므로 복원
         await documentRestoreMutation.mutateAsync(id);
       } else {
-        // isArchived가 false면 현재 활성 상태이므로 보관
         await documentArchiveMutation.mutateAsync(id);
       }
     } catch (error) {
@@ -214,24 +247,30 @@ const DocumentPage = () => {
     }
   }, [documentArchiveMutation, documentRestoreMutation]);
 
+  // 버전 히스토리 클릭 핸들러
   const handleVersionHistoryClick = useCallback((fileName: string) => {
-    // 파일명으로 문서 ID를 찾아서 버전 히스토리 모달 열기
     const document = documents.find(doc => doc.documentName === fileName);
     if (document) {
       setVersionModal({ isOpen: true, fileName, fileId: document.documentId });
     }
   }, [documents]);
 
-  const handleConfirmModalOpen = useCallback(() => {
-    // confirmModal 열기 로직
+  // 확인 모달 열기 핸들러
+  const handleConfirmModalOpen = useCallback((type: 'archive' | 'download', fileName: string) => {
+    // 필요한 경우 확인 모달 로직 구현
+    console.log(`${type} 모달 열기:`, fileName);
   }, []);
 
-  // 유효하지 않은 카테고리인 경우 리다이렉트
-  if (!category || !categoryConfig[category as keyof typeof categoryConfig]) {
+  // 타입 가드 함수
+  const isValidCategory = (cat: string | undefined): cat is CategoryKey => {
+    return cat !== undefined && Object.keys(categoryConfig).includes(cat);
+  };
+
+  if (!category || !isValidCategory(category)) {
     return <Navigate to="/admin/documents" replace />;
   }
 
-  const config = categoryConfig[category as keyof typeof categoryConfig];
+  const config = categoryConfig[category];
 
   return (
     <Container>
@@ -248,7 +287,7 @@ const DocumentPage = () => {
       </HeaderWrapper>
       
       <DocumentTable
-        category={category as 'policy' | 'glossary' | 'reportform'}
+        category={category}
         title={config.title}
         categoryImage={config.image}
         onArchive={handleArchive}
@@ -274,13 +313,13 @@ const DocumentPage = () => {
         type={confirmModal.modalType}
       />
 
-             <VersionHistoryModal
-         isOpen={versionModal.isOpen}
-         onClose={() => setVersionModal({ isOpen: false, fileName: '', fileId: null })}
-         fileName={versionModal.fileName}
-         fileId={versionModal.fileId || undefined}
-         pageType="document"
-       />
+      <VersionHistoryModal
+        isOpen={versionModal.isOpen}
+        onClose={() => setVersionModal({ isOpen: false, fileName: '', fileId: null })}
+        fileName={versionModal.fileName}
+        fileId={versionModal.fileId || undefined}
+        pageType="document"
+      />
 
       <DocumentUploadModal
         isOpen={updateModal.isOpen}
@@ -323,10 +362,7 @@ const ButtonContainer = styled.div`
 const StyledButton = styled(Button)`
   && {
     color: var(--color-white);
-    font-family: var(--font-pretendard);
     font-size: var(--font-size-18);
-    font-style: normal;
     font-weight: var(--table-header-font-weight);
-    line-height: normal;
   }
 `;

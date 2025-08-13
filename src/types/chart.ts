@@ -1,6 +1,3 @@
-// 차트 관련 컴포넌트 Props 타입들
-
-// DonutChart 컴포넌트
 export interface DonutChartProps {
   type: 'smallTalk' | 'qna' | 'formatSearch' | 'organization';
   size?: string;

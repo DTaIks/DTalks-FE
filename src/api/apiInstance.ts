@@ -72,7 +72,8 @@ const createAxiosInstance = (): AxiosInstance => {
           console.error('토큰 재발급 실패:', reissueError);
           const { logout } = useAuthStore.getState();
           logout();
-        } finally {
+        } 
+        finally {
           isLoggingOut = false;
         }
       } else if ((status === 410) && url && !isLoggingOut && !PUBLIC_APIS_WITH_COOKIES.some(api => url.includes(api)) && !PUBLIC_APIS_WITHOUT_COOKIES.some(api => url.includes(api))) {
@@ -108,7 +109,6 @@ const createAIAxiosInstance = (): AxiosInstance => {
   instance.interceptors.response.use(
     (response: AxiosResponse) => response,
     (error: AxiosError) => {
-      console.error('AI API 오류:', error);
       return Promise.reject(error);
     }
   );
