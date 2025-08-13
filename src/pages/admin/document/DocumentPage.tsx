@@ -3,6 +3,7 @@ import { useParams, Navigate } from "react-router-dom";
 import styled from "styled-components";
 import TitleContainer from "@/layout/TitleContainer";
 import Button from "@/components/common/Button";
+import CompareCard from "@/components/common/document/DocumentCompareCard";
 
 import ConfirmModal from "@/components/common/ConfirmModal";
 import DocumentUploadModal from "@/components/common/DocumentUploadModal";
@@ -56,7 +57,7 @@ interface DocumentData {
 const DocumentPage = () => {
   const { category } = useParams<{ category: string }>();
   
-  // State 관리
+  // 기존 State 관리
   const [versionModal, setVersionModal] = useState<VersionModalState>({ 
     isOpen: false, 
     fileName: '', 
@@ -95,6 +96,11 @@ const DocumentPage = () => {
       image: DocumentCategory1
     }
   };
+
+  // CompareCard에서 버전 비교를 처리하는 핸들러
+  const handleVersionCompare = useCallback((documentName: string, version1: string, version2: string) => {
+    console.log(`버전 비교 완료: ${documentName} - v${version1} vs v${version2}`);
+  }, []);
 
   // 문서 업로드 핸들러
   const handleDocumentUpload = useCallback(async (data: {
@@ -228,7 +234,6 @@ const DocumentPage = () => {
     pageType: category as 'policy' | 'glossary' | 'reportform',
     onUpload: handleDocumentUpload,
     onEdit: () => {
-      // 편집 기능이 필요한 경우 구현
     },
     onArchive: handleArchiveByFileName,
     onDownload: handleDownload
@@ -257,11 +262,9 @@ const DocumentPage = () => {
 
   // 확인 모달 열기 핸들러
   const handleConfirmModalOpen = useCallback((type: 'archive' | 'download', fileName: string) => {
-    // 필요한 경우 확인 모달 로직 구현
     console.log(`${type} 모달 열기:`, fileName);
   }, []);
 
-  // 타입 가드 함수
   const isValidCategory = (cat: string | undefined): cat is CategoryKey => {
     return cat !== undefined && Object.keys(categoryConfig).includes(cat);
   };
@@ -285,6 +288,13 @@ const DocumentPage = () => {
           />
         </ButtonContainer>
       </HeaderWrapper>
+      
+      <CompareCardWrapper>
+        <CompareCard
+          category={category}
+          onVersionCompare={handleVersionCompare}
+        />
+      </CompareCardWrapper>
       
       <DocumentTable
         category={category}
@@ -365,4 +375,11 @@ const StyledButton = styled(Button)`
     font-size: var(--font-size-18);
     font-weight: var(--table-header-font-weight);
   }
+`;
+
+const CompareCardWrapper = styled.div`
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  margin-bottom: 24px;
 `;

@@ -69,7 +69,7 @@ const VersionCompareSection: React.FC<VersionCompareSectionProps> = ({
       
       <CompareButtonContainer>
         <Button 
-          text={isLoading ? "비교 중..." : "비교"}
+          text={isLoading ? "비교 중" : "비교"}
           width="80px"
           height="34px"
           fontSize="14px"

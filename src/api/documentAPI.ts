@@ -66,6 +66,26 @@ interface DocumentUploadResponse {
   fileUrl: string;
 }
 
+// 버전 비교 요청 타입
+export interface DocumentVersionCompareRequest {
+  fileId: number;
+  oldVersionId: number;
+  newVersionId: number;
+}
+
+// 버전 비교 응답 타입 
+export interface DocumentVersionCompareResponse {
+  originalVersion: number;
+  revisedVersion: number;
+  insertCount: number;
+  deleteCount: number;
+  diff: Array<{
+    lineNumber: number;
+    changeType: 'delete' | 'insert' | 'equal';
+    content: string;
+  }>;
+}
+
 export const documentAPI = {
   // 문서 목록 조회 
   getDocuments: async (params: DocumentRequest): Promise<DocumentResponse> => {
@@ -172,6 +192,24 @@ export const documentAPI = {
       return handleApiError(error, '문서명으로 검색에 실패했습니다.');
     }
   },
+
+  // 문서 버전 비교 사항
+  compareDocumentVersions: async (params: DocumentVersionCompareRequest): Promise<DocumentVersionCompareResponse> => {
+    try {
+      const { fileId, oldVersionId, newVersionId } = params;
+      const queryParams = new URLSearchParams({
+        oldVersionId: oldVersionId.toString(),
+        newVersionId: newVersionId.toString()
+      });
+      
+      const url = `/admin/file/${fileId}/compare?${queryParams.toString()}`;
+      const response = await apiInstance.get(url, { headers: JSON_HEADERS });
+      
+      return extractResponseData(response.data) as DocumentVersionCompareResponse;
+    } catch (error) {
+      return handleApiError(error, '문서 버전 비교에 실패했습니다.');
+    }
+  },
   
   // 문서 업로드
   uploadDocument: async (file: File, fileInfo: DocumentUploadInfo): Promise<DocumentUploadResponse> => {
@@ -179,7 +217,6 @@ export const documentAPI = {
     
     // 파일 추가
     formData.append('file', file);
-    // fileInfo를 JSON 문자열로 변환하여 추가 (미디어 API와 동일한 방식)
     formData.append('fileInfo', JSON.stringify(fileInfo));
     
     const response = await apiInstance.post('/admin/documents/upload', formData, {
