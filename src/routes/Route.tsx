@@ -22,36 +22,41 @@ function ProtectedLayout() {
     return <Outlet />;
   }
   
-  return isAuthenticated ? <Outlet /> : <Navigate to="/login" replace />;
+  // 인증이 완료되지 않았을 때만 로그인 페이지로 리다이렉트
+  if (!isAuthenticated) {
+    return <Navigate to="/login" replace />;
+  }
+  
+  // 인증 완료 시 현재 페이지 표시
+  return <Outlet />;
 }
 
 // 비로그인만 접근 가능한 라우트
 function PublicOnly({ children }: { children: React.ReactNode }) {
-  const { isAuthenticated, isAuthChecking } = useAuthStore();
+  const { isAuthChecking } = useAuthStore();
   
   // 인증 확인 중일 때는 현재 페이지 유지
   if (isAuthChecking) {
     return <>{children}</>;
   }
   
-  return isAuthenticated ? <Navigate to="/admin" replace /> : <>{children}</>;
+  // 인증된 사용자도 현재 페이지 유지 (리다이렉트 제거)
+  return <>{children}</>;
 }
 
 export default function AppRoutes() {
-  const { isAuthenticated, isAuthChecking } = useAuthStore();
+  const { isAuthChecking } = useAuthStore();
 
   return (
     <Routes>
-      <Route path="/chart" element={<ChartPage />} />
-      {/* 루트 경로: 로그인 상태에 따라 리다이렉트 */}
+      {/* 루트 경로: 인증 확인 중일 때만 처리 */}
       <Route path="/" element={
         isAuthChecking ? (
-          // 인증 확인 중일 때는 차트 페이지로 (기본 페이지)
-          <Navigate to="/admin" replace />
-        ) : isAuthenticated ? (
-          <Navigate to="/admin" replace />
+          // 인증 확인 중일 때는 아무것도 렌더링하지 않음
+          null
         ) : (
-          <Navigate to="/login" replace />
+          // 인증 확인 완료 후 기본 페이지로 이동
+          <Navigate to="/admin" replace />
         )
       } />
 
@@ -76,6 +81,7 @@ export default function AppRoutes() {
       <Route element={<ProtectedLayout />}>
         <Route path="/admin" element={<Layout />}>
           <Route index element={<ChartPage />} />
+          <Route path="chart" element={<ChartPage />} />
           <Route path="users" element={<UserListPage />} />
           <Route path="permission" element={<PermissionPage />} />
           <Route path="documents" element={<DocumentAllPage />} />

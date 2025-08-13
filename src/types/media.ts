@@ -1,3 +1,6 @@
+// 모달 관련 타입들을 modal.ts에서 import
+export type { MediaUploadModalProps, MediaUploadData, VersionHistoryModalProps, MediaArchiveModalProps } from './modal';
+
 export interface CommonFileInfo {
   fileId: number;
   fileName: string;
@@ -141,4 +144,60 @@ export interface FileVersionHistory {
   createdAt: string;
   description: string;
   uploaderName: string;
+}
+
+// 미디어 관련 컴포넌트 Props 타입들
+
+// MediaContent 컴포넌트
+export interface MediaContentProps {
+  selectedDepartment: string;
+  selectedFileType: '전체' | '문서' | '이미지' | '음성';
+  isArchiveMode: boolean;
+  files: MediaFile[];
+  totalPages: number;
+  currentPage: number;
+  isLoading: boolean;
+  error: string | null;
+  handlers: {
+    handleDownloadClick: (fileName: string, fileUrl?: string) => void;
+    handleArchiveClick: (fileName: string) => void;
+    handleVersionManagementClick: (fileName: string, fileId?: number) => void;
+    handleEditClick: (file: MediaFile) => void;
+    handleUploadSubmit: (data: { uploadFile?: File; fileName: string; description: string; fileVersion: string; isPublic: boolean }) => void;
+    handleConfirmAction: () => void;
+    handleDocumentArchive: (documentId: number) => void;
+  };
+  onSelectFileType: (fileType: '전체' | '문서' | '이미지' | '음성') => void;
+  onPageChange: (page: number) => void;
+}
+
+// MediaFileContent 컴포넌트
+export interface MediaFileContentProps {
+  file: MediaFile;
+  isArchiveMode?: boolean;
+  handlers: { 
+    handleDownloadClick: (fileName: string, fileUrl?: string) => void;
+    handleArchiveClick: (fileName: string) => void;
+    handleVersionManagementClick: (fileName: string, fileId?: number) => void;
+    handleEditClick: (file: MediaFile) => void;
+    handleUploadSubmit: (data: { uploadFile?: File; fileName: string; description: string; fileVersion: string; isPublic: boolean }) => void;
+    handleConfirmAction: () => void;
+    handleDocumentArchive: (documentId: number) => void;
+  };
+}
+
+// MediaSidebar 컴포넌트
+export interface MediaSidebarProps {
+  departments: Array<{ id: string; name: string }>;
+  selectedDepartment: string;
+  isArchiveMode: boolean;
+  isArchiveClosing: boolean;
+  onSelectDepartment: (department: string) => void;
+  onToggleArchive: (isArchive: boolean) => void;
+  onSelectArchiveDepartment: (department: string) => void;
+}
+
+// MediaHeader 컴포넌트
+export interface MediaFileContentHeaderProps {
+  selectedTeam: string;
 }

@@ -26,6 +26,11 @@ export const authAPI = {
         { headers: { 'Content-Type': 'application/json', Accept: 'application/json' } }
       );
 
+      // 디버깅: 응답 구조 확인
+      console.log('로그인 응답 전체:', response);
+      console.log('로그인 응답 데이터:', response.data);
+      console.log('로그인 응답 데이터 타입:', typeof response.data);
+
       return response.data;
     } catch (error: unknown) {
       const axiosError = error as { response?: { status?: number; data?: { message?: string; error?: string }; headers?: Record<string, unknown> }; message?: string };
@@ -39,13 +44,10 @@ export const authAPI = {
   },
 
   // 토큰 재발급
-  reissueToken: async (accessToken: string): Promise<TokenReissueResponse> => {
+  reissueToken: async (): Promise<TokenReissueResponse> => {
     try {
-      const response = await apiInstance.post('/admin/auth/reissue', {}, {
-        headers: {
-          Authorization: `Bearer ${accessToken}`
-        }
-      });
+      // HttpOnly 쿠키 기반이므로 별도 헤더 없이 쿠키만 전송
+      const response = await apiInstance.post('/admin/auth/reissue');
       return response.data.data || response.data;
     } catch (error: unknown) {
       const axiosError = error as { response?: { status?: number; data?: { message?: string; error?: string }; headers?: Record<string, unknown> }; message?: string };
@@ -76,15 +78,18 @@ export const authAPI = {
         config?: { url?: string; method?: string };
       };
       
-      throw new Error(
-        axiosError?.response?.data?.message || 
-        axiosError?.response?.data?.error || 
-        axiosError?.message || '로그아웃 중 오류가 발생했습니다.'
-      );
+      // 401 에러가 아닌 경우에만 에러를 던짐 (401은 이미 로그아웃된 상태)
+      if (axiosError?.response?.status !== 401) {
+        throw new Error(
+          axiosError?.response?.data?.message || 
+          axiosError?.response?.data?.error || 
+          axiosError?.message || '로그아웃 중 오류가 발생했습니다.'
+        );
+      }
     }
   },
 
-  // 회원가입 API 추가
+  // 회원가입 API (공개 API - 토큰 불필요)
   signUp: async (data: SignUpRequest): Promise<SignUpResponse> => {
     const sanitized: SignUpRequest = {
       email: data.email?.trim(),
@@ -122,7 +127,7 @@ export const authAPI = {
     }
   },
 
-  // 이메일 중복 확인 API
+  // 이메일 중복 확인 API (공개 API - 토큰 불필요)
   validateEmail: async (email: string): Promise<EmailValidationResponse> => {
     try {
       const response = await apiInstance.post<{
@@ -142,7 +147,7 @@ export const authAPI = {
     }
   },
 
-  // 이메일 인증번호 전송 API
+  // 이메일 인증번호 전송 API (공개 API - 토큰 불필요)
   sendAuthCode: async (email: string, isDuplicateEmail: boolean): Promise<void> => {
     try {
       await apiInstance.post('/admin/email/send', {
@@ -160,13 +165,14 @@ export const authAPI = {
     }
   },
 
-  // 이메일 인증번호 확인 API
-  verifyAuthCode: async (email: string, verificationNumber: string): Promise<void> => {
+  // 이메일 인증번호 확인 API (공개 API - 토큰 불필요)
+  verifyAuthCode: async (email: string, verificationNumber: string): Promise<{ data: { verificationCode: string } }> => {
     try {
-      await apiInstance.post('/admin/email/verification', {
+      const response = await apiInstance.post<{ data: { verificationCode: string } }>('/admin/email/verification', {
         email,
         verificationNumber
       });
+      return response.data;
     } catch (error: unknown) {
       const axiosError = error as { response?: { status?: number; data?: { message?: string; error?: string }; headers?: Record<string, unknown> }; message?: string };
 
@@ -174,6 +180,34 @@ export const authAPI = {
         axiosError?.response?.data?.message ||
         axiosError?.response?.data?.error ||
         axiosError?.message
+      );
+    }
+  },
+
+  // 비밀번호 재설정 API (공개 API - 토큰 불필요)
+  resetPassword: async (data: { email: string; newPassword: string; verificationCode: string }): Promise<void> => {
+    const sanitized = {
+      email: data.email?.trim(),
+      newPassword: data.newPassword?.trim(),
+      verificationCode: data.verificationCode?.trim(),
+    };
+
+    if (!sanitized.email || !sanitized.newPassword || !sanitized.verificationCode) {
+      throw new Error('모든 필드를 입력해주세요.');
+    }
+
+    try {
+      await apiInstance.post('/admin/auth/password/reset', sanitized, {
+        headers: { 'Content-Type': 'application/json' }
+      });
+      // 성공 시 HTTP 204 No Content이므로 응답 데이터 없음
+    } catch (error: unknown) {
+      const axiosError = error as { response?: { status?: number; data?: { message?: string; error?: string }; headers?: Record<string, unknown> }; message?: string };
+
+      throw new Error(
+        axiosError?.response?.data?.message ||
+        axiosError?.response?.data?.error ||
+        axiosError?.message || '비밀번호 재설정 중 오류가 발생했습니다.'
       );
     }
   },

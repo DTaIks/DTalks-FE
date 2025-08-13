@@ -1,9 +1,9 @@
 import { aiApiInstance } from "./apiInstance";
 import type {
-     DailyConversationData,
-     SuccessRateData,
-     SatisfactionData,
-     ResponseTimeData,
+    DailyConversationData,
+    SuccessRateData,
+    SatisfactionData,
+    ResponseTimeData,
     TemplateUsageData,
     WeeklyResponseData
  } from "@/types/chart";

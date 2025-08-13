@@ -4,7 +4,7 @@ import styled from 'styled-components';
 import { UploadBaseModal } from '@/components/modal/UploadBaseModal';
 import { FileNameInput } from '@/components/modal/FileNameInput';
 import { FileDescriptionInput } from '@/components/modal/FileDescriptionInput';
-import { FileCategory } from '@/components/modal/FileCategoryDropdownMenu';
+import { FileCategory } from '@/components/modal/FAQCategoryDropdownMenu';
 import { UploadInfoCard } from '@/components/modal/UploadInfoCard';
 
 interface FAQUploadModalProps {

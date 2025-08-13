@@ -1,21 +1,7 @@
 import React from "react";
 import styled from 'styled-components';
 import DropDownButton from "@/components/common/DropDownButton";
-import type { MediaFile } from "@/types/media";
-
-interface MediaFileContentProps {
-  file: MediaFile;
-  isArchiveMode?: boolean;
-  handlers: { 
-    handleDownloadClick: (fileName: string, fileUrl?: string) => void;
-    handleArchiveClick: (fileName: string) => void;
-    handleVersionManagementClick: (fileName: string, fileId?: number) => void;
-    handleEditClick: (file: MediaFile) => void;
-    handleUploadSubmit: (data: { uploadFile?: File; fileName: string; description: string; fileVersion: string; isPublic: boolean }) => void;
-    handleConfirmAction: () => void;
-    handleDocumentArchive: (documentId: number) => void;
-  };
-}
+import type { MediaFile, MediaFileContentProps } from "@/types/media";
 
 const MediaFileContent: React.FC<MediaFileContentProps> = ({ 
   file,

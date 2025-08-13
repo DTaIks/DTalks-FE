@@ -1,36 +1,6 @@
 import { create } from 'zustand';
-import { apiInstance } from '@/api/apiInstance';
 import { authAPI } from '@/api/authAPI';
-
-interface User {
-  id: string;
-  email: string;
-  name?: string;
-  employeeNumber?: string;
-}
-
-interface AuthState {
-  // 클라이언트 상태만 관리
-  user: User | null;
-  isAuthenticated: boolean;
-  isLoading: boolean;
-  isAuthChecking: boolean; // 인증 확인 중 상태 추가
-  error: string | null;
-  accessToken?: string | null;
-  refreshToken?: string | null;
-  
-  // 순수한 상태 변경 액션들 (API 로직 없음)
-  setUser: (user: User | null) => void;
-  setAuthenticated: (isAuthenticated: boolean) => void;
-  setLoading: (loading: boolean) => void;
-  setAuthChecking: (checking: boolean) => void; // 인증 확인 상태 설정
-  setError: (error: string | null) => void;
-  clearError: () => void;
-  setAccessToken: (token: string | null) => void;
-  setRefreshToken: (token: string | null) => void;
-  logout: () => void;
-  reissueToken: () => Promise<void>;
-}
+import type { AuthStore } from '@/types/auth';
 
 const initialAuthState = {
   isAuthenticated: false, // 초기값은 false로 설정
@@ -38,7 +8,7 @@ const initialAuthState = {
   isAuthChecking: true, // 앱 시작 시 인증 확인 중으로 설정
 };
 
-export const useAuthStore = create<AuthState>()(
+export const useAuthStore = create<AuthStore>()(
   (set) => ({
     // 초기 상태
     user: null,
@@ -86,45 +56,49 @@ export const useAuthStore = create<AuthState>()(
       try {
         set({ isLoading: true, error: null });
         
-        // 쿠키만 전송하여 토큰 재발급 요청
-        const response = await apiInstance.post('/admin/auth/reissue');
+        // HttpOnly 쿠키 기반이므로 별도 토큰 없이 쿠키만 전송
+        const response = await authAPI.reissueToken();
         
-        // 응답에서 새 토큰 추출
-        const { accessToken, refreshToken } = response.data.data || response.data;
+        // 응답에서 새 토큰 추출 (백업용으로만 저장)
+        const { accessToken, refreshToken } = response;
         
         set({ 
           accessToken, 
           refreshToken,
           isLoading: false 
         });
-      } catch (error) {
+      } catch (error: unknown) {
+        const axiosError = error as { response?: { status?: number } };
+        const status = axiosError?.response?.status;
+        
+        let errorMessage = '토큰 재발급 실패';
+        if (status === 410) {
+          errorMessage = '세션이 만료되었습니다. 다시 로그인해주세요.';
+        } else if (status === 401) {
+          errorMessage = '인증이 필요합니다. 다시 로그인해주세요.';
+        } else if (error instanceof Error) {
+          errorMessage = error.message;
+        }
+        
         set({ 
-          error: error instanceof Error ? error.message : '토큰 재발급 실패',
+          error: errorMessage,
           isLoading: false 
         });
         throw error;
       }
     },
 
-    logout: async () => {
-      try {
-        // 서버에 로그아웃 요청 (쿠키 자동 전송)
-        await authAPI.logout();
-      } catch (error) {
-        // 로그아웃 API 실패해도 클라이언트 상태는 초기화
-        console.error('로그아웃 API 호출 실패:', error);
-      } finally {
-        // 클라이언트 상태 초기화
-        set({
-          user: null,
-          isAuthenticated: false,
-          error: null,
-          accessToken: null,
-          refreshToken: null,
-          isLoading: false,
-          isAuthChecking: false,
-        });
-      }
-    },
+    logout: () => {
+      // Zustand UI 상태만 초기화 (API 호출은 React Query에서 처리)
+      set({
+        user: null,
+        isAuthenticated: false,
+        error: null,
+        accessToken: null,
+        refreshToken: null,
+        isLoading: false,
+        isAuthChecking: false,
+      });
+        },
   })
 ); 

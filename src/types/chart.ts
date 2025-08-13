@@ -1,34 +1,68 @@
-export interface DailyConversationData {
-  count: number; 
-  increase: number; 
+export interface DonutChartProps {
+  type: 'smallTalk' | 'qna' | 'formatSearch' | 'organization';
+  size?: string;
+  value?: number;
+  count?: number;
+  pathColor?: string;
+  trailColor?: string;
 }
 
-export interface SuccessRateData {
-  percent: number;
-  increase: number; 
-}  
-
-export interface SatisfactionData {
-  percent: number;
-  increase: number; 
+// StatCard 컴포넌트
+export interface StatCardProps {
+  title: string;
+  value: string | number;
+  change?: {
+    value: number;
+    isPositive: boolean;
+  };
+  icon?: React.ReactNode;
+  color?: string;
 }
 
-export interface ResponseTimeData {
-  avg: number;
-  zones: number[]; 
+// ResponseTimeChart 컴포넌트
+export interface ResponseTimeChartProps {
+  data: Array<{
+    date: string;
+    responseTime: number;
+  }>;
+  width?: number;
+  height?: number;
+  title?: string;
 }
 
-export interface TemplateUsageData {
-  templates: string[];
-  counts: number[];
-  percentages: number[];
+// WeeklyResponseStatCard 컴포넌트
+export interface WeeklyResponseStatCardProps {
+  title: string;
+  value: string | number;
+  change?: {
+    value: number;
+    isPositive: boolean;
+  };
+  icon?: React.ReactNode;
+  color?: string;
 }
 
-export interface WeeklyResponseData {
-  values: number[]; 
+// PromptTemplateCard 컴포넌트
+export interface PromptTemplateCardProps {
+  title: string;
+  description: string;
+  usageCount: number;
+  lastUsed?: string;
+  onEdit?: () => void;
+  onDelete?: () => void;
 }
 
-export interface DonutChartData {
-  value: number;
-  count: number;
+// ChartDataState 관련 Props
+export interface LoadingStateProps {
+  message?: string;
+}
+
+export interface ErrorStateProps {
+  message: string;
+  onRetry?: () => void;
+}
+
+export interface NoDataStateProps {
+  message: string;
+  icon?: React.ReactNode;
 }

@@ -111,7 +111,6 @@ export const permissionAPI = {
           }
         }
       );
-
       return response.data;
     } catch (error: unknown) {
       const axiosError = error as {

@@ -9,8 +9,6 @@ import FAQTableHeader from "@/components/admin/faq/table/FAQTableHeader";
 import FAQTableHead from "@/components/admin/faq/table/FAQTableHead";
 import FAQTableRow from "@/components/admin/faq/table/FAQTableRow";
 import { useFAQStore } from "@/store/faqStore";
-import { useUpdateFAQ, useArchiveFAQ } from "@/query/useFAQMutations";
-import { faqAPI } from "@/api/faqAPI";
 
 const FAQTable: React.FC<FAQTableProps> = ({ 
   faqItems = [], 
@@ -20,7 +18,10 @@ const FAQTable: React.FC<FAQTableProps> = ({
   searchTerm = "",
   selectedCategory = "",
   onSearch = () => {},
-  onCategoryChange = () => {}
+  onCategoryChange = () => {},
+  onFAQDetail = () => {},
+  onFAQUpdate = () => {},
+  onFAQArchive = () => {}
 }) => {
   const {
     expandedRows,
@@ -28,13 +29,9 @@ const FAQTable: React.FC<FAQTableProps> = ({
     editModal,
     toggleExpandedRow,
     setConfirmModal,
-    setEditModal,
     closeConfirmModal,
     closeEditModal
   } = useFAQStore();
-
-  const updateFAQMutation = useUpdateFAQ();
-  const archiveFAQMutation = useArchiveFAQ();
 
   const handleRowToggle = useCallback((faqId: number) => {
     toggleExpandedRow(faqId);
@@ -47,24 +44,9 @@ const FAQTable: React.FC<FAQTableProps> = ({
       return;
     }
 
-    const createModalData = (question: string, answer: string, category: string) => ({
-      isOpen: true,
-      faqData: { question, answer, category },
-      faqId: faq.faqId
-    });
-
-    try {
-      const faqDetail = await faqAPI.getFAQDetail(faq.faqId);
-      setEditModal(createModalData(
-        faqDetail.question,
-        faqDetail.answer || '',
-        faqDetail.categoryName || faq.category
-      ));
-    } catch (error) {
-      console.error('FAQ 상세 정보 조회 실패:', error);
-      setEditModal(createModalData(faq.question, '', faq.category));
-    }
-  }, [setEditModal]);
+    // 페이지에서 FAQ 상세 정보를 가져오도록 요청
+    onFAQDetail(faq.faqId);
+  }, [onFAQDetail]);
 
   const handleArchiveClick = useCallback((faq: FAQItem) => {
     setConfirmModal({
@@ -81,27 +63,24 @@ const FAQTable: React.FC<FAQTableProps> = ({
     if (confirmModal.type !== 'archive' || !confirmModal.faqId) return;
     
     try {
-      await archiveFAQMutation.mutateAsync(confirmModal.faqId);
+      onFAQArchive(confirmModal.faqId);
     } catch (error) {
       console.error('FAQ 보관 실패:', error);
     } finally {
       closeConfirmModal();
     }
-  }, [confirmModal, archiveFAQMutation, closeConfirmModal]);
+  }, [confirmModal, onFAQArchive, closeConfirmModal]);
 
   const handleSubmitEdit = useCallback(async (data: { question: string; answer: string; category: string }) => {
     if (!editModal.faqId) return;
     
     try {
-      await updateFAQMutation.mutateAsync({
-        faqId: editModal.faqId,
-        faqData: data
-      });
+      onFAQUpdate(editModal.faqId, data);
       closeEditModal();
     } catch (error) {
       console.error('FAQ 수정 실패:', error);
     }
-  }, [editModal.faqId, updateFAQMutation, closeEditModal]);
+  }, [editModal.faqId, onFAQUpdate, closeEditModal]);
 
   const categoryOptions = useMemo(() => [
     { value: "", label: "전체 카테고리" },
@@ -136,7 +115,7 @@ const FAQTable: React.FC<FAQTableProps> = ({
           onConfirm={handleConfirmAction}
           fileName={confirmModal.faqName}
           type={confirmModal.type}
-          isLoading={archiveFAQMutation.isPending}
+          isLoading={false}
         />
       )}
 
@@ -147,11 +126,11 @@ const FAQTable: React.FC<FAQTableProps> = ({
           onSubmit={handleSubmitEdit}
           initialData={editModal.faqData}
           isEdit={true}
-          isSubmitting={updateFAQMutation.isPending}
+          isSubmitting={false}
         />
       )}
     </>
-  ), [confirmModal, editModal, closeConfirmModal, handleConfirmAction, closeEditModal, handleSubmitEdit, archiveFAQMutation.isPending, updateFAQMutation.isPending]);
+  ), [confirmModal, editModal, closeConfirmModal, handleConfirmAction, closeEditModal, handleSubmitEdit]);
 
   const renderHeader = () => (
     <FAQTableHeader

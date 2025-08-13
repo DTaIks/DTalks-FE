@@ -6,21 +6,57 @@ import DocumentAllTable from "@/components/admin/documentAll/DocumentAllTable";
 import Pagination from "@/components/common/Pagination";
 import ConfirmModal from "@/components/common/ConfirmModal";
 import { VersionHistoryModal } from "@/components/common/FileVersionManagementModal";
+import DocumentUploadModal from "@/components/common/DocumentUploadModal";
 import { useDocumentStore } from "@/store/documentStore";
 import { useDocumentAllList, useDocumentSearch, useDocumentFilter } from "@/query/useDocumentAllQueries";
 import { useDocumentCountByCategory, useRecentUpdateCountByCategory, useActiveDocumentCountByCategory } from "@/query/useDocumentQueries";
+import { useDocumentUpdate, useDocumentArchive, useDocumentRestore } from "@/query/useDocumentMutations";
+
+// 타입 정의
+interface ConfirmModalState {
+  isOpen: boolean;
+  type: 'archive' | 'download';
+  fileName: string;
+}
+
+interface VersionModalState {
+  isOpen: boolean;
+  fileName: string;
+  fileId: number | null;
+}
+
+interface UpdateModalState {
+  isOpen: boolean;
+  documentName: string;
+  initialData?: {
+    fileId?: number;
+    fileName: string;
+    description: string;
+    fileVersion: string;
+    category: string;
+    fileUrl?: string;
+  };
+}
+
 
 // 전체 문서 관리 페이지
 const DocumentAllPage = () => {
+  // State 관리
   const [currentPage, setCurrentPage] = useState(1);
-  const [confirmModal, setConfirmModal] = useState({ 
+  const [confirmModal, setConfirmModal] = useState<ConfirmModalState>({ 
     isOpen: false, 
-    type: 'archive' as 'archive' | 'download', 
+    type: 'archive', 
     fileName: '' 
   });
-  const [versionModal, setVersionModal] = useState({ 
+  const [versionModal, setVersionModal] = useState<VersionModalState>({ 
     isOpen: false, 
-    fileName: '' 
+    fileName: '',
+    fileId: null
+  });
+  const [updateModal, setUpdateModal] = useState<UpdateModalState>({ 
+    isOpen: false, 
+    documentName: '', 
+    initialData: undefined
   });
   
   // 검색 및 필터 상태
@@ -33,33 +69,33 @@ const DocumentAllPage = () => {
     setSelectedStatus 
   } = useDocumentStore();
   
-  // 전체 문서 수 조회
+  // 통계 관련 쿼리
   const { data: totalCount } = useDocumentCountByCategory('all');
-  
-  // 최근 업데이트 문서 수 조회
   const { data: recentUpdateCount } = useRecentUpdateCountByCategory('all');
-  
-  // 활성 문서 수 조회
   const { data: activeCount } = useActiveDocumentCountByCategory('all');
   
-  // API 데이터로 통계 생성
-  const stats = [
+  // 문서 관련 뮤테이션
+  const documentUpdateMutation = useDocumentUpdate();
+  const documentArchiveMutation = useDocumentArchive();
+  const documentRestoreMutation = useDocumentRestore();
+  
+  const stats = useMemo(() => [
     {
       title: "전체 문서",
-      value: totalCount?.documentCount?.toString() || "0",
+      value: `${totalCount?.documentCount || 0}개`,
       additionalInfo: "총 문서수"
     },
     {
       title: "최근 업데이트 문서 수",
       value: `${recentUpdateCount?.documentCount || 0}개`,
-      additionalInfo: "+1개 이번 주"
+      additionalInfo: "이번 주"
     },
     {
-      title: "활성 문서 수",
+      title: "활성 버전",
       value: `${activeCount?.documentCount || 0}개`,
-      additionalInfo: "+1개 이번 달"
+      additionalInfo: "활성 문서 수"
     }
-  ];
+  ], [totalCount, recentUpdateCount, activeCount]);
   
   // 데이터 모드 결정
   const dataMode = useMemo(() => {
@@ -185,6 +221,7 @@ const DocumentAllPage = () => {
     setCurrentPage(1);
   }, [searchTerm, selectedCategory, selectedStatus]);
   
+  // 페이지 변경 핸들러
   const handlePageChange = useCallback((page: number) => {
     setCurrentPage(page);
   }, []);
@@ -204,38 +241,121 @@ const DocumentAllPage = () => {
     setSelectedStatus(status);
   }, [setSelectedStatus]);
   
-  const openConfirmModal = (type: 'archive' | 'download', fileName: string) => {
+  // 확인 모달 핸들러
+  const openConfirmModal = useCallback((type: 'archive' | 'download', fileName: string) => {
     setConfirmModal({ isOpen: true, type, fileName });
-  };
+  }, []);
   
   const closeConfirmModal = useCallback(() => {
     setConfirmModal({ isOpen: false, type: 'archive', fileName: '' });
   }, []);
   
-  const openVersionModal = (fileName: string) => {
-    setVersionModal({ isOpen: true, fileName });
-  };
+  // 버전 모달 핸들러
+  const openVersionModal = useCallback((fileName: string) => {
+    const document = documents.find(doc => doc.documentName === fileName);
+    if (document) {
+      setVersionModal({ isOpen: true, fileName, fileId: document.documentId });
+    }
+  }, [documents]);
   
-  const closeVersionModal = () => {
-    setVersionModal({ isOpen: false, fileName: '' });
-  };
+  const closeVersionModal = useCallback(() => {
+    setVersionModal({ isOpen: false, fileName: '', fileId: null });
+  }, []);
+  
+  // 업데이트 모달 핸들러
+  const openUpdateModal = useCallback((documentName: string) => {
+    const documentToUpdate = documents.find(doc => doc.documentName === documentName);
+    if (documentToUpdate) {
+      setUpdateModal({
+        isOpen: true,
+        documentName,
+        initialData: {
+          fileId: documentToUpdate.documentId,
+          fileName: documentToUpdate.documentName,
+          description: '',
+          fileVersion: documentToUpdate.latestVersion || '1.0.0',
+          category: documentToUpdate.category,
+          fileUrl: documentToUpdate.fileUrl
+        }
+      });
+    }
+  }, [documents]);
+  
+  const closeUpdateModal = useCallback(() => {
+    setUpdateModal({ isOpen: false, documentName: '', initialData: undefined });
+  }, []);
 
-  const handleConfirmAction = useCallback(() => {
+  // 확인 액션 핸들러
+  const handleConfirmAction = useCallback(async () => {
     if (confirmModal.type === 'archive') {
-      const { archiveDocumentItem } = useDocumentStore.getState();
       const documentToArchive = documents.find(
         doc => doc.documentName === confirmModal.fileName
       );
       if (documentToArchive) {
-        archiveDocumentItem(documentToArchive.documentId);
+        try {
+          if (!documentToArchive.isActive) {
+            await documentRestoreMutation.mutateAsync(documentToArchive.documentId);
+          } else {
+            await documentArchiveMutation.mutateAsync(documentToArchive.documentId);
+          }
+        } catch (error) {
+          console.error('문서 보관/복원 실패:', error);
+        }
       }
     } else if (confirmModal.type === 'download') {
-      console.log(`${confirmModal.fileName} 다운로드 처리`);
+      // 다운로드 처리 로직
+      const documentToDownload = documents.find(
+        doc => doc.documentName === confirmModal.fileName
+      );
+      if (documentToDownload?.fileUrl) {
+        try {
+          const response = await fetch(documentToDownload.fileUrl, { method: 'HEAD' });
+          if (response.ok) {
+            const link = document.createElement('a');
+            link.href = documentToDownload.fileUrl;
+            link.download = confirmModal.fileName;
+            link.style.display = 'none';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+          } else {
+            alert('파일을 찾을 수 없습니다. 관리자에게 문의해주세요.');
+          }
+        } catch (error) {
+          alert('파일 다운로드 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.');
+        }
+      } else {
+        alert('다운로드할 파일 URL이 없습니다.');
+      }
     }
     closeConfirmModal();
-  }, [confirmModal.type, confirmModal.fileName, closeConfirmModal, documents]);
+  }, [confirmModal.type, confirmModal.fileName, closeConfirmModal, documents, documentArchiveMutation, documentRestoreMutation]);
 
-  const modals = {
+  // 문서 업데이트 핸들러
+  const handleDocumentUpdate = useCallback((data: {
+    uploadFile?: File;
+    fileName: string;
+    description: string;
+    fileVersion: string;
+    category: string;
+  }) => {
+    if (updateModal.initialData?.fileId) {
+      documentUpdateMutation.mutate({
+        fileId: updateModal.initialData.fileId,
+        file: data.uploadFile || null,
+        fileInfo: {
+          fileName: data.fileName,
+          description: data.description,
+          fileVersion: data.fileVersion,
+          category: data.category
+        }
+      });
+      closeUpdateModal();
+    }
+  }, [updateModal.initialData, documentUpdateMutation, closeUpdateModal]);
+
+  // 모달 객체
+  const modals = useMemo(() => ({
     confirmModal: {
       open: openConfirmModal,
       close: closeConfirmModal
@@ -245,28 +365,38 @@ const DocumentAllPage = () => {
       close: closeVersionModal,
       isOpen: versionModal.isOpen
     }
-  };
+  }), [openConfirmModal, closeConfirmModal, openVersionModal, closeVersionModal, versionModal.isOpen]);
 
   return (
     <Container>
       <HeaderWrapper>
         <TitleContainer title="전체 문서" subtitle="모든 사내 문서를 한 번에 확인하고 정리하세요" />
       </HeaderWrapper>
+      
       <DocumentAllStatCard stats={stats} />
+      
+      {/* 에러 상태 표시 */}
+      {currentError && !currentLoading && (
+        <ErrorMessage>
+          문서를 불러오는 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.
+        </ErrorMessage>
+      )}
+      
       <DocumentAllTable 
         documents={documents}
         modals={modals}
         isLoading={currentLoading}
-        error={currentError}
         isSearchMode={dataMode === 'search'}
         searchTerm={searchTerm}
         selectedCategory={selectedCategory}
         selectedStatus={selectedStatus} 
         onSearch={handleSearch}
         onCategoryChange={handleCategoryChange}
-        onStatusChange={handleStatusChange} 
+        onStatusChange={handleStatusChange}
+        onUpdate={openUpdateModal}
       />
-      {totalPages >= 1 && (
+      
+      {!currentLoading && totalPages > 1 && (
         <PaginationContainer>
           <Pagination
             key={totalPages}
@@ -289,6 +419,17 @@ const DocumentAllPage = () => {
         isOpen={versionModal.isOpen}
         onClose={closeVersionModal}
         fileName={versionModal.fileName}
+        fileId={versionModal.fileId || undefined}
+        pageType="document"
+      />
+
+      <DocumentUploadModal
+        isOpen={updateModal.isOpen}
+        onClose={closeUpdateModal}
+        onSubmit={handleDocumentUpdate}
+        isSubmitting={documentUpdateMutation.isPending}
+        mode="update"
+        initialData={updateModal.initialData}
       />
     </Container>
   );
@@ -302,6 +443,19 @@ const Container = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
+`;
+
+const ErrorMessage = styled.div`
+  width: 100%;
+  max-width: 1056px;
+  padding: 16px;
+  margin-bottom: 16px;
+  background-color: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: 8px;
+  color: #dc2626;
+  text-align: center;
+  font-size: 14px;
 `;
 
 const HeaderWrapper = styled.div`

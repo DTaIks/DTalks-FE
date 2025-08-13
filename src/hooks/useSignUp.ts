@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
+import { useNavigate } from 'react-router-dom';
 import { signUpSchema, type SignUpFormData } from '@/utils/authSchema';
 import {
   useEmailValidationMutation,
@@ -20,6 +21,7 @@ interface AuthState {
 }
 
 export const useSignUpForm = () => {
+  const navigate = useNavigate();
   const [authState, setAuthState] = useState<AuthState>({
     isEmailVerified: false,
     isAuthCodeSent: false,
@@ -206,10 +208,11 @@ export const useSignUpForm = () => {
       password: data.password
     };
 
-    signUpMutation.mutate(signUpData, {
-      onSuccess: (response) => {
-        console.log('회원가입 성공:', response);
-        reset();
+          signUpMutation.mutate(signUpData, {
+        onSuccess: () => {
+          reset();
+          // 회원가입 성공 시 로그인 페이지로 리다이렉트
+        navigate('/login');
       },
       onError: (error) => {
         const errorMessage = error instanceof Error ? error.message : '회원가입 중 오류가 발생했습니다.';

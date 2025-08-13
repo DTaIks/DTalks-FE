@@ -49,7 +49,6 @@ const LoginForm: React.FC<LoginFormProps> = ({
           value={email}
           onChange={onEmailChange}
           inputWidth="380px"
-          autocomplete="username"
         />
         <InputField
           inputWidth="380px"
@@ -59,12 +58,13 @@ const LoginForm: React.FC<LoginFormProps> = ({
           type="password"
           value={password}
           onChange={onPasswordChange}
-          autocomplete="current-password"
         />
         {error && <ErrorMessage>{error}</ErrorMessage>}
-        <ForgotPasswordLink onClick={() => navigate('/password')}>
-          <span>비밀번호 찾기</span>
-        </ForgotPasswordLink>
+        <ForgotPasswordContainer>
+          <ForgotPasswordLink onClick={() => navigate('/password')}>
+            비밀번호 찾기
+          </ForgotPasswordLink>
+        </ForgotPasswordContainer>
         <LoginButtonWrapper>
           <Button
             text="로그인"
@@ -163,15 +163,18 @@ const ErrorMessage = styled.div`
   width: 100%;
 `;
 
+const ForgotPasswordContainer = styled.div`
+  width: 382.5px;
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 8px;
+`;
+
 const ForgotPasswordLink = styled.div`
   color: var(--color-mediumpurple-300);
   font-size: 14px;
   text-decoration: none;
   cursor: pointer;
-  margin-bottom: 8px;
-  width: 382.5px;
-  display: block;
-  text-align: right;
   &:hover {
     text-decoration: underline;
     color: #7742A7;

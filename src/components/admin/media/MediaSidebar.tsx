@@ -2,16 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 import DepartmentBox from '@/components/admin/media/DepartmentList';
 import ArchiveModal from '@/components/admin/media/ArchiveModal';
-
-interface MediaSidebarProps {
-  departments: Array<{ id: string; name: string }>;
-  selectedDepartment: string;
-  isArchiveMode: boolean;
-  isArchiveClosing: boolean;
-  onSelectDepartment: (department: string) => void;
-  onToggleArchive: (isArchive: boolean) => void;
-  onSelectArchiveDepartment: (department: string) => void;
-}
+import type { MediaSidebarProps } from '@/types/media';
 
 const MediaSidebar: React.FC<MediaSidebarProps> = ({
   departments,

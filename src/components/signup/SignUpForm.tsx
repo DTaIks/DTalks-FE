@@ -82,7 +82,7 @@ export default function SignUpForm(): JSX.Element {
           label="비밀번호"
           placeholder="문자, 숫자, 특수문자 포함 8자~20자"
           inputProps={{
-            type: 'password',
+            type: "password",
             ...register('password')
           }}
           infoText={errors.password?.message || ''}
@@ -94,7 +94,7 @@ export default function SignUpForm(): JSX.Element {
           label="비밀번호 확인"
           placeholder="비밀번호를 다시 입력해 주세요."
           inputProps={{
-            type: 'password',
+            type: "password",
             ...register('passwordCheck')
           }}
           infoText={errors.passwordCheck?.message || ''}
@@ -136,7 +136,7 @@ const Title = styled.h2`
 `;
 
 const TimerText = styled.div`
-  font-size: 12px;
+  font-size: 14px;
   color: #F0191D;
   text-align: center;
   margin-top: 3px;

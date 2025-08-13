@@ -4,23 +4,11 @@ import { useNavigate, useLocation } from "react-router-dom";
 import LogoImage from "@/assets/common/Small_Logo.png";
 import ProfileImageSrc from "@/assets/common/Profile.png";
 import LogoutModal from "@/components/common/LogoutModal";
+import type { DropdownIconProps, MenuItemProps, SubMenuItemProps } from '@/types/layout';
 
 type SidebarProps = {
   className?: string;
 };
-
-interface DropdownIconProps {
-  isOpen: boolean;
-}
-
-interface MenuItemProps {
-  isSelected?: boolean;
-  isToggle?: boolean;
-}
-
-interface SubMenuItemProps {
-  isSelected?: boolean;
-}
 
 interface ProfileMenuAction {
   key: string;

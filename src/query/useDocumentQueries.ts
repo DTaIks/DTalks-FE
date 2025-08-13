@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { documentAPI } from '@/api/documentAPI';
 import { useDebouncedSearch } from '@/hooks/useDebouncedSearch';
-import type { DocumentInfo } from '@/types/document';
+import type { DocumentInfo, DocumentPagingInfo } from '@/types/document';
 
 const filterDocumentsByStatus = (documents: DocumentInfo[], status: string): DocumentInfo[] => {
   if (status === '전체 상태') {
@@ -35,8 +35,12 @@ export const useDocumentList = (
         totalElements: response.pagingInfo?.elementCount || 0,
       };
     },
-    staleTime: 1000 * 60 * 5,
+    staleTime: 1000 * 60 * 10, // 10분
+    gcTime: 1000 * 60 * 30, // 30분
+    refetchOnMount: false,
     refetchOnWindowFocus: false,
+    refetchOnReconnect: false,
+    placeholderData: (previousData: { content: DocumentInfo[]; totalPages: number; totalElements: number; documentInfoResponseList: DocumentInfo[]; pagingInfo: DocumentPagingInfo; } | undefined) => previousData,
   });
 };
 
@@ -224,4 +228,16 @@ export const useSearchDocumentsByName = (
     ...queryResult,
     isDebouncing,
   };
+};
+// 문서 버전 히스토리 조회
+export const useDocumentVersionHistory = (fileId: number | null) => {
+  return useQuery({
+    queryKey: ['documentVersionHistory', fileId],
+    queryFn: () => documentAPI.getDocumentVersionHistory(fileId!),
+    enabled: !!fileId,
+    staleTime: 1000 * 60 * 5, // 5분간 캐시 유지
+    gcTime: 1000 * 60 * 15, // 15분간 캐시 보관
+    refetchOnWindowFocus: false,
+    refetchOnMount: false,
+  });
 };

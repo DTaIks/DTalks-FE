@@ -21,6 +21,7 @@ export const useDailyChat = () => {
     },
     staleTime: 5 * 60 * 1000,
     gcTime: 10 * 60 * 1000,
+    refetchOnMount: true,
   });
 };
 
@@ -40,6 +41,7 @@ export const useSuccessRate = () => {
     },
     staleTime: 5 * 60 * 1000,
     gcTime: 10 * 60 * 1000,
+    refetchOnMount: true,
   });
 };
 
@@ -59,6 +61,7 @@ export const useSatisfaction = () => {
     },
     staleTime: 5 * 60 * 1000,
     gcTime: 10 * 60 * 1000,
+    refetchOnMount: true,
   });
 };
 
@@ -75,6 +78,7 @@ export const useResponseTime = () => {
     },
     staleTime: 5 * 60 * 1000,
     gcTime: 10 * 60 * 1000,
+    refetchOnMount: true,
   });
 };
 
@@ -125,6 +129,7 @@ export const usePromptTemplate = () => {
     },
     staleTime: 5 * 60 * 1000,
     gcTime: 10 * 60 * 1000,
+    refetchOnMount: true,
   });
 };
 
@@ -145,5 +150,6 @@ export const useWeeklyResponse = () => {
     },
     staleTime: 5 * 60 * 1000,
     gcTime: 10 * 60 * 1000,
+    refetchOnMount: true,
   });
 };
