@@ -1,6 +1,6 @@
 import { apiInstance } from './apiInstance';
 import type { CommonFileResponse, CommonFileRequest, FileUploadInfo, FileUploadResponse, DepartmentFileResponse, DepartmentFileRequest, CommonArchivedFileResponse, CommonArchivedFileRequest, DepartmentArchivedFileResponse, DepartmentArchivedFileRequest, FileVersionHistory } from '@/types/media';
-import type { MediaUploadData } from '@/components/admin/media/MediaFileUploadModal';
+import type { MediaUploadData } from '@/types/modal';
 
 export const mediaAPI = {
   // 공통 파일 조회

@@ -1,3 +1,36 @@
+// 차트 관련 컴포넌트 Props 타입들
+// API 응답 데이터 타입들
+export interface DailyConversationData {
+  date: string;
+  conversationCount: number;
+}
+
+export interface SuccessRateData {
+  date: string;
+  successRate: number;
+}
+
+export interface SatisfactionData {
+  date: string;
+  satisfactionScore: number;
+}
+
+export interface ResponseTimeData {
+  date: string;
+  averageResponseTime: number;
+}
+
+export interface TemplateUsageData {
+  templateName: string;
+  usageCount: number;
+}
+
+export interface WeeklyResponseData {
+  week: string;
+  responseCount: number;
+}
+
+// DonutChart 컴포넌트
 export interface DonutChartProps {
   type: 'smallTalk' | 'qna' | 'formatSearch' | 'organization';
   size?: string;

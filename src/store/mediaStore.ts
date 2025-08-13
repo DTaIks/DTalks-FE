@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 
-import type { MediaUploadData } from '@/components/admin/media/MediaFileUploadModal';
+import type { MediaUploadData } from '@/types/modal';
 
 type FileType = '전체' | '문서' | '이미지' | '음성';
 type ModalType = 'archive' | 'download';

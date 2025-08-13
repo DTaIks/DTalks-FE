@@ -131,6 +131,7 @@ export interface Department {
 export interface VersionData {
   id: string;
   version: string;
+  fileName?: string;
   date: string;
   uploaderName: string;
   fileSize: string;
@@ -140,6 +141,7 @@ export interface VersionData {
 
 export interface FileVersionHistory {
   versionId: number;
+  fileName: string;
   versionNumber: string;
   createdAt: string;
   description: string;

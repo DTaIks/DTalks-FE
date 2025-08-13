@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-import type { DocumentUploadData } from '@/components/common/DocumentUploadModal';
+import type { DocumentUploadData } from '@/types/modal';
 
 interface FileUploadModalState {
   isOpen: boolean;
@@ -18,7 +18,7 @@ interface UseFileUploadProps {
   onEdit?: (data: DocumentUploadData) => void;
   onArchive?: (fileName: string) => void;
   onDownload?: (fileName: string) => void;
-  pageType: 'policy' | 'report' | 'glossary';
+  pageType: 'policy' | 'reportform' | 'glossary';
 }
 
 export const useFileUpload = ({ onUpload, onEdit, onArchive, onDownload, pageType }: UseFileUploadProps) => {
@@ -101,7 +101,7 @@ export const useFileUpload = ({ onUpload, onEdit, onArchive, onDownload, pageTyp
     switch (pageType) {
       case 'policy':
         return '파일 업로드';
-      case 'report':
+      case 'reportform':
         return '파일 업로드';
       case 'glossary':
         return '파일 업로드';
@@ -115,7 +115,7 @@ export const useFileUpload = ({ onUpload, onEdit, onArchive, onDownload, pageTyp
     switch (pageType) {
       case 'policy':
         return '사내 정책 파일 업로드';
-      case 'report':
+      case 'reportform':
         return '보고서 양식 파일 업로드';
       case 'glossary':
         return '용어 사전 파일 업로드';

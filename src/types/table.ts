@@ -30,10 +30,29 @@ export interface CommonModals {
   };
 }
 
+// DocumentItem 타입
+export interface DocumentItem {
+  documentId: number;
+  documentName: string;
+  latestVersion: string;
+  category: string;
+  fileUrl: string;
+  isActive: boolean;
+  uploaderName: string;
+  lastUpdatedAt: string;
+}
+
 // CommonTable 컴포넌트
 export interface CommonTableProps {
   title: string;
-  items: any[];
+  items: Array<{
+    id: number;
+    name: string;
+    status: string;
+    category: string;
+    updatedAt: string;
+    isActive: boolean;
+  }>;
   searchTerm: string;
   selectedStatus: string;
   onSearchChange: (e: React.ChangeEvent<HTMLInputElement>) => void;

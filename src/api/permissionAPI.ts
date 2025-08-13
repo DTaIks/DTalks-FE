@@ -1,4 +1,36 @@
 import { apiInstance } from '@/api/apiInstance';
+
+interface PermissionResponse {
+  code: number;
+  status: string;
+  message: string;
+  data: PermissionUserResponse[];
+}
+
+interface PermissionUserResponse {
+  roleId: number;
+  roleUserCount: number;
+  isActive: string;
+}
+
+// 권한 변경 요청 타입
+interface ChangeUserRoleRequest {
+  userIdList: number[];
+  roleId: number;
+}
+
+// 권한 변경 응답 타입
+interface ChangeUserRoleResponse {
+  code: number;
+  status: string;
+  message: string;
+  data?: {
+    changedCount?: number;
+    successUserIds?: number[];
+    failedUserIds?: number[];
+  };
+}
+
 import type { 
   PermissionUser,
   PermissionResponse,
@@ -12,7 +44,7 @@ import type {
 
 export const permissionAPI = {
   // 권한 목록 조회
-  getPermissions: async (): Promise<Pick<PermissionUser, 'roleId' | 'roleUserCount' | 'isActive'>[]> => {
+  getPermissions: async (): Promise<{ roleId: number; roleUserCount: number; isActive: string }[]> => {
     try {
       const response = await apiInstance.get<PermissionResponse>('/admin/role');
       return response.data.data.map(item => ({

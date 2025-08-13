@@ -174,7 +174,7 @@ const DocumentUploadModal: React.FC<DocumentUploadModalProps> = ({
     switch (pageType) {
       case 'policy':
         return `사내 정책 ${action}`;
-      case 'report':
+      case 'reportform':
         return `보고서 양식 ${action}`;
       case 'glossary':
         return `용어 사전 ${action}`;
