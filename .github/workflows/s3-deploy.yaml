@@ -49,6 +49,8 @@ jobs:
       KAKAO_BUCKET: ${{ secrets.KAKAO_BUCKET }}
       KAKAO_IAM_ACCESS_KEY_ID: ${{ secrets.KAKAO_IAM_ACCESS_KEY_ID }}
       KAKAO_IAM_SECRET_KEY: ${{ secrets.KAKAO_IAM_SECRET_KEY }}
+      OBJECT_PREFIX: dist
+      
     steps:
       - name: Download build artifacts
         uses: actions/download-artifact@v4
@@ -61,7 +63,7 @@ jobs:
           sudo apt-get update -y
           sudo apt-get install -y jq file
 
-      - name: Issue API token (by access key id/secret)
+      - name: Issue API token
         id: auth
         shell: bash
         run: |
@@ -111,12 +113,15 @@ jobs:
             -H "X-Auth-Token: ${{ steps.auth.outputs.token }}" \
             || true
 
-      # 기존 오브젝트 삭제 없이 동일 경로로 PUT 하여 덮어쓰기
-
       - name: Upload dist to bucket (overwrite)
         run: |
           set -e
           BASE_URL="https://objectstorage.${KAKAO_REGION}.kakaocloud.com/v1/${KAKAO_PROJECT_ID}/${KAKAO_BUCKET}"
+          if [ -n "${OBJECT_PREFIX}" ]; then
+            BASE_PATH="${BASE_URL}/${OBJECT_PREFIX}"
+          else
+            BASE_PATH="${BASE_URL}"
+          fi
           find dist -type f ! -name 'index.html' -print0 | while IFS= read -r -d '' file; do
             REL_PATH="${file#dist/}"
             MIME_TYPE=$(file -b --mime-type "$file" || echo "application/octet-stream")
@@ -125,8 +130,8 @@ jobs:
             else
               CACHE_CONTROL="no-cache, no-store, must-revalidate"
             fi
-            echo "Uploading $REL_PATH (cache: $CACHE_CONTROL)"
-            curl --fail -s -X PUT "$BASE_URL/$REL_PATH" \
+            echo "Uploading ${OBJECT_PREFIX:+$OBJECT_PREFIX/}$REL_PATH (cache: $CACHE_CONTROL)"
+            curl --fail -s -X PUT "$BASE_PATH/$REL_PATH" \
               -H "X-Auth-Token: ${{ steps.auth.outputs.token }}" \
               -H "Content-Type: $MIME_TYPE" \
               -H "Cache-Control: $CACHE_CONTROL" \
@@ -138,7 +143,7 @@ jobs:
             MIME_TYPE=$(file -b --mime-type dist/index.html || echo "text/html")
             CACHE_CONTROL="no-cache, no-store, must-revalidate"
             echo "Uploading index.html (cache: $CACHE_CONTROL)"
-            curl --fail -s -X PUT "$BASE_URL/index.html" \
+            curl --fail -s -X PUT "$BASE_PATH/index.html" \
               -H "X-Auth-Token: ${{ steps.auth.outputs.token }}" \
               -H "Content-Type: $MIME_TYPE" \
               -H "Cache-Control: $CACHE_CONTROL" \
