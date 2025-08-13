@@ -26,7 +26,7 @@ jobs:
       - name: Install dependencies
         run: npm ci --no-audit
 
-      - name: Build app
+      - name: Build app (vite only, no tsc)
         run: npx vite build --mode development
         env:
           DISABLE_ESLINT_PLUGIN: true
@@ -50,7 +50,7 @@ jobs:
       KAKAO_IAM_ACCESS_KEY_ID: ${{ secrets.KAKAO_IAM_ACCESS_KEY_ID }}
       KAKAO_IAM_SECRET_KEY: ${{ secrets.KAKAO_IAM_SECRET_KEY }}
       OBJECT_PREFIX: dist
-      
+       
     steps:
       - name: Download build artifacts
         uses: actions/download-artifact@v4
@@ -122,15 +122,44 @@ jobs:
           else
             BASE_PATH="${BASE_URL}"
           fi
+          
+          # Function to get Content-Type by file extension
+          get_content_type() {
+            local file_path="$1"
+            case "${file_path##*.}" in
+              css) echo "text/css" ;;
+              js|mjs) echo "application/javascript" ;;
+              json) echo "application/json" ;;
+              html|htm) echo "text/html" ;;
+              svg) echo "image/svg+xml" ;;
+              png) echo "image/png" ;;
+              jpg|jpeg) echo "image/jpeg" ;;
+              gif) echo "image/gif" ;;
+              webp) echo "image/webp" ;;
+              ico) echo "image/x-icon" ;;
+              woff) echo "font/woff" ;;
+              woff2) echo "font/woff2" ;;
+              ttf) echo "font/ttf" ;;
+              otf) echo "font/otf" ;;
+              eot) echo "application/vnd.ms-fontobject" ;;
+              map) echo "application/json" ;;
+              txt) echo "text/plain" ;;
+              xml) echo "application/xml" ;;
+              pdf) echo "application/pdf" ;;
+              zip) echo "application/zip" ;;
+              *) echo "application/octet-stream" ;;
+            esac
+          }
+          
           find dist -type f ! -name 'index.html' -print0 | while IFS= read -r -d '' file; do
             REL_PATH="${file#dist/}"
-            MIME_TYPE=$(file -b --mime-type "$file" || echo "application/octet-stream")
+            MIME_TYPE=$(get_content_type "$REL_PATH")
             if [[ "$REL_PATH" =~ \.[0-9a-fA-F]{8,}\.(js|css|svg|png|jpg|jpeg|gif|webp|ico|map)$ ]]; then
               CACHE_CONTROL="public, max-age=31536000, immutable"
             else
               CACHE_CONTROL="no-cache, no-store, must-revalidate"
             fi
-            echo "Uploading ${OBJECT_PREFIX:+$OBJECT_PREFIX/}$REL_PATH (cache: $CACHE_CONTROL)"
+            echo "Uploading ${OBJECT_PREFIX:+$OBJECT_PREFIX/}$REL_PATH (type: $MIME_TYPE, cache: $CACHE_CONTROL)"
             curl --fail -s -X PUT "$BASE_PATH/$REL_PATH" \
               -H "X-Auth-Token: ${{ steps.auth.outputs.token }}" \
               -H "Content-Type: $MIME_TYPE" \
@@ -140,9 +169,9 @@ jobs:
           done
 
           if [ -f dist/index.html ]; then
-            MIME_TYPE=$(file -b --mime-type dist/index.html || echo "text/html")
+            MIME_TYPE="text/html"
             CACHE_CONTROL="no-cache, no-store, must-revalidate"
-            echo "Uploading index.html (cache: $CACHE_CONTROL)"
+            echo "Uploading ${OBJECT_PREFIX:+$OBJECT_PREFIX/}index.html (type: $MIME_TYPE, cache: $CACHE_CONTROL)"
             curl --fail -s -X PUT "$BASE_PATH/index.html" \
               -H "X-Auth-Token: ${{ steps.auth.outputs.token }}" \
               -H "Content-Type: $MIME_TYPE" \
