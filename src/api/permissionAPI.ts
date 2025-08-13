@@ -1,6 +1,4 @@
 import { apiInstance } from '@/api/apiInstance';
-import type { PermissionUser } from '@/types/permission';
-
 interface PermissionResponse {
   code: number;
   status: string;
@@ -34,7 +32,7 @@ interface ChangeUserRoleResponse {
 
 export const permissionAPI = {
   // 권한 목록 조회
-  getPermissions: async (): Promise<Pick<PermissionUser, 'roleId' | 'roleUserCount' | 'isActive'>[]> => {
+  getPermissions: async (): Promise<{ roleId: number; roleUserCount: number; isActive: string }[]> => {
     try {
       const response = await apiInstance.get<PermissionResponse>('/admin/role');
       return response.data.data.map(item => ({

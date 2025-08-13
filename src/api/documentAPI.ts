@@ -4,6 +4,7 @@ import type { DocumentResponse, DocumentRequest } from '@/types/document';
 // 문서 버전 히스토리 타입
 export interface DocumentVersionHistory {
   versionId: number;
+  fileName: string;
   versionNumber: string;
   createdAt: string;
   description: string;

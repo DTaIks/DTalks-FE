@@ -51,7 +51,7 @@ const DocumentPage = () => {
     'policy': {
       title: "사내 정책",
       subtitle: "모든 사내 정책 문서를 한 번에 확인하고 정리하세요",
-      image: DocumentCategory1
+      image: DocumentCategory2
     },
     'glossary': {
       title: "용어사전",
@@ -61,7 +61,7 @@ const DocumentPage = () => {
     'reportform': {
       title: "보고서 양식",
       subtitle: "모든 보고서 양식 문서를 한 번에 확인하고 정리하세요",
-      image: DocumentCategory2
+      image: DocumentCategory1
     }
   };
 
@@ -165,7 +165,7 @@ const DocumentPage = () => {
     closeConfirmModal,
     getButtonText
   } = useFileUpload({
-    pageType: category as 'policy' | 'glossary' | 'report',
+    pageType: category as 'policy' | 'glossary' | 'reportform',
     onUpload: handleDocumentUpload,
     onEdit: () => {
       // 파일 수정 처리
@@ -262,7 +262,7 @@ const DocumentPage = () => {
         isOpen={uploadModal.isOpen}
         onClose={handleCloseUploadModal}
         onSubmit={handleSubmit}
-        pageType={category as 'policy' | 'glossary' | 'report'}
+        pageType={category as 'policy' | 'glossary' | 'reportform'}
         isSubmitting={documentUploadMutation.isPending}
       />
 

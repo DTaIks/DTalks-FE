@@ -1,7 +1,7 @@
 import React from "react";
 import styled from 'styled-components';
 import DropDownButton from "@/components/common/DropDownButton";
-import type { MediaFile, MediaFileContentProps } from "@/types/media";
+import type { MediaFileContentProps } from "@/types/media";
 
 const MediaFileContent: React.FC<MediaFileContentProps> = ({ 
   file,

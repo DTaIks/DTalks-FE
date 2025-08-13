@@ -1,6 +1,5 @@
 import { useCallback } from 'react';
 import type { MediaFile } from '@/types/media';
-import { useDocumentStore } from '@/store/documentStore';
 
 interface UseCommonHandlersProps {
   modals: {
@@ -133,15 +132,8 @@ export const useCommonHandlers = ({ modals, mediaActions, documentActions }: Use
 
   // 파일명으로 문서를 찾아서 보관하는 핸들러 (공통)
   const handleArchiveByFileName = useCallback((fileName: string) => {
-    // 파일명으로 문서를 찾아서 보관 처리
-    const documentToArchive = useDocumentStore.getState().documentItems.find(
-      doc => doc.documentName === fileName
-    );
-    
-    if (documentToArchive) {
-      // 실제 API 호출을 위해 confirmModal을 통해 처리
-      modals.confirmModal.open('archive', fileName);
-    }
+    // React Query로 데이터 관리하므로 직접 confirmModal 열기
+    modals.confirmModal.open('archive', fileName);
   }, [modals.confirmModal]);
 
   // 버전 히스토리 모달 핸들러 (공통)

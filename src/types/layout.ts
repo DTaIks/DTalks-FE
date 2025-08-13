@@ -38,7 +38,7 @@ export interface MediaSidebarProps {
 export interface MediaContentProps {
   selectedCategory: string;
   onFileUpload: () => void;
-  onFileSelect: (file: any) => void;
+  onFileSelect: (file: { fileId: number; fileName: string; fileSize: number; uploadDate: string; uploader: string; isActive: boolean }) => void;
   onFileArchive: (fileId: number) => void;
   onFileDownload: (fileId: number) => void;
   onVersionHistory: (fileId: number) => void;
@@ -63,7 +63,7 @@ export interface MediaFileContentProps {
     uploader: string;
     isActive: boolean;
   }>;
-  onFileSelect: (file: any) => void;
+  onFileSelect: (file: { fileId: number; fileName: string; fileSize: number; uploadDate: string; uploader: string; isActive: boolean }) => void;
   onFileArchive: (fileId: number) => void;
   onFileDownload: (fileId: number) => void;
   onVersionHistory: (fileId: number) => void;

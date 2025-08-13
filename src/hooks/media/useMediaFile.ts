@@ -37,6 +37,7 @@ export const transformFileVersionHistoryToVersionData = (history: FileVersionHis
   return history.map(item => ({
     id: item.versionId.toString(),
     version: item.versionNumber,
+    fileName: item.fileName,
     date: item.createdAt,
     uploaderName: item.uploaderName,
     fileSize: '', // API에서 제공하지 않으므로 빈 문자열

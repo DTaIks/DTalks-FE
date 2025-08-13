@@ -39,6 +39,7 @@ export const VersionHistoryModal: React.FC<VersionHistoryModalProps> = ({
     return history.map((version) => ({
       id: version.versionId,
       version: version.versionNumber,
+      fileName: version.fileName,
       updatedAt: version.createdAt,
       uploaderName: version.uploaderName,
       description: version.description
@@ -76,6 +77,9 @@ export const VersionHistoryModal: React.FC<VersionHistoryModalProps> = ({
     return versions.map((version) => (
       <VersionItem key={version.id}>
         <VersionNumber>v{version.version}</VersionNumber>
+        {version.fileName && (
+          <VersionFileName>{version.fileName}</VersionFileName>
+        )}
         <VersionInfo>{version.updatedAt} · {version.uploaderName}</VersionInfo>
         {version.description && (
           <VersionDescription>{version.description}</VersionDescription>
@@ -199,6 +203,13 @@ const VersionNumber = styled.div`
   font-weight: var(--font-weight-600);
   color: #6c64ff;
   font-size: var(--font-size-18);
+  margin-bottom: 8px;
+`;
+
+const VersionFileName = styled.div`
+  font-size: var(--font-size-14);
+  color: var(--color-gray);
+  font-weight: var(--font-weight-500);
   margin-bottom: 8px;
 `;
 

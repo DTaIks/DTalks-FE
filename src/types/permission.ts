@@ -1,5 +1,15 @@
 // 권한 관리 관련 컴포넌트 Props 타입들
 
+// PermissionUser 타입
+export interface PermissionUser {
+  userId: number;
+  name: string;
+  email: string;
+  department: string;
+  position: string;
+  isActive: boolean;
+}
+
 // RoleManagement 컴포넌트
 export interface RoleManagementProps {
   roles: Array<{

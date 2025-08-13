@@ -67,6 +67,36 @@ export interface FAQListApiResponse {
   };
 }
 
+// 클라이언트에서 사용하는 FAQ 리스트 응답 (변환된 데이터)
+export interface FAQListResponse {
+  content: FAQItem[];
+  pageable: {
+    pageNumber: number;
+    pageSize: number;
+    offset: number;
+    paged: boolean;
+    unpaged: boolean;
+    sort: {
+      sorted: boolean;
+      unsorted: boolean;
+      empty: boolean;
+    };
+  };
+  totalPages: number;
+  totalElements: number;
+  last: boolean;
+  first: boolean;
+  size: number;
+  number: number;
+  numberOfElements: number;
+  empty: boolean;
+  sort: {
+    sorted: boolean;
+    unsorted: boolean;
+    empty: boolean;
+  };
+}
+
 // API 요청 관련 타입들
 export interface FAQListRequest {
   pageNumber: number; // 0부터 시작

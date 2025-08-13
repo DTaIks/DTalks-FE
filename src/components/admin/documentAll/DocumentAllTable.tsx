@@ -1,6 +1,5 @@
 import React, { useCallback } from "react";
 import DocumentCommonTable from "@/components/common/table/DocumentCommonTable";
-import type { DocumentInfo } from "@/types/document";
 import type { DocumentAllTableProps } from "@/types/table";
 
 const DocumentAllTable: React.FC<DocumentAllTableProps> = ({ 

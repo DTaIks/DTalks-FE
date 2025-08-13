@@ -48,11 +48,10 @@ const ConfirmModal: React.FC<ConfirmModalProps> = ({
   return (
     <ModalOverlay onClick={handleBackdropClick}>
       <ModalContainer>
-        <CloseButton onClick={onClose}>×</CloseButton>
 
         <ModalContent>
           <MessageText>
-            {fileName}을 {getActionText()}.
+            {fileName} 을/를 {getActionText()}.
           </MessageText>
         </ModalContent>
 
@@ -61,26 +60,25 @@ const ConfirmModal: React.FC<ConfirmModalProps> = ({
             text="취소"
             onClick={onClose}
             variant="secondary"
-            width="76px"
-            height="32px"
+            width="140px"
+            height="40px"
             fontSize="16px"
             style={{
-              borderRadius: '3.75px',
-              border: '0.75px solid #8061B0',
-              color: '#8061B0',
-              backgroundColor: 'white'
+              borderRadius: '8px',
+              color: '#666666',
+              backgroundColor: '#F3F3F3'
             }}
           />
           <Button
             text="확인"
             onClick={handleConfirm}
             variant="primary"
-            width="76px"
-            height="32px"
+            width="140px"
+            height="40px"
             fontSize="16px"
             disabled={isLoading}
             style={{
-              borderRadius: '3.75px',
+              borderRadius: '8px',
               backgroundColor: '#8061B0',
               border: '0.75px solid #8061B0'
             }}
@@ -109,46 +107,32 @@ const ModalOverlay = styled.div`
 
 const ModalContainer = styled.div`
   background: var(--color-white);
-  border-radius: 12px;
-  padding: var(--padding-32);
-  width: 540px;
-  height: 128px;
+  border-radius: 20px;
+  padding: 40px;
+  width: 320px;
+  height: 160px;
   flex-shrink: 0;
   position: relative;
 `;
 
-const CloseButton = styled.button`
-  position: absolute;
-  top: 18px;
-  right: 18px;
-  background: none;
-  border: none;
-  cursor: pointer;
-  font-size: var(--font-size-32);
-  color: #6b7280;
-  border-radius: var(--br-4);
-
-  &:hover {
-    color: #1f2937;
-  }
-`;
-
 const ModalContent = styled.div`
-  width: 400px;
-  height: 16px;
+  width: 320px;
+  height: 120px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 `;
 
 const MessageText = styled.p`
   font-size: var(--font-size-16);
   color: #222;
   font-weight: var(--font-weight-500);
-  margin-top: 40px;
-  margin-left: 4px;
+  text-align: center;
 `;
 
 const ButtonContainer = styled.div`
   display: flex;
-  gap: var(--gap-12);
-  justify-content: flex-end;
-  margin-top: 48px;
+  gap: var(--gap-8);
+  justify-content: center;
+  margin-top: 4px;
 `;

@@ -16,7 +16,7 @@ export interface DocumentUploadModalProps {
   onClose: () => void;
   onSubmit: (data: DocumentUploadData) => void;
   isSubmitting?: boolean;
-  pageType?: 'policy' | 'report' | 'glossary' | 'document';
+  pageType?: 'policy' | 'reportform' | 'glossary' | 'document';
   mode?: 'upload' | 'update';
   initialData?: {
     fileId?: number;
