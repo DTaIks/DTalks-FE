@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import styled from 'styled-components';
 import { useCompareStore } from '@/store/compareStore';
 import { type VersionDiffItem } from '@/components/common/document/DocumentVersionDiffList';
+import { useSearchDocumentsByName, useDocumentVersions } from '@/query/useDocumentQueries';
 import DocumentSearch from './DocumentSearch';
 import VersionCompareSection from './DocumentVersionCompare';
 import VersionHistorySection from './DocumentVersionHistory';
@@ -13,60 +14,96 @@ interface DocumentInfo {
 }
 
 interface CompareCardProps {
-  documentSuggestions?: DocumentInfo[];
-  versionOptions?: Array<{ value: string; label: string }>;
-  onSearchChange?: (value: string) => void;
-  onDocumentSelect?: (documentName: string) => void;
+  category: 'policy' | 'glossary' | 'reportform';
   onVersionCompare?: (documentName: string, version1: string, version2: string) => void;
-  onHistoryView?: () => void;
   diffData?: VersionDiffItem[];
-  isLoading?: boolean;
-  isLoadingDocuments?: boolean;
-  isLoadingVersions?: boolean;
-  searchValue?: string;
-  selectedDocument?: string;
+  isComparingVersions?: boolean;
 }
 
 type TabType = 'compare' | 'history';
 
 const CompareCard: React.FC<CompareCardProps> = ({
-  documentSuggestions = [],
-  versionOptions = [],
-  onSearchChange,
-  onDocumentSelect,
+  category,
   onVersionCompare,
-  onHistoryView,
   diffData = [],
-  isLoading = false,
-  isLoadingDocuments = false,
-  isLoadingVersions = false,
-  searchValue = '',
-  selectedDocument = ''
+  isComparingVersions = false
 }) => {
   const { activeTab, setActiveTab } = useCompareStore();
+  const [searchValue, setSearchValue] = useState('');
+  const [selectedDocument, setSelectedDocument] = useState('');
   const [compareResult, setCompareResult] = useState<{
     version1: string;
     version2: string;
   }>({ version1: '', version2: '' });
 
+  // 문서 검색 API 호출
+  const {
+    data: searchData,
+    isLoading: isLoadingDocuments,
+    isDebouncing
+  } = useSearchDocumentsByName(
+    category,
+    searchValue,
+    searchValue.trim().length > 0
+  );
+
+  // 선택된 문서의 버전 목록 조회
+  const {
+    data: versionData,
+    isLoading: isLoadingVersions
+  } = useDocumentVersions(
+    category,
+    selectedDocument,
+    !!selectedDocument
+  );
+
+  // 문서 검색 결과를 DocumentInfo 형태로 변환
+  const documentSuggestions: DocumentInfo[] = React.useMemo(() => {
+    if (!searchData?.documents) return [];
+    
+    return searchData.documents.map(doc => ({
+      documentName: doc.documentName,
+      description: `문서 ID: ${doc.documentId}`,
+      lastModified: doc.versions?.[0]?.createdAt || ''
+    }));
+  }, [searchData]);
+
+  // 버전 옵션을 선택 가능한 형태로 변환
+  const versionOptions = React.useMemo(() => {
+    if (!versionData?.versions) return [];
+    
+    return versionData.versions.map(version => ({
+      value: version.versionId.toString(),
+      label: `v ${version.versionNumber}`
+    }));
+  }, [versionData]);
+
   const handleTabChange = (tab: TabType) => {
     setActiveTab(tab);
-    if (tab === 'history') {
-      onHistoryView?.();
+  };
+
+  const handleSearchChange = (value: string) => {
+    setSearchValue(value);
+    if (selectedDocument && !value.includes(selectedDocument)) {
+      setSelectedDocument('');
+      setCompareResult({ version1: '', version2: '' });
     }
+  };
+
+  const handleDocumentSelect = (documentName: string) => {
+    setSelectedDocument(documentName);
+    setSearchValue(documentName);
+    setCompareResult({ version1: '', version2: '' });
   };
 
   const handleVersionCompare = (documentName: string, version1: string, version2: string) => {
     setCompareResult({ version1, version2 });
     onVersionCompare?.(documentName, version1, version2);
     setActiveTab('history');
-    onHistoryView?.();
   };
 
-  const handleDocumentSelectInternal = (documentName: string) => {
-    setCompareResult({ version1: '', version2: '' });
-    onDocumentSelect?.(documentName);
-  };
+  // 검색 중이거나 버전 로딩 중인 상태 계산
+  const isSearching = isLoadingDocuments || isDebouncing;
 
   return (
     <Container $activeTab={activeTab}>
@@ -91,16 +128,16 @@ const CompareCard: React.FC<CompareCardProps> = ({
             <DocumentSearch
               searchValue={searchValue}
               documentSuggestions={documentSuggestions}
-              isLoadingDocuments={isLoadingDocuments}
-              onSearchChange={onSearchChange || (() => {})}
-              onDocumentSelect={handleDocumentSelectInternal}
+              isLoadingDocuments={isSearching}
+              onSearchChange={handleSearchChange}
+              onDocumentSelect={handleDocumentSelect}
               selectedDocument={selectedDocument}
             />
             
             <VersionCompareSection
               versionOptions={versionOptions}
               isLoadingVersions={isLoadingVersions}
-              isLoading={isLoading}
+              isLoading={isComparingVersions}
               selectedDocument={selectedDocument}
               onVersionCompare={handleVersionCompare}
             />
@@ -110,7 +147,7 @@ const CompareCard: React.FC<CompareCardProps> = ({
         {activeTab === 'history' && (
           <VersionHistorySection
             diffData={diffData}
-            isLoading={isLoading}
+            isLoading={isComparingVersions}
             selectedDocument={selectedDocument}
             version1={compareResult.version1}
             version2={compareResult.version2}

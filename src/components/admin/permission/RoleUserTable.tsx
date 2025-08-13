@@ -19,7 +19,7 @@ const UserTable = ({ tableHeaders, tableData }: UserTableProps) => {
     <UserTableContainer>
       <TableHeader>
         {tableHeaders.map((header, index) => (
-          <HeaderCell key={index}>{header}</HeaderCell>
+          <HeaderCell key={index} columnIndex={index}>{header}</HeaderCell>
         ))}
       </TableHeader>
       <TableBody>
@@ -29,10 +29,10 @@ const UserTable = ({ tableHeaders, tableData }: UserTableProps) => {
             selected={selectedUserIds.includes(row.userId)} 
             onClick={() => toggleSelectedUserId(row.userId)}
           >
-            <TableCell>{row.name}</TableCell>
-            <TableCell>{row.email}</TableCell>
-            <TableCell>{row.department}</TableCell>
-            <TableCell>{row.role}</TableCell>
+            <TableCell columnIndex={0}>{row.name}</TableCell>
+            <TableCell columnIndex={1}>{row.email}</TableCell>
+            <TableCell columnIndex={2}>{row.department}</TableCell>
+            <TableCell columnIndex={3}>{row.role}</TableCell>
           </TableRow>
         ))}
       </TableBody>
@@ -54,21 +54,37 @@ const TableHeader = styled.div`
   margin-bottom: 8px;
 `;
 
-const HeaderCell = styled.div`
-  flex: 1;
+const HeaderCell = styled.div<{ columnIndex: number }>`
   color: #000;
   font-size: 16px;
   font-weight: 600;
   text-align: left;
   margin-top: -10px;
   
-  &:first-child {
-    padding-left: 36px;
-  }
-  
-  &:nth-child(3) {
-    padding-left: 36px;
-  }
+  ${props => {
+    switch (props.columnIndex) {
+      case 0: 
+        return `
+          flex: 1;
+          padding-left: 36px;
+        `;
+      case 1:
+        return `
+          flex: 2;
+        `;
+      case 2:
+        return `
+          flex: 0.8;
+          padding-left: 36px;
+        `;
+      case 3: 
+        return `
+          flex: 0.85;
+        `;
+      default:
+        return 'flex: 1;';
+    }
+  }}
 `;
 
 const TableBody = styled.div`
@@ -92,17 +108,33 @@ const TableRow = styled.div<{ selected?: boolean }>`
   `}
 `;
 
-const TableCell = styled.div`
-  flex: 1;
+const TableCell = styled.div<{ columnIndex: number }>`
   color: #000;
   font-size: 16px;
   text-align: left;
   
-  &:first-child {
-    padding-left: 36px;
-  }
-  
-  &:nth-child(3) {
-    padding-left: 36px;
-  }
+  ${props => {
+    switch (props.columnIndex) {
+      case 0: 
+        return `
+          flex: 1;
+          padding-left: 36px;
+        `;
+      case 1: 
+        return `
+          flex: 2;
+        `;
+      case 2: 
+        return `
+          flex: 0.8;
+          padding-left: 36px;
+        `;
+      case 3: 
+        return `
+          flex: 0.85;
+        `;
+      default:
+        return 'flex: 1;';
+    }
+  }}
 `;

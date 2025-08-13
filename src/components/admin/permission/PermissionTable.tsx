@@ -1,11 +1,12 @@
+import React, { useCallback } from "react";
 import styled from "styled-components";
 import RoleManagement from "./RoleManagement";
 import { usePermissionStore } from "@/store/permissionStore";
 import TableHeader from "@/components/admin/permission/PermissionTableHeader";
 import TableRow from "@/components/admin/permission/PermissionTableRow";
+import EmptyState from "@/components/common/EmptyState";
 import { usePermissions } from "@/query/usePermission";
 import type { PermissionUser } from "@/types/permission";
-import EmptyState from "@/components/common/EmptyState";
 
 import Roll1 from '@/assets/permission/PermissionRoll1.svg';
 import Roll2 from '@/assets/permission/PermissionRoll2.svg';
@@ -35,34 +36,34 @@ const roleInfo = [
   },
 ];
 
-const PermissionTable = () => {
+const PermissionTable: React.FC = () => {
   const { selectedUser, isModalOpen, setSelectedUser, setModalOpen } = usePermissionStore();
-  const { data: permissionData, isLoading, isError } = usePermissions();
+  const { data: permissionData = [], isLoading, isError } = usePermissions();
 
-  const handleEditClick = (user: PermissionUser) => {
+  const handleEditClick = useCallback((user: PermissionUser) => {
     setSelectedUser(user);
     setModalOpen(true);
-  };
+  }, [setSelectedUser, setModalOpen]);
 
-  const handleEditModalClose = () => {
+  const handleEditModalClose = useCallback(() => {
     setModalOpen(false);
     setSelectedUser(null);
-  };
+  }, [setModalOpen, setSelectedUser]);
 
   const renderEmptyState = () => {
     if (isLoading) {
-      return <EmptyState message="권한 목록을 불러오고 있습니다..." subMessage="잠시만 기다려주세요." />;
+      return <EmptyState message="사용자 권한 목록을 불러오고 있습니다..." subMessage="잠시만 기다려주세요." />;
     }
     if (isError) {
-      return <EmptyState message="권한 목록을 불러오는데 실패했습니다." subMessage="잠시 후 다시 시도해주세요." />;
+      return <EmptyState message="사용자 권한 목록을 불러올 수 없습니다." subMessage="권한을 확인해주세요." />;
     }
-    if (!permissionData || permissionData.length === 0) {
+    if (permissionData.length === 0) {
       return <EmptyState message="등록된 권한이 없습니다." subMessage="새로운 권한을 추가해보세요." />;
     }
     return null;
   };
 
-  const mergedData: PermissionUser[] = (permissionData ?? []).map(item => {
+  const mergedData: PermissionUser[] = permissionData.map(item => {
     const fixed = roleInfo.find(r => r.roleId === item.roleId);
     return {
       roleId: item.roleId,
@@ -75,25 +76,28 @@ const PermissionTable = () => {
     };
   });
 
+  const renderTableRow = useCallback((user: PermissionUser) => (
+    <TableRow
+      key={user.roleId}
+      user={user}
+      onEditClick={handleEditClick}
+    />
+  ), [handleEditClick]);
+
   const emptyState = renderEmptyState();
   if (emptyState) {
     return (
-      <>
-        <TableWrapper>
-          <TableBox>
-            <Table>
-              <TableHeader />
-              {emptyState}
-            </Table>
-          </TableBox>
-        </TableWrapper>
-
+      <TableWrapper>
+        <TableBox>
+          <TableHeader />
+          {emptyState}
+        </TableBox>
         <RoleManagement
           open={isModalOpen}
           onClose={handleEditModalClose}
           selectedUser={selectedUser}
         />
-      </>
+      </TableWrapper>
     );
   }
 
@@ -104,13 +108,7 @@ const PermissionTable = () => {
           <Table>
             <TableHeader />
             <TableBody>
-              {mergedData.map(user => (
-                <TableRow
-                  key={user.roleId}
-                  user={user}
-                  onEditClick={handleEditClick}
-                />
-              ))}
+              {mergedData.map(renderTableRow)}
             </TableBody>
           </Table>
         </TableBox>

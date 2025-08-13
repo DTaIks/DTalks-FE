@@ -23,7 +23,7 @@ function getChange(increase: number, compareWith: string = '이전 대비') {
   const prefix = isPositive ? '+' : '';
   const text = `${prefix}${increase}% ${compareWith}`;
   const color = isPositive ? '#22C55D' : '#EF4444';
-
+  
   return { text, color };
 }
 
@@ -35,7 +35,7 @@ const StatCard: React.FC<StatCardProps> = ({ data, isLoading, error }) => {
   if (isLoading) {
     return (
       <Card>
-        <Content>
+        <Content $centered>
           <LoadingState message="데이터를 불러오는 중" />
         </Content>
       </Card>
@@ -45,10 +45,10 @@ const StatCard: React.FC<StatCardProps> = ({ data, isLoading, error }) => {
   if (error) {
     return (
       <Card>
-        <Content>
+        <Content $centered>
           <ErrorState 
-            title="데이터를 불러올 수 없습니다" 
-            message={error.message} 
+            title="데이터를 불러올 수 없습니다"
+            message={error.message}
           />
         </Content>
       </Card>
@@ -58,7 +58,7 @@ const StatCard: React.FC<StatCardProps> = ({ data, isLoading, error }) => {
   if (!data) {
     return (
       <Card>
-        <Content>
+        <Content $centered>
           <NoDataState message="데이터가 없습니다" />
         </Content>
       </Card>
@@ -109,16 +109,16 @@ const Card = styled.div`
   box-shadow: 0px 0px 11.25px 2.25px rgba(153, 102, 204, 0.05);
 `;
 
-const Content = styled.div`
+const Content = styled.div<{ $centered?: boolean }>`
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
+  align-items: ${props => props.$centered ? 'center' : 'flex-start'};
   justify-content: center;
   height: 100%;
   padding: 0 36px;
   box-sizing: border-box;
-  text-align: left;
-  padding-bottom: 27px;
+  text-align: ${props => props.$centered ? 'center' : 'left'};
+  padding-bottom: ${props => props.$centered ? '0' : '27px'};
 `;
 
 const Title = styled.p`

@@ -1,14 +1,28 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import styled from "styled-components";
-import CompareCard from "@/components/common/document/DocumentCompareCard";
 import CommonTable from "@/components/common/table/CommonTable";
-import { useDocumentList } from "@/query/useDocumentQueries";
-import { useVersionCompare } from "@/hooks/useVersionCompare";
-import type { DocumentTableProps } from "@/types/table";
+import Pagination from "@/components/common/Pagination";
+import { 
+  useDocumentList, 
+  useDocumentSearchByCategory, 
+  useDocumentFilterByCategory
+} from "@/query/useDocumentQueries";
+import type { DocumentInfo } from "@/types/document";
 
-const DocumentTable: React.FC<DocumentTableProps> = ({ 
-  category, 
-  title, 
+interface DocumentTableProps {
+  category: 'policy' | 'glossary' | 'reportform';
+  title: string;
+  categoryImage: string;
+  onArchive?: (id: number, isArchived?: boolean) => void;
+  onVersionHistoryClick?: (fileName: string) => void;
+  onConfirmModalOpen?: (type: 'archive' | 'download', fileName: string) => void;
+  onUpdate?: (documentName: string) => void;
+  onDocumentsLoaded?: (documents: DocumentInfo[]) => void;
+}
+
+const DocumentTable: React.FC<DocumentTableProps> = ({
+  category,
+  title,
   categoryImage,
   onArchive,
   onVersionHistoryClick,
@@ -17,107 +31,173 @@ const DocumentTable: React.FC<DocumentTableProps> = ({
   onDocumentsLoaded
 }) => {
   const [currentPage, setCurrentPage] = useState(1);
-  
-  // 문서 API 쿼리 사용
-  const { data: documentData, isLoading: isLoadingDocument } = useDocumentList(currentPage, category);
-  
-  // 버전 비교 훅 사용
-  const { 
-    diffData, 
-    documentSuggestions,
-    versionOptions, 
-    isLoading, 
-    isLoadingDocuments,
-    isLoadingVersions, 
-    error, 
-    searchValue, 
-    selectedDocument,
-    setSearchValue, 
-    selectDocument,
-    compareVersions, 
-    clearError 
-  } = useVersionCompare({ documentType: category as 'policy' | 'glossary' | 'report' });
-  
-  // 로컬 상태로 검색 및 필터링 관리
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedStatus, setSelectedStatus] = useState("전체 상태");
 
-  // API 데이터에서 문서 목록 추출
-  const documentList = useMemo(() => documentData?.documentInfoResponseList || [], [documentData?.documentInfoResponseList]);
-  const totalPages = documentData?.pagingInfo?.totalPageCount || 1;
-  
+  // 데이터 모드 결정 로직
+  const dataMode = useMemo(() => {
+    const hasSearchTerm = searchTerm.trim().length > 0;
+    const hasSpecificStatus = selectedStatus !== '전체 상태';
+    
+    if (hasSearchTerm) return 'search';
+    if (hasSpecificStatus) return 'filter';
+    return 'list';
+  }, [searchTerm, selectedStatus]);
+
+  // 기본 문서 목록 쿼리
+  const { data: documentData, isLoading: isLoadingList, error: listError } = useDocumentList(
+    currentPage, 
+    category,
+    4
+  );
+
+  // 검색 쿼리
+  const { data: searchData, isLoading: isLoadingSearch, isDebouncing, error: searchError } = useDocumentSearchByCategory(
+    category,
+    searchTerm,
+    currentPage,
+    dataMode === 'search',
+    4,
+    selectedStatus
+  );
+
+  // 상태 필터링 쿼리
+  const { data: filterData, isLoading: isLoadingFilter, error: filterError } = useDocumentFilterByCategory(
+    category,
+    currentPage,
+    dataMode === 'filter',
+    4,
+    selectedStatus
+  );
+
+  // 현재 사용할 데이터 결정
+  const { currentResponse, currentLoading, currentError } = useMemo(() => {
+    switch (dataMode) {
+      case 'search':
+        return {
+          currentResponse: searchData,
+          currentLoading: isLoadingSearch || isDebouncing,
+          currentError: searchError
+        };
+      case 'filter':
+        return {
+          currentResponse: filterData,
+          currentLoading: isLoadingFilter,
+          currentError: filterError
+        };
+      default:
+        return {
+          currentResponse: documentData,
+          currentLoading: isLoadingList,
+          currentError: listError
+        };
+    }
+  }, [
+    dataMode,
+    searchData, isLoadingSearch, isDebouncing, searchError,
+    filterData, isLoadingFilter, filterError,
+    documentData, isLoadingList, listError
+  ]);
+
+  // 문서 목록과 총 페이지 수 추출
+  const { documents, totalPages } = useMemo(() => {
+    let items: DocumentInfo[] = [];
+    let pages = 1;
+
+    if (dataMode === 'search' || dataMode === 'filter') {
+      items = currentResponse?.content || [];
+      pages = currentResponse?.totalPages || 1;
+    } else {
+      items = currentResponse?.documentInfoResponseList || [];
+      pages = currentResponse?.pagingInfo?.totalPageCount || 1;
+    }
+
+    return { documents: items, totalPages: pages };
+  }, [currentResponse, dataMode]);
+
   // 문서 목록이 로드되면 부모 컴포넌트에 전달
   useEffect(() => {
-    if (onDocumentsLoaded && documentList.length > 0) {
-      onDocumentsLoaded(documentList);
+    if (onDocumentsLoaded && documents.length > 0) {
+      onDocumentsLoaded(documents);
     }
-  }, [documentList, onDocumentsLoaded]);
+  }, [documents, onDocumentsLoaded]);
   
+  // 페이지 범위 체크 및 조정
   useEffect(() => {
-    if (currentPage > totalPages) {
+    if (totalPages > 0 && currentPage > totalPages) {
       setCurrentPage(1);
     }
   }, [totalPages, currentPage]);
 
+  // 검색어, 상태가 변경되면 첫 페이지로 이동
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm, selectedStatus]);
 
+  // 페이지 변경 핸들러
+  const handlePageChange = useCallback((page: number) => {
+    setCurrentPage(page);
+  }, []);
 
-  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
+  // 검색 핸들러
+  const handleSearch = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(e.target.value);
-  };
+  }, []);
 
-  const handleStatusChange = (value: string) => {
-    setSelectedStatus(value);
-  };
+  // 상태 변경 핸들러
+  const handleStatusChange = useCallback((status: string) => {
+    setSelectedStatus(status);
+  }, []);
 
-  const handleArchive = (id: number, isArchived?: boolean) => {
+  // 보관/복원 핸들러
+  const handleArchive = useCallback((id: number, isArchived?: boolean) => {
     if (onArchive) {
       onArchive(id, isArchived);
     }
-  };
+  }, [onArchive]);
 
-  // 검색값 변경 핸들러
-  const handleSearchChange = (value: string) => {
-    setSearchValue(value);
-    // 에러가 있다면 새로운 검색 시 클리어
-    if (error) {
-      clearError();
-    }
-  };
+  // 변환된 문서 목록
+  const transformedDocuments = useMemo(() => 
+    documents.map(doc => ({
+      documentId: doc.documentId,
+      documentName: doc.documentName,
+      category: doc.category,
+      latestVersion: doc.latestVersion,
+      uploaderName: doc.uploaderName,
+      lastUpdatedAt: doc.lastUpdatedAt,
+      isActive: doc.isActive,
+      fileUrl: doc.fileUrl,
+    })), [documents]
+  );
 
-  // 문서 선택 핸들러
-  const handleDocumentSelect = (documentName: string) => {
-    selectDocument(documentName);
-    if (error) {
-      clearError();
-    }
-  };
+  // 로딩 상태일 때는 빈 배열 전달 (EmptyState가 표시됨)
+  const displayDocuments = currentLoading ? [] : transformedDocuments;
 
-  // 히스토리 뷰 처리
-  const handleHistoryView = () => {
-    if (error) {
-      clearError();
-    }
-  };
+  // 모달 객체
+  const modals = useMemo(() => ({
+    confirmModal: {
+      open: onConfirmModalOpen || (() => {})
+    },
+    handleVersionHistoryClick: onVersionHistoryClick || (() => {})
+  }), [onConfirmModalOpen, onVersionHistoryClick]);
+
+  // 에러 처리
+  if (currentError && !currentLoading) {
+    console.error('Document Table Error:', currentError);
+  }
 
   return (
     <Container>
-      <CompareCard 
-        documentSuggestions={documentSuggestions}
-        versionOptions={versionOptions}
-        onSearchChange={handleSearchChange}
-        onDocumentSelect={handleDocumentSelect}
-        onVersionCompare={compareVersions}
-        onHistoryView={handleHistoryView}
-        diffData={diffData}
-        isLoading={isLoading}
-        isLoadingDocuments={isLoadingDocuments}
-        isLoadingVersions={isLoadingVersions}
-        searchValue={searchValue}
-        selectedDocument={selectedDocument}
-      />
+      {/* 에러 상태 표시 */}
+      {currentError && !currentLoading && (
+        <ErrorMessage>
+          문서를 불러오는 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.
+        </ErrorMessage>
+      )}
+      
       <CommonTable
         title={`${title} 목록`}
-        items={documentList}
+        items={displayDocuments}
         searchTerm={searchTerm}
         selectedStatus={selectedStatus}
         onSearchChange={handleSearch}
@@ -125,14 +205,21 @@ const DocumentTable: React.FC<DocumentTableProps> = ({
         onArchive={handleArchive}
         onUpdate={onUpdate}
         categoryImage={categoryImage}
-        modals={{
-          confirmModal: {
-            open: onConfirmModalOpen || (() => {})
-          },
-          handleVersionHistoryClick: onVersionHistoryClick
-        }}
-        isLoading={isLoadingDocument}
+        modals={modals}
+        isLoading={currentLoading}
       />
+
+      {/* 페이지네이션 - 로딩 중이 아니고 페이지가 1개 이상일 때만 표시 */}
+      {!currentLoading && totalPages > 1 && (
+        <PaginationContainer>
+          <Pagination
+            key={`${category}-${totalPages}-${dataMode}`}
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={handlePageChange}
+          />
+        </PaginationContainer>
+      )}
     </Container>
   );
 };
@@ -144,4 +231,25 @@ const Container = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
+`;
+
+const ErrorMessage = styled.div`
+  width: 100%;
+  max-width: 1056px;
+  padding: 16px;
+  margin-bottom: 16px;
+  background-color: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: 8px;
+  color: #dc2626;
+  text-align: center;
+  font-size: 14px;
+`;
+
+const PaginationContainer = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 4px;
+  margin-bottom: 24px;
 `;

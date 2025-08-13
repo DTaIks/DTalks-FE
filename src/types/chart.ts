@@ -1,5 +1,4 @@
 // 차트 관련 컴포넌트 Props 타입들
-
 // API 응답 데이터 타입들
 export interface DailyConversationData {
   date: string;

@@ -1,0 +1,184 @@
+name: Deploy to Kakao Object Storage
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci --no-audit
+
+      - name: Build app (vite only, no tsc)
+        run: npx vite build --mode development
+        env:
+          DISABLE_ESLINT_PLUGIN: true
+          GENERATE_SOURCEMAP: false
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist-files
+          path: dist/
+          retention-days: 1
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      KAKAO_REGION: ${{ secrets.KAKAO_REGION }}
+      KAKAO_PROJECT_ID: ${{ secrets.KAKAO_PROJECT_ID }}
+      KAKAO_BUCKET: ${{ secrets.KAKAO_BUCKET }}
+      KAKAO_IAM_ACCESS_KEY_ID: ${{ secrets.KAKAO_IAM_ACCESS_KEY_ID }}
+      KAKAO_IAM_SECRET_KEY: ${{ secrets.KAKAO_IAM_SECRET_KEY }}
+      OBJECT_PREFIX: dist
+       
+    steps:
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: dist-files
+          path: dist/
+
+      - name: Install tools
+        run: |
+          sudo apt-get update -y
+          sudo apt-get install -y jq file
+
+      - name: Issue API token
+        id: auth
+        shell: bash
+        run: |
+          set -e
+          if [ -z "${KAKAO_IAM_ACCESS_KEY_ID}" ] || [ -z "${KAKAO_IAM_SECRET_KEY}" ]; then
+            echo "KAKAO_IAM_ACCESS_KEY_ID or KAKAO_IAM_SECRET_KEY is missing"
+            exit 1
+          fi
+          AUTH_PAYLOAD=$(cat <<JSON
+          {
+            "auth": {
+              "identity": {
+                "methods": ["application_credential"],
+                "application_credential": {
+                  "id": "${KAKAO_IAM_ACCESS_KEY_ID}",
+                  "secret": "${KAKAO_IAM_SECRET_KEY}"
+                }
+              }
+            }
+          }
+          JSON
+          )
+          RESP_FILE=$(mktemp)
+          HEADERS_FILE=$(mktemp)
+          HTTP_CODE=$(curl -sS -o "$RESP_FILE" -D "$HEADERS_FILE" -w "%{http_code}" \
+            -X POST "https://iam.kakaocloud.com/identity/v3/auth/tokens" \
+            -H "Content-Type: application/json" \
+            -H "Accept: application/json" \
+            -d "$AUTH_PAYLOAD")
+          TOKEN=$(grep -i '^x-subject-token:' "$HEADERS_FILE" | awk -F': ' '{print $2}' | tr -d '\r')
+          if [ -z "$TOKEN" ]; then
+            echo "Failed to get X-Subject-Token (HTTP $HTTP_CODE)"
+            echo "---- response headers ----"
+            cat "$HEADERS_FILE" || true
+            echo "---- response body ----"
+            cat "$RESP_FILE" || true
+            exit 1
+          fi
+          echo "token=$TOKEN" >> $GITHUB_OUTPUT
+
+      - name: Ensure bucket exists
+        run: |
+          set -e
+          BASE_URL="https://objectstorage.${KAKAO_REGION}.kakaocloud.com/v1/${KAKAO_PROJECT_ID}/${KAKAO_BUCKET}"
+          # Create container if not exists (Swift: PUT on container path)
+          curl -s -o /dev/null -w "%{http_code}" -X PUT "$BASE_URL" \
+            -H "X-Auth-Token: ${{ steps.auth.outputs.token }}" \
+            || true
+
+      - name: Upload dist to bucket (overwrite)
+        run: |
+          set -e
+          BASE_URL="https://objectstorage.${KAKAO_REGION}.kakaocloud.com/v1/${KAKAO_PROJECT_ID}/${KAKAO_BUCKET}"
+          if [ -n "${OBJECT_PREFIX}" ]; then
+            BASE_PATH="${BASE_URL}/${OBJECT_PREFIX}"
+          else
+            BASE_PATH="${BASE_URL}"
+          fi
+          
+          # Function to get Content-Type by file extension
+          get_content_type() {
+            local file_path="$1"
+            case "${file_path##*.}" in
+              css) echo "text/css" ;;
+              js|mjs) echo "application/javascript" ;;
+              json) echo "application/json" ;;
+              html|htm) echo "text/html" ;;
+              svg) echo "image/svg+xml" ;;
+              png) echo "image/png" ;;
+              jpg|jpeg) echo "image/jpeg" ;;
+              gif) echo "image/gif" ;;
+              webp) echo "image/webp" ;;
+              ico) echo "image/x-icon" ;;
+              woff) echo "font/woff" ;;
+              woff2) echo "font/woff2" ;;
+              ttf) echo "font/ttf" ;;
+              otf) echo "font/otf" ;;
+              eot) echo "application/vnd.ms-fontobject" ;;
+              map) echo "application/json" ;;
+              txt) echo "text/plain" ;;
+              xml) echo "application/xml" ;;
+              pdf) echo "application/pdf" ;;
+              zip) echo "application/zip" ;;
+              *) echo "application/octet-stream" ;;
+            esac
+          }
+          
+          find dist -type f ! -name 'index.html' -print0 | while IFS= read -r -d '' file; do
+            REL_PATH="${file#dist/}"
+            MIME_TYPE=$(get_content_type "$REL_PATH")
+            if [[ "$REL_PATH" =~ \.[0-9a-fA-F]{8,}\.(js|css|svg|png|jpg|jpeg|gif|webp|ico|map)$ ]]; then
+              CACHE_CONTROL="public, max-age=31536000, immutable"
+            else
+              CACHE_CONTROL="no-cache, no-store, must-revalidate"
+            fi
+            echo "Uploading ${OBJECT_PREFIX:+$OBJECT_PREFIX/}$REL_PATH (type: $MIME_TYPE, cache: $CACHE_CONTROL)"
+            curl --fail -s -X PUT "$BASE_PATH/$REL_PATH" \
+              -H "X-Auth-Token: ${{ steps.auth.outputs.token }}" \
+              -H "Content-Type: $MIME_TYPE" \
+              -H "Cache-Control: $CACHE_CONTROL" \
+              --data-binary @"$file" \
+              -o /dev/null || { echo "Failed to upload $REL_PATH"; exit 1; }
+          done
+
+          if [ -f dist/index.html ]; then
+            MIME_TYPE="text/html"
+            CACHE_CONTROL="no-cache, no-store, must-revalidate"
+            echo "Uploading ${OBJECT_PREFIX:+$OBJECT_PREFIX/}index.html (type: $MIME_TYPE, cache: $CACHE_CONTROL)"
+            curl --fail -s -X PUT "$BASE_PATH/index.html" \
+              -H "X-Auth-Token: ${{ steps.auth.outputs.token }}" \
+              -H "Content-Type: $MIME_TYPE" \
+              -H "Cache-Control: $CACHE_CONTROL" \
+              --data-binary @"dist/index.html" \
+              -o /dev/null || { echo "Failed to upload index.html"; exit 1; }
+          fi
+
+      - name: Done
+        run: echo "배포 완료"
