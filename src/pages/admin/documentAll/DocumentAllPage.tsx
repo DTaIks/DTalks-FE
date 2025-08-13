@@ -1,4 +1,4 @@
-import { useEffect, useCallback, useState } from "react";
+import { useEffect, useCallback, useState, useMemo } from "react";
 import styled from "styled-components";
 import TitleContainer from "@/layout/TitleContainer";
 import DocumentAllStatCard from "@/components/admin/documentAll/DocumentAllStatCard";
@@ -7,12 +7,31 @@ import Pagination from "@/components/common/Pagination";
 import ConfirmModal from "@/components/common/ConfirmModal";
 import { VersionHistoryModal } from "@/components/common/FileVersionManagementModal";
 import { useDocumentStore } from "@/store/documentStore";
-import { useDocumentAllList } from "@/query/useDocumentAllQueries";
+import { useDocumentAllList, useDocumentSearch, useDocumentFilter } from "@/query/useDocumentAllQueries";
 import { useDocumentCountByCategory, useRecentUpdateCountByCategory, useActiveDocumentCountByCategory } from "@/query/useDocumentQueries";
-
 
 // 전체 문서 관리 페이지
 const DocumentAllPage = () => {
+  const [currentPage, setCurrentPage] = useState(1);
+  const [confirmModal, setConfirmModal] = useState({ 
+    isOpen: false, 
+    type: 'archive' as 'archive' | 'download', 
+    fileName: '' 
+  });
+  const [versionModal, setVersionModal] = useState({ 
+    isOpen: false, 
+    fileName: '' 
+  });
+  
+  // 검색 및 필터 상태
+  const { 
+    searchTerm, 
+    selectedCategory, 
+    selectedStatus,
+    setSearchTerm, 
+    setSelectedCategory,
+    setSelectedStatus 
+  } = useDocumentStore();
   
   // 전체 문서 수 조회
   const { data: totalCount } = useDocumentCountByCategory('all');
@@ -42,26 +61,148 @@ const DocumentAllPage = () => {
     }
   ];
   
+  // 데이터 모드 결정
+  const dataMode = useMemo(() => {
+    const hasSearchTerm = searchTerm.trim().length > 0;
+    const hasSpecificCategory = selectedCategory !== '전체 카테고리';
+    const hasSpecificStatus = selectedStatus !== '전체 상태';
+    
+    if (hasSearchTerm) return 'search';
+    if (hasSpecificCategory && hasSpecificStatus) return 'categoryAndStatus';
+    if (hasSpecificCategory) return 'category';
+    if (hasSpecificStatus) return 'status';
+    return 'list';
+  }, [searchTerm, selectedCategory, selectedStatus]);
+
+  // 전체 문서 목록 쿼리
+  const { data: documentListData, isLoading: isListLoading, error: listError } = useDocumentAllList(
+    currentPage, 
+    4, 
+    selectedStatus
+  );
+  
+  // 문서 검색 쿼리
+  const { data: documentSearchData, isLoading: isSearchLoading, error: searchError, isDebouncing } = useDocumentSearch(
+    selectedCategory === '전체 카테고리' ? 'all' : selectedCategory,
+    searchTerm,
+    currentPage,
+    dataMode === 'search',
+    4,
+    selectedStatus
+  );
+
+  // 문서 카테고리별 필터링 쿼리 
+  const { data: documentCategoryFilterData, isLoading: isCategoryFilterLoading, error: categoryFilterError } = useDocumentFilter(
+    selectedCategory,
+    currentPage,
+    dataMode === 'category',
+    4,
+    selectedStatus
+  );
+
+  // 카테고리, 상태 조합 필터링 쿼리
+  const { data: documentCombinedFilterData, isLoading: isCombinedFilterLoading, error: combinedFilterError } = useDocumentFilter(
+    selectedCategory,
+    currentPage,
+    dataMode === 'categoryAndStatus',
+    4,
+    selectedStatus
+  );
+
+  // 상태만 필터링 쿼리
+  const { data: documentStatusFilterData, isLoading: isStatusFilterLoading, error: statusFilterError } = useDocumentAllList(
+    currentPage,
+    4,
+    selectedStatus
+  );
+
+  // 현재 사용할 데이터 결정
+  const { currentResponse, currentLoading, currentError } = useMemo(() => {
+    switch (dataMode) {
+      case 'search':
+        return {
+          currentResponse: documentSearchData,
+          currentLoading: isSearchLoading || isDebouncing,
+          currentError: searchError
+        };
+      case 'category':
+        return {
+          currentResponse: documentCategoryFilterData,
+          currentLoading: isCategoryFilterLoading,
+          currentError: categoryFilterError
+        };
+      case 'status':
+        return {
+          currentResponse: documentStatusFilterData,
+          currentLoading: isStatusFilterLoading,
+          currentError: statusFilterError
+        };
+      case 'categoryAndStatus':
+        return {
+          currentResponse: documentCombinedFilterData,
+          currentLoading: isCombinedFilterLoading,
+          currentError: combinedFilterError
+        };
+      default:
+        return {
+          currentResponse: documentListData,
+          currentLoading: isListLoading,
+          currentError: listError
+        };
+    }
+  }, [
+    dataMode, 
+    documentSearchData, isSearchLoading, isDebouncing, searchError,
+    documentCategoryFilterData, isCategoryFilterLoading, categoryFilterError,
+    documentStatusFilterData, isStatusFilterLoading, statusFilterError,
+    documentCombinedFilterData, isCombinedFilterLoading, combinedFilterError,
+    documentListData, isListLoading, listError
+  ]);
+
+  // 문서 목록과 총 페이지 수 추출
+  const { documents, totalPages } = useMemo(() => {
+    const items = currentResponse?.content || [];
+    const pages = currentResponse?.totalPages || 1;
+    return { documents: items, totalPages: pages };
+  }, [currentResponse]);
+  
   // 페이지 진입 시 전체 상태로 설정
   useEffect(() => {
     const { setSelectedStatus, setSelectedCategory } = useDocumentStore.getState();
     setSelectedStatus("전체 상태");
     setSelectedCategory("전체 카테고리");
   }, []);
-  
-  const [currentPage, setCurrentPage] = useState(1);
-  const [confirmModal, setConfirmModal] = useState({ isOpen: false, type: 'archive' as 'archive' | 'download', fileName: '' });
-  const [versionModal, setVersionModal] = useState({ isOpen: false, fileName: '' });
-  
-  // 전체 문서 쿼리 사용
-  const { data: documentData, isLoading, error } = useDocumentAllList(currentPage);
-  
-  const documents = documentData?.documentInfoResponseList || [];
-  const totalPages = documentData?.pagingInfo?.totalPageCount || 1;
+
+  // 총 페이지가 변경되었을 때 현재 페이지가 범위를 벗어나면 첫 페이지로 이동
+  useEffect(() => {
+    if (totalPages > 0 && currentPage > totalPages) {
+      setCurrentPage(1);
+    }
+  }, [totalPages, currentPage]);
+
+  // 검색어, 카테고리, 상태가 변경되면 첫 페이지로 이동
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm, selectedCategory, selectedStatus]);
   
   const handlePageChange = useCallback((page: number) => {
     setCurrentPage(page);
   }, []);
+
+  // 검색 핸들러
+  const handleSearch = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchTerm(e.target.value);
+  }, [setSearchTerm]);
+
+  // 카테고리 변경 핸들러
+  const handleCategoryChange = useCallback((category: string) => {
+    setSelectedCategory(category);
+  }, [setSelectedCategory]);
+
+  // 상태 변경 핸들러
+  const handleStatusChange = useCallback((status: string) => {
+    setSelectedStatus(status);
+  }, [setSelectedStatus]);
   
   const openConfirmModal = (type: 'archive' | 'download', fileName: string) => {
     setConfirmModal({ isOpen: true, type, fileName });
@@ -78,19 +219,11 @@ const DocumentAllPage = () => {
   const closeVersionModal = () => {
     setVersionModal({ isOpen: false, fileName: '' });
   };
-  
-  useEffect(() => {
-    if (currentPage > totalPages) {
-      handlePageChange(1);
-    }
-  }, [totalPages, currentPage, handlePageChange]);
 
   const handleConfirmAction = useCallback(() => {
     if (confirmModal.type === 'archive') {
-      // 실제 보관 처리 로직
       const { archiveDocumentItem } = useDocumentStore.getState();
-      // 파일명으로 문서 ID를 찾아서 보관 처리
-      const documentToArchive = useDocumentStore.getState().documentItems.find(
+      const documentToArchive = documents.find(
         doc => doc.documentName === confirmModal.fileName
       );
       if (documentToArchive) {
@@ -100,7 +233,7 @@ const DocumentAllPage = () => {
       console.log(`${confirmModal.fileName} 다운로드 처리`);
     }
     closeConfirmModal();
-  }, [confirmModal.type, confirmModal.fileName, closeConfirmModal]);
+  }, [confirmModal.type, confirmModal.fileName, closeConfirmModal, documents]);
 
   const modals = {
     confirmModal: {
@@ -123,8 +256,15 @@ const DocumentAllPage = () => {
       <DocumentAllTable 
         documents={documents}
         modals={modals}
-        isLoading={isLoading}
-        error={error}
+        isLoading={currentLoading}
+        error={currentError}
+        isSearchMode={dataMode === 'search'}
+        searchTerm={searchTerm}
+        selectedCategory={selectedCategory}
+        selectedStatus={selectedStatus} 
+        onSearch={handleSearch}
+        onCategoryChange={handleCategoryChange}
+        onStatusChange={handleStatusChange} 
       />
       {totalPages >= 1 && (
         <PaginationContainer>
@@ -181,5 +321,3 @@ const PaginationContainer = styled.div`
   margin-top: 4px;
   margin-bottom: 24px;
 `;
-
-

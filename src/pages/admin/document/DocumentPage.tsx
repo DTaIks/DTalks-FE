@@ -14,13 +14,32 @@ import DocumentCategory1 from "@/assets/document/DocumentCategory1.svg";
 import DocumentCategory2 from "@/assets/document/DocumentCategory2.svg";
 import DocumentCategory3 from "@/assets/document/DocumentCategory3.svg";
 
+// 추가된 타입 정의들
+interface CategoryConfig {
+  title: string;
+  subtitle: string;
+  image: string;
+}
+
+type CategoryKey = 'policy' | 'glossary' | 'reportform';
+
+interface VersionModalState {
+  isOpen: boolean;
+  fileName: string;
+}
+
 // 통합 문서 관리 페이지
 const DocumentPage = () => {
   const { category } = useParams<{ category: string }>();
-  const [versionModal, setVersionModal] = useState({ isOpen: false, fileName: '' });
+  const [versionModal, setVersionModal] = useState<VersionModalState>({ 
+    isOpen: false, 
+    fileName: '' 
+  });
+  
+
 
   // 카테고리별 설정
-  const categoryConfig = {
+  const categoryConfig: Record<CategoryKey, CategoryConfig> = {
     'policy': {
       title: "사내 정책",
       subtitle: "모든 사내 정책 문서를 한 번에 확인하고 정리하세요",
@@ -42,7 +61,7 @@ const DocumentPage = () => {
   const { handleArchiveByFileName } = useCommonHandlers({
     modals: {
       confirmModal: {
-        open: () => {} // 실제로는 사용하지 않음
+        open: () => {} 
       },
       versionModal: {
         open: (fileName: string) => setVersionModal({ isOpen: true, fileName }),
@@ -52,7 +71,7 @@ const DocumentPage = () => {
     }
   });
 
-  // 파일 업로드 hook 사용
+  // 파일 업로드 훅
   const {
     uploadModal,
     confirmModal,
@@ -65,19 +84,17 @@ const DocumentPage = () => {
   } = useFileUpload({
     pageType: category as 'policy' | 'glossary' | 'report',
     onUpload: () => {
-      // 파일 업로드 처리
     },
     onEdit: () => {
-      // 파일 수정 처리
     },
     onArchive: handleArchiveByFileName,
     onDownload: () => {
-      // 다운로드 처리
     }
   });
 
+
+
   const handleArchive = useCallback((id: number) => {
-    // 보관 처리 로직
     console.log('보관 처리:', id);
   }, []);
 
@@ -86,16 +103,19 @@ const DocumentPage = () => {
   }, []);
 
   const handleConfirmModalOpen = useCallback((type: 'archive' | 'download', fileName: string) => {
-    // confirmModal 열기 로직
     console.log(`${type} 모달 열기:`, fileName);
   }, []);
 
-  // 유효하지 않은 카테고리인 경우 리다이렉트
-  if (!category || !categoryConfig[category as keyof typeof categoryConfig]) {
+  // 타입 가드 함수
+  const isValidCategory = (cat: string | undefined): cat is CategoryKey => {
+    return cat !== undefined && Object.keys(categoryConfig).includes(cat);
+  };
+
+  if (!category || !isValidCategory(category)) {
     return <Navigate to="/admin/documents" replace />;
   }
 
-  const config = categoryConfig[category as keyof typeof categoryConfig];
+  const config = categoryConfig[category];
 
   return (
     <Container>
@@ -111,8 +131,10 @@ const DocumentPage = () => {
         </ButtonContainer>
       </HeaderWrapper>
       
+
+      
       <DocumentTable
-        category={category as 'policy' | 'glossary' | 'reportform'}
+        category={category}
         title={config.title}
         categoryImage={config.image}
         onArchive={handleArchive}
@@ -173,10 +195,7 @@ const ButtonContainer = styled.div`
 const StyledButton = styled(Button)`
   && {
     color: var(--color-white);
-    font-family: var(--font-pretendard);
     font-size: var(--font-size-18);
-    font-style: normal;
     font-weight: var(--table-header-font-weight);
-    line-height: normal;
   }
 `;

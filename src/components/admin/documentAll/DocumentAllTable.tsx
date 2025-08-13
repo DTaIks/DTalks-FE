@@ -17,15 +17,27 @@ interface DocumentAllTableProps {
   };
   isLoading?: boolean;
   error?: Error | null;
+  isSearchMode?: boolean;
+  searchTerm?: string;
+  selectedCategory?: string;
+  selectedStatus?: string; 
+  onSearch?: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  onCategoryChange?: (category: string) => void;
+  onStatusChange?: (status: string) => void; 
 }
 
-const DocumentAllTable: React.FC<DocumentAllTableProps> = ({ 
+const DocumentAllTable: React.FC<DocumentAllTableProps> = ({
   documents,
   modals,
   isLoading = false,
-  error = null
+  error = null,
+  searchTerm = "",
+  selectedCategory = "",
+  selectedStatus = "", 
+  onSearch,
+  onCategoryChange,
+  onStatusChange 
 }) => {
-  // API 데이터를 DocumentItem 형태로 변환
   const transformedDocuments = documents.map(doc => ({
     documentId: doc.documentId,
     documentName: doc.documentName,
@@ -38,8 +50,20 @@ const DocumentAllTable: React.FC<DocumentAllTableProps> = ({
   }));
 
   const handleArchive = useCallback(() => {
-    // 보관 처리 로직 (API 연동 필요)
   }, []);
+
+  const handleSearchChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    onSearch?.(e);
+  }, [onSearch]);
+
+  const handleCategoryChange = useCallback((category: string) => {
+    onCategoryChange?.(category);
+  }, [onCategoryChange]);
+
+  // 상태 변경 핸들러 추가
+  const handleStatusChange = useCallback((status: string) => {
+    onStatusChange?.(status);
+  }, [onStatusChange]);
 
   // 로딩 상태일 때는 빈 배열 전달 (EmptyState가 표시됨)
   const displayDocuments = isLoading ? [] : transformedDocuments;
@@ -48,12 +72,12 @@ const DocumentAllTable: React.FC<DocumentAllTableProps> = ({
     <DocumentCommonTable
       title="문서 목록"
       documents={displayDocuments}
-      searchTerm=""
-      selectedCategory="전체 카테고리"
-      selectedStatus="전체 상태"
-      onSearchChange={() => {}}
-      onCategoryChange={() => {}}
-      onStatusChange={() => {}}
+      searchTerm={searchTerm}
+      selectedCategory={selectedCategory}
+      selectedStatus={selectedStatus} 
+      onSearchChange={handleSearchChange}
+      onCategoryChange={handleCategoryChange}
+      onStatusChange={handleStatusChange}
       onArchive={handleArchive}
       modals={modals}
       error={error}
