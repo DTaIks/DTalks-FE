@@ -27,7 +27,7 @@ jobs:
         run: npm ci --no-audit
 
       - name: Build app
-        run: npm run build
+        run: npx vite build --mode development
         env:
           DISABLE_ESLINT_PLUGIN: true
           GENERATE_SOURCEMAP: false
