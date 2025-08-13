@@ -61,37 +61,43 @@ jobs:
           sudo apt-get update -y
           sudo apt-get install -y jq file
 
-      - name: Issue API token
+      - name: Issue API token (by access key id/secret)
         id: auth
         shell: bash
         run: |
           set -e
-          AUTH_PAYLOAD=$(cat <<'JSON'
+          if [ -z "${KAKAO_IAM_ACCESS_KEY_ID}" ] || [ -z "${KAKAO_IAM_SECRET_KEY}" ]; then
+            echo "KAKAO_IAM_ACCESS_KEY_ID or KAKAO_IAM_SECRET_KEY is missing"
+            exit 1
+          fi
+          AUTH_PAYLOAD=$(cat <<JSON
           {
-              "auth": {
-                  "identity": {
-                      "methods": [
-                          "application_credential"
-                      ],
-                      "application_credential": {
-                          "id": "${KAKAO_IAM_ACCESS_KEY_ID}",
-                          "secret": "${KAKAO_IAM_SECRET_KEY}"
-                      }
-                  }
+            "auth": {
+              "identity": {
+                "methods": ["application_credential"],
+                "application_credential": {
+                  "id": "${KAKAO_IAM_ACCESS_KEY_ID}",
+                  "secret": "${KAKAO_IAM_SECRET_KEY}"
+                }
               }
+            }
           }
           JSON
           )
+          RESP_FILE=$(mktemp)
           HEADERS_FILE=$(mktemp)
           curl -s -i -X POST "https://iam.kakaocloud.com/identity/v3/auth/tokens" \
             -H "Content-Type: application/json" \
+            -H "Accept: application/json" \
             -d "$AUTH_PAYLOAD" \
-            -o /dev/null -D "$HEADERS_FILE"
+            -o "$RESP_FILE" -D "$HEADERS_FILE"
           TOKEN=$(awk '/^X-Subject-Token:/ {print $2}' "$HEADERS_FILE" | tr -d '\r')
           if [ -z "$TOKEN" ]; then
             echo "Failed to get X-Subject-Token"
-            echo "---- headers ----"
-            cat "$HEADERS_FILE"
+            echo "---- response body ----"
+            cat "$RESP_FILE" || true
+            echo "---- response headers ----"
+            cat "$HEADERS_FILE" || true
             exit 1
           fi
           echo "token=$TOKEN" >> $GITHUB_OUTPUT
