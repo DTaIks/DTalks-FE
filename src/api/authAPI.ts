@@ -1,12 +1,12 @@
-import { apiInstance } from './apiInstance';
-import type { 
-  LoginRequest, 
-  LoginResponse, 
-  SignUpRequest, 
-  SignUpResponse, 
-  TokenReissueResponse, 
-  EmailValidationResponse 
+import type {
+  EmailValidationResponse,
+  LoginRequest,
+  LoginResponse,
+  SignUpRequest,
+  SignUpResponse,
+  TokenReissueResponse
 } from '@/types/auth';
+import { apiInstance } from './apiInstance';
 
 export const authAPI = {
   login: async (data: LoginRequest): Promise<LoginResponse> => {
@@ -208,6 +208,35 @@ export const authAPI = {
         axiosError?.response?.data?.message ||
         axiosError?.response?.data?.error ||
         axiosError?.message || '비밀번호 재설정 중 오류가 발생했습니다.'
+      );
+    }
+  },
+
+  // 프로필 조회 API
+  getProfile: async (): Promise<{ name: string }> => {
+    try {
+      const response = await apiInstance.get('/admin/profile');
+      console.log('프로필 API 응답:', response.data);
+      
+      // 다양한 응답 구조 처리
+      if (response.data && typeof response.data === 'object') {
+        if (response.data.name) {
+          return { name: response.data.name };
+        } else if (response.data.data && response.data.data.name) {
+          return { name: response.data.data.name };
+        }
+      }
+      
+      // 기본값 반환
+      return { name: 'admin' };
+    } catch (error: unknown) {
+      console.error('프로필 조회 에러:', error);
+      const axiosError = error as { response?: { status?: number; data?: { message?: string; error?: string }; headers?: Record<string, unknown> }; message?: string };
+
+      throw new Error(
+        axiosError?.response?.data?.message ||
+        axiosError?.response?.data?.error ||
+        axiosError?.message || '프로필 조회 중 오류가 발생했습니다.'
       );
     }
   },
