@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import styled from 'styled-components';
 import { useCompareStore } from '@/store/compareStore';
 import { type VersionDiffItem } from '@/components/common/document/DocumentVersionDiffList';
-import { useSearchDocumentsByName, useDocumentVersions } from '@/query/useDocumentQueries';
+import { useSearchDocumentsByName, useDocumentVersions, useDocumentVersionCompare } from '@/query/useDocumentQueries';
 import DocumentSearch from './DocumentSearch';
 import VersionCompareSection from './DocumentVersionCompare';
 import VersionHistorySection from './DocumentVersionHistory';
@@ -16,17 +16,13 @@ interface DocumentInfo {
 interface CompareCardProps {
   category: 'policy' | 'glossary' | 'reportform';
   onVersionCompare?: (documentName: string, version1: string, version2: string) => void;
-  diffData?: VersionDiffItem[];
-  isComparingVersions?: boolean;
 }
 
 type TabType = 'compare' | 'history';
 
 const CompareCard: React.FC<CompareCardProps> = ({
   category,
-  onVersionCompare,
-  diffData = [],
-  isComparingVersions = false
+  onVersionCompare
 }) => {
   const { activeTab, setActiveTab } = useCompareStore();
   const [searchValue, setSearchValue] = useState('');
@@ -34,9 +30,21 @@ const CompareCard: React.FC<CompareCardProps> = ({
   const [compareResult, setCompareResult] = useState<{
     version1: string;
     version2: string;
-  }>({ version1: '', version2: '' });
+    diffData: VersionDiffItem[];
+    compareStats?: {
+      insertCount: number;
+      deleteCount: number;
+      originalVersion: number;
+      revisedVersion: number;
+    };
+  }>({ 
+    version1: '', 
+    version2: '', 
+    diffData: [],
+    compareStats: undefined
+  });
 
-  // 문서 검색 API 호출
+  // 문서 검색
   const {
     data: searchData,
     isLoading: isLoadingDocuments,
@@ -57,6 +65,9 @@ const CompareCard: React.FC<CompareCardProps> = ({
     !!selectedDocument
   );
 
+  // 버전 비교 뮤테이션
+  const versionCompareMutation = useDocumentVersionCompare();
+
   // 문서 검색 결과를 DocumentInfo 형태로 변환
   const documentSuggestions: DocumentInfo[] = React.useMemo(() => {
     if (!searchData?.documents) return [];
@@ -74,7 +85,11 @@ const CompareCard: React.FC<CompareCardProps> = ({
     
     return versionData.versions.map(version => ({
       value: version.versionId.toString(),
-      label: `v ${version.versionNumber}`
+      label: `v ${version.versionNumber}`,
+      versionId: version.versionId,
+      versionNumber: version.versionNumber,
+      createdAt: version.createdAt,
+      uploader: version.uploader
     }));
   }, [versionData]);
 
@@ -86,20 +101,65 @@ const CompareCard: React.FC<CompareCardProps> = ({
     setSearchValue(value);
     if (selectedDocument && !value.includes(selectedDocument)) {
       setSelectedDocument('');
-      setCompareResult({ version1: '', version2: '' });
+      setCompareResult({ 
+        version1: '', 
+        version2: '', 
+        diffData: [],
+        compareStats: undefined
+      });
     }
   };
 
   const handleDocumentSelect = (documentName: string) => {
     setSelectedDocument(documentName);
     setSearchValue(documentName);
-    setCompareResult({ version1: '', version2: '' });
+    setCompareResult({ 
+      version1: '', 
+      version2: '', 
+      diffData: [],
+      compareStats: undefined
+    });
   };
 
-  const handleVersionCompare = (documentName: string, version1: string, version2: string) => {
-    setCompareResult({ version1, version2 });
-    onVersionCompare?.(documentName, version1, version2);
-    setActiveTab('history');
+  const handleVersionCompare = async (documentName: string, version1: string, version2: string) => {
+    if (!versionData?.documentInfo?.documentId) {
+      console.error('문서 ID를 찾을 수 없습니다.');
+      return;
+    }
+
+    try {
+      const compareResponse = await versionCompareMutation.mutateAsync({
+        fileId: versionData.documentInfo.documentId,
+        oldVersionId: parseInt(version1),
+        newVersionId: parseInt(version2)
+      });
+
+      const diffData: VersionDiffItem[] = compareResponse.diff.map(item => ({
+        lineNumber: item.lineNumber,
+        changeType: item.changeType,
+        content: item.content
+      }));
+
+      setCompareResult({
+        version1,
+        version2,
+        diffData,
+        compareStats: {
+          insertCount: compareResponse.insertCount,
+          deleteCount: compareResponse.deleteCount,
+          originalVersion: compareResponse.originalVersion,
+          revisedVersion: compareResponse.revisedVersion
+        }
+      });
+
+      // 외부 콜백 호출
+      onVersionCompare?.(documentName, version1, version2);
+      
+      // 히스토리 탭으로 자동 전환
+      setActiveTab('history');
+    } catch (error) {
+      console.error('버전 비교 실패:', error);
+    }
   };
 
   // 검색 중이거나 버전 로딩 중인 상태 계산
@@ -137,7 +197,7 @@ const CompareCard: React.FC<CompareCardProps> = ({
             <VersionCompareSection
               versionOptions={versionOptions}
               isLoadingVersions={isLoadingVersions}
-              isLoading={isComparingVersions}
+              isLoading={versionCompareMutation.isPending}
               selectedDocument={selectedDocument}
               onVersionCompare={handleVersionCompare}
             />
@@ -146,8 +206,8 @@ const CompareCard: React.FC<CompareCardProps> = ({
         
         {activeTab === 'history' && (
           <VersionHistorySection
-            diffData={diffData}
-            isLoading={isComparingVersions}
+            diffData={compareResult.diffData}
+            isLoading={versionCompareMutation.isPending}
             selectedDocument={selectedDocument}
             version1={compareResult.version1}
             version2={compareResult.version2}
@@ -162,7 +222,7 @@ export default CompareCard;
 
 const Container = styled.div<{ $activeTab: TabType }>`
   width: 1062px;
-  height: ${props => props.$activeTab === 'history' ? '650px' : '140px'};
+  height: ${props => props.$activeTab === 'history' ? '800px' : '140px'};
   flex-shrink: 0;
   border-radius: 18px;
   background: #FFF;
