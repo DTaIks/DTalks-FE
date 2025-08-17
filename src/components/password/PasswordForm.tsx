@@ -69,7 +69,7 @@ export default function PasswordForm(): JSX.Element {
         <InputField
           variant="signup"
           label="새 비밀번호"
-          placeholder="문자, 숫자, 특수문자 포함 8자~20자"
+          placeholder="대소문자, 숫자, 특수문자 포함 8자~20자"
           inputProps={{
             type: "password",
             ...register('password')
