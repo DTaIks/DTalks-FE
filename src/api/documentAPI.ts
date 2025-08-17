@@ -87,14 +87,18 @@ export interface DocumentVersionCompareResponse {
 }
 
 export const documentAPI = {
-  // 문서 목록 조회 
+  // 문서 목록 조회
   getDocuments: async (params: DocumentRequest): Promise<DocumentResponse> => {
     try {
-      const { categoryName, pageNumber, pageSize = 4 } = params;
+      const { categoryName, pageNumber, pageSize = 4, status } = params;
       const queryParams = new URLSearchParams();
       
       const category = categoryName || 'all';
       queryParams.append('category', category);
+      
+      if (status) {
+        queryParams.append('status', status);
+      }
       
       if (pageNumber >= 0) {
         queryParams.append('pageNumber', pageNumber.toString());
@@ -106,7 +110,7 @@ export const documentAPI = {
       
       const url = `/admin/documents?${queryParams.toString()}`;
       const response = await apiInstance.get(url, { headers: JSON_HEADERS });
-      
+        
       return extractResponseData(response.data) as DocumentResponse;
     } catch (error) {
       return handleApiError(error, '문서 목록 조회에 실패했습니다.');
@@ -121,6 +125,10 @@ export const documentAPI = {
       pageNumber: params.pageNumber.toString(),
       pageSize: (params.pageSize ?? 4).toString()
     });
+
+    if (params.status) {
+      queryParams.append('status', params.status);
+    }
 
     try {
       const response = await apiInstance.get(`/admin/documents/search?${queryParams.toString()}`, { headers: JSON_HEADERS });

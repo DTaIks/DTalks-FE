@@ -3,31 +3,57 @@ import { documentAPI, type DocumentVersionCompareRequest } from '@/api/documentA
 import { useDebouncedSearch } from '@/hooks/useDebouncedSearch';
 import type { DocumentInfo, DocumentPagingInfo } from '@/types/document';
 
+// 상태 매핑 함수
+const mapStatusToAPIParam = (status: string): string | undefined => {
+  switch (status) {
+    case '활성':
+      return 'active';
+    case '비활성':
+      return 'inactive';
+    case '전체 상태':
+      return 'all';
+    default:
+      return undefined;
+  }
+};
+
 const filterDocumentsByStatus = (documents: DocumentInfo[], status: string): DocumentInfo[] => {
-  if (status === '전체 상태') {
+  const apiStatus = mapStatusToAPIParam(status);
+  
+  if (!apiStatus || apiStatus === 'all') {
     return documents;
   }
   
-  const isActiveFilter = status === '활성';
-  return documents.filter(doc => doc.isActive === isActiveFilter);
+  return documents.filter(doc => {
+    if (apiStatus === 'active') {
+      return doc.isActive === true;
+    } else if (apiStatus === 'inactive') {
+      return doc.isActive === false;
+    }
+    return true;
+  });
 };
 
 // 카테고리별 문서 목록 조회 쿼리
 export const useDocumentList = (
   currentPage: number, 
-  category: 'policy' | 'glossary' | 'reportform', 
-  pageSize: number = 4
+  category: 'policy' | 'glossary' | 'reportform' | 'all', 
+  pageSize: number = 4,
+  status: string = '전체 상태'
 ) => {
   const pageNumber = currentPage - 1;
+  const apiStatus = mapStatusToAPIParam(status);
 
   return useQuery({
-    queryKey: ['documentList', category, pageNumber, pageSize],
-    queryFn: async () => {
+    queryKey: ['documentList', category, pageNumber, pageSize, apiStatus],
+    queryFn: async () => {      
       const response = await documentAPI.getDocuments({
         pageNumber,
         pageSize,
-        categoryName: category
+        categoryName: category,
+        status: apiStatus
       });
+
       return {
         ...response,
         content: response.documentInfoResponseList || [],
@@ -44,21 +70,22 @@ export const useDocumentList = (
   });
 };
 
-// 카테고리별 문서 검색 쿼리 
+// 카테고리별 문서 검색 쿼리
 export const useDocumentSearchByCategory = (
-  category: 'policy' | 'glossary' | 'reportform',
+  category: 'policy' | 'glossary' | 'reportform' | 'all',
   fileName: string,
   currentPage: number,
   enabled: boolean = true,
   pageSize: number = 4,
-  status: string = '전체 상태'
+  status: string = '전체 상태',
+  refreshKey: number = 0
 ) => {
   const { debouncedValue: debouncedFileName, isDebouncing } = useDebouncedSearch(fileName, 500);
   const pageNumber = currentPage - 1;
 
   const queryResult = useQuery({
-    queryKey: ['documentSearchByCategory', category, debouncedFileName, pageNumber, status],
-    queryFn: async () => {
+    queryKey: ['documentSearchByCategory', category, debouncedFileName, pageNumber, pageSize, status, refreshKey],
+    queryFn: async () => {      
       const response = await documentAPI.searchDocuments({
         category: category,
         fileName: debouncedFileName,
@@ -73,57 +100,21 @@ export const useDocumentSearchByCategory = (
         ...response,
         content: filteredDocuments,
         totalPages: response.pagingInfo?.totalPageCount || 0,
-        totalElements: response.pagingInfo?.elementCount || 0,
-        filteredCount: filteredDocuments.length,
-        originalCount: allDocuments.length,
+        totalElements: filteredDocuments.length,
       };
     },
     enabled: enabled && debouncedFileName.trim().length > 0 && !isDebouncing,
-    staleTime: 1000 * 60 * 2,
+    staleTime: 1000 * 30, // 30초간 캐시 유지
+    gcTime: 1000 * 60 * 5, // 5분간 캐시 보관
     refetchOnWindowFocus: false,
+    refetchOnMount: true,
+    refetchOnReconnect: true,
   });
 
   return {
     ...queryResult,
     isDebouncing,
   };
-};
-
-// 카테고리별 문서 상태 필터링 쿼리
-export const useDocumentFilterByCategory = (
-  category: 'policy' | 'glossary' | 'reportform',
-  currentPage: number,
-  enabled: boolean = true,
-  pageSize: number = 4,
-  status: string = '전체 상태'
-) => {
-  const pageNumber = currentPage - 1;
-
-  return useQuery({
-    queryKey: ['documentFilterByCategory', category, pageNumber, pageSize, status],
-    queryFn: async () => {
-      const response = await documentAPI.getDocuments({
-        categoryName: category,
-        pageNumber,
-        pageSize,
-      });
-
-      const allDocuments = response.documentInfoResponseList || [];
-      const filteredDocuments = filterDocumentsByStatus(allDocuments, status);
-
-      return {
-        ...response,
-        content: filteredDocuments,
-        totalPages: response.pagingInfo?.totalPageCount || 0,
-        totalElements: response.pagingInfo?.elementCount || 0,
-        filteredCount: filteredDocuments.length,
-        originalCount: allDocuments.length,
-      };
-    },
-    enabled: enabled && status !== '전체 상태',
-    staleTime: 1000 * 60 * 5,
-    refetchOnWindowFocus: false,
-  });
 };
 
 // 카테고리별 문서 수 조회
@@ -243,7 +234,7 @@ export const useDocumentVersionHistory = (fileId: number | null) => {
   });
 };
 
-// 문서 버전 비교 뮤테이션 추가
+// 문서 버전 비교 뮤테이션
 export const useDocumentVersionCompare = () => {
   const queryClient = useQueryClient();
   
