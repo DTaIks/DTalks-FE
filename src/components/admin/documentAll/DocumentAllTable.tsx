@@ -1,6 +1,5 @@
 import React, { useCallback } from "react";
 import DocumentCommonTable from "@/components/common/table/DocumentCommonTable";
-import type { DocumentAllTableProps } from "@/types/table";
 import type { DocumentInfo } from "@/types/document";
 
 interface DocumentAllTableProps {

@@ -4,7 +4,7 @@ import type { MediaFile } from '@/types/media';
 interface UseCommonHandlersProps {
   modals: {
     confirmModal: {
-      open: (type: 'archive' | 'download', fileName: string) => void;
+      open: (type: 'archive' | 'download' | 'restore', fileName: string) => void;
     };
     uploadModal?: {
       openEdit: (initialData: { fileName: string; description: string; fileVersion: string; isPublic: boolean }) => void;
@@ -61,8 +61,10 @@ export const useCommonHandlers = ({ modals, mediaActions, documentActions }: Use
   }, [modals.confirmModal]);
 
   // 보관 버튼 클릭 핸들러 (공통)
-  const handleArchiveClick = useCallback((fileName: string) => {
-    modals.confirmModal.open('archive', fileName);
+  const handleArchiveClick = useCallback((fileName: string, isActive?: boolean) => {
+    // 문서의 상태에 따라 archive 또는 restore 타입 결정
+    const modalType = isActive ? 'archive' : 'restore';
+    modals.confirmModal.open(modalType, fileName);
   }, [modals.confirmModal]);
 
   // 버전관리 버튼 클릭 핸들러 (공통)

@@ -100,9 +100,9 @@ export const documentAPI = {
         queryParams.append('pageNumber', pageNumber.toString());
       }
       
-      if (pageSize >= 1 && pageSize <= 10) {
-        queryParams.append('pageSize', pageSize.toString());
-      }
+      // pageSize 파라미터 처리 (1-10 범위만 가능)
+      const validPageSize = Math.max(1, Math.min(10, pageSize));
+      queryParams.append('pageSize', validPageSize.toString());
       
       const url = `/admin/documents?${queryParams.toString()}`;
       const response = await apiInstance.get(url, { headers: JSON_HEADERS });
