@@ -10,8 +10,6 @@ interface UseDocumentAllActionsProps {
   setSearchTerm: (term: string) => void;
   setRefreshKey: (fn: (prev: number) => number) => void;
   isSearchMode: boolean;
-  selectedCategory: string;
-  selectedStatus: string;
   closeConfirmModal: () => void;
   closeUpdateModal: () => void;
   confirmModal: {

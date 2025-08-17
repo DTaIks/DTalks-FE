@@ -14,15 +14,8 @@ export const useDocumentAllData = () => {
   const prevCategoryRef = useRef<string>('');
   const prevSearchTermRef = useRef<string>('');
   
-  // 전역 상태
-  const { 
-    searchTerm, 
-    selectedCategory, 
-    selectedStatus,
-    setSearchTerm, 
-    setSelectedCategory,
-    setSelectedStatus 
-  } = useDocumentStore();
+  // 전역 상태 (직접 구조분해할당으로 가져오기)
+  const { searchTerm, selectedCategory, selectedStatus } = useDocumentStore();
 
   // 데이터 모드 결정
   const dataMode = useMemo(() => {
@@ -155,6 +148,7 @@ export const useDocumentAllData = () => {
     return { documents: items, totalPages: pages };
   }, [currentResponse]);
 
+  // 페이지 관련 useEffect들
   useEffect(() => {
     if (totalPages > 0 && currentPage > totalPages) {
       setCurrentPage(1);
@@ -179,14 +173,6 @@ export const useDocumentAllData = () => {
     currentError,
     dataMode,
     isSearchMode,
-    
-    // 전역 상태
-    searchTerm,
-    selectedCategory,
-    selectedStatus,
-    setSearchTerm,
-    setSelectedCategory,
-    setSelectedStatus,
     
     // 유틸리티
     queryClient,

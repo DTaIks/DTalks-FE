@@ -10,12 +10,24 @@ import DocumentUploadModal from "@/components/common/DocumentUploadModal";
 import { useDocumentStore } from "@/store/documentStore";
 import { useDocumentCountByCategory, useRecentUpdateCountByCategory, useActiveDocumentCountByCategory } from "@/query/useDocumentQueries";
 
+// 분리된 훅들 import
 import { useDocumentAllData } from "@/hooks/document/useDocumentAllData";
 import { useDocumentAllModals } from "@/hooks/document/useDocumentAllModals";
 import { useDocumentAllActions } from "@/hooks/document/usdDocumentAllActions";
 
+// 전체 문서 관리 페이지
 const DocumentAllPage = () => {
-  // 데이터 관리
+  // 전역 상태 직접 사용
+  const {
+    searchTerm,
+    selectedCategory,
+    selectedStatus,
+    setSearchTerm,
+    setSelectedCategory,
+    setSelectedStatus,
+  } = useDocumentStore();
+
+  // 1. 데이터 관리
   const {
     currentPage,
     setCurrentPage,
@@ -25,15 +37,9 @@ const DocumentAllPage = () => {
     currentLoading,
     currentError,
     isSearchMode,
-    searchTerm,
-    selectedCategory,
-    selectedStatus,
-    setSearchTerm,
-    setSelectedCategory,
-    setSelectedStatus,
   } = useDocumentAllData();
 
-  // 모달 관리
+  // 2. 모달 관리
   const {
     confirmModal,
     versionModal,
@@ -46,7 +52,7 @@ const DocumentAllPage = () => {
     closeUpdateModal,
   } = useDocumentAllModals(documents);
 
-  // 액션 핸들러
+  // 3. 액션 핸들러
   const {
     handleSearch,
     handleCategoryChange,
@@ -61,15 +67,13 @@ const DocumentAllPage = () => {
     setSearchTerm,
     setRefreshKey,
     isSearchMode,
-    selectedCategory,
-    selectedStatus,
     closeConfirmModal,
     closeUpdateModal,
     confirmModal,
     updateModal,
   });
 
-  // 통계 데이터
+  // 4. 통계 데이터
   const { data: totalCount } = useDocumentCountByCategory('all');
   const { data: recentUpdateCount } = useRecentUpdateCountByCategory('all');
   const { data: activeCount } = useActiveDocumentCountByCategory('all');
@@ -92,19 +96,19 @@ const DocumentAllPage = () => {
     }
   ], [totalCount, recentUpdateCount, activeCount]);
 
-  // 초기 설정
+  // 5. 초기 설정
   useEffect(() => {
     const { setSelectedStatus, setSelectedCategory } = useDocumentStore.getState();
     setSelectedStatus("전체 상태");
     setSelectedCategory("전체 카테고리");
   }, []);
 
-  // 페이지 변경 핸들러
+  // 6. 페이지 변경 핸들러
   const handlePageChange = useCallback((page: number) => {
     setCurrentPage(page);
   }, [setCurrentPage]);
 
-  // 모달 객체
+  // 7. 모달 객체
   const modals = useMemo(() => ({
     confirmModal: {
       open: openConfirmModal,
@@ -186,6 +190,7 @@ const DocumentAllPage = () => {
 
 export default DocumentAllPage;
 
+// 스타일드 컴포넌트들
 const Container = styled.div`
   width: 100%;
   height: 100%;
