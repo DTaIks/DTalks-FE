@@ -28,6 +28,7 @@ export interface DocumentRequest {
   categoryName?: string;
   pageNumber: number;
   pageSize?: number;
+  status?: string;
 }
 
 export interface DocumentSearchRequest {
@@ -35,6 +36,7 @@ export interface DocumentSearchRequest {
   fileName: string;
   pageNumber: number;
   pageSize?: number;
+  status?: string;
 }
 
 // 문서 버전 관리 관련 수정된 타입들
@@ -57,12 +59,12 @@ export interface DocumentVersionResponse {
 
 // 버전 선택용 옵션 타입
 export interface VersionOption {
-  value: string;         
-  label: string;       
-  versionId: number;    
-  versionNumber: string;  
-  createdAt: string;     
-  uploader: string;     
+  value: string;
+  label: string;
+  versionId: number;
+  versionNumber: string;
+  createdAt: string;
+  uploader: string;
 }
 
 // 문서 정보 (검색용)
@@ -75,3 +77,6 @@ export interface DocumentSearchInfo {
 
 // 카테고리 매핑용 타입
 export type CategoryType = 'policy' | 'glossary' | 'reportform';
+
+// 상태 타입 추가
+export type DocumentStatusType = 'active' | 'inactive' | 'all';
