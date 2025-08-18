@@ -95,8 +95,8 @@ const DocumentTable: React.FC<DocumentTableProps> = ({
     if (documents.length === 0) {
       return (
         <EmptyState 
-          message={error ? "문서 목록을 불러오는데 실패했습니다." : "표시할 문서가 없습니다"}
-          subMessage={error ? "잠시 후 다시 시도해주세요." : "업로드된 문서가 없거나 필터 조건에 맞는 문서가 없습니다."}
+          message={error ? "문서 목록을 불러오는데 실패했습니다." : "접근 권한이 없습니다."}
+          subMessage={error ? "잠시 후 다시 시도해주세요." : "권한을 확인해주세요."}
         />
       );
     }

@@ -89,8 +89,8 @@ const CommonTable: React.FC<CommonTableProps> = ({
     if (items.length === 0) {
       return (
         <EmptyState 
-          message={searchTerm ? "검색 결과가 없습니다." : "표시할 문서가 없습니다"}
-          subMessage={searchTerm ? "다른 검색어를 입력해보세요." : "업로드된 문서가 없거나 필터 조건에 맞는 문서가 없습니다."}
+          message={searchTerm ? "검색 결과가 없습니다." : "접근 권한이 없습니다."}
+          subMessage={searchTerm ? "다른 검색어를 입력해보세요." : "권한을 확인해주세요."}
         />
       );
     }
