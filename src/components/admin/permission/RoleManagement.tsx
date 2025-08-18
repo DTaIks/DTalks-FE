@@ -42,7 +42,8 @@ const RoleManagement = ({ open, onClose, selectedUser }: RoleManagementProps) =>
       setIsSearchMode(false);
       resetError(); // 에러 상태 리셋
     }
-  }, [open, clearSelectedUserIds, clearExcludedUserIds, resetError]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open]);
 
   // 검색어 변경 감지
   React.useEffect(() => {
