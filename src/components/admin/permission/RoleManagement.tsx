@@ -3,7 +3,7 @@ import React, { useState, useMemo } from 'react';
 import { usePermissionStore } from '@/store/permissionStore';
 import { useAdminRoleInfo, useAdminRoleSearch } from '@/query/usePermission';
 import { useRoleManagement } from '@/query/usePermission';
-import type { PermissionUser, User } from '@/types/permission';
+import type { PermissionRole, User } from '@/types/permission';
 import ModalHeader from '@/components/admin/permission/RoleModalHeader';
 import { RoleInfoSection } from './RoleInfoSection';
 import { UserSearchSection } from './RoleUserSearchSection';
@@ -12,16 +12,14 @@ import { RoleFooterSection } from './RoleModalFooter';
 interface RoleManagementProps {
   open: boolean;
   onClose: () => void;
-  selectedUser: PermissionUser | null;
+  selectedUser: PermissionRole | null;
 }
 
 const RoleManagement = ({ open, onClose, selectedUser }: RoleManagementProps) => {
   const { 
     clearSelectedUserIds, 
     selectedUserIds, 
-    setSelectedUserIds, 
-    clearExcludedUserIds,
-    isUserExcluded 
+    clearExcludedUserIds
   } = usePermissionStore(); 
   
   // 상태 관리
@@ -30,7 +28,9 @@ const RoleManagement = ({ open, onClose, selectedUser }: RoleManagementProps) =>
   const [isSearchMode, setIsSearchMode] = useState(false);
 
   // 권한 관리 훅
-  const { handleRoleChange, isLoading: isSaving, error: roleChangeError } = useRoleManagement();
+  const { handleRoleChange, isLoading: isSaving, error: roleChangeError, resetError } = useRoleManagement();
+
+  // Zustand store 액션들을 직접 사용 (의존성 배열에서 제외)
 
   // 모달이 열릴 때 상태 초기화
   React.useEffect(() => {
@@ -40,8 +40,9 @@ const RoleManagement = ({ open, onClose, selectedUser }: RoleManagementProps) =>
       setSearchTerm('');
       setCurrentPage(1); 
       setIsSearchMode(false);
+      resetError(); // 에러 상태 리셋
     }
-  }, [open, clearSelectedUserIds, clearExcludedUserIds]);
+  }, [open, clearSelectedUserIds, clearExcludedUserIds, resetError]);
 
   // 검색어 변경 감지
   React.useEffect(() => {
@@ -89,20 +90,6 @@ const RoleManagement = ({ open, onClose, selectedUser }: RoleManagementProps) =>
   // 로딩 상태 및 에러 상태
   const isLoading = isSearchMode ? isSearchLoading : isUserListLoading;
   const error = isSearchMode ? searchError : userListError;
-
-  // 해당 권한을 가진 사용자들을 자동 선택
-  React.useEffect(() => {
-    if (currentData?.adminRoleInfoList && selectedUser?.roleName && open) {
-      const usersWithSelectedRole = currentData.adminRoleInfoList
-        .filter((user: User) => user.role === selectedUser.roleName)
-        .filter((user: User) => !isUserExcluded(user.userId)) 
-        .map((user: User) => user.userId);
-      
-      if (usersWithSelectedRole.length > 0) {
-        setSelectedUserIds(prev => Array.from(new Set([...prev, ...usersWithSelectedRole])));
-      }
-    }
-  }, [currentData, selectedUser?.roleName, open, setSelectedUserIds, isUserExcluded]);
 
   // 테이블 데이터 변환
   const tableData = useMemo(() => {

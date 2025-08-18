@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useCallback } from 'react';
 import { permissionAPI } from '@/api/permissionAPI';
 import type { 
-  PermissionUser, 
   AdminRoleInfoRequest, 
   AdminRoleInfoResponse, 
   AdminRoleSearchRequest, 
@@ -15,7 +15,7 @@ export const ADMIN_ROLE_SEARCH_QUERY_KEY = ['adminRoleSearch'];
 
 // 권한 목록 조회
 export function usePermissions() {
-  return useQuery<Pick<PermissionUser, 'roleId' | 'roleUserCount' | 'isActive'>[], Error>({
+  return useQuery<{ roleId: number; roleUserCount: number; isActive: string }[], Error>({
     queryKey: PERMISSION_QUERY_KEY,
     queryFn: () => permissionAPI.getPermissions(),
     staleTime: 1000 * 60 * 15, // 15분
@@ -23,7 +23,7 @@ export function usePermissions() {
     refetchOnMount: false,
     refetchOnWindowFocus: false,
     refetchOnReconnect: false,
-    placeholderData: (previousData: Pick<PermissionUser, 'roleId' | 'roleUserCount' | 'isActive'>[] | undefined) => previousData,
+    placeholderData: (previousData: { roleId: number; roleUserCount: number; isActive: string }[] | undefined) => previousData,
   });
 }
 
@@ -72,7 +72,7 @@ export function useChangeUserRole() {
 export function useRoleManagement() {
   const changeRoleMutation = useChangeUserRole();
 
-  const handleRoleChange = async (
+  const handleRoleChange = useCallback(async (
     userIds: number[],
     roleId: number,
     onSuccess?: () => void,
@@ -93,13 +93,18 @@ export function useRoleManagement() {
       const errorMessage = error instanceof Error ? error.message : '권한 변경에 실패했습니다.';
       onError?.(errorMessage);
     }
-  };
+  }, [changeRoleMutation]);
+
+  const resetError = useCallback(() => {
+    changeRoleMutation.reset();
+  }, [changeRoleMutation]);
 
   return {
     handleRoleChange,
     isLoading: changeRoleMutation.isPending,
     error: changeRoleMutation.error,
     isSuccess: changeRoleMutation.isSuccess,
-    reset: changeRoleMutation.reset
+    reset: changeRoleMutation.reset,
+    resetError
   };
 }

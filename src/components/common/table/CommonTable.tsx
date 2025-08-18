@@ -26,9 +26,13 @@ interface CommonTableProps {
   onUpdate?: (documentName: string) => void;
   categoryImage: string;
   isLoading?: boolean;
+  error?: {
+    message: string;
+    subMessage: string;
+  } | null;
   modals: {
     confirmModal: {
-      open: (type: 'archive' | 'download', fileName: string) => void;
+      open: (type: 'archive' | 'download' | 'restore', fileName: string) => void;
     };
     handleVersionHistoryClick?: (fileName: string) => void;
   };
@@ -47,6 +51,7 @@ const CommonTable: React.FC<CommonTableProps> = ({
   onUpdate,
   categoryImage,
   isLoading = false,
+  error = null,
   modals
 }) => {
   const handlers = useCommonHandlers({ modals, documentActions: { onArchive, onUpdate } });
@@ -83,6 +88,15 @@ const CommonTable: React.FC<CommonTableProps> = ({
         <LoadingContainer>
           <LoadingText>로딩 중...</LoadingText>
         </LoadingContainer>
+      );
+    }
+
+    if (error) {
+      return (
+        <EmptyState 
+          message={error.message}
+          subMessage={error.subMessage}
+        />
       );
     }
 

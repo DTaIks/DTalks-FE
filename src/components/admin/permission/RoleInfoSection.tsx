@@ -1,9 +1,9 @@
 import styled from 'styled-components';
 import Roll1 from '@/assets/permission/PermissionRoll1.svg';
-import type { PermissionUser } from '@/types/permission';
+import type { PermissionRole } from '@/types/permission';
 
 interface RoleInfoSectionProps {
-  selectedUser: PermissionUser | null;
+  selectedUser: PermissionRole | null;
 }
 
 export const RoleInfoSection = ({ selectedUser }: RoleInfoSectionProps) => (

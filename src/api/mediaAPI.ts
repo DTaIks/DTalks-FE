@@ -34,7 +34,7 @@ export const mediaAPI = {
     // 파일 추가
     formData.append('file', file);
     
-    // fileInfo에서 uploadFile 필드가 있다면 제거 (MediaUploadData인 경우)
+    // fileInfo에서 uploadFile 필드를 제거 (MediaUploadData인 경우)
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { uploadFile, ...cleanFileInfo } = fileInfo as FileUploadInfo & { uploadFile?: File };
     formData.append('fileInfo', JSON.stringify(cleanFileInfo));
@@ -57,7 +57,7 @@ export const mediaAPI = {
       formData.append('file', file);
     }
     
-    // fileInfo에서 uploadFile 필드가 있다면 제거 (MediaUploadData인 경우)
+    // fileInfo에서 uploadFile 필드를 제거 (MediaUploadData인 경우)
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { uploadFile, ...cleanFileInfo } = fileInfo as FileUploadInfo & { uploadFile?: File };
     formData.append('fileInfo', JSON.stringify(cleanFileInfo));

@@ -18,7 +18,6 @@ interface UseCommonHandlersProps {
     }
   };
   mediaActions?: {
-    handleConfirmAction: (modalType: 'archive' | 'download', fileName: string) => void;
     handleEdit: (data: { fileName: string; description: string; fileVersion: string; isPublic: boolean }) => void;
     handleUpload: (data: { fileName: string; description: string; fileVersion: string; isPublic: boolean }) => void;
     setSelectedFile?: (file: { fileId: number; fileName: string } | null) => void;

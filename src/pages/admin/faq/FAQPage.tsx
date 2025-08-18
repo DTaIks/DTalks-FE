@@ -3,6 +3,7 @@ import styled from "styled-components";
 import TitleContainer from "@/layout/TitleContainer";
 import { useScrollToTop } from "@/hooks/useScrollToTop";
 import FAQTable from "@/components/admin/faq/table/FAQTable";
+import ErrorModal from "@/components/common/ErrorModal";
 import Button from "@/components/common/Button";
 import Pagination from "@/components/common/Pagination";
 import FAQUploadModal, { type FAQUploadData } from "@/components/admin/faq/FAQUploadModal";
@@ -11,6 +12,8 @@ import { useCreateFAQ, useUpdateFAQ, useArchiveFAQ } from "@/query/useFAQMutatio
 import { useFAQStore } from "@/store/faqStore";
 import { getCategoryNameFromFilter } from "@/utils/faqUtils";
 import { faqAPI } from "@/api/faqAPI";
+import { authAPI } from "@/api/authAPI";
+import type { AxiosError } from 'axios';
 
 const FAQPage = () => {
   useScrollToTop();
@@ -18,6 +21,10 @@ const FAQPage = () => {
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [modalError, setModalError] = useState<string>("");
+  const [isErrorModalOpen, setIsErrorModalOpen] = useState<boolean>(false);
+  const [errorMessage, setErrorMessage] = useState<string>("");
+  // 기본값을 '사용자'로 두어 프로필 로딩 전에는 차단되도록 함
+  const [userRole, setUserRole] = useState<string>('사용자');
 
   const { 
     searchTerm, 
@@ -95,10 +102,23 @@ const FAQPage = () => {
     setCurrentPage(page);
   }, []);
 
+  // 권한 확인 함수
+  const checkUserPermission = useCallback((): boolean => {
+    // 프로필 로딩 전(빈 값) 또는 일반 사용자면 차단
+    if (!userRole || userRole === '사용자') {
+      setErrorMessage('접근 권한이 없습니다.');
+      setIsErrorModalOpen(true);
+      return false;
+    }
+    return true;
+  }, [userRole]);
+
   const handleModalOpen = useCallback((): void => {
+    if (!checkUserPermission()) return;
+    
     setIsModalOpen(true);
     setModalError(""); // 모달 열 때 에러 메시지 초기화
-  }, []);
+  }, [checkUserPermission]);
 
   const handleModalClose = useCallback((): void => {
     setIsModalOpen(false);
@@ -111,9 +131,18 @@ const FAQPage = () => {
       await createFAQMutation.mutateAsync(data);
       handleModalClose();
     } catch (error) {
+      if (!(error instanceof Error)) throw error;
       console.error('FAQ 생성 실패:', error);
       
-      // 에러 메시지 처리
+      // 403 에러 처리
+      if ((error as AxiosError)?.response?.status === 403) {
+        setErrorMessage('접근 권한이 없습니다.');
+        setIsErrorModalOpen(true);
+        handleModalClose();
+        return;
+      }
+      
+      // 기타 에러 메시지 처리
       const errorMessage = error instanceof Error ? error.message : 'FAQ 추가에 실패했습니다.';
       
       // 중복 에러인지 확인
@@ -173,7 +202,13 @@ const FAQPage = () => {
       });
       closeEditModal(); // 수정 완료 후 모달 닫기
     } catch (error) {
+      if (!(error instanceof Error)) throw error;
       console.error('FAQ 수정 실패:', error);
+      if ((error as AxiosError)?.response?.status === 403) {
+        setErrorMessage('접근 권한이 없습니다.');
+        setIsErrorModalOpen(true);
+        closeEditModal();
+      }
     }
   }, [updateFAQMutation, closeEditModal]);
 
@@ -182,13 +217,32 @@ const FAQPage = () => {
     try {
       await archiveFAQMutation.mutateAsync(faqId);
     } catch (error) {
+      if (!(error instanceof Error)) throw error;
       console.error('FAQ 보관 실패:', error);
+      if ((error as AxiosError)?.response?.status === 403) {
+        setErrorMessage('접근 권한이 없습니다.');
+        setIsErrorModalOpen(true);
+      }
     }
   }, [archiveFAQMutation]);
 
   useEffect(() => {
     setCurrentPage(1);
   }, [searchTerm, selectedCategory]);
+
+  // 사용자 권한 확인을 위한 프로필 조회
+  useEffect(() => {
+    const fetchUserProfile = async () => {
+      try {
+        const profileData = await authAPI.getProfile();
+        setUserRole(profileData.role);
+      } catch (error) {
+        console.error('프로필 조회 실패:', error);
+      }
+    };
+
+    fetchUserProfile();
+  }, []);
 
   return (
     <Container>
@@ -214,6 +268,7 @@ const FAQPage = () => {
         onCategoryChange={handleCategoryChange}
         onFAQDetail={handleFAQDetail}
         onFAQArchive={handleFAQArchive}
+        checkUserPermission={checkUserPermission}
       />
       {(faqItems.length > 0 || totalPages > 0) && (
         <PaginationContainer>
@@ -243,6 +298,12 @@ const FAQPage = () => {
         isEdit={true}
         initialData={editModal.faqData}
         errorMessage={modalError}
+      />
+
+      <ErrorModal
+        isOpen={isErrorModalOpen}
+        onClose={() => setIsErrorModalOpen(false)}
+        errorMessage={errorMessage}
       />
     </Container>
   );

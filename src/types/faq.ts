@@ -129,4 +129,5 @@ export interface FAQTableProps {
   onCategoryChange?: (categoryValue: string) => void;
   onFAQDetail?: (faqId: number) => void;
   onFAQArchive?: (faqId: number) => void;
+  checkUserPermission?: () => boolean;
 } 

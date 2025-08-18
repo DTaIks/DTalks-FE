@@ -1,11 +1,10 @@
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
-import { useNavigate } from "react-router-dom";
 import ProfileImageSrc from "@/assets/common/Profile.png";
-import { useAuthStore } from "@/store/authStore";
-import { useLogout } from "@/hooks/useAuth";
 import { useBodyScrollLock } from "@/hooks/useScrollControl";
 import { authAPI } from "@/api/authAPI";
+import { useLogoutMutation } from "@/query/useAuthQueries";
+import { performLogoutCleanup } from "@/utils/logoutUtils";
 
 interface LogoutModalProps {
   isOpen: boolean;
@@ -14,9 +13,7 @@ interface LogoutModalProps {
 }
 
 const LogoutModal: React.FC<LogoutModalProps> = ({ isOpen, onClose }) => {
-  const navigate = useNavigate();
-  const { logout: resetLocal } = useAuthStore();
-  const logoutMutation = useLogout();
+  const logoutMutation = useLogoutMutation();
   const [profileName, setProfileName] = useState<string>("admin");
 
   // 모달 열릴 때 스크롤 락
@@ -41,14 +38,16 @@ const LogoutModal: React.FC<LogoutModalProps> = ({ isOpen, onClose }) => {
 
   const handleLogout = async () => {
     try {
+      // 로그아웃 API 호출 (성공/실패와 관계없이 clearAllData 호출됨)
       await logoutMutation.mutateAsync();
     } catch {
       // 401 에러는 이미 로그아웃된 상태이므로 정상 처리
+      // clearAllData는 mutation의 onError에서 호출됨
     } finally {
-      // 로그아웃 성공/실패와 관계없이 로컬 상태 초기화
-      resetLocal();
+      // 모달 닫기
       onClose();
-      navigate('/login');
+      // 로그인 페이지로 리다이렉트
+      performLogoutCleanup();
     }
   };
 

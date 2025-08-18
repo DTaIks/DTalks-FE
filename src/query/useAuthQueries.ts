@@ -1,5 +1,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { authAPI } from '@/api/authAPI';
+import { clearAllData } from '@/utils/logoutUtils';
 
 // 이메일 중복 확인
 export const useEmailValidationMutation = () => {
@@ -62,11 +63,13 @@ export const useLogoutMutation = () => {
   return useMutation({
     mutationFn: () => authAPI.logout(),
     onSuccess: () => {
-      // 로그아웃 성공 시 모든 React Query 캐시 초기화
-      queryClient.clear();
+      // 로그아웃 성공 시 모든 UI 상태와 데이터 캐시 무효화
+      clearAllData(queryClient);
     },
     onError: (error) => {
       console.error('로그아웃 실패:', error);
+      // 에러가 발생해도 로컬 상태는 초기화 (보안상 중요)
+      clearAllData(queryClient);
     }
   });
 };

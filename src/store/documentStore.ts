@@ -11,6 +11,7 @@ interface DocumentStore {
   setSelectedStatus: (status: string) => void;
   setSelectedCategory: (category: string) => void;
   resetFilters: () => void;
+  resetAll: () => void;
 }
 
 export const useDocumentStore = create<DocumentStore>()(
@@ -34,6 +35,14 @@ export const useDocumentStore = create<DocumentStore>()(
     },
 
     resetFilters: () => {
+      set({ 
+        searchTerm: '',
+        selectedStatus: '전체 상태',
+        selectedCategory: '전체 카테고리'
+      });
+    },
+
+    resetAll: () => {
       set({ 
         searchTerm: '',
         selectedStatus: '전체 상태',

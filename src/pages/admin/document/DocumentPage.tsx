@@ -11,7 +11,9 @@ import DocumentUploadModal from "@/components/common/DocumentUploadModal";
 import { VersionHistoryModal } from "@/components/common/FileVersionManagementModal";
 import DocumentTable from "@/components/admin/documentAll/DocumentTable";
 import { useFileUpload } from "@/hooks/useFileUpload";
-import { useCommonHandlers } from "@/hooks/useCommonHandlers";
+import ErrorModal from "@/components/common/ErrorModal";
+import { authAPI } from "@/api/authAPI";
+
 import { useDocumentUpload, useDocumentUpdate, useDocumentArchive, useDocumentRestore } from "@/query/useDocumentMutations";
 import { useDocumentList, useDocumentSearchByCategory } from "@/query/useDocumentQueries";
 import { useDocumentStore } from "@/store/documentStore";
@@ -58,6 +60,11 @@ const DocumentPage = () => {
   const [refreshKey, setRefreshKey] = useState(0);
   const prevStatusRef = useRef<string>('');
   
+  // 권한 관련 상태
+  const [userRole, setUserRole] = useState<string>('사용자');
+  const [isErrorModalOpen, setIsErrorModalOpen] = useState<boolean>(false);
+  const [errorMessage, setErrorMessage] = useState<string>('');
+  
   // 기존 State 관리
   const [versionModal, setVersionModal] = useState<VersionModalState>({ 
     isOpen: false, 
@@ -76,6 +83,30 @@ const DocumentPage = () => {
     selectedStatus,
     setSelectedStatus 
   } = useDocumentStore();
+  
+  // 프로필 정보 조회
+  useEffect(() => {
+    const fetchUserProfile = async () => {
+      try {
+        const profileData = await authAPI.getProfile();
+        setUserRole(profileData.role);
+      } catch (error) {
+        console.error('프로필 조회 실패:', error);
+      }
+    };
+
+    fetchUserProfile();
+  }, []);
+
+  // 권한 확인 함수
+  const checkUserPermission = useCallback((): boolean => {
+    if (!userRole || userRole === '사용자') {
+      setErrorMessage('접근 권한이 없습니다.');
+      setIsErrorModalOpen(true);
+      return false;
+    }
+    return true;
+  }, [userRole]);
   
   // 문서 관련 뮤테이션
   const documentUploadMutation = useDocumentUpload();
@@ -197,7 +228,7 @@ const DocumentPage = () => {
       queryKey: ['documentSearchByCategory', category],
       exact: false
     });
-  }, [selectedStatus, setSelectedStatus, queryClient, category, isSearchMode]);
+  }, [setSelectedStatus, queryClient, category, isSearchMode]);
 
   // CompareCard에서 버전 비교를 처리하는 핸들러
   const handleVersionCompare = useCallback((documentName: string, version1: string, version2: string) => {
@@ -212,6 +243,10 @@ const DocumentPage = () => {
     fileVersion: string;
     category: string;
   }) => {
+    if (!checkUserPermission()) {
+      return;
+    }
+    
     if (!data.uploadFile) {
       return;
     }
@@ -230,7 +265,7 @@ const DocumentPage = () => {
     } catch (error) {
       console.error('문서 업로드 실패:', error);
     }
-  }, [documentUploadMutation]);
+  }, [documentUploadMutation, checkUserPermission]);
 
   // 문서 수정 관련 핸들러
   const closeUpdateModal = useCallback(() => {
@@ -244,6 +279,10 @@ const DocumentPage = () => {
     fileVersion: string;
     category: string;
   }) => {
+    if (!checkUserPermission()) {
+      return;
+    }
+    
     if (updateModal.initialData?.fileId) {
       documentUpdateMutation.mutate({
         fileId: updateModal.initialData.fileId,
@@ -257,9 +296,13 @@ const DocumentPage = () => {
       });
       closeUpdateModal();
     }
-  }, [updateModal.initialData, documentUpdateMutation, closeUpdateModal]);
+  }, [updateModal.initialData, documentUpdateMutation, closeUpdateModal, checkUserPermission]);
 
   const openUpdateModal = useCallback((documentName: string) => {
+    if (!checkUserPermission()) {
+      return;
+    }
+    
     const documentToUpdate = documents.find(doc => doc.documentName === documentName);
     if (documentToUpdate) {
       setUpdateModal({
@@ -275,7 +318,7 @@ const DocumentPage = () => {
         }
       });
     }
-  }, [documents]);
+  }, [documents, checkUserPermission]);
 
   // 다운로드 핸들러
   const handleDownload = useCallback((fileName: string, fileUrl?: string) => {
@@ -302,26 +345,22 @@ const DocumentPage = () => {
     }
   }, []);
 
-  // 공통 핸들러 사용
-  const { handleArchiveByFileName } = useCommonHandlers({
-    modals: {
-      confirmModal: {
-        open: () => {} 
-      },
-      versionModal: {
-        open: (fileName: string) => {
-          const document = documents.find(doc => doc.documentName === fileName);
-          setVersionModal({ 
-            isOpen: true, 
-            fileName, 
-            fileId: document?.documentId || null 
-          });
-        },
-        close: () => setVersionModal({ isOpen: false, fileName: '', fileId: null }),
-        isOpen: versionModal.isOpen
-      }
+  // 보관/복원 핸들러
+  const handleArchive = useCallback(async (id: number, isArchived?: boolean) => {
+    if (!checkUserPermission()) {
+      return;
     }
-  });
+    
+    try {
+      if (isArchived) {
+        await documentRestoreMutation.mutateAsync(id);
+      } else {
+        await documentArchiveMutation.mutateAsync(id);
+      }
+    } catch (error) {
+      console.error('문서 보관/복원 실패:', error);
+    }
+  }, [documentArchiveMutation, documentRestoreMutation, checkUserPermission]);
 
   // 파일 업로드 훅
   const {
@@ -332,28 +371,28 @@ const DocumentPage = () => {
     handleSubmit,
     handleConfirmAction,
     closeConfirmModal,
+    openConfirmModal,
     getButtonText
   } = useFileUpload({
     pageType: category as 'policy' | 'glossary' | 'reportform',
     onUpload: handleDocumentUpload,
-    onEdit: () => {
+    onEdit: () => {},
+    onArchive: (fileName: string) => {
+      const document = documents.find(doc => doc.documentName === fileName);
+      if (document) {
+        handleArchive(document.documentId, !document.isActive);
+      }
     },
-    onArchive: handleArchiveByFileName,
     onDownload: handleDownload
   });
 
-  // 보관/복원 핸들러
-  const handleArchive = useCallback(async (id: number, isArchived?: boolean) => {
-    try {
-      if (isArchived) {
-        await documentRestoreMutation.mutateAsync(id);
-      } else {
-        await documentArchiveMutation.mutateAsync(id);
-      }
-    } catch (error) {
-      console.error('문서 보관/복원 실패:', error);
+  // 권한 체크가 포함된 파일 업로드 클릭 핸들러
+  const handleFileUploadClickWithPermission = useCallback(() => {
+    if (!checkUserPermission()) {
+      return;
     }
-  }, [documentArchiveMutation, documentRestoreMutation]);
+    handleFileUploadClick();
+  }, [checkUserPermission, handleFileUploadClick]);
 
   // 버전 히스토리 클릭 핸들러
   const handleVersionHistoryClick = useCallback((fileName: string) => {
@@ -364,9 +403,9 @@ const DocumentPage = () => {
   }, [documents]);
 
   // 확인 모달 열기 핸들러
-  const handleConfirmModalOpen = useCallback((type: 'archive' | 'download', fileName: string) => {
-    console.log(`${type} 모달 열기:`, fileName);
-  }, []);
+  const handleConfirmModalOpen = useCallback((type: 'archive' | 'download' | 'restore', fileName: string) => {
+    openConfirmModal(type, fileName);
+  }, [openConfirmModal]);
 
   // 페이지 변경 핸들러
   const handlePageChange = useCallback((page: number) => {
@@ -392,7 +431,7 @@ const DocumentPage = () => {
             text={getButtonText()} 
             width="var(--button-width)" 
             height="var(--button-height)"
-            onClick={handleFileUploadClick}
+            onClick={handleFileUploadClickWithPermission}
           />
         </ButtonContainer>
       </HeaderWrapper>
@@ -417,7 +456,6 @@ const DocumentPage = () => {
         onPageChange={handlePageChange}
         onStatusChange={handleStatusChange}
         onSearchChange={handleSearchChange}
-        onArchive={handleArchive}
         onVersionHistoryClick={handleVersionHistoryClick}
         onConfirmModalOpen={handleConfirmModalOpen}
         onUpdate={openUpdateModal}
@@ -455,6 +493,12 @@ const DocumentPage = () => {
         isSubmitting={documentUpdateMutation.isPending}
         mode="update"
         initialData={updateModal.initialData}
+      />
+
+      <ErrorModal
+        isOpen={isErrorModalOpen}
+        onClose={() => setIsErrorModalOpen(false)}
+        errorMessage={errorMessage}
       />
     </Container>
   );

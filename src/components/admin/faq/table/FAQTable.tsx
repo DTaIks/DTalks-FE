@@ -19,7 +19,8 @@ const FAQTable: React.FC<FAQTableProps> = ({
   onSearch = () => {},
   onCategoryChange = () => {},
   onFAQDetail = () => {},
-  onFAQArchive = () => {}
+  onFAQArchive = () => {},
+  checkUserPermission = () => true
 }) => {
   const {
     expandedRows,
@@ -40,11 +41,17 @@ const FAQTable: React.FC<FAQTableProps> = ({
       return;
     }
 
+    // 권한 확인
+    if (!checkUserPermission()) return;
+    
     // 페이지에서 FAQ 상세 정보를 가져오도록 요청
     onFAQDetail(faq.faqId);
-  }, [onFAQDetail]);
+  }, [onFAQDetail, checkUserPermission]);
 
   const handleArchiveClick = useCallback((faq: FAQItem) => {
+    // 권한 확인
+    if (!checkUserPermission()) return;
+    
     setConfirmModal({
       isOpen: true,
       type: 'archive',
@@ -53,7 +60,7 @@ const FAQTable: React.FC<FAQTableProps> = ({
       categoryId: null,
       categoryName: ''
     });
-  }, [setConfirmModal]);
+  }, [setConfirmModal, checkUserPermission]);
 
   const handleConfirmAction = useCallback(async () => {
     if (confirmModal.type !== 'archive' || !confirmModal.faqId) return;

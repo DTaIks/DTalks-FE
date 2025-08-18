@@ -40,13 +40,13 @@ const MediaContent: React.FC<MediaContentProps> = ({
             <LoadingText>파일 목록을 불러오는 중...</LoadingText>
           ) : error ? (
             <EmptyState 
-              message="파일 목록을 불러오는데 실패했습니다"
-              subMessage="잠시 후 다시 시도해주세요."
+              message={error === '403' ? "접근 권한이 없습니다" : "파일 목록을 불러오는데 실패했습니다"}
+              subMessage={error === '403' ? "관리자에게 문의해주세요" : "잠시 후 다시 시도해주세요"}
             />
           ) : files.length === 0 ? (
             <EmptyState 
               message="표시할 파일이 없습니다"
-              subMessage="업로드된 파일이 없거나 필터 조건에 맞는 파일이 없습니다."
+              subMessage="파일이 없거나 필터 조건에 맞는 파일이 없습니다."
             />
           ) : (
             files.map((file: MediaFile) => (

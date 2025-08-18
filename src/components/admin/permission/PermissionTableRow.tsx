@@ -1,10 +1,10 @@
 import styled from "styled-components";
 import ActiveIcon from "@/assets/common/Active.svg";
-import type { PermissionUser } from "@/types/permission";
+import type { PermissionRole } from "@/types/permission";
 
 interface PermissionTableRowProps {
-  user: PermissionUser;
-  onEditClick: (user: PermissionUser) => void;
+  user: PermissionRole;
+  onEditClick: (user: PermissionRole) => void;
 }
 
 const PermissionTableRow = ({ user, onEditClick }: PermissionTableRowProps) => {

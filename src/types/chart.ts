@@ -3,31 +3,48 @@
 export interface DailyConversationData {
   date: string;
   conversationCount: number;
+  count: number;
+  increase: number;
+}
+
+export interface DonutChartData {
+  name?: string;
+  value: number;
+  count: number;
+  color?: string;
 }
 
 export interface SuccessRateData {
   date: string;
   successRate: number;
+  percent: number;
+  increase: number;
 }
 
 export interface SatisfactionData {
   date: string;
   satisfactionScore: number;
+  percent: number;
+  increase: number;
 }
 
 export interface ResponseTimeData {
   date: string;
   averageResponseTime: number;
+  avg: number;
+  zones: number[];
 }
 
 export interface TemplateUsageData {
-  templateName: string;
-  usageCount: number;
+  templates: string[];
+  counts: number[];
+  percentages: number[];
 }
 
 export interface WeeklyResponseData {
   week: string;
   responseCount: number;
+  values: number[];
 }
 
 // DonutChart 컴포넌트
@@ -73,6 +90,14 @@ export interface WeeklyResponseStatCardProps {
   };
   icon?: React.ReactNode;
   color?: string;
+}
+
+// PromptTemplate 타입
+export interface PromptTemplate {
+  smallTalk: DonutChartData;
+  qna: DonutChartData;
+  formatSearch: DonutChartData;
+  organization: DonutChartData;
 }
 
 // PromptTemplateCard 컴포넌트

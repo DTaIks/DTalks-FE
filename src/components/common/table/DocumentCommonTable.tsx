@@ -29,7 +29,7 @@ interface DocumentTableProps {
   onUpdate?: (documentName: string) => void;
   modals: {
     confirmModal: {
-      open: (type: 'archive' | 'download', fileName: string) => void;
+      open: (type: 'archive' | 'download' | 'restore', fileName: string) => void;
     };
   };
   error?: Error | null;
@@ -91,12 +91,54 @@ const DocumentTable: React.FC<DocumentTableProps> = ({
     }
   };
 
+  // 에러 메시지 결정
+  const getErrorMessage = () => {
+    if (!error) return '';
+    
+    // 403 권한 오류인지 확인
+    const isPermissionError = error.message?.includes('403') || 
+                             error.message?.includes('권한') ||
+                             error.message?.includes('접근') ||
+                             (error as { response?: { status?: number } })?.response?.status === 403;
+    
+    if (isPermissionError) {
+      return '접근 권한이 없습니다.';
+    }
+    
+    return '문서를 불러오는데 실패했습니다.';
+  };
+
+  // 에러 서브메시지 결정
+  const getErrorSubMessage = () => {
+    if (!error) return '';
+    
+    const isPermissionError = error.message?.includes('403') || 
+                             error.message?.includes('권한') ||
+                             error.message?.includes('접근') ||
+                             (error as { response?: { status?: number } })?.response?.status === 403;
+    
+    if (isPermissionError) {
+      return '관리자에게 문의해주세요.';
+    }
+    
+    return '잠시 후 다시 시도해주세요.';
+  };
+
   const renderTableContent = () => {
+    if (error) {
+      return (
+        <EmptyState 
+          message={getErrorMessage()}
+          subMessage={getErrorSubMessage()}
+        />
+      );
+    }
+
     if (documents.length === 0) {
       return (
         <EmptyState 
-          message={error ? "문서 목록을 불러오는데 실패했습니다." : "표시할 문서가 없습니다"}
-          subMessage={error ? "잠시 후 다시 시도해주세요." : "업로드된 문서가 없거나 필터 조건에 맞는 문서가 없습니다."}
+          message="표시할 문서가 없습니다"
+          subMessage="업로드된 문서가 없거나 필터 조건에 맞는 문서가 없습니다."
         />
       );
     }

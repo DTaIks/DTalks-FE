@@ -213,22 +213,25 @@ export const authAPI = {
   },
 
   // 프로필 조회 API
-  getProfile: async (): Promise<{ name: string }> => {
+  getProfile: async (): Promise<{ name: string; department: string; role: string }> => {
     try {
       const response = await apiInstance.get('/admin/profile');
       console.log('프로필 API 응답:', response.data);
       
       // 다양한 응답 구조 처리
       if (response.data && typeof response.data === 'object') {
-        if (response.data.name) {
-          return { name: response.data.name };
-        } else if (response.data.data && response.data.data.name) {
-          return { name: response.data.data.name };
+        const profileData = response.data.data || response.data;
+        if (profileData.name) {
+          return {
+            name: profileData.name,
+            department: profileData.department || '',
+            role: profileData.role || ''
+          };
         }
       }
       
       // 기본값 반환
-      return { name: 'admin' };
+      return { name: 'admin', department: '', role: '' };
     } catch (error: unknown) {
       console.error('프로필 조회 에러:', error);
       const axiosError = error as { response?: { status?: number; data?: { message?: string; error?: string }; headers?: Record<string, unknown> }; message?: string };

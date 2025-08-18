@@ -29,6 +29,12 @@ export interface EmailValidationResponse {
 }
 
 // 사용자 정보 타입
+export interface ProfileResponse {
+  name: string;
+  department: string;
+  role: string;
+}
+
 export interface User {
   id: string;
   email: string;

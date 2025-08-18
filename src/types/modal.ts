@@ -44,23 +44,23 @@ export interface MediaUploadModalProps {
   onSubmit: (data: MediaUploadData) => void;
   isSubmitting?: boolean;
   mode?: 'upload' | 'update';
+  isEditMode?: boolean;
   initialData?: {
     fileId?: number;
     fileName: string;
     description: string;
     fileVersion: string;
-    category: string;
     fileUrl?: string;
+    isPublic?: boolean;
   };
 }
 // MediaUploadData 타입
 export interface MediaUploadData {
   fileId?: number;
-  uploadFile?: File;
+  uploadFile?: File | null;
   fileName: string;
   description: string;
   fileVersion: string;
-  category: string;
   isPublic: boolean;
 }
 
