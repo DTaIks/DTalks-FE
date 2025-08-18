@@ -1,10 +1,10 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useMemo, useEffect, useRef } from "react";
 import { useParams, Navigate } from "react-router-dom";
+import { useQueryClient } from '@tanstack/react-query';
 import styled from "styled-components";
 import TitleContainer from "@/layout/TitleContainer";
 import Button from "@/components/common/Button";
 import CompareCard from "@/components/common/document/DocumentCompareCard";
-
 import ConfirmModal from "@/components/common/ConfirmModal";
 import DocumentUploadModal from "@/components/common/DocumentUploadModal";
 import { VersionHistoryModal } from "@/components/common/FileVersionManagementModal";
@@ -12,6 +12,8 @@ import DocumentTable from "@/components/admin/documentAll/DocumentTable";
 import { useFileUpload } from "@/hooks/useFileUpload";
 import { useCommonHandlers } from "@/hooks/useCommonHandlers";
 import { useDocumentUpload, useDocumentUpdate, useDocumentArchive, useDocumentRestore } from "@/query/useDocumentMutations";
+import { useDocumentList, useDocumentSearchByCategory } from "@/query/useDocumentQueries";
+import { useDocumentStore } from "@/store/documentStore";
 import DocumentCategory1 from "@/assets/document/DocumentCategory1.svg";
 import DocumentCategory2 from "@/assets/document/DocumentCategory2.svg";
 import DocumentCategory3 from "@/assets/document/DocumentCategory3.svg";
@@ -44,18 +46,14 @@ interface UpdateModalState {
   };
 }
 
-interface DocumentData {
-  documentId: number;
-  documentName: string;
-  latestVersion: string;
-  category: string;
-  fileUrl: string;
-  isActive: boolean;
-}
-
 // 통합 문서 관리 페이지
 const DocumentPage = () => {
   const { category } = useParams<{ category: string }>();
+  const queryClient = useQueryClient();
+  const [currentPage, setCurrentPage] = useState(1);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [refreshKey, setRefreshKey] = useState(0);
+  const prevStatusRef = useRef<string>('');
   
   // 기존 State 관리
   const [versionModal, setVersionModal] = useState<VersionModalState>({ 
@@ -70,13 +68,86 @@ const DocumentPage = () => {
     initialData: undefined
   });
   
-  const [documents, setDocuments] = useState<DocumentData[]>([]);
+  // 검색 및 필터 상태 (전역 상태 사용)
+  const { 
+    selectedStatus,
+    setSelectedStatus 
+  } = useDocumentStore();
   
   // 문서 관련 뮤테이션
   const documentUploadMutation = useDocumentUpload();
   const documentUpdateMutation = useDocumentUpdate();
   const documentArchiveMutation = useDocumentArchive();
   const documentRestoreMutation = useDocumentRestore();
+
+  // 검색 모드 여부 결정
+  const isSearchMode = searchTerm.trim().length > 0;
+
+  // 일반 문서 목록 조회
+  const { 
+    data: documentListData, 
+    isLoading: isListLoading, 
+    error: listError 
+  } = useDocumentList(
+    currentPage,
+    category as CategoryKey,
+    4,
+    selectedStatus
+  );
+
+  // 검색 결과 조회
+  const { 
+    data: searchData, 
+    isLoading: isSearchLoading, 
+    error: searchError,
+    isDebouncing,
+    refetch: refetchSearch
+  } = useDocumentSearchByCategory(
+    category as CategoryKey,
+    searchTerm,
+    currentPage,
+    isSearchMode,
+    4,
+    selectedStatus,
+    refreshKey 
+  );
+
+  // 상태 변경을 감지하여 검색 
+  useEffect(() => {
+    // 상태가 실제로 변경되었을 때만 처리
+    if (prevStatusRef.current !== selectedStatus && prevStatusRef.current !== '') {
+      console.log('상태 변경 감지:', { prev: prevStatusRef.current, current: selectedStatus });
+      
+      if (isSearchMode) {
+        const timeoutId = setTimeout(() => {
+          refetchSearch();
+        }, 200);
+        
+        return () => clearTimeout(timeoutId);
+      }
+    }
+    
+    // 현재 상태를 이전 상태로 업데이트
+    prevStatusRef.current = selectedStatus;
+  }, [selectedStatus, isSearchMode, refetchSearch]);
+
+  // 현재 사용할 데이터와 로딩 상태 결정
+  const currentData = isSearchMode ? searchData : documentListData;
+  const isLoading = isSearchMode ? (isSearchLoading || isDebouncing) : isListLoading;
+  const error = isSearchMode ? searchError : listError;
+
+  // 문서 목록과 총 페이지 수 추출
+  const { documents, totalPages } = useMemo(() => {
+    const items = currentData?.content || [];
+    const pages = currentData?.totalPages || 1;
+    console.log('현재 표시할 문서:', { 
+      mode: isSearchMode ? 'search' : 'list', 
+      count: items.length, 
+      status: selectedStatus,
+      searchTerm: searchTerm.trim()
+    });
+    return { documents: items, totalPages: pages };
+  }, [currentData, isSearchMode, selectedStatus, searchTerm]);
 
   // 카테고리별 설정
   const categoryConfig: Record<CategoryKey, CategoryConfig> = {
@@ -97,6 +168,34 @@ const DocumentPage = () => {
     }
   };
 
+  // 검색어 변경 핸들러
+  const handleSearchChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setSearchTerm(value);
+    setCurrentPage(1);
+  }, []);
+
+  // 상태 필터 변경 핸들러
+  const handleStatusChange = useCallback((status: string) => {
+    setSelectedStatus(status);
+    setCurrentPage(1);
+    
+    // 강제 리페치를 위해 키 변경
+    setRefreshKey(prev => prev + 1);
+    
+    if (!isSearchMode) {
+      queryClient.invalidateQueries({ 
+        queryKey: ['documentList', category]
+      });
+    }
+    
+    // 검색 관련 쿼리는 항상 무효화
+    queryClient.removeQueries({ 
+      queryKey: ['documentSearchByCategory', category],
+      exact: false
+    });
+  }, [selectedStatus, setSelectedStatus, queryClient, category, isSearchMode]);
+
   // CompareCard에서 버전 비교를 처리하는 핸들러
   const handleVersionCompare = useCallback((documentName: string, version1: string, version2: string) => {
     console.log(`버전 비교 완료: ${documentName} - v${version1} vs v${version2}`);
@@ -111,7 +210,6 @@ const DocumentPage = () => {
     category: string;
   }) => {
     if (!data.uploadFile) {
-      console.error('업로드할 파일이 없습니다.');
       return;
     }
 
@@ -124,6 +222,8 @@ const DocumentPage = () => {
 
     try {
       await documentUploadMutation.mutateAsync({ file: data.uploadFile, fileInfo });
+      setSearchTerm("");
+      setCurrentPage(1);
     } catch (error) {
       console.error('문서 업로드 실패:', error);
     }
@@ -265,6 +365,11 @@ const DocumentPage = () => {
     console.log(`${type} 모달 열기:`, fileName);
   }, []);
 
+  // 페이지 변경 핸들러
+  const handlePageChange = useCallback((page: number) => {
+    setCurrentPage(page);
+  }, []);
+
   const isValidCategory = (cat: string | undefined): cat is CategoryKey => {
     return cat !== undefined && Object.keys(categoryConfig).includes(cat);
   };
@@ -300,11 +405,20 @@ const DocumentPage = () => {
         category={category}
         title={config.title}
         categoryImage={config.image}
+        documents={documents}
+        isLoading={isLoading}
+        currentPage={currentPage}
+        totalPages={totalPages}
+        selectedStatus={selectedStatus}
+        searchTerm={searchTerm}
+        onPageChange={handlePageChange}
+        onStatusChange={handleStatusChange}
+        onSearchChange={handleSearchChange}
         onArchive={handleArchive}
         onVersionHistoryClick={handleVersionHistoryClick}
         onConfirmModalOpen={handleConfirmModalOpen}
         onUpdate={openUpdateModal}
-        onDocumentsLoaded={setDocuments}
+        error={error}
       />
 
       <DocumentUploadModal
