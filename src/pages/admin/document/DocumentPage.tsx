@@ -115,9 +115,7 @@ const DocumentPage = () => {
   // 상태 변경을 감지하여 검색 
   useEffect(() => {
     // 상태가 실제로 변경되었을 때만 처리
-    if (prevStatusRef.current !== selectedStatus && prevStatusRef.current !== '') {
-      console.log('상태 변경 감지:', { prev: prevStatusRef.current, current: selectedStatus });
-      
+    if (prevStatusRef.current !== selectedStatus && prevStatusRef.current !== '') {      
       if (isSearchMode) {
         const timeoutId = setTimeout(() => {
           refetchSearch();
@@ -292,7 +290,6 @@ const DocumentPage = () => {
           }
         })
         .catch(() => {
-          alert('파일 다운로드 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.');
         });
     } else {
       alert('다운로드할 파일 URL이 없습니다.');

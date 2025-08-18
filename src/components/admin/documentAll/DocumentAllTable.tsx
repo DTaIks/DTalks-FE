@@ -24,7 +24,7 @@ interface DocumentAllTableProps {
   onSearch?: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onCategoryChange?: (category: string) => void;
   onStatusChange?: (status: string) => void;
-  onUpdate?: (documentName: string) => void; // 누락된 prop 추가
+  onUpdate?: (documentName: string) => void;
 }
 
 const DocumentAllTable: React.FC<DocumentAllTableProps> = ({

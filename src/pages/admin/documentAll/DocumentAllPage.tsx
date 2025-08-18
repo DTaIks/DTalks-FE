@@ -35,7 +35,6 @@ const DocumentAllPage = () => {
     documents,
     totalPages,
     currentLoading,
-    currentError,
     isSearchMode,
   } = useDocumentAllData();
 
@@ -142,12 +141,6 @@ const DocumentAllPage = () => {
 
       <DocumentAllStatCard stats={stats} />
 
-      {currentError && !currentLoading && (
-        <ErrorMessage>
-          문서를 불러오는 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.
-        </ErrorMessage>
-      )}
-
       <DocumentAllTable
         documents={documents}
         modals={modals}
@@ -210,19 +203,6 @@ const Container = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-`;
-
-const ErrorMessage = styled.div`
-  width: 100%;
-  max-width: 1056px;
-  padding: 16px;
-  margin-bottom: 16px;
-  background-color: #fef2f2;
-  border: 1px solid #fecaca;
-  border-radius: 8px;
-  color: #dc2626;
-  text-align: center;
-  font-size: 14px;
 `;
 
 const HeaderWrapper = styled.div`

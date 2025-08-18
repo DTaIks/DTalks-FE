@@ -55,7 +55,7 @@ const UserListTable = () => {
       return <EmptyState message="사용자 목록을 불러오고 있습니다..." subMessage="잠시만 기다려주세요." />;
     }
     if (isError) {
-      return <EmptyState message="사용자 목록을 불러올 수 없습니다." subMessage="권한을 확인해주세요." />;
+      return <EmptyState message="접근 권한이 없습니다." subMessage="권한을 확인해주세요." />;
     }
     if (!response?.data?.adminInfoList || response.data.adminInfoList.length === 0) {
       return <EmptyState 
