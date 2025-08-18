@@ -45,6 +45,7 @@ const DocumentAllPage = () => {
     documents,
     totalPages,
     currentLoading,
+    currentError,
     isSearchMode,
   } = useDocumentAllData();
 
