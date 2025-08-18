@@ -170,7 +170,7 @@ const MediaFileUploadModal: React.FC<MediaUploadModalProps> = ({
         fileDisplayName={fileDisplayName}
         onFileDisplayNameChange={handleFileDisplayNameChange}
         onFileChange={handleFileChange}
-        accept="image/*,audio/*,.pdf,.docx,.xlsx"
+        accept=".jpg,.jpeg,.png,.mp3,.pdf,.docx,.xlsx,.csv"
         maxSizeInMB={10}
         onFileError={setFileError}
         fileError={fileError}
@@ -178,7 +178,7 @@ const MediaFileUploadModal: React.FC<MediaUploadModalProps> = ({
         disabled={false} // 수정 모드에서도 파일 변경 가능
       />
 
-             <FileNameInput
+        <FileNameInput
          value={formData.fileName}
          onChange={(value) => handleInputChange('fileName', value)}
          onBlur={() => handleBlur('fileName')}

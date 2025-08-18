@@ -45,7 +45,6 @@ const DocumentAllPage = () => {
     documents,
     totalPages,
     currentLoading,
-    currentError,
     isSearchMode,
   } = useDocumentAllData();
 
@@ -243,7 +242,6 @@ const DocumentAllPage = () => {
         mode="update"
         initialData={updateModal.initialData}
       />
-
       <ErrorModal
         isOpen={isErrorModalOpen}
         onClose={() => setIsErrorModalOpen(false)}
@@ -263,8 +261,6 @@ const Container = styled.div`
   flex-direction: column;
   align-items: center;
 `;
-
-
 
 const HeaderWrapper = styled.div`
   position: relative;

@@ -1,4 +1,4 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useQuery, useMutation } from '@tanstack/react-query';
 import { documentAPI, type DocumentVersionCompareRequest } from '@/api/documentAPI';
 import { useDebouncedSearch } from '@/hooks/useDebouncedSearch';
 import type { DocumentInfo, DocumentPagingInfo } from '@/types/document';
@@ -235,15 +235,10 @@ export const useDocumentVersionHistory = (fileId: number | null) => {
 };
 
 // 문서 버전 비교 뮤테이션
-export const useDocumentVersionCompare = () => {
-  const queryClient = useQueryClient();
-  
+export const useDocumentVersionCompare = () => {  
   return useMutation({
     mutationFn: (params: DocumentVersionCompareRequest) => 
       documentAPI.compareDocumentVersions(params),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['documentVersions'] });
-    },
     onError: (error) => {
       console.error('문서 버전 비교 실패:', error);
     },

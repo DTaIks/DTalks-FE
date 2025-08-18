@@ -19,6 +19,40 @@ export const FileSelectInput: React.FC<FileSelectInputProps> = ({
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0] || null;
     if (file) {
+      const allowedExtensions = ['.jpg', '.jpeg', '.png', '.mp3', '.pdf', '.docx', '.xlsx', '.csv'];
+      const fileExtension = file.name.toLowerCase().substring(file.name.lastIndexOf('.'));
+      
+      // 파일 확장자 검증
+      if (!allowedExtensions.includes(fileExtension)) {
+        onFileError?.(`지원하지 않는 파일 형식입니다. 지원 형식: 이미지(JPG, PNG), 음성(MP3), 문서(PDF, DOCX, XLSX, CSV)`);
+        onFileDisplayNameChange('');
+        onFileChange(null);
+        if (fileInputRef.current) {
+          fileInputRef.current.value = '';
+        }
+        return;
+      }
+
+      const allowedMimeTypes = [
+        'image/jpeg', 'image/jpg', 'image/png',
+        'audio/mpeg', 'audio/mp3',
+        'application/pdf',
+        'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 
+        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 
+        'text/csv', 'application/csv'
+      ];
+      
+      if (!allowedMimeTypes.includes(file.type)) {
+        onFileError?.(`지원하지 않는 파일 형식입니다. 지원 형식: 이미지(JPG, PNG), 음성(MP3), 문서(PDF, DOCX, XLSX, CSV)`);
+        onFileDisplayNameChange('');
+        onFileChange(null);
+        // 파일 입력 초기화
+        if (fileInputRef.current) {
+          fileInputRef.current.value = '';
+        }
+        return;
+      }
+      
       // 파일 크기 체크 (MB 단위)
       const maxSizeInBytes = maxSizeInMB * 1024 * 1024;
       if (file.size > maxSizeInBytes) {
