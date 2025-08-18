@@ -1,6 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
-import { useCompareStore } from '@/store/compareStore';
 import { type VersionDiffItem } from '@/components/common/document/DocumentVersionDiffList';
 import { useSearchDocumentsByName, useDocumentVersions, useDocumentVersionCompare } from '@/query/useDocumentQueries';
 import DocumentSearch from './DocumentSearch';
@@ -24,9 +23,11 @@ const CompareCard: React.FC<CompareCardProps> = ({
   category,
   onVersionCompare
 }) => {
-  const { activeTab, setActiveTab } = useCompareStore();
+  const [activeTab, setActiveTab] = useState<TabType>('compare');
   const [searchValue, setSearchValue] = useState('');
   const [selectedDocument, setSelectedDocument] = useState('');
+  const [compareError, setCompareError] = useState<string>(''); 
+  
   const [compareResult, setCompareResult] = useState<{
     version1: string;
     version2: string;
@@ -43,6 +44,19 @@ const CompareCard: React.FC<CompareCardProps> = ({
     diffData: [],
     compareStats: undefined
   });
+
+  useEffect(() => {
+    setActiveTab('compare');
+    setSearchValue('');
+    setSelectedDocument('');
+    setCompareError(''); 
+    setCompareResult({ 
+      version1: '', 
+      version2: '', 
+      diffData: [],
+      compareStats: undefined
+    });
+  }, [category]);
 
   // 문서 검색
   const {
@@ -99,6 +113,7 @@ const CompareCard: React.FC<CompareCardProps> = ({
 
   const handleSearchChange = (value: string) => {
     setSearchValue(value);
+    setCompareError(''); 
     if (selectedDocument && !value.includes(selectedDocument)) {
       setSelectedDocument('');
       setCompareResult({ 
@@ -107,23 +122,34 @@ const CompareCard: React.FC<CompareCardProps> = ({
         diffData: [],
         compareStats: undefined
       });
+      setActiveTab('compare');
     }
   };
 
   const handleDocumentSelect = (documentName: string) => {
     setSelectedDocument(documentName);
     setSearchValue(documentName);
+    setCompareError('');
     setCompareResult({ 
       version1: '', 
       version2: '', 
       diffData: [],
       compareStats: undefined
     });
+    setActiveTab('compare');
   };
 
   const handleVersionCompare = async (documentName: string, version1: string, version2: string) => {
+    setCompareError('');
+
+    // 같은 버전 비교 체크
+    if (version1 === version2) {
+      setCompareError('같은 버전은 비교할 수 없습니다.');
+      return;
+    }
+
     if (!versionData?.documentInfo?.documentId) {
-      console.error('문서 ID를 찾을 수 없습니다.');
+      setCompareError('문서 ID를 찾을 수 없습니다.');
       return;
     }
 
@@ -154,15 +180,30 @@ const CompareCard: React.FC<CompareCardProps> = ({
 
       // 외부 콜백 호출
       onVersionCompare?.(documentName, version1, version2);
-      
-      // 히스토리 탭으로 자동 전환
       setActiveTab('history');
     } catch (error) {
       console.error('버전 비교 실패:', error);
+      
+      const axiosError = error as { response?: { status?: number; data?: { message?: string } } };
+      if (axiosError?.response?.status === 404) {
+        if (axiosError?.response?.data?.message?.includes('비교할 버전')) {
+          setCompareError('같은 버전은 비교할 수 없습니다.');
+        } else {
+          setCompareError('비교할 버전을 찾을 수 없습니다.');
+        }
+      } else {
+        setCompareError('버전 비교 중 오류가 발생했습니다.');
+      }
+      
+      setCompareResult({ 
+        version1: '', 
+        version2: '', 
+        diffData: [],
+        compareStats: undefined
+      });
     }
   };
 
-  // 검색 중이거나 버전 로딩 중인 상태 계산
   const isSearching = isLoadingDocuments || isDebouncing;
 
   return (
@@ -200,6 +241,7 @@ const CompareCard: React.FC<CompareCardProps> = ({
               isLoading={versionCompareMutation.isPending}
               selectedDocument={selectedDocument}
               onVersionCompare={handleVersionCompare}
+              compareError={compareError}
             />
           </CompareRow>
         )}
@@ -222,7 +264,7 @@ export default CompareCard;
 
 const Container = styled.div<{ $activeTab: TabType }>`
   width: 1062px;
-  height: ${props => props.$activeTab === 'history' ? '800px' : '140px'};
+  height: ${props => props.$activeTab === 'history' ? '640px' : '140px'};
   flex-shrink: 0;
   border-radius: 18px;
   background: #FFF;

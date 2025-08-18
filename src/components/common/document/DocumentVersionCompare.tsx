@@ -8,6 +8,7 @@ interface VersionCompareSectionProps {
   isLoadingVersions: boolean;
   isLoading: boolean;
   selectedDocument: string;
+  compareError?: string; 
   onVersionCompare: (documentName: string, version1: string, version2: string) => void;
 }
 
@@ -16,6 +17,7 @@ const VersionCompareSection: React.FC<VersionCompareSectionProps> = ({
   isLoadingVersions,
   isLoading,
   selectedDocument,
+  compareError, 
   onVersionCompare
 }) => {
   const [version1, setVersion1] = useState('');
@@ -41,11 +43,11 @@ const VersionCompareSection: React.FC<VersionCompareSectionProps> = ({
           value={version1}
           onChange={(value) => setVersion1(value)}
           placeholder={
-            isLoadingVersions 
-              ? "버전 로딩 중..." 
-              : versionOptions.length > 0 
-                ? "첫 번째 버전" 
-                : ""
+            isLoadingVersions
+               ? "버전 로딩 중..."
+               : versionOptions.length > 0
+                 ? "첫 번째 버전"
+                 : ""
           }
           width="128px"
           height="34px"
@@ -56,17 +58,17 @@ const VersionCompareSection: React.FC<VersionCompareSectionProps> = ({
           value={version2}
           onChange={(value) => setVersion2(value)}
           placeholder={
-            isLoadingVersions 
-              ? "버전 로딩 중..." 
-              : versionOptions.length > 0 
-                ? "두 번째 버전" 
-                : ""
+            isLoadingVersions
+               ? "버전 로딩 중..."
+               : versionOptions.length > 0
+                 ? "두 번째 버전"
+                 : ""
           }
           width="128px"
           height="34px"
         />
       </VersionSelectorGroup>
-      
+             
       <CompareButtonContainer>
         <Button 
           text={isLoading ? "비교 중" : "비교"}
@@ -76,7 +78,10 @@ const VersionCompareSection: React.FC<VersionCompareSectionProps> = ({
           onClick={handleCompare}
           disabled={isLoading || !selectedDocument || !version1 || !version2}
         />
-      </CompareButtonContainer>
+      </CompareButtonContainer>    
+      {compareError && (
+        <ErrorMessage>{compareError}</ErrorMessage>
+      )}
     </VersionCompareContainer>
   );
 };
@@ -87,6 +92,7 @@ const VersionCompareContainer = styled.div`
   display: flex;
   align-items: center;
   gap: 12px;
+  position: relative;
 `;
 
 const VersionSelectorGroup = styled.div`
@@ -103,4 +109,15 @@ const Text = styled.span`
   color: #000;
   font-size: 12px;
   font-weight: 500;
+`;
+
+const ErrorMessage = styled.div`
+  position: absolute;
+  top: 100%;
+  left: 72px;
+  color: var(--color-error);
+  padding: 8px 4px;
+  border-radius: 6px;
+  font-size: 12px;
+  text-align: center;
 `;
