@@ -1,9 +1,9 @@
 import React from 'react';
 import styled from 'styled-components';
 import DepartmentBox from '@/components/admin/media/DepartmentList';
-import type { ArchiveModalProps } from '@/types/media';
+import type { MediaArchiveModalProps } from '@/types/media';
 
-const ArchiveModal: React.FC<ArchiveModalProps> = ({
+const ArchiveModal: React.FC<MediaArchiveModalProps> = ({
   isOpen,
   isClosing,
   departments,
@@ -23,7 +23,7 @@ const ArchiveModal: React.FC<ArchiveModalProps> = ({
       <ArchiveContent>
         <ArchiveSubtitle>보관된 항목</ArchiveSubtitle>
         <DepartmentListContainer>
-          {departments.map(dept => (
+          {departments.map((dept) => (
             <DepartmentBox 
               key={`archive-${dept.id}`}
               title={dept.name}

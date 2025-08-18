@@ -6,7 +6,7 @@ import TableHeader from "@/components/admin/permission/PermissionTableHeader";
 import TableRow from "@/components/admin/permission/PermissionTableRow";
 import EmptyState from "@/components/common/EmptyState";
 import { usePermissions } from "@/query/usePermission";
-import type { PermissionUser } from "@/types/permission";
+import type { PermissionRole } from "@/types/permission";
 
 import Roll1 from '@/assets/permission/PermissionRoll1.svg';
 import Roll2 from '@/assets/permission/PermissionRoll2.svg';
@@ -40,7 +40,7 @@ const PermissionTable: React.FC = () => {
   const { selectedUser, isModalOpen, setSelectedUser, setModalOpen } = usePermissionStore();
   const { data: permissionData = [], isLoading, isError } = usePermissions();
 
-  const handleEditClick = useCallback((user: PermissionUser) => {
+  const handleEditClick = useCallback((user: PermissionRole) => {
     setSelectedUser(user);
     setModalOpen(true);
   }, [setSelectedUser, setModalOpen]);
@@ -63,7 +63,7 @@ const PermissionTable: React.FC = () => {
     return null;
   };
 
-  const mergedData: PermissionUser[] = permissionData.map(item => {
+  const mergedData: PermissionRole[] = permissionData.map(item => {
     const fixed = roleInfo.find(r => r.roleId === item.roleId);
     return {
       roleId: item.roleId,
@@ -76,7 +76,7 @@ const PermissionTable: React.FC = () => {
     };
   });
 
-  const renderTableRow = useCallback((user: PermissionUser) => (
+  const renderTableRow = useCallback((user: PermissionRole) => (
     <TableRow
       key={user.roleId}
       user={user}

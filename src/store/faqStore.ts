@@ -55,6 +55,7 @@ interface FAQState {
   setSelectedCategoryItem: (category: FAQCategory | null) => void;
   setCategoryConfirmModal: (modal: { isOpen: boolean; type: 'archive' | 'restore' | null; categoryId: string | null; categoryName: string }) => void;
   closeCategoryConfirmModal: () => void;
+  resetAll: () => void;
 }
 
 // FAQ 스토어 - UI 상태만 관리
@@ -150,6 +151,34 @@ export const useFAQStore = create<FAQState>()(
 
       closeCategoryConfirmModal: () => {
         set({
+          categoryConfirmModal: {
+            isOpen: false,
+            type: null,
+            categoryId: null,
+            categoryName: ""
+          }
+        });
+      },
+
+      resetAll: () => {
+        set({
+          selectedCategory: "",
+          searchTerm: "",
+          expandedRows: new Set<number>(),
+          confirmModal: {
+            isOpen: false,
+            type: null,
+            faqId: null,
+            faqName: "",
+            categoryId: null,
+            categoryName: ""
+          },
+          editModal: {
+            isOpen: false,
+            faqData: undefined,
+            faqId: null
+          },
+          selectedCategoryItem: null,
           categoryConfirmModal: {
             isOpen: false,
             type: null,

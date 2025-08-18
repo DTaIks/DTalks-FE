@@ -17,9 +17,9 @@ interface DocumentTableProps {
   onPageChange: (page: number) => void;
   onStatusChange: (status: string) => void;
   onSearchChange: (e: React.ChangeEvent<HTMLInputElement>) => void; 
-  onArchive?: (id: number, isArchived?: boolean) => void;
+
   onVersionHistoryClick?: (fileName: string) => void;
-  onConfirmModalOpen?: (type: 'archive' | 'download', fileName: string) => void;
+  onConfirmModalOpen?: (type: 'archive' | 'download' | 'restore', fileName: string) => void;
   onUpdate?: (documentName: string) => void;
   error?: Error | null;
 }
@@ -37,18 +37,21 @@ const DocumentTable: React.FC<DocumentTableProps> = ({
   onPageChange,
   onStatusChange,
   onSearchChange, 
-  onArchive,
+
   onVersionHistoryClick,
   onConfirmModalOpen,
   onUpdate,
   error
 }) => {
   // 보관/복원 핸들러
-  const handleArchive = useCallback((id: number, isArchived?: boolean) => {
-    if (onArchive) {
-      onArchive(id, isArchived);
+  const handleArchive = useCallback((id: number) => {
+    // 문서 ID로 문서를 찾아서 confirmModal 열기
+    const document = documents.find(doc => doc.documentId === id);
+    if (document && onConfirmModalOpen) {
+      const modalType = document.isActive ? 'archive' : 'restore';
+      onConfirmModalOpen(modalType, document.documentName);
     }
-  }, [onArchive]);
+  }, [documents, onConfirmModalOpen]);
 
   // 변환된 문서 목록
   const transformedDocuments = useMemo(() => 
@@ -80,6 +83,39 @@ const DocumentTable: React.FC<DocumentTableProps> = ({
     console.error('Document Table Error:', error);
   }
 
+  // 에러 메시지 결정
+  const getErrorMessage = () => {
+    if (!error) return '';
+    
+    // 403 권한 오류인지 확인
+    const isPermissionError = error.message?.includes('403') || 
+                             error.message?.includes('권한') ||
+                             error.message?.includes('접근') ||
+                             (error as { response?: { status?: number } })?.response?.status === 403;
+    
+    if (isPermissionError) {
+      return '접근 권한이 없습니다.';
+    }
+    
+    return '문서를 불러오는데 실패했습니다.';
+  };
+
+  // 에러 서브메시지 결정
+  const getErrorSubMessage = () => {
+    if (!error) return '';
+    
+    const isPermissionError = error.message?.includes('403') || 
+                             error.message?.includes('권한') ||
+                             error.message?.includes('접근') ||
+                             (error as { response?: { status?: number } })?.response?.status === 403;
+    
+    if (isPermissionError) {
+      return '관리자에게 문의해주세요.';
+    }
+    
+    return '잠시 후 다시 시도해주세요.';
+  };
+
   return (
     <Container>
       <CommonTable
@@ -94,6 +130,10 @@ const DocumentTable: React.FC<DocumentTableProps> = ({
         categoryImage={categoryImage}
         modals={modals}
         isLoading={isLoading}
+        error={error && !isLoading ? {
+          message: getErrorMessage(),
+          subMessage: getErrorSubMessage()
+        } : null}
       />
 
       {!isLoading && totalPages > 1 && (

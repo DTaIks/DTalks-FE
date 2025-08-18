@@ -1,7 +1,6 @@
 import React, { useCallback, useMemo } from "react";
 import styled from "styled-components";
 import ConfirmModal from "@/components/common/ConfirmModal";
-import FAQUploadModal from "@/components/admin/faq/FAQUploadModal";
 import EmptyState from "@/components/common/EmptyState";
 import { type FAQItem } from "@/types/faq";
 import type { FAQTableProps } from "@/types/faq";
@@ -20,17 +19,15 @@ const FAQTable: React.FC<FAQTableProps> = ({
   onSearch = () => {},
   onCategoryChange = () => {},
   onFAQDetail = () => {},
-  onFAQUpdate = () => {},
-  onFAQArchive = () => {}
+  onFAQArchive = () => {},
+  checkUserPermission = () => true
 }) => {
   const {
     expandedRows,
     confirmModal,
-    editModal,
     toggleExpandedRow,
     setConfirmModal,
-    closeConfirmModal,
-    closeEditModal
+    closeConfirmModal
   } = useFAQStore();
 
   const handleRowToggle = useCallback((faqId: number) => {
@@ -44,11 +41,17 @@ const FAQTable: React.FC<FAQTableProps> = ({
       return;
     }
 
+    // 권한 확인
+    if (!checkUserPermission()) return;
+    
     // 페이지에서 FAQ 상세 정보를 가져오도록 요청
     onFAQDetail(faq.faqId);
-  }, [onFAQDetail]);
+  }, [onFAQDetail, checkUserPermission]);
 
   const handleArchiveClick = useCallback((faq: FAQItem) => {
+    // 권한 확인
+    if (!checkUserPermission()) return;
+    
     setConfirmModal({
       isOpen: true,
       type: 'archive',
@@ -57,7 +60,7 @@ const FAQTable: React.FC<FAQTableProps> = ({
       categoryId: null,
       categoryName: ''
     });
-  }, [setConfirmModal]);
+  }, [setConfirmModal, checkUserPermission]);
 
   const handleConfirmAction = useCallback(async () => {
     if (confirmModal.type !== 'archive' || !confirmModal.faqId) return;
@@ -71,16 +74,7 @@ const FAQTable: React.FC<FAQTableProps> = ({
     }
   }, [confirmModal, onFAQArchive, closeConfirmModal]);
 
-  const handleSubmitEdit = useCallback(async (data: { question: string; answer: string; category: string }) => {
-    if (!editModal.faqId) return;
-    
-    try {
-      onFAQUpdate(editModal.faqId, data);
-      closeEditModal();
-    } catch (error) {
-      console.error('FAQ 수정 실패:', error);
-    }
-  }, [editModal.faqId, onFAQUpdate, closeEditModal]);
+
 
   const categoryOptions = useMemo(() => [
     { value: "", label: "전체 카테고리" },
@@ -118,19 +112,8 @@ const FAQTable: React.FC<FAQTableProps> = ({
           isLoading={false}
         />
       )}
-
-      {editModal.isOpen && (
-        <FAQUploadModal
-          isOpen={editModal.isOpen}
-          onClose={closeEditModal}
-          onSubmit={handleSubmitEdit}
-          initialData={editModal.faqData}
-          isEdit={true}
-          isSubmitting={false}
-        />
-      )}
     </>
-  ), [confirmModal, editModal, closeConfirmModal, handleConfirmAction, closeEditModal, handleSubmitEdit]);
+  ), [confirmModal, closeConfirmModal, handleConfirmAction]);
 
   const renderHeader = () => (
     <FAQTableHeader

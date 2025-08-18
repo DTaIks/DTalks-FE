@@ -1,8 +1,11 @@
 import styled from "styled-components";
 import TitleContainer from "@/layout/TitleContainer";
+import { useScrollToTop } from "@/hooks/useScrollToTop";
 import PermissionTable from "@/components/admin/permission/PermissionTable";
 
 const PermissionPage = () => {
+  useScrollToTop();
+  
   return (
     <Container>
       <HeaderWrapper>

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import type { MediaFile, MediaContentProps } from '@/types/media';
 import MediaFileContent from './MediaFileContentList';
@@ -20,6 +20,21 @@ const MediaContent: React.FC<MediaContentProps> = ({
   onSelectFileType,
   onPageChange
 }) => {
+  // 부서 변경 시 에러 상태를 즉시 초기화
+  const [localError, setLocalError] = useState<string | null>(error);
+  const [prevDepartment, setPrevDepartment] = useState(selectedDepartment);
+
+  useEffect(() => {
+    // 부서가 변경되면 에러 상태를 즉시 초기화
+    if (prevDepartment !== selectedDepartment) {
+      setLocalError(null);
+      setPrevDepartment(selectedDepartment);
+    } else {
+      // 같은 부서에서는 에러 상태 업데이트
+      setLocalError(error);
+    }
+  }, [selectedDepartment, error, prevDepartment]);
+
   return (
     <RightContainer>
       <HeaderContainer>
@@ -38,10 +53,10 @@ const MediaContent: React.FC<MediaContentProps> = ({
         <FileContentWrapper>
           {isLoading ? (
             <LoadingText>파일 목록을 불러오는 중...</LoadingText>
-          ) : error ? (
+          ) : localError ? (
             <EmptyState 
-              message="해당 소속된 부서 인원이 아니면 파일 목록을 볼 수 없습니다."
-              subMessage="부서를 다시 한 번 확인해주세요."
+              message={localError === '403' ? "접근 권한이 없습니다" : "파일 목록을 불러오는데 실패했습니다"}
+              subMessage={localError === '403' ? "관리자에게 문의해주세요" : "잠시 후 다시 시도해주세요"}
             />
           ) : files.length === 0 ? (
             <EmptyState 

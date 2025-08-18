@@ -3,8 +3,11 @@ import { useNavigate } from 'react-router-dom';
 import Logo from '@/assets/common/Logo.png';
 import SignUpForm from '@/components/signup/SignUpForm';
 import { useScrollControl } from '@/hooks/useScrollControl';
+import { useScrollToTop } from '@/hooks/useScrollToTop';
 
 export default function SignUpPage(): JSX.Element {
+  useScrollToTop();
+  
   const navigate = useNavigate();
 
   // 세로 스크롤만 허용

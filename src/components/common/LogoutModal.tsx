@@ -1,10 +1,10 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import styled from "styled-components";
-import { useNavigate } from "react-router-dom";
 import ProfileImageSrc from "@/assets/common/Profile.png";
-import { useAuthStore } from "@/store/authStore";
-import { useLogout } from "@/hooks/useAuth";
 import { useBodyScrollLock } from "@/hooks/useScrollControl";
+import { authAPI } from "@/api/authAPI";
+import { useLogoutMutation } from "@/query/useAuthQueries";
+import { performLogoutCleanup } from "@/utils/logoutUtils";
 
 interface LogoutModalProps {
   isOpen: boolean;
@@ -13,23 +13,41 @@ interface LogoutModalProps {
 }
 
 const LogoutModal: React.FC<LogoutModalProps> = ({ isOpen, onClose }) => {
-  const navigate = useNavigate();
-  const { logout: resetLocal } = useAuthStore();
-  const logoutMutation = useLogout();
+  const logoutMutation = useLogoutMutation();
+  const [profileName, setProfileName] = useState<string>("admin");
 
   // 모달 열릴 때 스크롤 락
   useBodyScrollLock(isOpen);
 
+  // 프로필 정보 가져오기
+  useEffect(() => {
+    const fetchProfile = async () => {
+      try {
+        const profileData = await authAPI.getProfile();
+        console.log('프로필 데이터 받음:', profileData);
+        setProfileName(profileData.name);
+      } catch (error) {
+        console.error('프로필 조회 실패:', error);
+        // 에러 발생 시 기본값 유지
+        setProfileName('admin');
+      }
+    };
+
+    fetchProfile();
+  }, []);
+
   const handleLogout = async () => {
     try {
+      // 로그아웃 API 호출 (성공/실패와 관계없이 clearAllData 호출됨)
       await logoutMutation.mutateAsync();
     } catch {
       // 401 에러는 이미 로그아웃된 상태이므로 정상 처리
+      // clearAllData는 mutation의 onError에서 호출됨
     } finally {
-      // 로그아웃 성공/실패와 관계없이 로컬 상태 초기화
-      resetLocal();
+      // 모달 닫기
       onClose();
-      navigate('/login');
+      // 로그인 페이지로 리다이렉트
+      performLogoutCleanup();
     }
   };
 
@@ -44,8 +62,7 @@ const LogoutModal: React.FC<LogoutModalProps> = ({ isOpen, onClose }) => {
           <AvatarImage src={ProfileImageSrc} alt="Profile" />
         </ProfileAvatar>
         
-        <UserName>admin</UserName>
-        <UserEmail>admin@email.com</UserEmail>
+        <UserName>{profileName}</UserName>
         
         <LogoutButton onClick={handleLogout} disabled={logoutMutation.isPending}>
           {logoutMutation.isPending ? '로그아웃 중...' : '로그아웃'}
@@ -63,10 +80,11 @@ const ModalOverlay = styled.div`
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: var(--color-gray-100);
+  background-color: rgba(0, 0, 0, 0.35);
   display: flex;
   justify-content: center;
   align-items: center;
+  backdrop-filter: blur(3.75px);
   z-index: 1050;
 `;
 
@@ -131,13 +149,7 @@ const UserName = styled.h2`
   color: var(--color-dimgray);
   margin: 0 0 var(--gap-8) 0;
   text-align: center;
-`;
-
-const UserEmail = styled.p`
-  font-size: var(--font-size-16);
-  color: var(--color-darkgray);
-  margin: 0 0 var(--gap-40) 0;
-  text-align: center;
+  margin-bottom: 48px;
 `;
 
 const LogoutButton = styled.button`

@@ -13,7 +13,7 @@ interface UseDocumentAllActionsProps {
   closeConfirmModal: () => void;
   closeUpdateModal: () => void;
   confirmModal: {
-    type: 'archive' | 'download';
+    type: 'archive' | 'download' | 'restore';
     fileName: string;
   };
   updateModal: {
@@ -94,13 +94,20 @@ export const useDocumentAllActions = ({
       );
       if (documentToArchive) {
         try {
-          if (!documentToArchive.isActive) {
-            await documentRestoreMutation.mutateAsync(documentToArchive.documentId);
-          } else {
-            await documentArchiveMutation.mutateAsync(documentToArchive.documentId);
-          }
+          await documentArchiveMutation.mutateAsync(documentToArchive.documentId);
         } catch (error) {
-          console.error('문서 보관/복원 실패:', error);
+          console.error('문서 보관 실패:', error);
+        }
+      }
+    } else if (confirmModal.type === 'restore') {
+      const documentToRestore = documents.find(
+        doc => doc.documentName === confirmModal.fileName
+      );
+      if (documentToRestore) {
+        try {
+          await documentRestoreMutation.mutateAsync(documentToRestore.documentId);
+        } catch (error) {
+          console.error('문서 복원 실패:', error);
         }
       }
     } else if (confirmModal.type === 'download') {
@@ -121,7 +128,7 @@ export const useDocumentAllActions = ({
           } else {
             alert('파일을 찾을 수 없습니다. 관리자에게 문의해주세요.');
           }
-        } catch (error) {
+        } catch {
           alert('파일 다운로드 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.');
         }
       } else {

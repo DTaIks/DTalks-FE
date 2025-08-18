@@ -4,7 +4,7 @@ import type { DocumentInfo } from "@/types/document";
 // 모달 상태 타입 정의
 interface ConfirmModalState {
   isOpen: boolean;
-  type: 'archive' | 'download';
+  type: 'archive' | 'download' | 'restore';
   fileName: string;
 }
 
@@ -48,7 +48,7 @@ export const useDocumentAllModals = (documents: DocumentInfo[]) => {
   });
 
   // 확인 모달 핸들러
-  const openConfirmModal = useCallback((type: 'archive' | 'download', fileName: string) => {
+  const openConfirmModal = useCallback((type: 'archive' | 'download' | 'restore', fileName: string) => {
     setConfirmModal({ isOpen: true, type, fileName });
   }, []);
   

@@ -61,26 +61,7 @@ export const useLogin = () => {
   });
 };
 
-// 로그아웃
-export const useLogout = () => {
-  const { logout, setError } = useAuthStore();
-
-  return useMutation({
-    mutationFn: authAPI.logout,
-    onSuccess: () => {
-      logout();
-    },
-    onError: (error: unknown) => {
-      // 401 에러는 이미 로그아웃된 상태이므로 에러로 처리하지 않음
-      const errorMessage = error instanceof Error ? error.message : '로그아웃에 실패했습니다.';
-      if (!errorMessage.includes('401')) {
-        setError(errorMessage);
-      }
-      // 401 에러가 아닌 경우에도 로컬 상태는 초기화
-      logout();
-    },
-  });
-};
+// 로그아웃 관련 함수는 useAuthQueries.ts의 useLogoutMutation과 logoutUtils.ts로 이동됨
 
 // 백그라운드 인증 확인
 export const useAuth = () => {

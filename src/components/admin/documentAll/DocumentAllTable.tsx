@@ -6,7 +6,7 @@ interface DocumentAllTableProps {
   documents: DocumentInfo[];
   modals: {
     confirmModal: {
-      open: (type: 'archive' | 'download', fileName: string) => void;
+      open: (type: 'archive' | 'download' | 'restore', fileName: string) => void;
       close: () => void;
     };
     versionModal: {
@@ -57,7 +57,8 @@ const DocumentAllTable: React.FC<DocumentAllTableProps> = ({
     // 문서 ID로 문서를 찾아서 confirmModal 열기
     const document = documents.find(doc => doc.documentId === id);
     if (document) {
-      modals.confirmModal.open('archive', document.documentName);
+      const modalType = document.isActive ? 'archive' : 'restore';
+      modals.confirmModal.open(modalType, document.documentName);
     }
   }, [documents, modals.confirmModal]);
 

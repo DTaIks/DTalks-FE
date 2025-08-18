@@ -1,17 +1,53 @@
-import React from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import styled from 'styled-components';
 import TitleContainer from '@/layout/TitleContainer';
+import { useScrollToTop } from '@/hooks/useScrollToTop';
 import Button from '@/components/common/Button';
 import MediaFileUploadModal from '@/components/admin/media/MediaFileUploadModal';
 import ConfirmModal from '@/components/common/ConfirmModal';
+import ErrorModal from '@/components/common/ErrorModal';
 import { VersionHistoryModal } from '@/components/common/FileVersionManagementModal';
+import { authAPI } from '@/api/authAPI';
 import MediaSidebar from '@/components/admin/media/MediaSidebar';
 import MediaContent from '@/components/admin/media/MediaContent';
 import { useMediaPage } from '@/hooks/media/useMediaPage';
 import { useMediaActions } from '@/hooks/media/useMediaActions';
 import { useCommonHandlers } from '@/hooks/useCommonHandlers';
+import type { MediaFile } from '@/types/media';
+import type { MediaUploadData } from '@/types/modal';
+import type { AxiosError } from 'axios';
 
 const MediaPage: React.FC = () => {
+  useScrollToTop();
+  
+  // 권한 관련 상태
+  const [userRole, setUserRole] = useState<string>('사용자');
+  const [isErrorModalOpen, setIsErrorModalOpen] = useState<boolean>(false);
+  const [errorMessage, setErrorMessage] = useState<string>('');
+
+  // 프로필 정보 조회
+  useEffect(() => {
+    const fetchUserProfile = async () => {
+      try {
+        const profileData = await authAPI.getProfile();
+        setUserRole(profileData.role);
+      } catch (error) {
+        console.error('프로필 조회 실패:', error);
+      }
+    };
+
+    fetchUserProfile();
+  }, []);
+
+  // 권한 확인 함수
+  const checkUserPermission = useCallback((): boolean => {
+    if (!userRole || userRole === '사용자') {
+      setErrorMessage('접근 권한이 없습니다.');
+      setIsErrorModalOpen(true);
+      return false;
+    }
+    return true;
+  }, [userRole]);
   
   // 부서 목록 정의
   const departments = [
@@ -52,13 +88,20 @@ const MediaPage: React.FC = () => {
 
   const mediaActions = useMediaActions();
   
-  const handlers = useCommonHandlers({ 
+  const baseHandlers = useCommonHandlers({ 
     modals: {
       confirmModal: {
-        open: openConfirmModal,
+        open: (type: 'archive' | 'download' | 'restore', fileName: string) =>
+          openConfirmModal(type === 'restore' ? 'archive' : type, fileName),
       },
       uploadModal: {
-        openEdit: openEditModal,
+        openEdit: (data: { fileName: string; description: string; fileVersion: string; isPublic: boolean }) =>
+          openEditModal({
+            fileName: data.fileName,
+            description: data.description,
+            fileVersion: data.fileVersion,
+            isPublic: data.isPublic,
+          } as MediaUploadData),
         close: closeUploadModal,
         isEditMode: uploadModal.isEditMode,
       },
@@ -69,41 +112,66 @@ const MediaPage: React.FC = () => {
       }
     }, 
     mediaActions: {
-      ...mediaActions,
-      setSelectedFile,
-      handleConfirmAction: () => {
-        if (confirmModal.type === 'archive') {
-          const fileToArchive = files.find(file => file.fileName === confirmModal.fileName);
-          if (fileToArchive) {
-            mediaActions.handleArchive(fileToArchive.fileId);
-          }
-        } else if (confirmModal.type === 'download') {
-          // 확인 모달에서 다운로드 처리
-          const fileToDownload = files.find(file => file.fileName === confirmModal.fileName);
-          if (fileToDownload && fileToDownload.fileUrl) {
-            // 파일 유효성 검사 후 다운로드
-            fetch(fileToDownload.fileUrl, { method: 'HEAD' })
-              .then(response => {
-                if (response.ok) {
-                  const link = document.createElement('a');
-                  link.href = fileToDownload.fileUrl!;
-                  link.download = fileToDownload.fileName;
-                  document.body.appendChild(link);
-                  link.click();
-                  document.body.removeChild(link);
-                } else {
-                  alert('파일을 찾을 수 없습니다. 관리자에게 문의해주세요.');
-                }
-              })
-                             .catch(() => {
-                 alert('파일 다운로드 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.');
-               });
-          }
-        }
-        closeConfirmModal();
-      }
+      handleUpload: (data: { fileName: string; description: string; fileVersion: string; isPublic: boolean }) =>
+        mediaActions.handleUpload({ ...data } as MediaUploadData),
+      handleEdit: (data: { fileName: string; description: string; fileVersion: string; isPublic: boolean }) =>
+        mediaActions.handleEdit({ ...data } as MediaUploadData),
+      setSelectedFile
     }
   });
+
+  const handlers = {
+    ...baseHandlers,
+    handleDownloadClick: baseHandlers.handleDownloadClick,
+    handleVersionManagementClick: baseHandlers.handleVersionManagementClick,
+    handleDocumentArchive: baseHandlers.handleDocumentArchive,
+    handleConfirmAction: () => {
+      if (confirmModal.type === 'archive') {
+        const fileToArchive = files.find(file => file.fileName === confirmModal.fileName);
+        if (fileToArchive) {
+          mediaActions.handleArchive(fileToArchive.fileId);
+        }
+      } else if (confirmModal.type === 'download') {
+        // 확인 모달에서 다운로드 처리
+        const fileToDownload = files.find(file => file.fileName === confirmModal.fileName);
+        if (fileToDownload && fileToDownload.fileUrl) {
+          // 파일 유효성 검사 후 다운로드
+          fetch(fileToDownload.fileUrl, { method: 'HEAD' })
+            .then(response => {
+              if (response.ok) {
+                const link = document.createElement('a');
+                link.href = fileToDownload.fileUrl!;
+                link.download = fileToDownload.fileName;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+              } else {
+                alert('파일을 찾을 수 없습니다. 관리자에게 문의해주세요.');
+              }
+            })
+            .catch(() => {
+              alert('파일 다운로드 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.');
+            });
+        }
+      }
+      closeConfirmModal();
+    },
+    handleEditClick: (file: MediaFile) => {
+      if (checkUserPermission()) {
+        baseHandlers.handleEditClick(file);
+      }
+    },
+    handleArchiveClick: (fileName: string) => {
+      if (checkUserPermission()) {
+        baseHandlers.handleArchiveClick(fileName);
+      }
+    },
+    handleUploadSubmit: (data: { uploadFile?: File | null; fileName: string; description: string; fileVersion: string; isPublic: boolean }) => {
+      if (checkUserPermission()) {
+        baseHandlers.handleUploadSubmit(data);
+      }
+    }
+  };
 
   // 페이지 변경 핸들러
   const handlePageChange = (page: number) => {
@@ -122,7 +190,11 @@ const MediaPage: React.FC = () => {
             <ButtonContainer>
               <StyledUploadButton 
                 text="파일 업로드"
-                onClick={openUploadModal}
+                onClick={() => {
+                  if (checkUserPermission()) {
+                    openUploadModal();
+                  }
+                }}
                 variant="primary"
                 width="var(--button-width)"
                 height="var(--button-height)"
@@ -150,7 +222,7 @@ const MediaPage: React.FC = () => {
             totalPages={totalPages}
             currentPage={currentPage}
             isLoading={isLoading}
-            error={error?.message || (error ? String(error) : null)}
+            error={(error as AxiosError)?.response?.status === 403 ? '403' : (error?.message || (error ? String(error) : null))}
             handlers={handlers}
             onSelectFileType={selectFileType}
             onPageChange={handlePageChange}
@@ -162,9 +234,9 @@ const MediaPage: React.FC = () => {
         isOpen={uploadModal.isOpen}
         onClose={closeUploadModal}
         onSubmit={handlers.handleUploadSubmit}
-        initialData={uploadModal.initialData}
+        initialData={uploadModal.initialData ?? undefined}
         isEditMode={uploadModal.isEditMode}
-        isSubmitting={uploadModal.isEditMode ? isUpdating : isUploading}
+        isSubmitting={uploadModal.initialData ? isUpdating : isUploading}
       />
 
       <ConfirmModal
@@ -180,6 +252,12 @@ const MediaPage: React.FC = () => {
         onClose={closeVersionModal}
         fileName={versionModal.fileName}
         fileId={versionModal.fileId}
+      />
+
+      <ErrorModal
+        isOpen={isErrorModalOpen}
+        onClose={() => setIsErrorModalOpen(false)}
+        errorMessage={errorMessage}
       />
     </PageContainer>
   );

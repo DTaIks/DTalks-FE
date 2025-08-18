@@ -1,12 +1,15 @@
-import { useEffect, useCallback, useMemo } from "react";
+import { useEffect, useCallback, useMemo, useState } from "react";
 import styled from "styled-components";
 import TitleContainer from "@/layout/TitleContainer";
+import { useScrollToTop } from "@/hooks/useScrollToTop";
 import DocumentAllStatCard from "@/components/admin/documentAll/DocumentAllStatCard";
 import DocumentAllTable from "@/components/admin/documentAll/DocumentAllTable";
 import Pagination from "@/components/common/Pagination";
 import ConfirmModal from "@/components/common/ConfirmModal";
 import { VersionHistoryModal } from "@/components/common/FileVersionManagementModal";
 import DocumentUploadModal from "@/components/common/DocumentUploadModal";
+import ErrorModal from "@/components/common/ErrorModal";
+import { authAPI } from "@/api/authAPI";
 import { useDocumentStore } from "@/store/documentStore";
 import { useDocumentCountByCategory, useRecentUpdateCountByCategory, useActiveDocumentCountByCategory } from "@/query/useDocumentQueries";
 
@@ -17,6 +20,8 @@ import { useDocumentAllActions } from "@/hooks/document/usdDocumentAllActions";
 
 // 전체 문서 관리 페이지
 const DocumentAllPage = () => {
+  useScrollToTop();
+  
   // 전역 상태 직접 사용
   const {
     searchTerm,
@@ -26,6 +31,11 @@ const DocumentAllPage = () => {
     setSelectedCategory,
     setSelectedStatus,
   } = useDocumentStore();
+
+  // 권한 관련 상태
+  const [userRole, setUserRole] = useState<string>('사용자');
+  const [isErrorModalOpen, setIsErrorModalOpen] = useState<boolean>(false);
+  const [errorMessage, setErrorMessage] = useState<string>('');
 
   // 1. 데이터 관리
   const {
@@ -77,6 +87,8 @@ const DocumentAllPage = () => {
   const { data: recentUpdateCount } = useRecentUpdateCountByCategory("all");
   const { data: activeCount } = useActiveDocumentCountByCategory("all");
 
+
+
   const stats = useMemo(
     () => [
       {
@@ -98,6 +110,30 @@ const DocumentAllPage = () => {
     [totalCount, recentUpdateCount, activeCount]
   );
 
+  // 프로필 정보 조회
+  useEffect(() => {
+    const fetchUserProfile = async () => {
+      try {
+        const profileData = await authAPI.getProfile();
+        setUserRole(profileData.role);
+      } catch (error) {
+        console.error('프로필 조회 실패:', error);
+      }
+    };
+
+    fetchUserProfile();
+  }, []);
+
+  // 권한 확인 함수
+  const checkUserPermission = useCallback((): boolean => {
+    if (!userRole || userRole === '사용자') {
+      setErrorMessage('접근 권한이 없습니다.');
+      setIsErrorModalOpen(true);
+      return false;
+    }
+    return true;
+  }, [userRole]);
+
   // 5. 초기 설정
   useEffect(() => {
     const { setSelectedStatus, setSelectedCategory } =
@@ -118,7 +154,10 @@ const DocumentAllPage = () => {
   const modals = useMemo(
     () => ({
       confirmModal: {
-        open: openConfirmModal,
+        open: (type: 'archive' | 'download' | 'restore', fileName: string) => {
+          if (!checkUserPermission()) return;
+          openConfirmModal(type, fileName);
+        },
         close: closeConfirmModal,
       },
       versionModal: {
@@ -127,8 +166,20 @@ const DocumentAllPage = () => {
         isOpen: versionModal.isOpen,
       },
     }),
-    [openConfirmModal, closeConfirmModal, openVersionModal, closeVersionModal, versionModal.isOpen]
+    [openConfirmModal, closeConfirmModal, openVersionModal, closeVersionModal, versionModal.isOpen, checkUserPermission]
   );
+
+  // 권한 체크가 포함된 업데이트 모달 열기 핸들러
+  const openUpdateModalWithPermission = useCallback((documentName: string) => {
+    if (!checkUserPermission()) return;
+    openUpdateModal(documentName);
+  }, [checkUserPermission, openUpdateModal]);
+
+  // 권한 체크가 포함된 확인 액션
+  const handleConfirmActionWithPermission = useCallback(() => {
+    if (!checkUserPermission()) return;
+    handleConfirmAction();
+  }, [checkUserPermission, handleConfirmAction]);
 
   return (
     <Container>
@@ -152,7 +203,8 @@ const DocumentAllPage = () => {
         onSearch={handleSearch}
         onCategoryChange={handleCategoryChange}
         onStatusChange={handleStatusChange}
-        onUpdate={openUpdateModal}
+        onUpdate={openUpdateModalWithPermission}
+        error={currentError}
       />
 
       {!currentLoading && totalPages > 1 && (
@@ -169,7 +221,7 @@ const DocumentAllPage = () => {
       <ConfirmModal
         isOpen={confirmModal.isOpen}
         onClose={closeConfirmModal}
-        onConfirm={handleConfirmAction}
+        onConfirm={handleConfirmActionWithPermission}
         fileName={confirmModal.fileName}
         type={confirmModal.type}
       />
@@ -189,6 +241,11 @@ const DocumentAllPage = () => {
         isSubmitting={documentUpdateMutation.isPending}
         mode="update"
         initialData={updateModal.initialData}
+      />
+      <ErrorModal
+        isOpen={isErrorModalOpen}
+        onClose={() => setIsErrorModalOpen(false)}
+        errorMessage={errorMessage}
       />
     </Container>
   );

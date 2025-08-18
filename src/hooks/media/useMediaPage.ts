@@ -1,8 +1,9 @@
-import { useMemo } from 'react';
+import { useMemo, useEffect, useRef } from 'react';
 import { useMediaStore } from '@/store/mediaStore';
 import { useMediaFiles, useDepartmentFiles, useArchivedFiles, useDepartmentArchivedFiles } from '@/query/useMediaQueries';
 import { useFileUpload, useFileUpdate, useFileArchive } from '@/query/useMediaMutations';
 import { transformCommonFileToMediaFile, transformArchivedFileToMediaFile } from './useMediaFile';
+import { useQueryClient } from '@tanstack/react-query';
 
 // 부서명 매핑 상수
 const DEPARTMENT_MAPPING: Record<string, string> = {
@@ -13,6 +14,8 @@ const DEPARTMENT_MAPPING: Record<string, string> = {
 };
 
 export const useMediaPage = () => {
+  const queryClient = useQueryClient();
+  
   // Zustand 스토어에서 상태 가져오기
   const {
     selectedDepartment,
@@ -37,7 +40,7 @@ export const useMediaPage = () => {
     setSelectedFile,
   } = useMediaStore();
 
-
+  const prevDepartmentRef = useRef(selectedDepartment);
 
   // 부서명을 API용으로 변환하는 함수
   const getDepartmentNameForAPI = (uiDepartmentName: string): string => {
@@ -78,6 +81,28 @@ export const useMediaPage = () => {
     Boolean(selectedDepartment && selectedDepartment !== '전체 파일'),
     [selectedDepartment]
   );
+
+  // 부서 변경 시 에러 상태 초기화
+  useEffect(() => {
+    if (prevDepartmentRef.current !== selectedDepartment) {
+      // 이전 부서와 다른 경우, 관련 쿼리들의 에러 상태를 초기화
+      queryClient.removeQueries({
+        queryKey: ['mediaFiles']
+      });
+      queryClient.removeQueries({
+        queryKey: ['departmentFiles']
+      });
+      queryClient.removeQueries({
+        queryKey: ['archivedFiles']
+      });
+      queryClient.removeQueries({
+        queryKey: ['departmentArchivedFiles']
+      });
+      
+      // 현재 부서 업데이트
+      prevDepartmentRef.current = selectedDepartment;
+    }
+  }, [selectedDepartment, queryClient]);
   
   // API 쿼리
   const { 
@@ -85,7 +110,7 @@ export const useMediaPage = () => {
     isLoading: isCommonLoading, 
     error: commonError 
   } = useMediaFiles(commonApiParams, {
-    enabled: !isDepartmentSpecific
+    enabled: !isDepartmentSpecific && !isArchiveMode
   });
 
   const { 
@@ -93,7 +118,7 @@ export const useMediaPage = () => {
     isLoading: isDepartmentLoading, 
     error: departmentError 
   } = useDepartmentFiles(departmentApiParams, {
-    enabled: isDepartmentSpecific
+    enabled: isDepartmentSpecific && !isArchiveMode
   });
 
   // 보관된 파일 쿼리
@@ -102,7 +127,7 @@ export const useMediaPage = () => {
     isLoading: isArchivedLoading, 
     error: archivedError 
   } = useArchivedFiles(archivedApiParams, {
-    enabled: isArchiveMode && selectedDepartment === '전체 파일'
+    enabled: isArchiveMode && selectedDepartment === '전체 파일' && !isDepartmentSpecific
   });
 
   // 보관된 부서별 파일 쿼리
@@ -111,7 +136,7 @@ export const useMediaPage = () => {
     isLoading: isDepartmentArchivedLoading, 
     error: departmentArchivedError 
   } = useDepartmentArchivedFiles(departmentArchivedApiParams, {
-    enabled: isArchiveMode && selectedDepartment !== '전체 파일'
+    enabled: isArchiveMode && isDepartmentSpecific
   });
 
   // 현재 사용할 데이터와 로딩 상태 결정
@@ -126,8 +151,6 @@ export const useMediaPage = () => {
   const error = isArchiveMode 
     ? (selectedDepartment === '전체 파일' ? archivedError : departmentArchivedError)
     : (isDepartmentSpecific ? departmentError : commonError);
-
-
 
   const uploadMutation = useFileUpload();
   const updateMutation = useFileUpdate();
@@ -196,7 +219,7 @@ export const useMediaPage = () => {
       setSelectedDepartment(departmentName);
       setCurrentPage(1); // 보관함에서 부서 변경 시 첫 페이지로 이동
     }
-      }), [setCurrentPage, setSelectedDepartment, setSelectedFileType, setArchiveMode]);
+  }), [setCurrentPage, setSelectedDepartment, setSelectedFileType, setArchiveMode]);
 
   return {
     // 상태

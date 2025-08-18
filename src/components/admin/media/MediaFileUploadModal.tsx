@@ -12,8 +12,8 @@ import type { MediaUploadModalProps, MediaUploadData } from '@/types/media';
 
 const MEDIA_UPLOAD_INFO = [
   "지원 형식: 이미지(JPG, PNG), 음성(MP3), \n문서(pdf, docx, xlsx, csv)",
-  "중복 파일 업로드 시 자동으로 버전 관리됩니다",
-  "파일 변경 사항이 자동으로 추적됩니다"
+  "중복 파일 업로드 시 자동으로 버전 관리됩니다.",
+  "파일 변경 사항이 자동으로 추적됩니다."
 ];
 
 const MediaFileUploadModal: React.FC<MediaUploadModalProps> = ({
@@ -78,7 +78,12 @@ const MediaFileUploadModal: React.FC<MediaUploadModalProps> = ({
 
   const handleSubmit = () => {
     if (isFormValid()) {
-      onSubmit(formData);
+      // 수정 모드에서 파일이 선택되지 않은 경우 uploadFile을 null로 설정
+      const submitData = {
+        ...formData,
+        uploadFile: isEditMode && !formData.uploadFile ? null : formData.uploadFile
+      };
+      onSubmit(submitData);
       handleReset(); 
     }
   };
@@ -113,7 +118,11 @@ const MediaFileUploadModal: React.FC<MediaUploadModalProps> = ({
   const isValidSemver = (version: string): boolean => /^\d+\.\d+\.\d+$/.test(version);
   
   const hasValidFile = () => {
-    // 모든 모드에서 파일이 필수
+    // 수정 모드에서는 파일 선택이 선택사항 (기존 파일 유지 가능)
+    if (isEditMode) {
+      return !fileError; // 파일 에러만 없으면 됨
+    }
+    // 업로드 모드에서는 파일이 필수
     return formData.uploadFile !== undefined && !fileError;
   };
   const hasValidFileName = () => formData.fileName.trim() !== '';
@@ -152,7 +161,7 @@ const MediaFileUploadModal: React.FC<MediaUploadModalProps> = ({
     <UploadBaseModal
       isOpen={isOpen}
       onClose={handleClose}
-      title="파일 업로드"
+      title={isEditMode ? "파일 수정" : "파일 업로드"}
       onSubmit={handleSubmit}
       submitDisabled={!isFormValid()}
       isSubmitting={isSubmitting}

@@ -1,6 +1,6 @@
 // 권한 관리 관련 컴포넌트 Props 타입들
 
-// PermissionUser 타입
+// PermissionUser 타입 (사용자 정보용)
 export interface PermissionUser {
   userId: number;
   name: string;
@@ -8,6 +8,19 @@ export interface PermissionUser {
   department: string;
   position: string;
   isActive: boolean;
+  roleId?: number;
+  roleName?: string;
+}
+
+// PermissionRole 타입 (권한 정보용)
+export interface PermissionRole {
+  roleId: number;
+  roleName: string;
+  roleNameEn: string;
+  description: string;
+  image: string;
+  roleUserCount: number;
+  isActive: string;
 }
 
 // RoleManagement 컴포넌트

@@ -52,7 +52,6 @@ const DROPDOWN_MENUS = {
 } as const;
 
 const PROFILE_MENU_ACTIONS: ProfileMenuAction[] = [
-  { key: 'settings', label: '설정', icon: '' },
   { key: 'logout', label: '로그아웃', icon: '' }
 ];
 
@@ -225,7 +224,11 @@ const Sidebar: React.FC<SidebarProps> = ({ className = "" }) => {
   const [hoveredMenu, setHoveredMenu] = useState<string>("");
   const [isProfileDropdownOpen, setProfileDropdownOpen] = useState(false);
   const [isLogoutModalOpen, setLogoutModalOpen] = useState(false);
-  const [profileName, setProfileName] = useState<string>("admin");
+  const [profile, setProfile] = useState<{ name: string; department: string; role: string }>({
+    name: "admin",
+    department: "",
+    role: ""
+  });
 
   // 프로필 정보 가져오기
   useEffect(() => {
@@ -233,11 +236,19 @@ const Sidebar: React.FC<SidebarProps> = ({ className = "" }) => {
       try {
         const profileData = await authAPI.getProfile();
         console.log('프로필 데이터 받음:', profileData);
-        setProfileName(profileData.name);
+        setProfile({
+          name: profileData.name,
+          department: profileData.department,
+          role: profileData.role
+        });
       } catch (error) {
         console.error('프로필 조회 실패:', error);
         // 에러 발생 시 기본값 유지
-        setProfileName('admin');
+        setProfile({
+          name: "admin",
+          department: "",
+          role: ""
+        });
       }
     };
 
@@ -291,7 +302,7 @@ const Sidebar: React.FC<SidebarProps> = ({ className = "" }) => {
 
   const handleLogoClick = () => {
     try {
-      navigate("/");
+      navigate("/admin");
     } catch (error) {
       // setGlobalError('네비게이션 오류가 발생했습니다.'); // This line was removed from imports, so it's removed here.
       console.error('Navigation error:', error);
@@ -395,7 +406,10 @@ const Sidebar: React.FC<SidebarProps> = ({ className = "" }) => {
       <ProfileSection onClick={handleProfileClick}>
         <Profile alt="" src={ProfileImageSrc} />
         <AdminText>
-          {profileName || 'admin'}
+          <AdminName>{profile.name || 'admin'}</AdminName>
+          {(profile.department || profile.role) && (
+            <AdminInfo>{profile.role} / {profile.department}</AdminInfo>
+          )}
         </AdminText>
         <ProfileDropdown 
           isOpen={isProfileDropdownOpen} 
@@ -595,14 +609,30 @@ const Profile = styled.img`
 `;
 
 const AdminText = styled.div`
+  display: flex;
+  flex-direction: column;
+  margin-left: 8px;
+  max-width: 160px;
+`;
+
+const AdminName = styled.span`
   font-size: var(--font-size-18);
   font-weight: 500;
   color: var(--color-dimgray);
   font-family: var(--font-pretendard);
-  position: absolute;
-  left: 50%;
-  transform: translateX(-50%);
-  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+`;
+
+const AdminInfo = styled.span`
+  font-size: var(--font-size-12);
+  color: var(--color-gray);
+  font-family: var(--font-pretendard);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-top: 4px;  // 간격 추가
 `;
 
 const ProfileDropdownContainer = styled.div`
