@@ -1,6 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import TitleContainer from '@/layout/TitleContainer';
+import { useScrollToTop } from '@/hooks/useScrollToTop';
 import Button from '@/components/common/Button';
 import MediaFileUploadModal from '@/components/admin/media/MediaFileUploadModal';
 import ConfirmModal from '@/components/common/ConfirmModal';
@@ -12,6 +13,7 @@ import { useMediaActions } from '@/hooks/media/useMediaActions';
 import { useCommonHandlers } from '@/hooks/useCommonHandlers';
 
 const MediaPage: React.FC = () => {
+  useScrollToTop();
   
   // 부서 목록 정의
   const departments = [

@@ -3,6 +3,7 @@ import { useParams, Navigate } from "react-router-dom";
 import { useQueryClient } from '@tanstack/react-query';
 import styled from "styled-components";
 import TitleContainer from "@/layout/TitleContainer";
+import { useScrollToTop } from "@/hooks/useScrollToTop";
 import Button from "@/components/common/Button";
 import CompareCard from "@/components/common/document/DocumentCompareCard";
 import ConfirmModal from "@/components/common/ConfirmModal";
@@ -48,6 +49,8 @@ interface UpdateModalState {
 
 // 통합 문서 관리 페이지
 const DocumentPage = () => {
+  useScrollToTop();
+  
   const { category } = useParams<{ category: string }>();
   const queryClient = useQueryClient();
   const [currentPage, setCurrentPage] = useState(1);

@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import LoginForm from "@/components/login/LoginForm";
+import { useScrollToTop } from '@/hooks/useScrollToTop';
 import Logo from "@/assets/common/Logo.png";
 import { useAuthStore } from '@/store/authStore';
 import { useLoginStore } from '@/store/loginStore';
@@ -11,6 +12,8 @@ import { loginSchema, type LoginFormData } from '@/utils/authSchema';
 import styled from "styled-components";
 
 export default function LoginPage(): JSX.Element {
+  useScrollToTop();
+  
   const navigate = useNavigate();
   
   // Zustand store에서 상태 가져오기

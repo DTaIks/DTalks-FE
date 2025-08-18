@@ -3,7 +3,7 @@
 // Sidebar 컴포넌트
 export interface DropdownIconProps {
   isOpen: boolean;
-  onClick: () => void;
+  onClick?: () => void;
 }
 
 export interface MenuItemProps {

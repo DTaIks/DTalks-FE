@@ -1,6 +1,7 @@
 import React, { useCallback } from "react";
 import styled from "styled-components";
 import TitleContainer from "@/layout/TitleContainer";
+import { useScrollToTop } from "@/hooks/useScrollToTop";
 import FAQCategoryTable from "@/components/admin/faq/category/FAQCategoryTable";
 import { useFAQCategories } from "@/query/useFAQQueries";
 import { useArchiveFAQCategory, useRestoreFAQCategory } from "@/query/useFAQMutations";
@@ -8,6 +9,8 @@ import { useFAQStore } from "@/store/faqStore";
 import type { FAQCategory } from "@/types/faq";
 
 const FAQCategoryPage = () => {
+  useScrollToTop();
+  
   const { data: categoryData = [], isLoading, error } = useFAQCategories();
   const archiveCategoryMutation = useArchiveFAQCategory();
   const restoreCategoryMutation = useRestoreFAQCategory();
@@ -47,7 +50,7 @@ const FAQCategoryPage = () => {
   return (
     <Container>
       <HeaderWrapper>
-        <TitleContainer title="FAQ 카테고리 관리" subtitle="FAQ 카테고리를 관리하고 편집하세요" />
+        <TitleContainer title="FAQ 카테고리 관리" subtitle="FAQ 카테고리를 관리하세요" />
       </HeaderWrapper>
       <FAQCategoryTable 
         categoryData={categoryData}

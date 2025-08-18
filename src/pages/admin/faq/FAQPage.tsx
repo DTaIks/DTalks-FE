@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo, useCallback } from "react";
 import styled from "styled-components";
 import TitleContainer from "@/layout/TitleContainer";
+import { useScrollToTop } from "@/hooks/useScrollToTop";
 import FAQTable from "@/components/admin/faq/table/FAQTable";
 import Button from "@/components/common/Button";
 import Pagination from "@/components/common/Pagination";
@@ -9,14 +10,25 @@ import { useFAQList, useFAQSearch, useFAQFilter } from "@/query/useFAQQueries";
 import { useCreateFAQ, useUpdateFAQ, useArchiveFAQ } from "@/query/useFAQMutations";
 import { useFAQStore } from "@/store/faqStore";
 import { getCategoryNameFromFilter } from "@/utils/faqUtils";
+import { faqAPI } from "@/api/faqAPI";
 
 const FAQPage = () => {
+  useScrollToTop();
+  
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [modalError, setModalError] = useState<string>("");
 
-
-  const { searchTerm, setSearchTerm, selectedCategory, setSelectedCategory } = useFAQStore();
+  const { 
+    searchTerm, 
+    setSearchTerm, 
+    selectedCategory, 
+    setSelectedCategory,
+    editModal,
+    setEditModal,
+    closeEditModal
+  } = useFAQStore();
+  
   const createFAQMutation = useCreateFAQ();
   const updateFAQMutation = useUpdateFAQ();
   const archiveFAQMutation = useArchiveFAQ();
@@ -129,11 +141,28 @@ const FAQPage = () => {
     }
   }, [searchTerm, setSelectedCategory, setSearchTerm]);
 
-  // FAQ 상세 정보 조회 핸들러
+  // FAQ 상세 정보 조회 핸들러 - 수정 모달을 여는 역할
   const handleFAQDetail = useCallback(async (faqId: number) => {
-    // TODO: FAQ 상세 정보 조회 로직 구현
-    console.log('FAQ 상세 정보 조회:', faqId);
-  }, []);
+    try {
+      // FAQ 상세 정보 조회
+      const faqDetail = await faqAPI.getFAQDetail(faqId);
+      
+      if (faqDetail) {
+        // 수정 모달 열기
+        setEditModal({
+          isOpen: true,
+          faqData: {
+            question: faqDetail.question,
+            answer: faqDetail.answer,
+            category: faqDetail.categoryName // categoryName 필드 사용
+          },
+          faqId: faqId
+        });
+      }
+    } catch (error) {
+      console.error('FAQ 상세 정보 조회 실패:', error);
+    }
+  }, [setEditModal]);
 
   // FAQ 수정 핸들러
   const handleFAQUpdate = useCallback(async (faqId: number, faqData: { question: string; answer: string; category: string }) => {
@@ -142,10 +171,11 @@ const FAQPage = () => {
         faqId,
         faqData
       });
+      closeEditModal(); // 수정 완료 후 모달 닫기
     } catch (error) {
       console.error('FAQ 수정 실패:', error);
     }
-  }, [updateFAQMutation]);
+  }, [updateFAQMutation, closeEditModal]);
 
   // FAQ 보관 핸들러
   const handleFAQArchive = useCallback(async (faqId: number) => {
@@ -183,7 +213,6 @@ const FAQPage = () => {
         onSearch={handleSearch}
         onCategoryChange={handleCategoryChange}
         onFAQDetail={handleFAQDetail}
-        onFAQUpdate={handleFAQUpdate}
         onFAQArchive={handleFAQArchive}
       />
       {(faqItems.length > 0 || totalPages > 0) && (
@@ -202,6 +231,17 @@ const FAQPage = () => {
         onClose={handleModalClose}
         onSubmit={handleFAQSubmit}
         isSubmitting={createFAQMutation.isPending}
+        errorMessage={modalError}
+      />
+
+      {/* 수정 모달 */}
+      <FAQUploadModal
+        isOpen={editModal.isOpen}
+        onClose={closeEditModal}
+        onSubmit={(data) => handleFAQUpdate(editModal.faqId!, data)}
+        isSubmitting={updateFAQMutation.isPending}
+        isEdit={true}
+        initialData={editModal.faqData}
         errorMessage={modalError}
       />
     </Container>

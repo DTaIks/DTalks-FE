@@ -61,6 +61,7 @@ export interface MediaUploadData {
   description: string;
   fileVersion: string;
   category: string;
+  isPublic: boolean;
 }
 
 // FAQUploadModal 컴포넌트

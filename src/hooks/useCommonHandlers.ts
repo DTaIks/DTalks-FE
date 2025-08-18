@@ -62,8 +62,8 @@ export const useCommonHandlers = ({ modals, mediaActions, documentActions }: Use
 
   // 보관 버튼 클릭 핸들러 (공통)
   const handleArchiveClick = useCallback((fileName: string, isActive?: boolean) => {
-    // 문서의 상태에 따라 archive 또는 restore 타입 결정
-    const modalType = isActive ? 'archive' : 'restore';
+    // 기본은 보관(archive). isActive가 false로 명시된 경우에만 복원(restore)
+    const modalType = isActive === false ? 'restore' : 'archive';
     modals.confirmModal.open(modalType, fileName);
   }, [modals.confirmModal]);
 

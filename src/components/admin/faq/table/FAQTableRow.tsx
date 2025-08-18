@@ -33,6 +33,10 @@ const FAQTableRow: React.FC<FAQTableRowProps> = ({
 
   const handleArchiveClick = (e: React.MouseEvent) => {
     e.stopPropagation();
+    // 비활성화된 FAQ는 보관할 수 없음
+    if (!faq.isActive) {
+      return;
+    }
     onArchiveClick(faq);
   };
 
@@ -46,7 +50,13 @@ const FAQTableRow: React.FC<FAQTableRowProps> = ({
         수정
       </ActionText>
       <ActionDivider />
-      <ActionText onClick={handleArchiveClick}>보관</ActionText>
+      <ActionText 
+        onClick={handleArchiveClick}
+        $disabled={!faq.isActive}
+        title={!faq.isActive ? "보관된 FAQ는 추가로 보관할 수 없습니다." : ""}
+      >
+        보관
+      </ActionText>
     </ActionContainer>
   );
 

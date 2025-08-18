@@ -1,8 +1,11 @@
 import styled from "styled-components";
 import TitleContainer from "@/layout/TitleContainer";
+import { useScrollToTop } from "@/hooks/useScrollToTop";
 import UserTable from "@/components/admin/userlist/UserListTable";
 
 const UserListPage = () => {
+  useScrollToTop();
+  
   return (
     <Container>
       <HeaderWrapper>

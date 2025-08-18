@@ -52,7 +52,6 @@ const DROPDOWN_MENUS = {
 } as const;
 
 const PROFILE_MENU_ACTIONS: ProfileMenuAction[] = [
-  { key: 'settings', label: '설정', icon: '' },
   { key: 'logout', label: '로그아웃', icon: '' }
 ];
 
@@ -599,10 +598,11 @@ const AdminText = styled.div`
   font-weight: 500;
   color: var(--color-dimgray);
   font-family: var(--font-pretendard);
-  position: absolute;
-  left: 50%;
-  transform: translateX(-50%);
-  text-align: center;
+  margin-left: 8px;  // 프로필 이미지(40px) + 여백(12px) + 추가 여백(8px)
+  max-width: 160px;   // 최대 너비 제한
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 `;
 
 const ProfileDropdownContainer = styled.div`

@@ -1,7 +1,7 @@
 import { useCallback } from 'react';
 import { useFileUpload, useFileUpdate, useFileArchive } from '@/query/useMediaMutations';
 import { useMediaStore } from '@/store/mediaStore';
-import type { MediaUploadData } from '@/components/admin/media/MediaFileUploadModal';
+import type { MediaUploadData } from '@/types/media';
 
 export const useMediaActions = () => {
   const uploadMutation = useFileUpload();

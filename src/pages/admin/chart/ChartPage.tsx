@@ -5,8 +5,11 @@ import { DailyChatCard, SuccessRateCard, SatisfactionCard } from '@/components/a
 import { ResponseTimeChart } from '@/components/admin/chart/ResponseTimeCard';
 import { PromptTemplateCard } from '@/components/admin/chart/PromptTemplateCard';
 import WeeklyResponseCard from '@/components/admin/chart/WeeklyResponseCard';
+import { useScrollToTop } from '@/hooks/useScrollToTop';
 
 const ChartPage: React.FC = () => {
+  useScrollToTop();
+  
   return (
     <Container>
       <HeaderWrapper>
