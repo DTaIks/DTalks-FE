@@ -9,7 +9,7 @@ interface FileUploadModalState {
 
 interface ConfirmModalState {
   isOpen: boolean;
-  modalType: 'archive' | 'download';
+  modalType: 'archive' | 'download' | 'restore';
   selectedFileName: string;
 }
 
@@ -69,7 +69,7 @@ export const useFileUpload = ({ onUpload, onEdit, onArchive, onDownload, pageTyp
   }, [uploadModal.isEditMode, onUpload, onEdit, handleCloseUploadModal]);
 
   // 확인 모달 열기 핸들러
-  const openConfirmModal = useCallback((type: 'archive' | 'download', fileName: string) => {
+  const openConfirmModal = useCallback((type: 'archive' | 'download' | 'restore', fileName: string) => {
     setConfirmModal({
       isOpen: true,
       modalType: type,
@@ -88,7 +88,7 @@ export const useFileUpload = ({ onUpload, onEdit, onArchive, onDownload, pageTyp
 
   // 확인 모달 액션 핸들러
   const handleConfirmAction = useCallback(() => {
-    if (confirmModal.modalType === 'archive') {
+    if (confirmModal.modalType === 'archive' || confirmModal.modalType === 'restore') {
       onArchive?.(confirmModal.selectedFileName);
     } else if (confirmModal.modalType === 'download') {
       onDownload?.(confirmModal.selectedFileName);

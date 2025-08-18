@@ -2,7 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 import { faqAPI } from '@/api/faqAPI';
 import { transformFAQApiItems, transformFAQCategoryApiItems } from '@/utils/faqUtils';
 import { useDebouncedSearch } from '@/hooks/useDebouncedSearch';
-import type { FAQListApiResponse, FAQListResponse } from '@/types/faq';
+import type { FAQListResponse } from '@/types/faq';
 
 // FAQ 목록 조회 쿼리 (페이지는 0부터 시작)
 export const useFAQList = (currentPage: number) => {
