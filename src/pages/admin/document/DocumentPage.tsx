@@ -265,12 +265,18 @@ const DocumentPage = () => {
       await documentUploadMutation.mutateAsync({ file: data.uploadFile, fileInfo });
       setSearchTerm("");
       setCurrentPage(1);
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const axiosError = error as { 
+        response?: { 
+          status?: number; 
+          data?: { message?: string }; 
+        }; 
+      };
       console.error('문서 업로드 실패:', error);
       
       // 409 에러 처리
-      if (error?.response?.status === 409) {
-        const errorMessage = error?.response?.data?.message || 
+      if (axiosError?.response?.status === 409) {
+        const errorMessage = axiosError?.response?.data?.message || 
                             '기존 파일 버전과 같거나 낮은 버전으로 업데이트할 수 없습니다!';
         setUploadError(errorMessage);
         throw error; // 모달을 닫지 않기 위해 에러를 다시 throw
@@ -312,12 +318,18 @@ const DocumentPage = () => {
           }
         });
         closeUpdateModal();
-      } catch (error: any) {
+      } catch (error: unknown) {
+        const axiosError = error as { 
+          response?: { 
+            status?: number; 
+            data?: { message?: string }; 
+          }; 
+        };
         console.error('문서 수정 실패:', error);
         
         // 409 에러 처리
-        if (error?.response?.status === 409) {
-          const errorMessage = error?.response?.data?.message || 
+        if (axiosError?.response?.status === 409) {
+          const errorMessage = axiosError?.response?.data?.message || 
                               '기존 파일 버전과 같거나 낮은 버전으로 업데이트할 수 없습니다!';
           setUpdateError(errorMessage);
         } else {

@@ -20,7 +20,6 @@ export const useMediaActions = () => {
       await uploadMutation.mutateAsync({ file: data.uploadFile, fileInfo: data });
     } catch (error: unknown) {
       console.error('파일 업로드 실패:', error);
-      
       // 에러를 다시 throw해서 부모 컴포넌트에서 처리할 수 있도록 함
       throw error;
     }
@@ -41,7 +40,6 @@ export const useMediaActions = () => {
       });
     } catch (error: unknown) {
       console.error('파일 수정 실패:', error);
-      
       // 에러를 다시 throw해서 부모 컴포넌트에서 처리할 수 있도록 함
       throw error;
     }
