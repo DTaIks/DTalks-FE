@@ -1,91 +1,116 @@
-import { useState, useCallback, useMemo, useEffect, useRef } from "react";
-import { useQueryClient } from '@tanstack/react-query';
+import { useEffect, useCallback, useMemo, useState } from "react";
 import styled from "styled-components";
 import TitleContainer from "@/layout/TitleContainer";
 import { useScrollToTop } from "@/hooks/useScrollToTop";
-import Button from "@/components/common/Button";
-import CompareCard from "@/components/common/document/DocumentCompareCard";
+import DocumentAllStatCard from "@/components/admin/documentAll/DocumentAllStatCard";
+import DocumentAllTable from "@/components/admin/documentAll/DocumentAllTable";
+import Pagination from "@/components/common/Pagination";
 import ConfirmModal from "@/components/common/ConfirmModal";
-import DocumentUploadModal from "@/components/common/DocumentUploadModal";
 import { VersionHistoryModal } from "@/components/common/FileVersionManagementModal";
-import DocumentTable from "@/components/admin/documentAll/DocumentTable";
-import { useFileUpload } from "@/hooks/useFileUpload";
+import DocumentUploadModal from "@/components/common/DocumentUploadModal";
 import ErrorModal from "@/components/common/ErrorModal";
 import { authAPI } from "@/api/authAPI";
-
-import { useDocumentUpload, useDocumentUpdate, useDocumentArchive, useDocumentRestore } from "@/query/useDocumentMutations";
-import { useDocumentList, useDocumentSearchByCategory } from "@/query/useDocumentQueries";
 import { useDocumentStore } from "@/store/documentStore";
-import DocumentCategory1 from "@/assets/document/DocumentCategory1.svg";
-import DocumentCategory2 from "@/assets/document/DocumentCategory2.svg";
-import DocumentCategory3 from "@/assets/document/DocumentCategory3.svg";
+import { useDocumentCountByCategory, useRecentUpdateCountByCategory, useActiveDocumentCountByCategory } from "@/query/useDocumentQueries";
 
-// 타입 정의들
-interface CategoryConfig {
-  title: string;
-  subtitle: string;
-  image: string;
-}
+// 분리된 훅들 import
+import { useDocumentAllData } from "@/hooks/document/useDocumentAllData";
+import { useDocumentAllModals } from "@/hooks/document/useDocumentAllModals";
+import { useDocumentAllActions } from "@/hooks/document/usdDocumentAllActions";
 
-type CategoryKey = 'policy' | 'glossary' | 'reportform';
-
-interface VersionModalState {
-  isOpen: boolean;
-  fileName: string;
-  fileId: number | null;
-}
-
-interface UpdateModalState {
-  isOpen: boolean;
-  documentName: string;
-  initialData?: {
-    fileId?: number;
-    fileName: string;
-    description: string;
-    fileVersion: string;
-    category: string;
-    fileUrl?: string;
-  };
-}
-
-// 통합 문서 관리 페이지
+// 전체 문서 관리 페이지
 const DocumentAllPage = () => {
   useScrollToTop();
   
-  const queryClient = useQueryClient();
-  const [currentPage, setCurrentPage] = useState(1);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [refreshKey, setRefreshKey] = useState(0);
-  const prevStatusRef = useRef<string>('');
-  
+  // 전역 상태 직접 사용
+  const {
+    searchTerm,
+    selectedCategory,
+    selectedStatus,
+    setSearchTerm,
+    setSelectedCategory,
+    setSelectedStatus,
+  } = useDocumentStore();
+
   // 권한 관련 상태
   const [userRole, setUserRole] = useState<string>('사용자');
   const [isErrorModalOpen, setIsErrorModalOpen] = useState<boolean>(false);
   const [errorMessage, setErrorMessage] = useState<string>('');
-  
-  // 업로드/수정 에러 상태 추가
-  const [uploadError, setUploadError] = useState<string>('');
-  const [updateError, setUpdateError] = useState<string>('');
-  
-  // 기존 State 관리
-  const [versionModal, setVersionModal] = useState<VersionModalState>({ 
-    isOpen: false, 
-    fileName: '', 
-    fileId: null 
+
+  // 1. 데이터 관리
+  const {
+    currentPage,
+    setCurrentPage,
+    setRefreshKey,
+    documents,
+    totalPages,
+    currentLoading,
+    currentError,
+    isSearchMode,
+  } = useDocumentAllData();
+
+  // 2. 모달 관리
+  const {
+    confirmModal,
+    versionModal,
+    updateModal,
+    openConfirmModal,
+    closeConfirmModal,
+    openVersionModal,
+    closeVersionModal,
+    openUpdateModal,
+    closeUpdateModal,
+  } = useDocumentAllModals(documents);
+
+  // 3. 액션 핸들러
+  const {
+    handleSearch,
+    handleCategoryChange,
+    handleStatusChange,
+    handleConfirmAction,
+    handleDocumentUpdate,
+    documentUpdateMutation,
+  } = useDocumentAllActions({
+    documents,
+    setSelectedCategory,
+    setSelectedStatus,
+    setSearchTerm,
+    setRefreshKey,
+    isSearchMode,
+    closeConfirmModal,
+    closeUpdateModal,
+    confirmModal,
+    updateModal,
   });
-  
-  const [updateModal, setUpdateModal] = useState<UpdateModalState>({ 
-    isOpen: false, 
-    documentName: '', 
-    initialData: undefined
-  });
-  
-  // 검색 및 필터 상태 (전역 상태 사용)
-  const { 
-    selectedStatus,
-    setSelectedStatus 
-  } = useDocumentStore();
-  
+
+  // 4. 통계 데이터
+  const { data: totalCount } = useDocumentCountByCategory("all");
+  const { data: recentUpdateCount } = useRecentUpdateCountByCategory("all");
+  const { data: activeCount } = useActiveDocumentCountByCategory("all");
+
+
+
+  const stats = useMemo(
+    () => [
+      {
+        title: "전체 문서",
+        value: `${totalCount?.documentCount || 0}개`,
+        additionalInfo: "총 문서수",
+      },
+      {
+        title: "최근 업데이트 문서 수",
+        value: `${recentUpdateCount?.documentCount || 0}개`,
+        additionalInfo: "이번 주",
+      },
+      {
+        title: "활성 버전",
+        value: `${activeCount?.documentCount || 0}개`,
+        additionalInfo: "활성 문서 수",
+      },
+    ],
+    [totalCount, recentUpdateCount, activeCount]
+  );
+
   // 프로필 정보 조회
   useEffect(() => {
     const fetchUserProfile = async () => {
@@ -109,418 +134,102 @@ const DocumentAllPage = () => {
     }
     return true;
   }, [userRole]);
-  
-  // 문서 관련 뮤테이션
-  const documentUploadMutation = useDocumentUpload();
-  const documentUpdateMutation = useDocumentUpdate();
-  const documentArchiveMutation = useDocumentArchive();
-  const documentRestoreMutation = useDocumentRestore();
 
-  // 검색 모드 여부 결정
-  const isSearchMode = searchTerm.trim().length > 0;
-
-  // 일반 문서 목록 조회
-  const { 
-    data: documentListData, 
-    isLoading: isListLoading, 
-    error: listError 
-  } = useDocumentList(
-    currentPage,
-    undefined, // 전체 카테고리 조회
-    4,
-    selectedStatus
-  );
-
-  // 검색 결과 조회
-  const { 
-    data: searchData, 
-    isLoading: isSearchLoading, 
-    error: searchError,
-    isDebouncing,
-    refetch: refetchSearch
-  } = useDocumentSearchByCategory(
-    undefined, // 전체 카테고리에서 검색
-    searchTerm,
-    currentPage,
-    isSearchMode,
-    4,
-    selectedStatus,
-    refreshKey 
-  );
-
-  // 상태 변경을 감지하여 검색 
+  // 5. 초기 설정
   useEffect(() => {
-    // 상태가 실제로 변경되었을 때만 처리
-    if (prevStatusRef.current !== selectedStatus && prevStatusRef.current !== '') {      
-      if (isSearchMode) {
-        const timeoutId = setTimeout(() => {
-          refetchSearch();
-        }, 200);
-        
-        return () => clearTimeout(timeoutId);
-      }
-    }
-    
-    // 현재 상태를 이전 상태로 업데이트
-    prevStatusRef.current = selectedStatus;
-  }, [selectedStatus, isSearchMode, refetchSearch]);
+    const { setSelectedStatus, setSelectedCategory } =
+      useDocumentStore.getState();
+    setSelectedStatus("전체 상태");
+    setSelectedCategory("전체 카테고리");
+  }, []);
 
-  // 현재 사용할 데이터와 로딩 상태 결정
-  const currentData = isSearchMode ? searchData : documentListData;
-  const isLoading = isSearchMode ? (isSearchLoading || isDebouncing) : isListLoading;
-  const error = isSearchMode ? searchError : listError;
-
-  // 문서 목록과 총 페이지 수 추출
-  const { documents, totalPages } = useMemo(() => {
-    const items = currentData?.content || [];
-    const pages = currentData?.totalPages || 1;
-    console.log('현재 표시할 문서:', { 
-      mode: isSearchMode ? 'search' : 'list', 
-      count: items.length, 
-      status: selectedStatus,
-      searchTerm: searchTerm.trim()
-    });
-    return { documents: items, totalPages: pages };
-  }, [currentData, isSearchMode, selectedStatus, searchTerm]);
-
-  // 카테고리별 설정
-  const categoryConfig: Record<CategoryKey, CategoryConfig> = {
-    'policy': {
-      title: "사내 정책",
-      subtitle: "모든 사내 정책 문서를 한 번에 확인하고 정리하세요",
-      image: DocumentCategory2
+  // 6. 페이지 변경 핸들러
+  const handlePageChange = useCallback(
+    (page: number) => {
+      setCurrentPage(page);
     },
-    'glossary': {
-      title: "용어사전",
-      subtitle: "모든 용어 사전 문서를 한 번에 확인하고 정리하세요",
-      image: DocumentCategory3
-    },
-    'reportform': {
-      title: "보고서 양식",
-      subtitle: "모든 보고서 양식 문서를 한 번에 확인하고 정리하세요",
-      image: DocumentCategory1
-    }
-  };
+    [setCurrentPage]
+  );
 
-  // 검색어 변경 핸들러
-  const handleSearchChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    setSearchTerm(value);
-    setCurrentPage(1);
-  }, []);
+  // 7. 모달 객체
+  const modals = useMemo(
+    () => ({
+      confirmModal: {
+        open: (type: 'archive' | 'download' | 'restore', fileName: string) => {
+          if (!checkUserPermission()) return;
+          openConfirmModal(type, fileName);
+        },
+        close: closeConfirmModal,
+      },
+      versionModal: {
+        open: openVersionModal,
+        close: closeVersionModal,
+        isOpen: versionModal.isOpen,
+      },
+    }),
+    [openConfirmModal, closeConfirmModal, openVersionModal, closeVersionModal, versionModal.isOpen, checkUserPermission]
+  );
 
-  // 상태 필터 변경 핸들러
-  const handleStatusChange = useCallback((status: string) => {
-    setSelectedStatus(status);
-    setCurrentPage(1);
-    
-    // 강제 리페치를 위해 키 변경
-    setRefreshKey(prev => prev + 1);
-    
-    if (!isSearchMode) {
-      queryClient.invalidateQueries({ 
-        queryKey: ['documentList']
-      });
-    }
-    
-    // 검색 관련 쿼리는 항상 무효화
-    queryClient.removeQueries({ 
-      queryKey: ['documentSearchByCategory'],
-      exact: false
-    });
-  }, [setSelectedStatus, queryClient, isSearchMode]);
+  // 권한 체크가 포함된 업데이트 모달 열기 핸들러
+  const openUpdateModalWithPermission = useCallback((documentName: string) => {
+    if (!checkUserPermission()) return;
+    openUpdateModal(documentName);
+  }, [checkUserPermission, openUpdateModal]);
 
-  // CompareCard에서 버전 비교를 처리하는 핸들러
-  const handleVersionCompare = useCallback((documentName: string, version1: string, version2: string) => {
-    console.log(`버전 비교 완료: ${documentName} - v${version1} vs v${version2}`);
-  }, []);
-
-  // 에러 클리어 핸들러들
-  const handleClearUploadError = useCallback(() => {
-    setUploadError('');
-  }, []);
-
-  const handleClearUpdateError = useCallback(() => {
-    setUpdateError('');
-  }, []);
-
-  // 문서 업로드 핸들러 (에러 처리 개선)
-  const handleDocumentUpload = useCallback(async (data: {
-    uploadFile?: File;
-    fileName: string;
-    description: string;
-    fileVersion: string;
-    category: string;
-  }) => {
-    if (!checkUserPermission()) {
-      return;
-    }
-    
-    if (!data.uploadFile) {
-      return;
-    }
-
-    const fileInfo = {
-      fileName: data.fileName,
-      description: data.description,
-      fileVersion: data.fileVersion,
-      category: data.category
-    };
-
-    try {
-      setUploadError(''); // 에러 초기화
-      await documentUploadMutation.mutateAsync({ file: data.uploadFile, fileInfo });
-      setSearchTerm("");
-      setCurrentPage(1);
-    } catch (error: any) {
-      console.error('문서 업로드 실패:', error);
-      
-      // 409 에러 처리
-      if (error?.response?.status === 409) {
-        const errorMessage = error?.response?.data?.message || 
-                            '기존 파일 버전과 같거나 낮은 버전으로 업데이트할 수 없습니다!';
-        setUploadError(errorMessage);
-      } else {
-        setUploadError('파일 업로드 중 오류가 발생했습니다. 다시 시도해주세요.');
-      }
-      throw error; // 모달을 닫지 않기 위해 에러를 다시 throw
-    }
-  }, [documentUploadMutation, checkUserPermission]);
-
-  // 문서 수정 관련 핸들러
-  const closeUpdateModal = useCallback(() => {
-    setUpdateModal({ isOpen: false, documentName: '', initialData: undefined });
-    setUpdateError(''); // 모달 닫을 때 에러 초기화
-  }, []);
-
-  const handleDocumentUpdate = useCallback(async (data: {
-    uploadFile?: File;
-    fileName: string;
-    description: string;
-    fileVersion: string;
-    category: string;
-  }) => {
-    if (!checkUserPermission()) {
-      return;
-    }
-    
-    if (updateModal.initialData?.fileId) {
-      try {
-        setUpdateError(''); // 에러 초기화
-        await documentUpdateMutation.mutateAsync({
-          fileId: updateModal.initialData.fileId,
-          file: data.uploadFile || null,
-          fileInfo: {
-            fileName: data.fileName,
-            description: data.description,
-            fileVersion: data.fileVersion,
-            category: data.category
-          }
-        });
-        closeUpdateModal();
-      } catch (error: any) {
-        console.error('문서 수정 실패:', error);
-        
-        // 409 에러 처리
-        if (error?.response?.status === 409) {
-          const errorMessage = error?.response?.data?.message || 
-                              '기존 파일 버전과 같거나 낮은 버전으로 업데이트할 수 없습니다!';
-          setUpdateError(errorMessage);
-        } else {
-          setUpdateError('파일 수정 중 오류가 발생했습니다. 다시 시도해주세요.');
-        }
-      }
-    }
-  }, [updateModal.initialData, documentUpdateMutation, closeUpdateModal, checkUserPermission]);
-
-  const openUpdateModal = useCallback((documentName: string) => {
-    if (!checkUserPermission()) {
-      return;
-    }
-    
-    const documentToUpdate = documents.find(doc => doc.documentName === documentName);
-    if (documentToUpdate) {
-      setUpdateError(''); // 모달 열 때 에러 초기화
-      setUpdateModal({
-        isOpen: true,
-        documentName,
-        initialData: {
-          fileId: documentToUpdate.documentId,
-          fileName: documentToUpdate.documentName,
-          description: '',
-          fileVersion: documentToUpdate.latestVersion || '1.0.0',
-          category: documentToUpdate.category,
-          fileUrl: documentToUpdate.fileUrl
-        }
-      });
-    }
-  }, [documents, checkUserPermission]);
-
-  // 다운로드 핸들러
-  const handleDownload = useCallback((fileName: string, fileUrl?: string) => {
-    if (fileUrl) {
-      fetch(fileUrl, { method: 'HEAD' })
-        .then(response => {
-          if (response.ok) {
-            const link = document.createElement('a');
-            link.href = fileUrl;
-            link.download = fileName;
-            link.style.display = 'none';
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-          } else {
-            alert('파일을 찾을 수 없습니다. 관리자에게 문의해주세요.');
-          }
-        })
-        .catch(() => {
-        });
-    } else {
-      alert('다운로드할 파일 URL이 없습니다.');
-    }
-  }, []);
-
-  // 보관/복원 핸들러
-  const handleArchive = useCallback(async (id: number, isArchived?: boolean) => {
-    if (!checkUserPermission()) {
-      return;
-    }
-    
-    try {
-      if (isArchived) {
-        await documentRestoreMutation.mutateAsync(id);
-      } else {
-        await documentArchiveMutation.mutateAsync(id);
-      }
-    } catch (error) {
-      console.error('문서 보관/복원 실패:', error);
-    }
-  }, [documentArchiveMutation, documentRestoreMutation, checkUserPermission]);
-
-  // 파일 업로드 훅
-  const {
-    uploadModal,
-    confirmModal,
-    handleFileUploadClick,
-    handleCloseUploadModal,
-    handleSubmit,
-    handleConfirmAction,
-    closeConfirmModal,
-    openConfirmModal,
-    getButtonText
-  } = useFileUpload({
-    pageType: "document",
-    onUpload: handleDocumentUpload,
-    onEdit: () => {},
-    onArchive: (fileName: string) => {
-      const document = documents.find(doc => doc.documentName === fileName);
-      if (document) {
-        handleArchive(document.documentId, !document.isActive);
-      }
-    },
-    onDownload: handleDownload
-  });
-
-  // 권한 체크가 포함된 파일 업로드 클릭 핸들러
-  const handleFileUploadClickWithPermission = useCallback(() => {
-    if (!checkUserPermission()) {
-      return;
-    }
-    setUploadError(''); // 모달 열 때 에러 초기화
-    handleFileUploadClick();
-  }, [checkUserPermission, handleFileUploadClick]);
-
-  // 업로드 모달 닫기 핸들러 (에러 초기화 포함)
-  const handleCloseUploadModalWithError = useCallback(() => {
-    setUploadError('');
-    handleCloseUploadModal();
-  }, [handleCloseUploadModal]);
-
-  // 버전 히스토리 클릭 핸들러
-  const handleVersionHistoryClick = useCallback((fileName: string) => {
-    const document = documents.find(doc => doc.documentName === fileName);
-    if (document) {
-      setVersionModal({ isOpen: true, fileName, fileId: document.documentId });
-    }
-  }, [documents]);
-
-  // 확인 모달 열기 핸들러
-  const handleConfirmModalOpen = useCallback((type: 'archive' | 'download' | 'restore', fileName: string) => {
-    openConfirmModal(type, fileName);
-  }, [openConfirmModal]);
-
-  // 페이지 변경 핸들러
-  const handlePageChange = useCallback((page: number) => {
-    setCurrentPage(page);
-  }, []);
-
-  const config = {
-    title: "전체 문서",
-    subtitle: "모든 문서를 한 번에 확인하고 정리하세요",
-    image: DocumentCategory1
-  };
+  // 권한 체크가 포함된 확인 액션
+  const handleConfirmActionWithPermission = useCallback(() => {
+    if (!checkUserPermission()) return;
+    handleConfirmAction();
+  }, [checkUserPermission, handleConfirmAction]);
 
   return (
     <Container>
       <HeaderWrapper>
-        <TitleContainer title={config.title} subtitle={config.subtitle} />
-        <ButtonContainer>
-          <StyledButton 
-            text={getButtonText()} 
-            width="var(--button-width)" 
-            height="var(--button-height)"
-            onClick={handleFileUploadClickWithPermission}
-          />
-        </ButtonContainer>
-      </HeaderWrapper>
-      
-      <CompareCardWrapper>
-        <CompareCard
-          category={undefined} // 전체 문서용
-          onVersionCompare={handleVersionCompare}
+        <TitleContainer
+          title="전체 문서"
+          subtitle="모든 사내 문서를 한 번에 확인하고 정리하세요"
         />
-      </CompareCardWrapper>
-      
-      <DocumentTable
-        category={undefined} // 전체 문서용
-        title={config.title}
-        categoryImage={config.image}
+      </HeaderWrapper>
+
+      <DocumentAllStatCard stats={stats} />
+
+      <DocumentAllTable
         documents={documents}
-        isLoading={isLoading}
-        currentPage={currentPage}
-        totalPages={totalPages}
-        selectedStatus={selectedStatus}
+        modals={modals}
+        isLoading={currentLoading}
+        isSearchMode={isSearchMode}
         searchTerm={searchTerm}
-        onPageChange={handlePageChange}
+        selectedCategory={selectedCategory}
+        selectedStatus={selectedStatus}
+        onSearch={handleSearch}
+        onCategoryChange={handleCategoryChange}
         onStatusChange={handleStatusChange}
-        onSearchChange={handleSearchChange}
-        onVersionHistoryClick={handleVersionHistoryClick}
-        onConfirmModalOpen={handleConfirmModalOpen}
-        onUpdate={openUpdateModal}
-        error={error}
+        onUpdate={openUpdateModalWithPermission}
+        error={currentError}
       />
 
-      <DocumentUploadModal
-        isOpen={uploadModal.isOpen}
-        onClose={handleCloseUploadModalWithError}
-        onSubmit={handleSubmit}
-        pageType="document"
-        isSubmitting={documentUploadMutation.isPending}
-        submitError={uploadError}
-        onClearError={handleClearUploadError}
-      />
+      {!currentLoading && totalPages > 1 && (
+        <PaginationContainer>
+          <Pagination
+            key={totalPages}
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={handlePageChange}
+          />
+        </PaginationContainer>
+      )}
 
       <ConfirmModal
         isOpen={confirmModal.isOpen}
         onClose={closeConfirmModal}
-        onConfirm={handleConfirmAction}
-        fileName={confirmModal.selectedFileName}
-        type={confirmModal.modalType}
+        onConfirm={handleConfirmActionWithPermission}
+        fileName={confirmModal.fileName}
+        type={confirmModal.type}
       />
 
       <VersionHistoryModal
         isOpen={versionModal.isOpen}
-        onClose={() => setVersionModal({ isOpen: false, fileName: '', fileId: null })}
+        onClose={closeVersionModal}
         fileName={versionModal.fileName}
         fileId={versionModal.fileId || undefined}
         pageType="document"
@@ -533,10 +242,7 @@ const DocumentAllPage = () => {
         isSubmitting={documentUpdateMutation.isPending}
         mode="update"
         initialData={updateModal.initialData}
-        submitError={updateError}
-        onClearError={handleClearUpdateError}
       />
-
       <ErrorModal
         isOpen={isErrorModalOpen}
         onClose={() => setIsErrorModalOpen(false)}
@@ -566,23 +272,10 @@ const HeaderWrapper = styled.div`
   margin-bottom: 32px;
 `;
 
-const ButtonContainer = styled.div`
-  display: flex;
-  align-items: center;
-  height: 64px;
-`;
-
-const StyledButton = styled(Button)`
-  && {
-    color: var(--color-white);
-    font-size: var(--font-size-18);
-    font-weight: var(--table-header-font-weight);
-  }
-`;
-
-const CompareCardWrapper = styled.div`
-  width: 100%;
+const PaginationContainer = styled.div`
   display: flex;
   justify-content: center;
+  align-items: center;
+  margin-top: 4px;
   margin-bottom: 24px;
 `;
