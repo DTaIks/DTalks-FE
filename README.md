@@ -82,6 +82,6 @@ src/
 
 ### 👨🏻‍💻 Contributors
 
-| <img width="160px" src="https://avatars.githubusercontent.com/{}" /> | <img width="160px" src="https://avatars.githubusercontent.com/{}" /> |
+| <img width="160px" src="https://avatars.githubusercontent.com/KyeongJooni" /> | <img width="160px" src="https://avatars.githubusercontent.com/swp1017" /> |
 |:---:|:---:|
-| [이경준](https://github.com/{}) | [박상우](https://github.com/yangseohyun) |
+| [이경준](https://github.com/KyeongJooni) | [박상우](https://github.com/swp1017) |
