@@ -65,10 +65,6 @@ const DocumentPage = () => {
   const [isErrorModalOpen, setIsErrorModalOpen] = useState<boolean>(false);
   const [errorMessage, setErrorMessage] = useState<string>('');
   
-  // 업로드/수정 에러 상태 추가
-  const [uploadError, setUploadError] = useState<string>('');
-  const [updateError, setUpdateError] = useState<string>('');
-  
   // 기존 State 관리
   const [versionModal, setVersionModal] = useState<VersionModalState>({ 
     isOpen: false, 
@@ -237,7 +233,7 @@ const DocumentPage = () => {
     console.log(`버전 비교 완료: ${documentName} - v${version1} vs v${version2}`);
   }, []);
 
-  // 문서 업로드 핸들러 (에러 처리 추가)
+  // 문서 업로드 핸들러
   const handleDocumentUpload = useCallback(async (data: {
     uploadFile?: File;
     fileName: string;
@@ -261,33 +257,20 @@ const DocumentPage = () => {
     };
 
     try {
-      setUploadError(''); // 에러 초기화
       await documentUploadMutation.mutateAsync({ file: data.uploadFile, fileInfo });
       setSearchTerm("");
       setCurrentPage(1);
-    } catch (error: any) {
+    } catch (error) {
       console.error('문서 업로드 실패:', error);
-      
-      // 409 에러 처리
-      if (error?.response?.status === 409) {
-        const errorMessage = error?.response?.data?.message || 
-                            '기존 파일 버전과 같거나 낮은 버전으로 업데이트할 수 없습니다!';
-        setUploadError(errorMessage);
-        throw error; // 모달을 닫지 않기 위해 에러를 다시 throw
-      } else {
-        setUploadError('파일 업로드 중 오류가 발생했습니다. 다시 시도해주세요.');
-        throw error;
-      }
     }
   }, [documentUploadMutation, checkUserPermission]);
 
   // 문서 수정 관련 핸들러
   const closeUpdateModal = useCallback(() => {
     setUpdateModal({ isOpen: false, documentName: '', initialData: undefined });
-    setUpdateError(''); // 모달 닫을 때 에러 초기화
   }, []);
 
-  const handleDocumentUpdate = useCallback(async (data: {
+  const handleDocumentUpdate = useCallback((data: {
     uploadFile?: File;
     fileName: string;
     description: string;
@@ -299,31 +282,17 @@ const DocumentPage = () => {
     }
     
     if (updateModal.initialData?.fileId) {
-      try {
-        setUpdateError(''); // 에러 초기화
-        await documentUpdateMutation.mutateAsync({
-          fileId: updateModal.initialData.fileId,
-          file: data.uploadFile || null,
-          fileInfo: {
-            fileName: data.fileName,
-            description: data.description,
-            fileVersion: data.fileVersion,
-            category: data.category
-          }
-        });
-        closeUpdateModal();
-      } catch (error: any) {
-        console.error('문서 수정 실패:', error);
-        
-        // 409 에러 처리
-        if (error?.response?.status === 409) {
-          const errorMessage = error?.response?.data?.message || 
-                              '기존 파일 버전과 같거나 낮은 버전으로 업데이트할 수 없습니다!';
-          setUpdateError(errorMessage);
-        } else {
-          setUpdateError('파일 수정 중 오류가 발생했습니다. 다시 시도해주세요.');
+      documentUpdateMutation.mutate({
+        fileId: updateModal.initialData.fileId,
+        file: data.uploadFile || null,
+        fileInfo: {
+          fileName: data.fileName,
+          description: data.description,
+          fileVersion: data.fileVersion,
+          category: data.category
         }
-      }
+      });
+      closeUpdateModal();
     }
   }, [updateModal.initialData, documentUpdateMutation, closeUpdateModal, checkUserPermission]);
 
@@ -334,7 +303,6 @@ const DocumentPage = () => {
     
     const documentToUpdate = documents.find(doc => doc.documentName === documentName);
     if (documentToUpdate) {
-      setUpdateError(''); // 모달 열 때 에러 초기화
       setUpdateModal({
         isOpen: true,
         documentName,
@@ -349,15 +317,6 @@ const DocumentPage = () => {
       });
     }
   }, [documents, checkUserPermission]);
-
-  // 에러 클리어 핸들러들
-  const handleClearUploadError = useCallback(() => {
-    setUploadError('');
-  }, []);
-
-  const handleClearUpdateError = useCallback(() => {
-    setUpdateError('');
-  }, []);
 
   // 다운로드 핸들러
   const handleDownload = useCallback((fileName: string, fileUrl?: string) => {
@@ -429,15 +388,8 @@ const DocumentPage = () => {
     if (!checkUserPermission()) {
       return;
     }
-    setUploadError(''); // 모달 열 때 에러 초기화
     handleFileUploadClick();
   }, [checkUserPermission, handleFileUploadClick]);
-
-  // 업로드 모달 닫기 핸들러 (에러 초기화 포함)
-  const handleCloseUploadModalWithError = useCallback(() => {
-    setUploadError('');
-    handleCloseUploadModal();
-  }, [handleCloseUploadModal]);
 
   // 버전 히스토리 클릭 핸들러
   const handleVersionHistoryClick = useCallback((fileName: string) => {
@@ -509,12 +461,10 @@ const DocumentPage = () => {
 
       <DocumentUploadModal
         isOpen={uploadModal.isOpen}
-        onClose={handleCloseUploadModalWithError}
+        onClose={handleCloseUploadModal}
         onSubmit={handleSubmit}
         pageType={category as 'policy' | 'glossary' | 'reportform'}
         isSubmitting={documentUploadMutation.isPending}
-        submitError={uploadError}
-        onClearError={handleClearUploadError}
       />
 
       <ConfirmModal
@@ -540,8 +490,6 @@ const DocumentPage = () => {
         isSubmitting={documentUpdateMutation.isPending}
         mode="update"
         initialData={updateModal.initialData}
-        submitError={updateError}
-        onClearError={handleClearUpdateError}
       />
 
       <ErrorModal
