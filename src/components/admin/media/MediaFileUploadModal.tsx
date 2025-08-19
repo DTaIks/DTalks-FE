@@ -10,19 +10,27 @@ import { PublicSetting } from '@/components/modal/FilePublicSetting';
 import { UploadInfoCard } from '@/components/modal/UploadInfoCard';
 import type { MediaUploadModalProps, MediaUploadData } from '@/types/media';
 
+// Props에 에러 관련 속성 추가를 위한 확장 타입
+interface ExtendedMediaUploadModalProps extends MediaUploadModalProps {
+  submitError?: string;
+  onClearError?: () => void;
+}
+
 const MEDIA_UPLOAD_INFO = [
   "지원 형식: 이미지(JPG, PNG), 음성(MP3), \n문서(pdf, docx, xlsx, csv)",
   "중복 파일 업로드 시 자동으로 버전 관리됩니다.",
   "파일 변경 사항이 자동으로 추적됩니다."
 ];
 
-const MediaFileUploadModal: React.FC<MediaUploadModalProps> = ({
+const MediaFileUploadModal: React.FC<ExtendedMediaUploadModalProps> = ({
   isOpen,
   onClose,
   onSubmit,
   initialData,
   isEditMode = false,
-  isSubmitting = false
+  isSubmitting = false,
+  submitError = '',
+  onClearError
 }) => {
   const [formData, setFormData] = useState<MediaUploadData>({
     uploadFile: undefined,
@@ -67,23 +75,18 @@ const MediaFileUploadModal: React.FC<MediaUploadModalProps> = ({
 
   useEffect(() => {
     if (!isOpen) {
-      // 모달이 닫힐 때 상태 완전 초기화
-      setFormData({
-        uploadFile: undefined,
-        fileName: '',
-        description: '',
-        fileVersion: '',
-        isPublic: false
-      });
-      setFileDisplayName('');
       setTouched({
         fileName: false,
         description: false,
         fileVersion: false
       });
       setFileError('');
+      // 모달이 닫힐 때 에러 초기화
+      if (onClearError) {
+        onClearError();
+      }
     }
-  }, [isOpen]);
+  }, [isOpen, onClearError]);
 
   const handleSubmit = () => {
     if (isFormValid()) {
@@ -93,8 +96,7 @@ const MediaFileUploadModal: React.FC<MediaUploadModalProps> = ({
         uploadFile: isEditMode && !formData.uploadFile ? null : formData.uploadFile
       };
       onSubmit(submitData);
-      // 저장 클릭 시 결과와 상관없이 즉시 모달 닫기
-      handleClose();
+      handleReset(); 
     }
   };
 
@@ -103,6 +105,11 @@ const MediaFileUploadModal: React.FC<MediaUploadModalProps> = ({
     value: string | boolean | File | undefined
   ) => {
     setFormData(prev => ({ ...prev, [field]: value }));
+    
+    // 버전 입력 시 에러 메시지 초기화
+    if (field === 'fileVersion' && onClearError) {
+      onClearError();
+    }
     
     if (field !== 'isPublic') {
       setTouched(prev => ({ ...prev, [field]: true }));
@@ -164,7 +171,6 @@ const MediaFileUploadModal: React.FC<MediaUploadModalProps> = ({
   };
 
   const handleClose = () => {
-    handleReset(); // 모달 닫을 때 상태 초기화
     onClose();
   };
 
@@ -176,6 +182,11 @@ const MediaFileUploadModal: React.FC<MediaUploadModalProps> = ({
       onSubmit={handleSubmit}
       submitDisabled={!isFormValid()}
       isSubmitting={isSubmitting}
+      submitText={
+        isSubmitting 
+          ? "업로드 중..." 
+          : (isEditMode ? "수정" : "저장")
+      }
     >
       <FileSelectInput
         fileDisplayName={fileDisplayName}
@@ -222,6 +233,12 @@ const MediaFileUploadModal: React.FC<MediaUploadModalProps> = ({
         title="업로드 정보"
         texts={MEDIA_UPLOAD_INFO}
       />
+
+      {submitError && (
+        <ErrorMessage>
+          {submitError}
+        </ErrorMessage>
+      )}
     </UploadBaseModal>
   );
 };
@@ -240,4 +257,11 @@ const InputRow = styled.div`
     flex-shrink: 0;
     width: 120px;
   }
+`;
+
+const ErrorMessage = styled.div`
+  color: var(--color-error);
+  font-size: 12px;
+  font-weight: 500;
+  margin-top: 8px;
 `;
