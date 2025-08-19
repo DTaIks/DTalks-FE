@@ -10,7 +10,7 @@ export const useMediaFiles = (params: CommonFileRequest, options?: { enabled?: b
       const result = await mediaAPI.getCommonFiles(params);
       return result;
     },
-    staleTime: 1000 * 60 * 5, // 5분 동안 fresh 상태 유지
+    staleTime: 1000 * 30, // 30초로 단축 (기존 5분)
     gcTime: 1000 * 60 * 15, // 15분
     refetchOnMount: false, // 마운트 시 자동 리페치 비활성화
     refetchOnWindowFocus: false, // 윈도우 포커스 시 자동 리페치 비활성화
@@ -28,7 +28,7 @@ export const useDepartmentFiles = (params: DepartmentFileRequest, options?: { en
       const result = await mediaAPI.getDepartmentFiles(params);
       return result;
     },
-    staleTime: 30 * 1000, // 30초 동안 fresh 상태 유지
+    staleTime: 1000 * 30, // 30초로 통일 (기존 30초 유지)
     gcTime: 5 * 60 * 1000, // 5분
     refetchOnMount: false, // 마운트 시 자동 리페치 비활성화
     refetchOnWindowFocus: false, // 윈도우 포커스 시 자동 리페치 비활성화
@@ -45,7 +45,7 @@ export const useArchivedFiles = (params: CommonArchivedFileRequest, options?: { 
       const result = await mediaAPI.getArchivedFiles(params);
       return result;
     },
-    staleTime: 1000 * 60 * 5, // 5분 동안 fresh 상태 유지
+    staleTime: 1000 * 30, // 30초로 단축 (기존 5분)
     gcTime: 1000 * 60 * 15, // 15분
     refetchOnMount: false, // 마운트 시 자동 리페치 비활성화
     refetchOnWindowFocus: false, // 윈도우 포커스 시 자동 리페치 비활성화
@@ -63,7 +63,7 @@ export const useDepartmentArchivedFiles = (params: DepartmentArchivedFileRequest
       const result = await mediaAPI.getDepartmentArchivedFiles(params);
       return result;
     },
-    staleTime: 30 * 1000, // 30초 동안 fresh 상태 유지
+    staleTime: 1000 * 30, // 30초로 통일 (기존 30초 유지)
     gcTime: 5 * 60 * 1000, // 5분
     refetchOnMount: false, // 마운트 시 자동 리페치 비활성화
     refetchOnWindowFocus: false, // 윈도우 포커스 시 자동 리페치 비활성화
@@ -81,7 +81,7 @@ export const useFileVersionHistory = (fileId: number | null, options?: { enabled
       const result = await mediaAPI.getFileVersionHistory(fileId);
       return result;
     },
-    staleTime: 30 * 1000, // 30초 동안 fresh 상태 유지
+    staleTime: 1000 * 30, // 30초로 통일 (기존 30초 유지)
     gcTime: 5 * 60 * 1000, // 5분
     refetchOnMount: false, // 마운트 시 자동 리페치 비활성화
     refetchOnWindowFocus: false, // 윈도우 포커스 시 자동 리페치 비활성화

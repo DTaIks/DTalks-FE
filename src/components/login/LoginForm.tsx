@@ -38,7 +38,7 @@ const LoginForm: React.FC<LoginFormProps> = ({
     <LoginFormContainer className={className}>
       <BackgroundPanel />
       <TitleWrapper>
-        <WelcomeTitle>다시 만나서 반가워요 :)</WelcomeTitle>
+        <WelcomeTitle>만나서 반가워요 :)</WelcomeTitle>
       </TitleWrapper>
       <Form onSubmit={handleSubmit}>
         <InputField

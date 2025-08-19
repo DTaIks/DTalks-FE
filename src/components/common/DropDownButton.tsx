@@ -4,6 +4,7 @@ import styled from 'styled-components';
 interface DropdownItem {
   label: string;
   onClick: () => void;
+  disabled?: boolean;
 }
 
 interface DropDownButtonProps {
@@ -18,8 +19,10 @@ const DropDownButton: React.FC<DropDownButtonProps> = ({ items }) => {
   };
 
   const handleItemClick = (item: DropdownItem) => {
-    item.onClick();
-    setIsOpen(false);
+    if (!item.disabled) {
+      item.onClick();
+      setIsOpen(false);
+    }
   };
 
   return (
@@ -43,6 +46,7 @@ const DropDownButton: React.FC<DropDownButtonProps> = ({ items }) => {
               <DropdownItemButton
                 key={index}
                 onClick={() => handleItemClick(item)}
+                disabled={item.disabled}
               >
                 {item.label}
               </DropdownItemButton>
@@ -136,19 +140,20 @@ const DropdownMenu = styled.div`
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
 `;
 
-const DropdownItemButton = styled.button`
+const DropdownItemButton = styled.button<{ disabled?: boolean }>`
   width: 100%;
   text-align: left;
   padding: 12px 16px;
   font-size: var(--font-size-14);
-  color: var(--color-black);
+  color: ${props => props.disabled ? '#ccc' : 'var(--color-black)'};
   background: none;
   border: none;
-  cursor: pointer;
+  cursor: ${props => props.disabled ? 'not-allowed' : 'pointer'};
+  opacity: ${props => props.disabled ? 0.5 : 1};
 
   &:hover {
-    background-color: var(--color-lightpurple);
-    color: var(--color-mediumpurple-300);
+    background-color: ${props => props.disabled ? 'transparent' : 'var(--color-lightpurple)'};
+    color: ${props => props.disabled ? '#ccc' : 'var(--color-mediumpurple-300)'};
   }
 
   &:first-child {

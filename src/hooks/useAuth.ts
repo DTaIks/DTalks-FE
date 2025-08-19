@@ -4,6 +4,7 @@ import { useAuthStore } from '@/store/authStore';
 import { useLoginStore } from '@/store/loginStore';
 import { authAPI } from '@/api/authAPI';
 import { useLocation } from 'react-router-dom';
+import { hasAuthCookie } from '@/utils/cookieUtils';
 
 // 이메일 중복 확인
 export const useCheckEmailDuplicate = (email: string) => {
@@ -69,8 +70,48 @@ export const useAuth = () => {
   const location = useLocation();
   const isCheckingRef = useRef(false);
   const hasCheckedRef = useRef(false);
+  const initialCheckDoneRef = useRef(false);
 
   useEffect(() => {
+    // 초기 페이지 로딩 시 쿠키 기반 인증 상태 확인
+    if (!initialCheckDoneRef.current) {
+      initialCheckDoneRef.current = true;
+      
+      // 쿠키에 인증 정보가 있는지 확인
+      const hasCookie = hasAuthCookie();
+      
+      if (hasCookie) {
+        // 쿠키가 있으면 토큰 재발급 시도
+        const checkAuthWithCookie = async () => {
+          isCheckingRef.current = true;
+          
+          try {
+            await reissueToken();
+            setAuthenticated(true);
+            setAuthChecking(false);
+            hasCheckedRef.current = true;
+            console.log('쿠키 기반 인증 성공');
+          } catch {
+            setAuthenticated(false);
+            setAuthChecking(false);
+            hasCheckedRef.current = true;
+            console.log('쿠키 기반 인증 실패');
+          } finally {
+            isCheckingRef.current = false;
+          }
+        };
+        
+        checkAuthWithCookie();
+      } else {
+        // 쿠키가 없으면 인증되지 않은 상태로 설정
+        setAuthenticated(false);
+        setAuthChecking(false);
+        console.log('인증 쿠키 없음');
+      }
+      
+      return;
+    }
+
     // 공개 페이지 목록 (토큰 재발급 불필요)
     const publicPages = ['/login', '/signup', '/password'];
     

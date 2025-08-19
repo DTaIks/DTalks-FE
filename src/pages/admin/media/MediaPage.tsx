@@ -112,10 +112,18 @@ const MediaPage: React.FC = () => {
       }
     }, 
     mediaActions: {
-      handleUpload: (data: { fileName: string; description: string; fileVersion: string; isPublic: boolean }) =>
-        mediaActions.handleUpload({ ...data } as MediaUploadData),
-      handleEdit: (data: { fileName: string; description: string; fileVersion: string; isPublic: boolean }) =>
-        mediaActions.handleEdit({ ...data } as MediaUploadData),
+      handleUpload: (
+        data: { fileName: string; description: string; fileVersion: string; isPublic: boolean },
+        onSuccess?: () => void,
+        onError?: (message: string) => void
+      ) =>
+        mediaActions.handleUpload({ ...data } as MediaUploadData, onSuccess, onError),
+      handleEdit: (
+        data: { fileName: string; description: string; fileVersion: string; isPublic: boolean },
+        onSuccess?: () => void,
+        onError?: (message: string) => void
+      ) =>
+        mediaActions.handleEdit({ ...data } as MediaUploadData, onSuccess, onError),
       setSelectedFile
     }
   });
@@ -210,7 +218,11 @@ const MediaPage: React.FC = () => {
             isArchiveMode={isArchiveMode}
             isArchiveClosing={isArchiveClosing}
             onSelectDepartment={selectDepartment}
-            onToggleArchive={toggleArchive}
+            onToggleArchive={() => {
+              if (checkUserPermission()) {
+                toggleArchive(!isArchiveMode);
+              }
+            }}
             onSelectArchiveDepartment={selectArchiveDepartment}
           />
           

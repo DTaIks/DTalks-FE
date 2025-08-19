@@ -110,17 +110,32 @@ export const useCommonHandlers = ({ modals, mediaActions, documentActions }: Use
   }, []);
 
   // 업로드 모달 핸들러 (Media 전용)
-  const handleUploadSubmit = useCallback((data: { fileName: string; description: string; fileVersion: string; isPublic: boolean }) => {
+  const handleUploadSubmit = useCallback((data: { uploadFile?: File | null; fileName: string; description: string; fileVersion: string; isPublic: boolean }) => {
     if (!modals.uploadModal || !mediaActions) {
       return;
     }
 
+    const closeModal = () => {
+      // 성공/실패 관계없이 모달 닫기
+      if (modals.uploadModal) {
+        modals.uploadModal.close();
+      }
+    };
+
+    const onSuccess = () => {
+      closeModal();
+    };
+
+    const onError = (_errorMessage: string) => {
+      // 에러 발생 시에도 모달만 닫기
+      closeModal();
+    };
+
     if (modals.uploadModal.isEditMode) {
-      mediaActions.handleEdit(data);
+      (mediaActions.handleEdit as any)({ ...data } as any, onSuccess, onError);
     } else {
-      mediaActions.handleUpload(data);
+      (mediaActions.handleUpload as any)({ ...data } as any, onSuccess, onError);
     }
-    modals.uploadModal.close();
   }, [modals.uploadModal, mediaActions]);
 
   // Document 보관 핸들러 (Document 전용)

@@ -67,6 +67,15 @@ const MediaFileUploadModal: React.FC<MediaUploadModalProps> = ({
 
   useEffect(() => {
     if (!isOpen) {
+      // 모달이 닫힐 때 상태 완전 초기화
+      setFormData({
+        uploadFile: undefined,
+        fileName: '',
+        description: '',
+        fileVersion: '',
+        isPublic: false
+      });
+      setFileDisplayName('');
       setTouched({
         fileName: false,
         description: false,
@@ -84,7 +93,8 @@ const MediaFileUploadModal: React.FC<MediaUploadModalProps> = ({
         uploadFile: isEditMode && !formData.uploadFile ? null : formData.uploadFile
       };
       onSubmit(submitData);
-      handleReset(); 
+      // 저장 클릭 시 결과와 상관없이 즉시 모달 닫기
+      handleClose();
     }
   };
 
@@ -154,6 +164,7 @@ const MediaFileUploadModal: React.FC<MediaUploadModalProps> = ({
   };
 
   const handleClose = () => {
+    handleReset(); // 모달 닫을 때 상태 초기화
     onClose();
   };
 

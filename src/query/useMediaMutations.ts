@@ -11,8 +11,17 @@ export const useFileUpload = () => {
     mutationFn: ({ file, fileInfo }: { file: File; fileInfo: FileUploadInfo | MediaUploadData }) =>
       mediaAPI.uploadFile(file, fileInfo),
     onSuccess: () => {
-      // 모든 미디어 관련 쿼리를 무효화
+      // 모든 미디어 관련 쿼리를 무효화하고 즉시 리페치
       queryClient.invalidateQueries({ 
+        predicate: (query) => 
+          query.queryKey[0] === 'mediaFiles' || 
+          query.queryKey[0] === 'departmentFiles' ||
+          query.queryKey[0] === 'archivedFiles' ||
+          query.queryKey[0] === 'departmentArchivedFiles'
+      });
+      
+      // 즉시 리페치를 위해 refetch 실행
+      queryClient.refetchQueries({
         predicate: (query) => 
           query.queryKey[0] === 'mediaFiles' || 
           query.queryKey[0] === 'departmentFiles' ||
@@ -21,7 +30,26 @@ export const useFileUpload = () => {
       });
     },
     onError: (error: Error) => {
-      console.error('파일 업로드 실패:', error);
+      console.error('파일 업로드 뮤테이션 실패:', error);
+      console.error('에러 상세 정보:', {
+        message: error.message,
+        name: error.name,
+        stack: error.stack
+      });
+      
+      // AxiosError인 경우 추가 정보 출력
+      if ('response' in error) {
+        const axiosError = error as any;
+        console.error('Axios 에러 상세 정보:', {
+          status: axiosError.response?.status,
+          statusText: axiosError.response?.statusText,
+          data: axiosError.response?.data,
+          config: {
+            url: axiosError.config?.url,
+            method: axiosError.config?.method
+          }
+        });
+      }
     },
   });
 };
@@ -34,8 +62,17 @@ export const useFileUpdate = () => {
     mutationFn: ({ fileId, file, fileInfo }: { fileId: number; file: File | null; fileInfo: FileUploadInfo | MediaUploadData }) =>
       mediaAPI.updateFile(fileId, file, fileInfo),
     onSuccess: () => {
-      // 모든 미디어 관련 쿼리를 무효화
+      // 모든 미디어 관련 쿼리를 무효화하고 즉시 리페치
       queryClient.invalidateQueries({
+        predicate: (query) =>
+          query.queryKey[0] === 'mediaFiles' || 
+          query.queryKey[0] === 'departmentFiles' ||
+          query.queryKey[0] === 'archivedFiles' ||
+          query.queryKey[0] === 'departmentArchivedFiles'
+      });
+      
+      // 즉시 리페치를 위해 refetch 실행
+      queryClient.refetchQueries({
         predicate: (query) =>
           query.queryKey[0] === 'mediaFiles' || 
           query.queryKey[0] === 'departmentFiles' ||
@@ -44,7 +81,26 @@ export const useFileUpdate = () => {
       });
     },
     onError: (error: Error) => {
-      console.error('파일 수정 실패:', error);
+      console.error('파일 수정 뮤테이션 실패:', error);
+      console.error('에러 상세 정보:', {
+        message: error.message,
+        name: error.name,
+        stack: error.stack
+      });
+      
+      // AxiosError인 경우 추가 정보 출력
+      if ('response' in error) {
+        const axiosError = error as any;
+        console.error('Axios 에러 상세 정보:', {
+          status: axiosError.response?.status,
+          statusText: axiosError.response?.statusText,
+          data: axiosError.response?.data,
+          config: {
+            url: axiosError.config?.url,
+            method: axiosError.config?.method
+          }
+        });
+      }
     },
   });
 };
@@ -56,8 +112,17 @@ export const useFileArchive = () => {
   return useMutation({
     mutationFn: (fileId: number) => mediaAPI.archiveFile(fileId),
     onSuccess: () => {
-      // 모든 미디어 관련 쿼리를 무효화
+      // 모든 미디어 관련 쿼리를 무효화하고 즉시 리페치
       queryClient.invalidateQueries({
+        predicate: (query) =>
+          query.queryKey[0] === 'mediaFiles' || 
+          query.queryKey[0] === 'departmentFiles' ||
+          query.queryKey[0] === 'archivedFiles' ||
+          query.queryKey[0] === 'departmentArchivedFiles'
+      });
+      
+      // 즉시 리페치를 위해 refetch 실행
+      queryClient.refetchQueries({
         predicate: (query) =>
           query.queryKey[0] === 'mediaFiles' || 
           query.queryKey[0] === 'departmentFiles' ||

@@ -20,7 +20,8 @@ interface DocumentAllTableProps {
   isSearchMode?: boolean;
   searchTerm?: string;
   selectedCategory?: string;
-  selectedStatus?: string; 
+  selectedStatus?: string;
+  userRole?: string;
   onSearch?: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onCategoryChange?: (category: string) => void;
   onStatusChange?: (status: string) => void;
@@ -34,7 +35,8 @@ const DocumentAllTable: React.FC<DocumentAllTableProps> = ({
   error = null,
   searchTerm = "",
   selectedCategory = "",
-  selectedStatus = "", 
+  selectedStatus = "",
+  userRole,
   onSearch,
   onCategoryChange,
   onStatusChange,
@@ -91,7 +93,8 @@ const DocumentAllTable: React.FC<DocumentAllTableProps> = ({
       documents={displayDocuments}
       searchTerm={searchTerm}
       selectedCategory={selectedCategory}
-      selectedStatus={selectedStatus} 
+      selectedStatus={selectedStatus}
+      userRole={userRole}
       onSearchChange={handleSearchChange}
       onCategoryChange={handleCategoryChange}
       onStatusChange={handleStatusChange}
