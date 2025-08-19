@@ -26,10 +26,7 @@ export const authAPI = {
         { headers: { 'Content-Type': 'application/json', Accept: 'application/json' } }
       );
 
-      // 디버깅: 응답 구조 확인
-      console.log('로그인 응답 전체:', response);
-      console.log('로그인 응답 데이터:', response.data);
-      console.log('로그인 응답 데이터 타입:', typeof response.data);
+
 
       return response.data;
     } catch (error: unknown) {
@@ -216,7 +213,6 @@ export const authAPI = {
   getProfile: async (): Promise<{ name: string; department: string; role: string }> => {
     try {
       const response = await apiInstance.get('/admin/profile');
-      console.log('프로필 API 응답:', response.data);
       
       // 다양한 응답 구조 처리
       if (response.data && typeof response.data === 'object') {
@@ -233,7 +229,6 @@ export const authAPI = {
       // 기본값 반환
       return { name: 'admin', department: '', role: '' };
     } catch (error: unknown) {
-      console.error('프로필 조회 에러:', error);
       const axiosError = error as { response?: { status?: number; data?: { message?: string; error?: string }; headers?: Record<string, unknown> }; message?: string };
 
       throw new Error(

@@ -176,12 +176,6 @@ const DocumentPage = () => {
   const { documents, totalPages } = useMemo(() => {
     const items = currentData?.content || [];
     const pages = currentData?.totalPages || 1;
-    console.log('현재 표시할 문서:', { 
-      mode: isSearchMode ? 'search' : 'list', 
-      count: items.length, 
-      status: selectedStatus,
-      searchTerm: searchTerm.trim()
-    });
     return { documents: items, totalPages: pages };
   }, [currentData, isSearchMode, selectedStatus, searchTerm]);
 
@@ -234,7 +228,7 @@ const DocumentPage = () => {
 
   // CompareCard에서 버전 비교를 처리하는 핸들러
   const handleVersionCompare = useCallback((documentName: string, version1: string, version2: string) => {
-    console.log(`버전 비교 완료: ${documentName} - v${version1} vs v${version2}`);
+    // 버전 비교 로직이 필요한 경우 여기에 구현
   }, []);
 
   // 문서 업로드 핸들러 (에러 처리 추가)

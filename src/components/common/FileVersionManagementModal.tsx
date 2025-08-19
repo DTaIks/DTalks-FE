@@ -89,8 +89,8 @@ export const VersionHistoryModal: React.FC<VersionHistoryModalProps> = ({
   };
 
   return (
-    <ModalOverlay isOpen={isOpen} onClick={handleOverlayClick}>
-      <ModalContainer isOpen={isOpen}>
+    <ModalOverlay $isOpen={isOpen} onClick={handleOverlayClick}>
+      <ModalContainer $isOpen={isOpen}>
         <ModalHeader>
           <HeaderContent>
             <ModalTitle>문서 버전 히스토리</ModalTitle>
@@ -110,7 +110,7 @@ export const VersionHistoryModal: React.FC<VersionHistoryModalProps> = ({
 };
 
 // Styled Components
-const ModalOverlay = styled.div<{ isOpen: boolean }>`
+const ModalOverlay = styled.div<{ $isOpen: boolean }>`
   position: fixed;
   top: 0;
   left: 0;
@@ -122,12 +122,12 @@ const ModalOverlay = styled.div<{ isOpen: boolean }>`
   align-items: center;
   backdrop-filter: blur(4px);
   z-index: 1050;
-  opacity: ${props => props.isOpen ? 1 : 0};
-  visibility: ${props => props.isOpen ? 'visible' : 'hidden'};
+  opacity: ${props => props.$isOpen ? 1 : 0};
+  visibility: ${props => props.$isOpen ? 'visible' : 'hidden'};
   transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1), visibility 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 `;
 
-const ModalContainer = styled.div<{ isOpen: boolean }>`
+const ModalContainer = styled.div<{ $isOpen: boolean }>`
   position: fixed;
   right: 0;
   top: 0;
@@ -135,7 +135,7 @@ const ModalContainer = styled.div<{ isOpen: boolean }>`
   width: 480px;
   background-color: var(--color-white);
   box-shadow: -4px 0 16px rgba(0, 0, 0, 0.1);
-  transform: ${props => props.isOpen ? 'translateX(0)' : 'translateX(100%)'};
+  transform: ${props => props.$isOpen ? 'translateX(0)' : 'translateX(100%)'};
   transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
   display: flex;
   flex-direction: column;

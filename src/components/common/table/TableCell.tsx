@@ -13,7 +13,7 @@ const TableCell: React.FC<TableCellProps> = ({
   justifyContent = "flex-start" 
 }) => {
   return (
-    <Cell width={width} justifyContent={justifyContent}>
+    <Cell width={width} $justifyContent={justifyContent}>
       {children}
     </Cell>
   );
@@ -21,10 +21,10 @@ const TableCell: React.FC<TableCellProps> = ({
 
 export default TableCell;
 
-const Cell = styled.div<{ width?: string; justifyContent?: string }>`
+const Cell = styled.div<{ width?: string; $justifyContent?: string }>`
   display: flex;
   align-items: center;
-  justify-content: ${props => props.justifyContent};
+  justify-content: ${props => props.$justifyContent};
   color: var(--table-header-color);
   font-size: var(--font-size-16);
   font-weight: 500;

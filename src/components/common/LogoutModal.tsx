@@ -24,10 +24,8 @@ const LogoutModal: React.FC<LogoutModalProps> = ({ isOpen, onClose }) => {
     const fetchProfile = async () => {
       try {
         const profileData = await authAPI.getProfile();
-        console.log('프로필 데이터 받음:', profileData);
         setProfileName(profileData.name);
       } catch (error) {
-        console.error('프로필 조회 실패:', error);
         // 에러 발생 시 기본값 유지
         setProfileName('admin');
       }
