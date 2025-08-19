@@ -43,11 +43,11 @@ const TableCell = styled.div`
   font-size: var(--font-size-16);
   font-weight: 600;
   
-  &:nth-child(1) { width: 200px; }
-  &:nth-child(2) { width: 200px; justify-content: center; }
+  &:nth-child(1) { width: 260px; }
+  &:nth-child(2) { width: 170px; justify-content: center; }
   &:nth-child(3) { width: 110px; }
-  &:nth-child(4) { width: 110px; }
-  &:nth-child(5) { width: 190px; }
-  &:nth-child(6) { width: 110px; justify-content: center; }
-  &:nth-child(7) { width: 110px; justify-content: center; }
+  &:nth-child(4) { width: 120px; }
+  &:nth-child(5) { width: 180px; }
+  &:nth-child(6) { width: 90px; justify-content: center; }
+  &:nth-child(7) { width: 90px; justify-content: center; }
 `;

@@ -39,14 +39,43 @@ export const mediaAPI = {
     const { uploadFile, ...cleanFileInfo } = fileInfo as FileUploadInfo & { uploadFile?: File };
     formData.append('fileInfo', JSON.stringify(cleanFileInfo));
     
-    // 일반 API 인스턴스 사용 (쿠키 기반 인증)
-    const response = await apiInstance.post('/admin/file/upload', formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data',
-      },
+    console.log('업로드할 파일 정보:', {
+      fileName: file.name,
+      fileSize: file.size,
+      fileType: file.type,
+      cleanFileInfo
     });
     
-    return response.data;
+    try {
+      // 일반 API 인스턴스 사용 (쿠키 기반 인증)
+      const response = await apiInstance.post('/admin/file/upload', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+      
+      console.log('업로드 성공 응답:', response.data);
+      return response.data;
+    } catch (error: any) {
+      console.error('파일 업로드 API 에러 상세 정보:', {
+        message: error.message,
+        status: error.response?.status,
+        statusText: error.response?.statusText,
+        data: error.response?.data,
+        config: {
+          url: error.config?.url,
+          method: error.config?.method,
+          headers: error.config?.headers
+        }
+      });
+      
+      // 서버 응답 데이터가 있다면 출력
+      if (error.response?.data) {
+        console.error('서버 응답 데이터:', error.response.data);
+      }
+      
+      throw error;
+    }
   },
 
   // 파일 수정
@@ -62,14 +91,46 @@ export const mediaAPI = {
     const { uploadFile, ...cleanFileInfo } = fileInfo as FileUploadInfo & { uploadFile?: File };
     formData.append('fileInfo', JSON.stringify(cleanFileInfo));
     
-    // 일반 API 인스턴스 사용 (쿠키 기반 인증)
-    const response = await apiInstance.post(`/admin/file/${fileId}/update`, formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data',
-      },
+    console.log('수정할 파일 정보:', {
+      fileId,
+      hasFile: !!file,
+      fileName: file?.name,
+      fileSize: file?.size,
+      fileType: file?.type,
+      cleanFileInfo
     });
     
-    return response.data;
+    try {
+      // 일반 API 인스턴스 사용 (쿠키 기반 인증)
+      const response = await apiInstance.post(`/admin/file/${fileId}/update`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+      
+      console.log('수정 성공 응답:', response.data);
+      return response.data;
+    } catch (error: any) {
+      console.error('파일 수정 API 에러 상세 정보:', {
+        fileId,
+        message: error.message,
+        status: error.response?.status,
+        statusText: error.response?.statusText,
+        data: error.response?.data,
+        config: {
+          url: error.config?.url,
+          method: error.config?.method,
+          headers: error.config?.headers
+        }
+      });
+      
+      // 서버 응답 데이터가 있다면 출력
+      if (error.response?.data) {
+        console.error('서버 응답 데이터:', error.response.data);
+      }
+      
+      throw error;
+    }
   },
   // 파일 보관
   archiveFile: async (fileId: number): Promise<void> => {

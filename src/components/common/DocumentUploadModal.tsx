@@ -85,6 +85,7 @@ const DocumentUploadModal: React.FC<ExtendedDocumentUploadModalProps> = ({
     }
   }, [initialData, mode]);
 
+  // 모달이 닫힐 때만 상태 초기화
   useEffect(() => {
     if (!isOpen) {
       setTouched({
@@ -92,21 +93,40 @@ const DocumentUploadModal: React.FC<ExtendedDocumentUploadModalProps> = ({
         description: false,
         fileVersion: false
       });
-      // 에러 초기화는 부모 컴포넌트에서 처리
-      onClearError?.();
+      // 모달이 완전히 닫힐 때만 에러 초기화
+      if (onClearError) {
+        onClearError();
+      }
     }
   }, [isOpen, onClearError]);
 
-  const handleSubmit = () => {
-    if (isFormValid()) {
-      // 카테고리를 영문으로 변환
-      const convertedData = {
-        ...formData,
-        category: CATEGORY_MAPPING[formData.category] || formData.category
-      };
+  // 수정된 handleSubmit - 에러 처리 개선
+  const handleSubmit = async () => {
+    console.log("📝 Modal handleSubmit 시작");
+    
+    if (!isFormValid()) {
+      console.log("❌ Form validation 실패");
+      return;
+    }
 
-      onSubmit(convertedData);
+    // 카테고리를 영문으로 변환
+    const convertedData = {
+      ...formData,
+      category: CATEGORY_MAPPING[formData.category] || formData.category
+    };
+
+    console.log("📤 Modal에서 onSubmit 호출", convertedData);
+
+    try {
+      await onSubmit(convertedData);
+      console.log("✅ Modal onSubmit 성공 - 폼 리셋");
+      // ✅ 성공 시에만 폼 리셋 (모달은 부모에서 닫음)
       handleReset();
+    } catch (error) {
+      console.error("❌ Modal onSubmit 실패:", error);
+      // ✅ 에러 발생 시 폼 리셋하지 않고 모달도 닫지 않음
+      // 에러는 부모 컴포넌트에서 처리되어 submitError prop으로 전달됨
+      // 여기서는 단순히 에러 로그만 남기고 리턴
     }
   };
 
@@ -163,6 +183,7 @@ const DocumentUploadModal: React.FC<ExtendedDocumentUploadModalProps> = ({
   );
 
   const handleReset = () => {
+    console.log("🔄 Form reset 실행");
     setFormData({
       fileId: undefined,
       uploadFile: undefined,
@@ -173,7 +194,6 @@ const DocumentUploadModal: React.FC<ExtendedDocumentUploadModalProps> = ({
     });
     setFileDisplayName('');
     setFileError('');
-    // submitError는 부모 컴포넌트에서 관리
     setTouched({
       fileName: false,
       description: false,
@@ -181,8 +201,13 @@ const DocumentUploadModal: React.FC<ExtendedDocumentUploadModalProps> = ({
     });
   };
 
+  // 모달 닫기 핸들러 수정
   const handleClose = () => {
-    onClearError?.(); // 모달 닫을 때 에러 메시지 초기화
+    console.log("🚪 Modal close 실행");
+    // 모달 닫을 때만 에러 메시지 초기화
+    if (onClearError) {
+      onClearError();
+    }
     onClose();
   };
 

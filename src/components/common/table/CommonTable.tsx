@@ -19,6 +19,7 @@ interface CommonTableProps {
   searchTerm: string;
   selectedStatus: string;
   selectedCategory?: string;
+  userRole?: string;
   onSearchChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onStatusChange: (value: string) => void;
   onCategoryChange?: (value: string) => void;
@@ -44,6 +45,7 @@ const CommonTable: React.FC<CommonTableProps> = ({
   searchTerm,
   selectedStatus,
   selectedCategory,
+  userRole,
   onSearchChange,
   onStatusChange,
   onCategoryChange,
@@ -126,13 +128,17 @@ const CommonTable: React.FC<CommonTableProps> = ({
                   alt={item.isActive ? "활성" : "비활성"} 
                 />
               </TableCell>
-              <TableCell>
+                            <TableCell>
                 <DropDownButton 
                   items={[
                     { label: "다운로드", onClick: () => handleAction('download', item.documentName, item.fileUrl) },
                     { label: "수정", onClick: () => handleAction('update', item.documentName) },
                     { label: "버전관리", onClick: () => handleAction('version', item.documentName) },
-                                         { label: item.isActive ? "보관" : "복원", onClick: () => handleAction('archive', item.documentName) },
+                    { 
+                      label: item.isActive ? "보관" : "복원", 
+                      onClick: () => handleAction('archive', item.documentName),
+                      disabled: !item.isActive && userRole === '편집자' // 비활성 상태이고 편집자인 경우 복원 버튼 비활성화
+                    },
                   ]}
                 />
               </TableCell>

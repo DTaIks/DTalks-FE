@@ -139,7 +139,7 @@ export const useDocumentAllActions = ({
   }, [confirmModal.type, confirmModal.fileName, closeConfirmModal, documents, documentArchiveMutation, documentRestoreMutation]);
 
   // 문서 업데이트 핸들러
-  const handleDocumentUpdate = useCallback((data: {
+  const handleDocumentUpdate = useCallback(async (data: {
     uploadFile?: File;
     fileName: string;
     description: string;
@@ -147,17 +147,25 @@ export const useDocumentAllActions = ({
     category: string;
   }) => {
     if (updateModal.initialData?.fileId) {
-      documentUpdateMutation.mutate({
-        fileId: updateModal.initialData.fileId,
-        file: data.uploadFile || null,
-        fileInfo: {
-          fileName: data.fileName,
-          description: data.description,
-          fileVersion: data.fileVersion,
-          category: data.category
-        }
-      });
-      closeUpdateModal();
+      try {
+        await documentUpdateMutation.mutateAsync({
+          fileId: updateModal.initialData.fileId,
+          file: data.uploadFile || null,
+          fileInfo: {
+            fileName: data.fileName,
+            description: data.description,
+            fileVersion: data.fileVersion,
+            category: data.category
+          }
+        });
+        // 성공 시에만 모달 닫기
+        closeUpdateModal();
+      } catch (error: unknown) {
+        console.error('문서 수정 실패:', error);
+        
+        // 에러를 다시 throw해서 부모 컴포넌트에서 처리할 수 있도록 함
+        throw error;
+      }
     }
   }, [updateModal.initialData, documentUpdateMutation, closeUpdateModal]);
 
