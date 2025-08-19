@@ -25,6 +25,10 @@ const MediaPage: React.FC = () => {
   const [isErrorModalOpen, setIsErrorModalOpen] = useState<boolean>(false);
   const [errorMessage, setErrorMessage] = useState<string>('');
 
+  // 업로드/수정 에러 상태 추가
+  const [uploadError, setUploadError] = useState<string>('');
+  const [updateError, setUpdateError] = useState<string>('');
+
   // 프로필 정보 조회
   useEffect(() => {
     const fetchUserProfile = async () => {
@@ -112,18 +116,10 @@ const MediaPage: React.FC = () => {
       }
     }, 
     mediaActions: {
-      handleUpload: (
-        data: { fileName: string; description: string; fileVersion: string; isPublic: boolean },
-        onSuccess?: () => void,
-        onError?: (message: string) => void
-      ) =>
-        mediaActions.handleUpload({ ...data } as MediaUploadData, onSuccess, onError),
-      handleEdit: (
-        data: { fileName: string; description: string; fileVersion: string; isPublic: boolean },
-        onSuccess?: () => void,
-        onError?: (message: string) => void
-      ) =>
-        mediaActions.handleEdit({ ...data } as MediaUploadData, onSuccess, onError),
+      handleUpload: (data: { fileName: string; description: string; fileVersion: string; isPublic: boolean }) =>
+        mediaActions.handleUpload({ ...data } as MediaUploadData),
+      handleEdit: (data: { fileName: string; description: string; fileVersion: string; isPublic: boolean }) =>
+        mediaActions.handleEdit({ ...data } as MediaUploadData),
       setSelectedFile
     }
   });
@@ -174,12 +170,58 @@ const MediaPage: React.FC = () => {
         baseHandlers.handleArchiveClick(fileName);
       }
     },
-    handleUploadSubmit: (data: { uploadFile?: File | null; fileName: string; description: string; fileVersion: string; isPublic: boolean }) => {
-      if (checkUserPermission()) {
-        baseHandlers.handleUploadSubmit(data);
+    handleUploadSubmit: async (data: { uploadFile?: File | null; fileName: string; description: string; fileVersion: string; isPublic: boolean }) => {
+      if (!checkUserPermission()) {
+        return;
+      }
+
+      try {
+        setUploadError(''); // 에러 초기화
+        setUpdateError(''); // 에러 초기화
+        
+        if (uploadModal.isEditMode) {
+          await mediaActions.handleEdit(data as MediaUploadData);
+        } else {
+          await mediaActions.handleUpload(data as MediaUploadData);
+        }
+        // 성공 시에만 모달 닫기
+        closeUploadModal();
+      } catch (error: unknown) {
+        console.error('파일 업로드/수정 실패:', error);
+        
+        // 409 에러 처리
+        const apiError = error as { response?: { status?: number; data?: { message?: string } } };
+        if (apiError?.response?.status === 409) {
+          const errorMessage = apiError?.response?.data?.message || 
+                              '기존 파일 버전과 같거나 낮은 버전으로 업데이트할 수 없습니다!';
+          
+          if (uploadModal.isEditMode) {
+            setUpdateError(errorMessage);
+          } else {
+            setUploadError(errorMessage);
+          }
+        } else {
+          const errorMessage = '파일 업로드/수정 중 오류가 발생했습니다. 다시 시도해주세요.';
+          
+          if (uploadModal.isEditMode) {
+            setUpdateError(errorMessage);
+          } else {
+            setUploadError(errorMessage);
+          }
+        }
+        // 에러 발생 시 모달은 닫지 않음
       }
     }
   };
+
+  // 에러 초기화 핸들러들
+  const handleClearUploadError = useCallback(() => {
+    setUploadError('');
+  }, []);
+
+  const handleClearUpdateError = useCallback(() => {
+    setUpdateError('');
+  }, []);
 
   // 페이지 변경 핸들러
   const handlePageChange = (page: number) => {
@@ -218,11 +260,7 @@ const MediaPage: React.FC = () => {
             isArchiveMode={isArchiveMode}
             isArchiveClosing={isArchiveClosing}
             onSelectDepartment={selectDepartment}
-            onToggleArchive={() => {
-              if (checkUserPermission()) {
-                toggleArchive(!isArchiveMode);
-              }
-            }}
+            onToggleArchive={toggleArchive}
             onSelectArchiveDepartment={selectArchiveDepartment}
           />
           
@@ -249,6 +287,8 @@ const MediaPage: React.FC = () => {
         initialData={uploadModal.initialData ?? undefined}
         isEditMode={uploadModal.isEditMode}
         isSubmitting={uploadModal.initialData ? isUpdating : isUploading}
+        submitError={uploadModal.isEditMode ? updateError : uploadError}
+        onClearError={uploadModal.isEditMode ? handleClearUpdateError : handleClearUploadError}
       />
 
       <ConfirmModal
