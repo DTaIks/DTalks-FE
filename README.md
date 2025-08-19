@@ -1,61 +1,82 @@
-# FE
+<div align="center">
 
-DTalks 프론트엔드 레포지토리
+<img width="75" alt="DTalks Logo" src="https://github.com/user-attachments/assets/8901ef46-86b0-44d8-b9f5-d32f831a5651" />
 
-## 🧷 Git 작업 컨벤션 (Branch / Commit / PR)
+<h1>DTalks Frontend</h1>
 
-### 📂 브랜치 네이밍 규칙(자동 생성)
+<p><em>PlayUs 웹 서비스를 위한 React 기반 프론트엔드 리포지토리입니다</em></p>
 
-예시:
+<p>
+  <img src="https://img.shields.io/badge/React-61DAFB?style=for-the-badge&logo=react&logoColor=black" alt="React"/>
+  <img src="https://img.shields.io/badge/TypeScript-3178C6?style=for-the-badge&logo=typescript&logoColor=white" alt="TypeScript"/>
+  <img src="https://img.shields.io/badge/Vite-646CFF?style=for-the-badge&logo=vite&logoColor=white" alt="Vite"/>
+  <img src="https://img.shields.io/badge/Styled--Components-DB7093?style=for-the-badge&logo=styled-components&logoColor=white" alt="Styled Components"/>
+</p>
 
-- `8_feat/대시보드-페이지-구현`
+<p>
+  <img src="https://img.shields.io/badge/개발기간-2025.07~2025.08-7D57C1?style=for-the-badge&logo=github&logoColor=white" alt="개발기간"/>
+</p>
 
-**타입 목록:**
+</div>
 
-| 타입       | 설명                                |
-| ---------- | ----------------------------------- |
-| `feat`     | 새로운 기능 추가                    |
-| `fix`      | 버그 수정                           |
-| `refactor` | 리팩토링 (기능 변경 없이 코드 개선) |
-| `test`     | 테스트 코드 관련                    |
-| `hotfix`   | 긴급 수정                           |
+<div align="left" display="flex">
 
----
+<br>
 
-### 💬 커밋 메시지 컨벤션.
+### 🚀 프로젝트 실행
 
-예시:
+**1. 의존성 설치**
 
-```
-feat: 로그인 성공 시 홈 리디렉션 구현
-
-- 로그인 성공 시 api/home 으로 이동
-
-resolves: #12
+```bash
+npm install 
 ```
 
-> 🔹 `resolves: #12` → PR 머지 시 GitHub 이슈 자동 닫힘
+**2. 환경 변수 설정**
 
-**타입 목록:**
+루트 디렉토리에 .env 파일을 생성하고 다음 값을 입력하세요.
 
-| 타입              | 설명                                                                                    |
-| ----------------- | --------------------------------------------------------------------------------------- |
-| `feat`            | 새로운 기능 추가                                                                        |
-| `fix`             | 버그 수정                                                                               |
-| `refactor`        | 리팩토링 (기능 변경 없이 코드 개선)                                                     |
-| `test`            | 테스트 코드 관련                                                                        |
-| `style`           | 코드 포맷팅, 세미콜론 누락, 코드 변경이 없는 경우                                       |
-| `chore`           | 빌드 설정 등 코드가 아닌 유지 보수 관련된 작업                                          |
-| `docs`            | 문서 수정                                                                               |
-| `BREAKING CHANGE` | 기존 기능을 크게 변경했을 때 </br> 다른 부분에 영향을 미치는 중요한 변경 사항이 있을 때 |
-| `mod`             | 코드 및 내부 파일 수정                                                                  |
+```
+VITE_API_URL=https://dtalks.kro.kr/
+VITE_AI_API_URL=/api
+```
 
----
+**3. 개발 서버 실행**
+```bash
+npm run dev
+```
 
-### 🔁 작업 프로세스 요약
+**4. 프로덕션 빌드**
+```bash
+npm run build
+```
 
-1. GitHub 이슈 생성 시 → 브랜치 자동 생성
-2. 브랜치로 이동해 작업 수행
-3. 커밋 시 `resolves` 포함
-4. PR 작성 → 템플릿에 맞춰 작성
-5. PR 머지 시 → GitHub 이슈 자동 닫힘
+<br>
+
+### 📁 프로젝트 구조
+
+```
+src/
+├── api/                    # API 통신 관련
+├── assets/                 # 이미지, 아이콘 등 정적 자원
+├── components/             # 재사용 가능한 컴포넌트
+│   ├── admin/              # 관리자 페이지 컴포넌트
+│   ├── common/             # 공통 컴포넌트
+│   └── modal/              # 모달 컴포넌트
+├── hooks/                  # 커스텀 훅
+├── layout/                 # 레이아웃 관련 컴포넌트
+├── pages/                  # 페이지 컴포넌트
+├── query/                  # React Query 관련
+├── routes/                 # 라우팅 설정
+├── store/                  # Zustand 스토어
+├── styles/                 # 전역 스타일
+├── types/                  # TypeScript 타입 정의
+└── utils/                  # 유틸리티 함수
+```
+
+<br>
+
+### 👨🏻‍💻 Contributors
+
+| <img width="160px" src="https://avatars.githubusercontent.com/{}" /> | <img width="160px" src="https://avatars.githubusercontent.com/{}" /> |
+|:---:|:---:|
+| [이경준](https://github.com/{}) | [박상우](https://github.com/yangseohyun) |
