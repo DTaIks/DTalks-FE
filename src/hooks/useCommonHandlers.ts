@@ -126,15 +126,15 @@ export const useCommonHandlers = ({ modals, mediaActions, documentActions }: Use
       closeModal();
     };
 
-    const onError = (_errorMessage: string) => {
+    const onError = () => {
       // 에러 발생 시에도 모달만 닫기
       closeModal();
     };
 
     if (modals.uploadModal.isEditMode) {
-      (mediaActions.handleEdit as any)({ ...data } as any, onSuccess, onError);
+      (mediaActions.handleEdit as (data: unknown, onSuccess?: () => void, onError?: () => void) => void)({ ...data }, onSuccess, onError);
     } else {
-      (mediaActions.handleUpload as any)({ ...data } as any, onSuccess, onError);
+      (mediaActions.handleUpload as (data: unknown, onSuccess?: () => void, onError?: () => void) => void)({ ...data }, onSuccess, onError);
     }
   }, [modals.uploadModal, mediaActions]);
 

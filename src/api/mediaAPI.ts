@@ -56,22 +56,35 @@ export const mediaAPI = {
       
       console.log('업로드 성공 응답:', response.data);
       return response.data;
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const axiosError = error as { 
+        message?: string; 
+        response?: { 
+          status?: number; 
+          statusText?: string; 
+          data?: unknown; 
+        }; 
+        config?: { 
+          url?: string; 
+          method?: string; 
+          headers?: unknown; 
+        }; 
+      };
       console.error('파일 업로드 API 에러 상세 정보:', {
-        message: error.message,
-        status: error.response?.status,
-        statusText: error.response?.statusText,
-        data: error.response?.data,
+        message: axiosError.message,
+        status: axiosError.response?.status,
+        statusText: axiosError.response?.statusText,
+        data: axiosError.response?.data,
         config: {
-          url: error.config?.url,
-          method: error.config?.method,
-          headers: error.config?.headers
+          url: axiosError.config?.url,
+          method: axiosError.config?.method,
+          headers: axiosError.config?.headers
         }
       });
       
       // 서버 응답 데이터가 있다면 출력
-      if (error.response?.data) {
-        console.error('서버 응답 데이터:', error.response.data);
+      if (axiosError.response?.data) {
+        console.error('서버 응답 데이터:', axiosError.response.data);
       }
       
       throw error;
@@ -110,23 +123,36 @@ export const mediaAPI = {
       
       console.log('수정 성공 응답:', response.data);
       return response.data;
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const axiosError = error as { 
+        message?: string; 
+        response?: { 
+          status?: number; 
+          statusText?: string; 
+          data?: unknown; 
+        }; 
+        config?: { 
+          url?: string; 
+          method?: string; 
+          headers?: unknown; 
+        }; 
+      };
       console.error('파일 수정 API 에러 상세 정보:', {
         fileId,
-        message: error.message,
-        status: error.response?.status,
-        statusText: error.response?.statusText,
-        data: error.response?.data,
+        message: axiosError.message,
+        status: axiosError.response?.status,
+        statusText: axiosError.response?.statusText,
+        data: axiosError.response?.data,
         config: {
-          url: error.config?.url,
-          method: error.config?.method,
-          headers: error.config?.headers
+          url: axiosError.config?.url,
+          method: axiosError.config?.method,
+          headers: axiosError.config?.headers
         }
       });
       
       // 서버 응답 데이터가 있다면 출력
-      if (error.response?.data) {
-        console.error('서버 응답 데이터:', error.response.data);
+      if (axiosError.response?.data) {
+        console.error('서버 응답 데이터:', axiosError.response.data);
       }
       
       throw error;

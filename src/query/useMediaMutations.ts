@@ -39,7 +39,17 @@ export const useFileUpload = () => {
       
       // AxiosError인 경우 추가 정보 출력
       if ('response' in error) {
-        const axiosError = error as any;
+        const axiosError = error as { 
+          response?: { 
+            status?: number; 
+            statusText?: string; 
+            data?: unknown; 
+          }; 
+          config?: { 
+            url?: string; 
+            method?: string; 
+          }; 
+        };
         console.error('Axios 에러 상세 정보:', {
           status: axiosError.response?.status,
           statusText: axiosError.response?.statusText,
@@ -90,7 +100,17 @@ export const useFileUpdate = () => {
       
       // AxiosError인 경우 추가 정보 출력
       if ('response' in error) {
-        const axiosError = error as any;
+        const axiosError = error as { 
+          response?: { 
+            status?: number; 
+            statusText?: string; 
+            data?: unknown; 
+          }; 
+          config?: { 
+            url?: string; 
+            method?: string; 
+          }; 
+        };
         console.error('Axios 에러 상세 정보:', {
           status: axiosError.response?.status,
           statusText: axiosError.response?.statusText,

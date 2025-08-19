@@ -105,15 +105,21 @@ const DocumentAllPage = () => {
         console.log("✅ originalHandleDocumentUpdate 성공!");
         // 성공 시에만 모달 닫기
         closeUpdateModal();
-      } catch (error: any) {
+      } catch (error: unknown) {
+        const axiosError = error as { 
+          response?: { 
+            status?: number; 
+            data?: { message?: string }; 
+          }; 
+        };
         console.error("❌ 문서 수정 실패:", error);
-        console.log("❌ Error status:", error?.response?.status);
-        console.log("❌ Error message:", error?.response?.data?.message);
+        console.log("❌ Error status:", axiosError?.response?.status);
+        console.log("❌ Error message:", axiosError?.response?.data?.message);
 
         let errorMessage = "";
         
-        if (error?.response?.status === 409) {
-          errorMessage = error?.response?.data?.message || 
+        if (axiosError?.response?.status === 409) {
+          errorMessage = axiosError?.response?.data?.message || 
                         "기존 파일 버전과 같거나 낮은 버전으로 업데이트할 수 없습니다!";
         } else {
           errorMessage = "파일 수정 중 오류가 발생했습니다. 다시 시도해주세요.";
