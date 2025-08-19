@@ -48,17 +48,35 @@ const createAxiosInstance = (): AxiosInstance => {
       
       // 401 에러이고 토큰 재발급 API가 아닌 경우에만 토큰 재발급 시도
       if (status === 401 && url && !url.includes('/admin/auth/reissue')) {
+        // 이미 재시도 중인지 확인 (무한 루프 방지)
+        const isRetry = (error.config as any)?._retry;
+        if (isRetry) {
+          // 이미 재시도했는데 또 401이면 로그아웃
+          const { logout } = useAuthStore.getState();
+          logout();
+          return Promise.reject(error);
+        }
+        
+        // 현재 인증 상태 확인
+        const { isAuthenticated, reissueToken, logout } = useAuthStore.getState();
+        
+        // 이미 로그아웃된 상태라면 토큰 재발급 시도하지 않음
+        if (!isAuthenticated) {
+          return Promise.reject(error);
+        }
+        
         try {
-          const { reissueToken } = useAuthStore.getState();
+          // 토큰 재발급 시도
           await reissueToken();
           
           // 토큰 재발급 성공 시 원래 요청 재시도
           if (error.config) {
+            // 재시도 플래그 설정
+            (error.config as any)._retry = true;
             return apiInstance.request(error.config);
           }
-        } catch {
+        } catch (reissueError) {
           // 토큰 재발급 실패 시 로그아웃
-          const { logout } = useAuthStore.getState();
           logout();
         }
       }

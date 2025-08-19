@@ -1,4 +1,5 @@
 import { useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import { useAuthStore } from '@/store/authStore';
 import { authAPI } from '@/api/authAPI';
 import AppRoutes from '@/routes/Route';
@@ -6,9 +7,20 @@ import '@/styles/Global.css';
 
 function App() {
   const { setAuthenticated, setAuthChecking, setUser } = useAuthStore();
+  const location = useLocation();
 
   useEffect(() => {
     const checkAuthStatus = async () => {
+      // 로그인 관련 페이지에서는 인증 확인하지 않음
+      const isAuthPage = ['/login', '/signup', '/password'].includes(location.pathname);
+      
+      if (isAuthPage) {
+        setAuthenticated(false);
+        setUser(null);
+        setAuthChecking(false);
+        return;
+      }
+
       try {
         // 프로필 조회로 인증 상태 확인
         const profile = await authAPI.getProfile();
@@ -30,8 +42,9 @@ function App() {
       }
     };
 
+    // 앱 시작 시 한 번만 인증 상태 확인
     checkAuthStatus();
-  }, [setAuthenticated, setAuthChecking, setUser]);
+  }, [setAuthenticated, setAuthChecking, setUser, location.pathname]);
 
   return (
     <>

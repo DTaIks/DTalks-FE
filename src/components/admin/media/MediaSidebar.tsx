@@ -29,7 +29,7 @@ const MediaSidebar: React.FC<MediaSidebarProps> = ({
           />
         ))}
       </DepartmentListContainer>
-      <Footer onClick={() => onToggleArchive(true)} isSelected={isArchiveMode}>
+      <Footer onClick={() => onToggleArchive(true)} $isSelected={isArchiveMode}>
         <ArchiveText>보관함</ArchiveText>
       </Footer>
       
@@ -69,12 +69,12 @@ const DepartmentListContainer = styled.div`
   min-height: 0;
 `;
 
-const Footer = styled.div<{ isSelected: boolean }>`
+const Footer = styled.div<{ $isSelected: boolean }>`
   padding: 16px 16px 16px 34px;
   height: 30px;
   border-top: 1px solid #e0e0e0;
   border-radius: 0 0 0 25px;
-  color: ${props => props.isSelected ? 'white' : '#222'};
+  color: ${props => props.$isSelected ? 'white' : '#222'};
   cursor: pointer;
   display: flex;
   align-items: center;

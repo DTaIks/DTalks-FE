@@ -46,10 +46,10 @@ function DropdownFilter<T extends readonly string[]>({
       <DropdownButton 
         onClick={toggleExpanded}
         disabled={disabled}
-        isExpanded={isExpanded}
+        $isExpanded={isExpanded}
       >
         {selectedValue || placeholder}
-        <Icon isExpanded={isExpanded}>
+        <Icon $isExpanded={isExpanded}>
           ▼
         </Icon>
       </DropdownButton>
@@ -78,8 +78,8 @@ function DropdownFilter<T extends readonly string[]>({
 
 export default DropdownFilter;
 
-const Icon = styled.span<{ isExpanded: boolean }>`
-  transform: ${props => props.isExpanded ? 'rotate(180deg)' : 'rotate(0deg)'};
+const Icon = styled.span<{ $isExpanded: boolean }>`
+  transform: ${props => props.$isExpanded ? 'rotate(180deg)' : 'rotate(0deg)'};
   display: flex;
   align-items: center;
   justify-content: center;
@@ -91,7 +91,7 @@ const DropdownContainer = styled.div`
   display: inline-block;
 `;
 
-const DropdownButton = styled.button<{ isExpanded: boolean }>`
+const DropdownButton = styled.button<{ $isExpanded: boolean }>`
   width: 160px;
   height: 40px;
   padding: 12px 16px;
@@ -99,7 +99,7 @@ const DropdownButton = styled.button<{ isExpanded: boolean }>`
   color: var(--color-black);
   background: var(--color-white);
   border: 1px solid #ccc;
-  border-radius: ${props => props.isExpanded ? '5px 5px 0 0' : '5px'};
+  border-radius: ${props => props.$isExpanded ? '5px 5px 0 0' : '5px'};
   cursor: pointer;
   display: flex;
   align-items: center;
