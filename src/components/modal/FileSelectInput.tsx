@@ -33,24 +33,33 @@ export const FileSelectInput: React.FC<FileSelectInputProps> = ({
         return;
       }
 
-      const allowedMimeTypes = [
-        'image/jpeg', 'image/jpg', 'image/png',
-        'audio/mpeg', 'audio/mp3',
-        'application/pdf',
-        'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 
-        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 
-        'text/csv', 'application/csv'
-      ];
+      // 확장자별 허용 MIME 타입 매핑
+      const extensionMimeMap: Record<string, string[]> = {
+        '.jpg': ['image/jpeg', 'image/jpg'],
+        '.jpeg': ['image/jpeg', 'image/jpg'],
+        '.png': ['image/png'],
+        '.mp3': ['audio/mpeg', 'audio/mp3'],
+        '.pdf': ['application/pdf'],
+        '.docx': [
+          'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+          'application/octet-stream', // 일부 브라우저에서 docx를 이렇게 인식
+          'application/zip' // docx는 실제로 zip 파일이므로
+        ],
+        '.xlsx': [
+          'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+          'application/octet-stream',
+          'application/zip'
+        ],
+        '.csv': ['text/csv', 'application/csv', 'text/plain']
+      };
+
+      const allowedMimeTypes = extensionMimeMap[fileExtension] || [];
       
-      if (!allowedMimeTypes.includes(file.type)) {
-        onFileError?.(`지원하지 않는 파일 형식입니다. 지원 형식: 이미지(JPG, PNG), 음성(MP3), 문서(PDF, DOCX, XLSX, CSV)`);
-        onFileDisplayNameChange('');
-        onFileChange(null);
-        // 파일 입력 초기화
-        if (fileInputRef.current) {
-          fileInputRef.current.value = '';
-        }
-        return;
+      // MIME 타입 검증 (확장자가 허용된 경우에만)
+      if (allowedMimeTypes.length > 0 && !allowedMimeTypes.includes(file.type)) {
+        // MIME 타입이 일치하지 않아도 확장자가 올바르면 허용 (브라우저별 차이 고려)
+        console.warn(`MIME 타입 불일치: ${file.type} (예상: ${allowedMimeTypes.join(', ')})`);
+        // MIME 타입 검증을 건너뛰고 진행
       }
       
       // 파일 크기 체크 (MB 단위)

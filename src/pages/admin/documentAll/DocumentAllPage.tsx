@@ -121,7 +121,7 @@ const DocumentAllPage = () => {
         
         console.log("설정할 에러 메시지:", errorMessage);
         setUpdateError(errorMessage);
-        
+
         throw error;
       }
     },
@@ -207,9 +207,11 @@ const DocumentAllPage = () => {
       versionModal: {
         open: openVersionModal,
         close: closeVersionModal,
+
+        isOpen: versionModal.isOpen,
       },
     }),
-    [openConfirmModal, closeConfirmModal, openVersionModal, closeVersionModal, checkUserPermission]
+    [openConfirmModal, closeConfirmModal, openVersionModal, closeVersionModal, versionModal.isOpen, checkUserPermission]
   );
 
   // 권한 체크 포함 업데이트 모달
@@ -258,6 +260,7 @@ const DocumentAllPage = () => {
         searchTerm={searchTerm}
         selectedCategory={selectedCategory}
         selectedStatus={selectedStatus}
+        userRole={userRole}
         onSearch={handleSearch}
         onCategoryChange={handleCategoryChange}
         onStatusChange={handleStatusChange}

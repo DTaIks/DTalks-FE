@@ -344,6 +344,11 @@ const DocumentPage = () => {
 
   // 보관/복원 핸들러
   const handleArchive = useCallback(async (id: number, isArchived?: boolean) => {
+    // 편집자이고 복원 작업인 경우 아무것도 하지 않음 (버튼이 이미 비활성화됨)
+    if (userRole === '편집자' && isArchived) {
+      return;
+    }
+    
     if (!checkUserPermission()) {
       return;
     }
@@ -357,7 +362,7 @@ const DocumentPage = () => {
     } catch (error) {
       console.error('문서 보관/복원 실패:', error);
     }
-  }, [documentArchiveMutation, documentRestoreMutation, checkUserPermission]);
+  }, [documentArchiveMutation, documentRestoreMutation, checkUserPermission, userRole]);
 
   // 파일 업로드 훅
   const {
@@ -450,6 +455,7 @@ const DocumentPage = () => {
         totalPages={totalPages}
         selectedStatus={selectedStatus}
         searchTerm={searchTerm}
+        userRole={userRole}
         onPageChange={handlePageChange}
         onStatusChange={handleStatusChange}
         onSearchChange={handleSearchChange}
@@ -539,5 +545,5 @@ const CompareCardWrapper = styled.div`
   width: 100%;
   display: flex;
   justify-content: center;
-  margin-bottom: 24px;
+  margin-bottom: 8px;
 `;

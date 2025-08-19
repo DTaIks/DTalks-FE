@@ -14,6 +14,7 @@ interface DocumentTableProps {
   totalPages: number;
   selectedStatus: string;
   searchTerm: string; 
+  userRole?: string;
   onPageChange: (page: number) => void;
   onStatusChange: (status: string) => void;
   onSearchChange: (e: React.ChangeEvent<HTMLInputElement>) => void; 
@@ -34,6 +35,7 @@ const DocumentTable: React.FC<DocumentTableProps> = ({
   totalPages,
   selectedStatus,
   searchTerm,
+  userRole,
   onPageChange,
   onStatusChange,
   onSearchChange, 
@@ -123,6 +125,7 @@ const DocumentTable: React.FC<DocumentTableProps> = ({
         items={displayDocuments}
         searchTerm={searchTerm}
         selectedStatus={selectedStatus}
+        userRole={userRole}
         onSearchChange={onSearchChange}
         onStatusChange={onStatusChange}
         onArchive={handleArchive}
