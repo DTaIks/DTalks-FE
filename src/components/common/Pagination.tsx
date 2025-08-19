@@ -17,17 +17,25 @@ const Pagination: React.FC<PaginationProps> = ({ currentPage, totalPages, onPage
     isNextDisabled
   } = usePagination({ currentPage, totalPages, onPageChange });
 
+  // 현재 페이지 그룹 계산 (1-10, 11-20, 21-30 등)
+  const currentGroup = Math.ceil(currentPage / 10);
+  const startPage = (currentGroup - 1) * 10 + 1;
+  const endPage = Math.min(currentGroup * 10, totalPages);
+
+
+
+
   return (
     <PaginationContainer>
+      {/* 이전 페이지 버튼 */}
       <PrevButtonContainer onClick={handlePrevClick} disabled={isPrevDisabled}>
         <PrevButtonBackground />
-        <InactivePageNumber>
-          이전
-        </InactivePageNumber>
+        <InactivePageNumber>이전</InactivePageNumber>
       </PrevButtonContainer>
       
-      {Array.from({ length: totalPages }, (_, index) => {
-        const pageNumber = index + 1;
+      {/* 현재 그룹의 페이지 번호들 */}
+      {Array.from({ length: endPage - startPage + 1 }, (_, index) => {
+        const pageNumber = startPage + index;
         const isActive = pageNumber === currentPage;
         
         return (
@@ -51,11 +59,10 @@ const Pagination: React.FC<PaginationProps> = ({ currentPage, totalPages, onPage
         );
       })}
       
+      {/* 다음 페이지 버튼 */}
       <NextButtonContainer onClick={handleNextClick} disabled={isNextDisabled}>
         <NextButtonBackground />
-        <InactivePageNumber>
-          다음
-        </InactivePageNumber>
+        <InactivePageNumber>다음</InactivePageNumber>
       </NextButtonContainer>
     </PaginationContainer>
   );
@@ -178,4 +185,4 @@ const PaginationContainer = styled.div`
   font-size: 14px;
   margin-top: 24px;
   position: relative;
-`; 
+`;
