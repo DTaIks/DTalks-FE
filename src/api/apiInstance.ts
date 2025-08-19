@@ -4,7 +4,7 @@ import { useAuthStore } from '@/store/authStore';
 
 // API 인스턴스 설정
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://dtalks.kro.kr/';
-const AI_API_BASE_URL = import.meta.env.VITE_AI_API_URL || 'http://61.109.238.56:8001';
+const AI_API_BASE_URL = import.meta.env.VITE_AI_API_URL || '/api';
 
 // 공개 API 목록 (인증 불필요, 쿠키도 받지 않는 API들)
 const PUBLIC_APIS_WITHOUT_COOKIES = [
