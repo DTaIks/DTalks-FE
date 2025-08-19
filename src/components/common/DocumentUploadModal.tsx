@@ -9,6 +9,12 @@ import { FileCategory } from '@/components/modal/FileCategoryDropdownMenu';
 import { UploadInfoCard } from '@/components/modal/UploadInfoCard';
 import type { DocumentUploadModalProps, DocumentUploadData } from '@/types/modal';
 
+// Props에 에러 관련 속성 추가를 위한 확장 타입
+interface ExtendedDocumentUploadModalProps extends DocumentUploadModalProps {
+  submitError?: string;
+  onClearError?: () => void;
+}
+
 const CATEGORY = [
   '용어 사전',
   '사내 정책',
@@ -35,14 +41,16 @@ const DOCUMENT_UPLOAD_INFO = [
   "파일 변경 사항이 자동으로 추적됩니다"
 ];
 
-const DocumentUploadModal: React.FC<DocumentUploadModalProps> = ({
+const DocumentUploadModal: React.FC<ExtendedDocumentUploadModalProps> = ({
   isOpen,
   onClose,
   onSubmit,
   isSubmitting = false,
   pageType = 'document',
   mode = 'upload',
-  initialData
+  initialData,
+  submitError = '',
+  onClearError
 }) => {
   const [formData, setFormData] = useState<DocumentUploadData>({
     fileId: undefined,
@@ -70,7 +78,7 @@ const DocumentUploadModal: React.FC<DocumentUploadModalProps> = ({
         fileId: initialData.fileId,
         uploadFile: undefined,
         fileName: initialData.fileName,
-        description: '', // 수정 모드에서는 설명을 빈 값으로 설정
+        description: initialData.description || '', // 기존 설명이 있으면 사용, 없으면 빈 값
         fileVersion: initialData.fileVersion,
         category: REVERSE_CATEGORY_MAPPING[initialData.category] || initialData.category,
       });
@@ -84,11 +92,12 @@ const DocumentUploadModal: React.FC<DocumentUploadModalProps> = ({
         description: false,
         fileVersion: false
       });
+      // 에러 초기화는 부모 컴포넌트에서 처리
+      onClearError?.();
     }
-  }, [isOpen]);
+  }, [isOpen, onClearError]);
 
   const handleSubmit = () => {
-    
     if (isFormValid()) {
       // 카테고리를 영문으로 변환
       const convertedData = {
@@ -96,7 +105,7 @@ const DocumentUploadModal: React.FC<DocumentUploadModalProps> = ({
         category: CATEGORY_MAPPING[formData.category] || formData.category
       };
 
-              onSubmit(convertedData);
+      onSubmit(convertedData);
       handleReset();
     }
   };
@@ -106,6 +115,11 @@ const DocumentUploadModal: React.FC<DocumentUploadModalProps> = ({
     value: string | boolean | File | undefined
   ) => {
     setFormData(prev => ({ ...prev, [field]: value }));
+    
+    // 버전 입력 시 에러 메시지 초기화
+    if (field === 'fileVersion' && onClearError) {
+      onClearError();
+    }
     
     if (field !== 'uploadFile' && field !== 'category') {
       setTouched(prev => ({ ...prev, [field]: true }));
@@ -133,18 +147,19 @@ const DocumentUploadModal: React.FC<DocumentUploadModalProps> = ({
 
   const isValidSemver = (version: string): boolean => /^\d+\.\d+\.\d+$/.test(version);
   
-  const hasValidFile = () => mode === 'upload' ? formData.uploadFile !== undefined : true;
+  const hasValidFile = () => formData.uploadFile !== undefined; // 모든 모드에서 파일 필수
   const hasValidFileName = () => formData.fileName.trim() !== '';
   const hasValidDescription = () => formData.description.trim() !== '';
   const hasValidVersion = () => isValidSemver(formData.fileVersion);
   const hasValidCategory = () => formData.category.trim() !== '';
 
+  // 모든 모드에서 모든 필드가 필수 (파일 포함)
   const isFormValid = () => (
+    hasValidFile() &&
     hasValidFileName() &&
     hasValidDescription() &&
     hasValidVersion() &&
-    hasValidCategory() &&
-    (mode === 'upload' ? hasValidFile() : true)
+    hasValidCategory()
   );
 
   const handleReset = () => {
@@ -158,6 +173,7 @@ const DocumentUploadModal: React.FC<DocumentUploadModalProps> = ({
     });
     setFileDisplayName('');
     setFileError('');
+    // submitError는 부모 컴포넌트에서 관리
     setTouched({
       fileName: false,
       description: false,
@@ -166,6 +182,7 @@ const DocumentUploadModal: React.FC<DocumentUploadModalProps> = ({
   };
 
   const handleClose = () => {
+    onClearError?.(); // 모달 닫을 때 에러 메시지 초기화
     onClose();
   };
 
@@ -201,8 +218,8 @@ const DocumentUploadModal: React.FC<DocumentUploadModalProps> = ({
          fileError={fileError}
          accept=".pdf,.docx,.xlsx,.csv"
          maxSizeInMB={10}
-         optional={mode === 'update'}
-         placeholder={mode === 'update' ? "선택된 파일 없음" : "파일을 선택하세요"}
+         optional={false} // 모든 모드에서 필수
+         placeholder="파일을 선택하세요"
        />
 
       <FileNameInput
@@ -240,6 +257,12 @@ const DocumentUploadModal: React.FC<DocumentUploadModalProps> = ({
         title="업로드 정보"
         texts={DOCUMENT_UPLOAD_INFO}
       />
+
+      {submitError && (
+        <ErrorMessage>
+          {submitError}
+        </ErrorMessage>
+      )}
     </UploadBaseModal>
   );
 };
@@ -250,4 +273,11 @@ const InputRow = styled.div`
   display: flex;
   gap: var(--gap-12);
   margin-bottom: 4px;
+`;
+
+const ErrorMessage = styled.div`
+  color: var(--color-error);
+  font-size: 12px;
+  font-weight: 500;
+  margin-top: 8px;
 `;

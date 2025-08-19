@@ -37,6 +37,9 @@ const DocumentAllPage = () => {
   const [isErrorModalOpen, setIsErrorModalOpen] = useState<boolean>(false);
   const [errorMessage, setErrorMessage] = useState<string>('');
 
+  // 업데이트 에러 상태 추가
+  const [updateError, setUpdateError] = useState<string>('');
+
   // 1. 데이터 관리
   const {
     currentPage,
@@ -68,7 +71,7 @@ const DocumentAllPage = () => {
     handleCategoryChange,
     handleStatusChange,
     handleConfirmAction,
-    handleDocumentUpdate,
+    handleDocumentUpdate: originalHandleDocumentUpdate,
     documentUpdateMutation,
   } = useDocumentAllActions({
     documents,
@@ -83,12 +86,40 @@ const DocumentAllPage = () => {
     updateModal,
   });
 
+  // 에러 처리가 포함된 문서 수정 핸들러
+  const handleDocumentUpdate = useCallback(async (data: any) => {
+    try {
+      setUpdateError(''); // 에러 초기화
+      await originalHandleDocumentUpdate(data);
+    } catch (error: any) {
+      console.error('문서 수정 실패:', error);
+      
+      // 409 에러 처리
+      if (error?.response?.status === 409) {
+        const errorMessage = error?.response?.data?.message || 
+                            '기존 파일 버전과 같거나 낮은 버전으로 업데이트할 수 없습니다!';
+        setUpdateError(errorMessage);
+      } else {
+        setUpdateError('파일 수정 중 오류가 발생했습니다. 다시 시도해주세요.');
+      }
+    }
+  }, [originalHandleDocumentUpdate]);
+
+  // 에러 클리어 핸들러
+  const handleClearUpdateError = useCallback(() => {
+    setUpdateError('');
+  }, []);
+
+  // 업데이트 모달 닫기 핸들러 (에러 초기화 포함)
+  const closeUpdateModalWithError = useCallback(() => {
+    setUpdateError('');
+    closeUpdateModal();
+  }, [closeUpdateModal]);
+
   // 4. 통계 데이터
   const { data: totalCount } = useDocumentCountByCategory("all");
   const { data: recentUpdateCount } = useRecentUpdateCountByCategory("all");
   const { data: activeCount } = useActiveDocumentCountByCategory("all");
-
-
 
   const stats = useMemo(
     () => [
@@ -173,6 +204,7 @@ const DocumentAllPage = () => {
   // 권한 체크가 포함된 업데이트 모달 열기 핸들러
   const openUpdateModalWithPermission = useCallback((documentName: string) => {
     if (!checkUserPermission()) return;
+    setUpdateError(''); // 모달 열 때 에러 초기화
     openUpdateModal(documentName);
   }, [checkUserPermission, openUpdateModal]);
 
@@ -237,12 +269,15 @@ const DocumentAllPage = () => {
 
       <DocumentUploadModal
         isOpen={updateModal.isOpen}
-        onClose={closeUpdateModal}
+        onClose={closeUpdateModalWithError}
         onSubmit={handleDocumentUpdate}
         isSubmitting={documentUpdateMutation.isPending}
         mode="update"
         initialData={updateModal.initialData}
+        submitError={updateError}
+        onClearError={handleClearUpdateError}
       />
+      
       <ErrorModal
         isOpen={isErrorModalOpen}
         onClose={() => setIsErrorModalOpen(false)}
@@ -254,7 +289,6 @@ const DocumentAllPage = () => {
 
 export default DocumentAllPage;
 
-// 스타일드 컴포넌트들
 const Container = styled.div`
   width: 100%;
   height: 100%;
